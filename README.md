@@ -50,7 +50,7 @@ This is a temporary working repo maintained by the Linux Foundation. Proposals a
 This project will be moved to a permanent location a later date with a permanent governance model. 
 
 #### Adoption
-When the specification is finalized, A2A and MCP plan to both, immediately, adopt the AI Card standard. This would replace existing protocol specific cards (“A2A Agent Card”, “MCP Server Card”). 
+When the specification is finalized, A2A and MCP plan to immediately adopt the AI Card standard. This would replace existing protocol-specific cards, such as A2A Agent Card and MCP Server Card. 
 
 Protocol-specific cards would be standardized as a common AI Card structure, with protocol-specific properties available in services as noted earlier. 
 
