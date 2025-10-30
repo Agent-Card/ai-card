@@ -43,7 +43,9 @@ This protocol-specific metadata would NOT be part of the AI Card spec.
 
 As part of the specification, this project would define a standard for how a server can make an individual card, and a catalog of cards, available at a well-known URL for a given domain (e.g. at `./well-known/ai-card.json`).
 
-Individual protocols may support dynamic card generation and discovery through their own methods (for example, to provide different card content based on a caller’s identity). This is out of scope for the AI Card standard.
+Implementing protocols may support dynamic card creation and discovery through their own methods for scenarios such as providing different card content based on a caller's identity.
+
+Defining this behavior is NOT in scope for the AI Card specification.
 
 #### Common Registry Standard
 
