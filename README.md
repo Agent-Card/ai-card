@@ -40,7 +40,7 @@ Individual protocols may support dynamic card generation and discovery through t
 
 #### Common Registry Standard
 
-The AI Card project should also define a common “AI Card Registry” standard that provides a standard interface for clients to interact (query, search, CRUDL) with collections of cards. 
+The AI Card project should also define a common **AI Card Registry** standard that provides a universal interface for clients to interact (query, search, CRUDL) with AI card collections. 
 
 ### Proposed Mechanics
 
