@@ -55,6 +55,6 @@ When the specification is finalized, A2A and MCP plan to both, immediately, adop
 Protocol-specific cards would be standardized as a common AI Card structure, with protocol-specific properties available in services as noted earlier. 
 
 #### Ecosystem
-MCP and A2A steering committees will recommend duplicative card-adjacent efforts like “Registry”, “Agent Identity”, etc consolidate. 
+MCP and A2A steering committees will recommend duplicative card-adjacent efforts that need to be consolidated, such as Registry, Agent Identity, and others. 
 
 
