@@ -14,7 +14,7 @@ Without a common discovery standard, we see duplicative and incompatible efforts
 ## What are we doing?
 In this repo, we will establish a new open standard for creating, discovering, securing, and serving AI service metadata called an **AI Card**. This will be immediately adopted as the metadata solution of choice for MCP and A2A. Other protocols are encouraged to adopt this standard as well. 
 
-*Important Note:* this new standard changes nothing about the actual interaction between AI clients and services. 
+*Important Note:* The **AI card** standard does not change the underlying protocol architecture. 
 
 ### Guiding Requirements
 
