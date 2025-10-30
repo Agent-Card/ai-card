@@ -9,7 +9,7 @@ Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-car
 ## What problem are we solving?
 There are multiple evolving standards for communication protocols between AI clients and servers. While these protocols differ in capabilities and technical architecture, there are common ecosystem needs for producers and consumers of services built on top of them. This includes discovery, verifiable metadata, and trusted identity standards. 
 
-Without a common standard, we are seeing duplicative and incompatible efforts in the ecosystem space (registry, marketplace, identity providers, UI and payments extensions, etc). This is increasing complexity, risk of vulnerabilities, and harming interop in the overall community. 
+Without a common discovery standard, we see duplicative and incompatible efforts in the ecosystem, such as registry, marketplace, identity providers, UI and payments extensions, and others. This increases complexity, risk of vulnerabilities, and harms interop within the developer community. 
 
 ## What are we doing?
 In this repo, we will create a new open standard for creating, discovering, securing, and serving AI service metadata called an **AI Card**. This will be immediately adopted as the metadata solution of choice for MCP and A2A. Other protocols are encouraged to adopt as well. 
