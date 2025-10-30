@@ -45,7 +45,7 @@ The AI Card project should also define a common **AI Card Registry** standard th
 ### Proposed Mechanics
 
 #### Governance
-This is a temporary working repo maintained by the Linux Foundation. Proposals and changes will be made in the public in this repo. 
+This is a temporary working repo maintained by the Linux Foundation. Proposals and changes will be made in public in this repo. 
 
 This project will be moved to a permanent location a later date with a permanent governance model. 
 
