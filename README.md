@@ -4,7 +4,7 @@ Co-Authors: [ToddSegal](https://github.com/ToddSegal), [David Soria Parra](https
 ## tl;dr;
 A2A and MCP are collaborating on a common AI card standard to benefit the AI Service Ecosystem. 
 
-Contact us via github discussions, issues, and pull requests. 
+Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-card/issues), and [Pull Requests](https://github.com/Agent-Card/ai-card/pulls). 
 
 ## What problem are we solving?
 There are multiple evolving standards for communication protocols between AI clients and services. While these protocols differ in features and technical choices, there are common ecosystem needs for producers and consumers of these services. This includes service discovery, verifiable metadata, and new trusted identity standards. 
