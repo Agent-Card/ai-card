@@ -12,7 +12,7 @@ There are multiple evolving standards for communication protocols between AI cli
 Without a common discovery standard, we see duplicative and incompatible efforts in the ecosystem, such as registry, marketplace, identity providers, UI and payments extensions, and others. This increases complexity, risk of vulnerabilities, and harms interop within the developer community. 
 
 ## What are we doing?
-In this repo, we will create a new open standard for creating, discovering, securing, and serving AI service metadata called an **AI Card**. This will be immediately adopted as the metadata solution of choice for MCP and A2A. Other protocols are encouraged to adopt as well. 
+In this repo, we will establish a new open standard for creating, discovering, securing, and serving AI service metadata called an **AI Card**. This will be immediately adopted as the metadata solution of choice for MCP and A2A. Other protocols are encouraged to adopt this standard as well. 
 
 *Important Note:* this new standard changes nothing about the actual interaction between AI clients and services. 
 
