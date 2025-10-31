@@ -24,13 +24,14 @@ In this repo, we will establish a new open standard for creating, discovering, s
 
 #### Core AI Card Features
 
-The project will define a schema for a secure, tamper-resistant AI Card. This may include items like:
+The project will define a schema for a secure, tamper-resistant AI Card. This may include items (potential examples):
 
-* **Common server metadata**, such as publishing company, links to documentation, description, icon, server version, etc
-* **Verifiable metadata**, such as accreditations, certifications, reputational scores, badges, etc
-**Identity metadata**, such as Decentralized Identifiers (DID) or Secure Production Identity Framework For Everyone (SPIFFE).**Custom data**, used by individual producers or consumers for their own needs
+* **Common server metadata**, such as publishing company, links to documentation, description, icon, and server version.
+* **Verifiable metadata**, such as accreditations, certifications, reputational scores, and badges.
+* **Identity metadata**, such as Decentralized Identifiers (DID) or Secure Production Identity Framework For Everyone (SPIFFE).
+* **Custom data** defined by individual producers or consumers for their own needs.
 
-This is directional - specific inclusions will be debated in PRs.
+Actual properties for inclusion will be debated in PRs.
 
 #### AI Protocol Services
 
