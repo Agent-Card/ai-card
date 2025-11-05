@@ -39,9 +39,9 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
   
   "services": [
     {
+      "type": "a2a",
       "name": "Finance Agent (A2A Interface)",
       "endpoint": "https://api.acme-finance.com/a2a/v1",
-      "type": "a2a",
       "authentication": {
         "type": "oauth2",
         "description": "OAuth 2.0 Client Credentials Flow",
@@ -64,31 +64,50 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
         },
         "skills": [
           {
-            "name": "getStockQuote",
-            "description": "Get the latest stock quote for a symbol."
+            "id": "get-stock-analysis-prediction",
+            "name": "run stock anaylysis and prediction",
+            "description": "Use the latest LLM based technology to run stock analysis and precdictions",
+            "tags": ["stock", "analysis", "prediction"],
+            "examples": [
+              "Run stock prediction for GOOG"
+            ],
+            "inputModes": ["application/json", "text/plain"],
+            "outputModes": [
+              "application/json",
+              "text/html"
+            ]
           },
-          {
-            "name": "executeTrade",
-            "description": "Execute a stock trade (buy/sell)."
-          }
         ]
       }
     },
+
     {
-      "name": "Finance Agent (MCP Interface)",
-      "endpoint": "https://api.acme-finance.com/mcp/v1",
       "type": "mcp",
+      "name": "MCP Interface",
+      "endpoint": "https://api.example.com/mcp/v1",
       "authentication": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+        "type": "bearer",
+        "scheme": "MCP-Custom-Auth"
       },
       "protocolSpecific": {
-        "protocolVersion": "2025-06-18"
+        "protocolVersion": "2025-06-18",
+        "transport": "jsonrpc-http",
+        "capabilities": {
+          "serverFeatures": [
+            "prompts",
+            "resources",
+            "tools"
+          ],
+          "clientFeatures": [
+            "sampling"
+          ],
+          "supportedModels": [
+            "acme-finance-model-v3"
+          ]
+        }
       }
-    }
-  ],
-  
+    },
+  ],  
   "createdAt": "2025-01-20T10:00:00Z",
   "updatedAt": "2025-11-01T15:00:00Z",
   
