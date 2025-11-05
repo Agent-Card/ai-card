@@ -26,12 +26,10 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
     "attestations": [
       {
         "type": "SOC2-Type2",
-        "description": "Annual SOC 2 Type II Report (Confidential)",
         "credentialUrl": "https://trust.acme-finance.com/reports/soc2-latest.pdf"
       },
       {
         "type": "FINRA-Audit",
-        "description": "FINRA Compliance Attestation (Embedded JWT)",
         "credentialValue": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZpbnJhLWtleS0xIn0.eyJpc3MiOiJodHRwczovL2F1ZGl0LmZpbnJhLm9yZyIsInN1YiI6ImRpZDpleGFtcGxlOmFnZW50LWZpbmFuY2UtMDAxIiwiZXhwIjoxNzYyMjM2MDAwLCJhdHRlc3RhdGlvbiI6eyJ0eXBlIjoiRklOUkEtQXVkaXQiLCJzdGF0dXMiOiJhY3RpdmUifX0.VGhpcy1pcy1hLXZlcnktc2FtcGxlLXNpZ25hdHVyZQ"
       }
     ]
@@ -64,50 +62,45 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
         },
         "skills": [
           {
-            "id": "get-stock-analysis-prediction",
-            "name": "run stock anaylysis and prediction",
-            "description": "Use the latest LLM based technology to run stock analysis and precdictions",
-            "tags": ["stock", "analysis", "prediction"],
-            "examples": [
-              "Run stock prediction for GOOG"
-            ],
-            "inputModes": ["application/json", "text/plain"],
-            "outputModes": [
-              "application/json",
-              "text/html"
-            ]
-          },
+            "name": "runStockAnalysisAndPrediction",
+            "description": "Use the latest LLM based technology to run stock analysis and predictions",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "symbol": { "type": "string" }
+              }
+            }
+          }
         ]
       }
     },
-
     {
       "type": "mcp",
-      "name": "MCP Interface",
-      "endpoint": "https://api.example.com/mcp/v1",
+      "name": "Finance Agent (MCP Interface)",
+      "endpoint": "https://api.acme-finance.com/mcp/v1",
       "authentication": {
-        "type": "bearer",
-        "scheme": "MCP-Custom-Auth"
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       },
       "protocolSpecific": {
         "protocolVersion": "2025-06-18",
-        "transport": "jsonrpc-http",
+        "transportType": "streamable-http",
         "capabilities": {
-          "serverFeatures": [
-            "prompts",
-            "resources",
-            "tools"
-          ],
-          "clientFeatures": [
-            "sampling"
-          ],
-          "supportedModels": [
-            "acme-finance-model-v3"
-          ]
-        }
+          "tools": { "listChanged": true },
+          "prompts": { "listChanged": true },
+          "resources": { "subscribe": true }
+        },
+        "requires": {
+          "sampling": {}
+        },
+        "tools": "dynamic",
+        "prompts": "dynamic",
+        "resources": "dynamic"
       }
-    },
-  ],  
+    }
+  ],
+  
   "createdAt": "2025-01-20T10:00:00Z",
   "updatedAt": "2025-11-01T15:00:00Z",
   
