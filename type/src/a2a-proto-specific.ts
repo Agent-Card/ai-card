@@ -1,12 +1,9 @@
 /**
- * For illustration purposes only. Not part of the AI Card spec. 
- * Defines the protocol-specific payload for an A2A service.
+ * We copied here for illustration purposes only 
+ * == It's the same AgentCard in A2A Spec (or we can remove some fields since it's covered in AI card) ==
+ * Defines the protocol-specific metadata payload for an A2A service.
  * This is referenced in the A2AService interface's 'protocolSpecific' field.
- * We keep this separate to avoid bloating the core AI Card schema with protocol-specific details.
- * Here we only copied some fields from the A2A Agent Spec as example. 
- * The A2AProtocolSpecific is a self-describing manifest for an agent. It provides essential
- * metadata including the agent's identity, capabilities, supported
- * communication methods, and security requirements.
+ * Here we only copied some fields from the A2A Agent Spec as example.
  */
 export interface A2AProtocolSpecific {
   /**

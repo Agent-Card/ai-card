@@ -169,6 +169,7 @@ export interface BaseService {
   
   /**
    * A human-readable name for this specific service endpoint.
+   * For example, "Travel Agent A2A Endpoint".
    */
   name: string;
 
@@ -186,10 +187,11 @@ export interface BaseService {
   authentication: any; 
 
   /**
-   * An arbitrary JSON object for protocol-specific data.
+   * An arbitrary JSON object for protocol-specific metadata.
    * The AI Card spec does not validate the contents of this, so we keep core schema clean.
    * Each specific service type will define its own structure for this field.
+   * For A2A services, this would be the A2AProtocolSpecific type (== current AgentCard).
    */
-  protocolSpecific: Record<string, any>; // The "black box" for protocol-specific data
+  protocolSpecific: Record<string, any>; // The protocol-specific metadata
 }
 // --8<-- [end:BaseService]
