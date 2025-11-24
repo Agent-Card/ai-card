@@ -142,6 +142,18 @@ export interface Trust {
    * A list of compliance or other attestations.
    */
   attestations?: Attestation[];
+
+  /**
+   * A URL to the agent's Privacy Policy.
+   * Critical for registries to display data handling practices.
+   */
+  privacyPolicyUrl?: string;
+
+  /**
+   * A URL to the agent's Terms of Service.
+   * Critical for establishing legal usage rights.
+   */
+  termsOfServiceUrl?: string;  
 }
 // --8<-- [end:Trust]
 
