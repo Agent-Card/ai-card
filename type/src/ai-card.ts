@@ -134,6 +134,7 @@ export interface Identity {
 export interface Trust {
   /**
    * A verifiable ID for the Agent.
+   * This MUST match the root `id` of the card.
    */  
   identity: Identity;
 
@@ -150,7 +151,7 @@ export interface Trust {
  */
 export interface Attestation {
   /**
-   * The type of attestation (e.Go., "SOC2", "HIPAA", "CustomBadge").
+   * The type of attestation (e.g., "SOC2", "HIPAA", "CustomBadge").
    */
   type: string;
 
@@ -167,6 +168,23 @@ export interface Attestation {
   credentialValue?: string;
 }
 // --8<-- [end:Attestation]
+
+// --8<-- [start:AgentEndpoint]
+/**
+ * Defines a physical access point for a service.
+ */
+export interface AgentEndpoint {
+  /**
+   * The full URL to the endpoint.
+   */
+  url: string;
+
+  /**
+   * Optional transport type identifier (e.g., "http", "grpc", "ws").
+   * Helps clients choose the best endpoint without trying them all.
+   */
+  transport?: string;
+}
 
 // --8<-- [start:BaseService]
 /**
@@ -186,13 +204,15 @@ export interface BaseService {
   name: string;
 
   /**
-   * The full URL to the service endpoint.
+   * A list of endpoints where this service can be accessed.
+   * This allows a single service definition (with one set of skills)
+   * to be available over multiple transports (e.g., HTTP and WebSocket).
    */
-  endpoint: string;
+  endpoints: AgentEndpoint[];
 
   /**
    * The authentication mechanism for this endpoint.
-   * (Using 'any' for simplicity, can be similar to A2A SecurityScheme).
+   * (Using 'any' for simplicity, can be similar to A2A SecurityScheme or OpenAPI).
    * Add here if we want to standardize authentication across all services. 
    * Otherwise, each protocol would define its own. 
    */
@@ -200,9 +220,9 @@ export interface BaseService {
 
   /**
    * An arbitrary JSON object for protocol-specific metadata.
-   * The AI Card spec does not validate the contents of this, so we keep core schema clean.
+   * The AI Card spec does not validate the contents of this, keeping the core schema clean.
    * Each specific service type will define its own structure for this field.
-   * For A2A services, this would be the A2AProtocolSpecific type (== current AgentCard).
+   * For A2A services, this would be the A2AProtocolSpecific type (replacing current AgentCard).
    */
   protocolSpecific: Record<string, any>; // The protocol-specific metadata
 }

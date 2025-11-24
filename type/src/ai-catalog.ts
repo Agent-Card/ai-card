@@ -1,7 +1,9 @@
 
 /** 
  * This file acts as the lightweight "index" (catalog) file served from a host's well-known URL, 
- * which is /.well-known/ai-catalog.json
+ * which is /.well-known/ai-catalog.json.
+ * Note this is the recommended binding for ** domain-based discovery **, but the AI Card format is 
+ * transport-agnostic and intended to be served by SaaS Registry APIs as well.
  */
 
 // --8<-- [start:HostInfo]
