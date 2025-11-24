@@ -15,7 +15,10 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
   "publisher": {
     "id": "did:example:org-acme-finance",
     "name": "Acme Financial Corp",
-    "attestation": "https://trust.acme-finance.com/publisher.jwt"
+    "attestation": {
+      "type": "IdentityProof",
+      "credentialUrl": "https://trust.acme.com/identity.jwt"
+    }    
   },
   
   "trust": {
@@ -84,7 +87,7 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
         "bearerFormat": "JWT"
       },
       "protocolSpecific": {
-        "protocolVersion": "2025-06-18",
+        "protocolVersions": ["2025-06-18", "2025-09-19"],
         "transportType": "streamable-http",
         "capabilities": {
           "tools": { "listChanged": true },

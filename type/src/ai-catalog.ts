@@ -62,6 +62,13 @@ export interface AgentEntry {
    * The full, absolute URL to this agent's complete ai-card.json file.
    */
   cardUrl: string;
+
+  /**
+   * An ISO 8601 timestamp of when the referenced `ai-card.json` file 
+   * was last modified.
+   * Used by crawlers to determine if they need to re-fetch the full card.
+   */
+  updatedAt: string;  
 }
 // --8<-- [end:AgentEntry]
 

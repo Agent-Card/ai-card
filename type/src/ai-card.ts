@@ -15,7 +15,13 @@ export interface AICard {
   specVersion: string;
   
   /**
-   * The primary verifiable ID for the agent (e.g., DID).
+   * A globally unique identifier for the agent.
+   * * **Recommendation:** We strongly recommend using a **Verifiable URI**, 
+   * like a DID (`did:method:...`).
+   * Using a verifiable format allows clients to cryptographically prove 
+   * agent identity and ownership.
+   * * Simple UUIDs or names are allowed but offer no trust guarantees.
+   * **Constraint:** This MUST match the `trust.identity.id` field.
    */
   id: string; 
   
@@ -30,7 +36,13 @@ export interface AICard {
   description: string;
 
   /**
-   * A direct URL to the agent's logo image.
+   * A URL to the agent's logo.
+   * * **Security Note:** We strongly recommend using **Data URLs** (RFC 2397)
+   * (e.g., "data:image/png;base64,...") to embed the image binary directly.
+   * * While standard HTTP URLs ("https://...") are allowed, they are discouraged 
+   * for enterprise/high-security environments because "dereferencing" (fetching) 
+   * the URL can leak user IP addresses (tracking) and creates a dependency on 
+   * external hosting uptime.
    */
   logoUrl?: string;
 
@@ -61,7 +73,8 @@ export interface AICard {
   createdAt: string; 
 
   /**
-   * An ISO 8601 timestamp of when this card was last updated.
+   * An ISO 8601 timestamp of when this **entire AI Card** was last modified.
+   * This includes changes to common metadata OR any of the service definitions.
    */
   updatedAt: string; 
 
@@ -82,7 +95,7 @@ export interface Publisher {
   /**
    * A verifiable ID for the publisher, e.g., a DID or organization ID.
    */
-  id: string;
+  identity: Identity;
 
   /**
    * The human-readable name of the publisher.
@@ -90,9 +103,10 @@ export interface Publisher {
   name: string;
 
   /**
-   * A URL to a verifiable credential (e.g., JWT) proving the publisher's identity.
+   * A verifiable credential proving the publisher's identity.
+   * Reuses the Attestation type to support both URLs and embedded tokens.
    */
-  attestation?: string;
+  attestation?: Attestation;
 }
 // --8<-- [end:Publisher]
 
@@ -118,8 +132,11 @@ export interface Identity {
  * Defines the security, identity, and compliance posture of the agent.
  */
 export interface Trust {
-  // NOTE: 'identity' and other fields can be added here later.
-  
+  /**
+   * A verifiable ID for the Agent.
+   */  
+  identity: Identity;
+
   /**
    * A list of compliance or other attestations.
    */
@@ -138,19 +155,14 @@ export interface Attestation {
   type: string;
 
   /**
-   * (Low-Trust) A URL to a simple JSON "badge" file.
-   */
-  badgeUrl?: string; 
-
-  /**
-   * (High-Trust) A URL to a verifiable credential (e.g., a JWT or PDF report).
+   * A URL to a verifiable credential (e.g., a JWT or PDF report).
    * Use this when the credential is large or hosted remotely.
    */
   credentialUrl?: string; 
 
   /**
-   * (High-Trust) The embedded, base64-encoded credential itself (e.g., a JWT).
-   * Use this for self-contained attestations (no extra network call).
+   * The embedded, base64-encoded credential itself (e.g., a JWT).
+   * Use this for self-contained attestations.
    */
   credentialValue?: string;
 }
