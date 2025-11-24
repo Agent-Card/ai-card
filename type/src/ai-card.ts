@@ -62,10 +62,23 @@ export interface AICard {
   trust: Trust;
   
   /**
-   * An array of all interaction protocols this agent supports.
-   * This is the core of the extensibility model.
+   * The agent's lifecycle stage.
+   * Useful for registries to filter out experimental or deprecated agents.
    */
-  services: BaseService[];
+  maturity?: "preview" | "stable" | "deprecated";
+
+  /**
+   * A detached JWS compact serialization (<header>..<signature>) 
+   * signing the canonical content of this card.
+   * Used to cryptographically bind the card content to the `id` (DID).
+   */
+  signature?: string;
+
+  /**
+   * A map of interaction protocols this agent supports, keyed by protocol type.
+   * e.g., { "a2a": { ... }, "mcp": { ... } }
+   */
+  services: Record<string, BaseService>;
 
   /**
    * An ISO 8601 timestamp of when the agent was first published.
