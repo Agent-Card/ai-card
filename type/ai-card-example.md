@@ -11,10 +11,15 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
   "description": "An agent for executing stock trades and getting market analysis. Available via A2A and MCP.",
   "logoUrl": "https://www.acme-finance.com/images/agent-logo.png",
   "tags": ["finance", "stocks", "trading", "a2a", "mcp"],
+  "maturity": "stable",
+  "signature": "eyJhbGciOiJFUzI1NiJ9..[detached-jws-signature]..",
   
   "publisher": {
-    "id": "did:example:org-acme-finance",
     "name": "Acme Financial Corp",
+    "identity": {
+      "type": "did",
+      "id": "did:example:org-acme-finance"
+    },
     "attestation": {
       "type": "IdentityProof",
       "credentialUrl": "https://trust.acme.com/identity.jwt"
@@ -35,14 +40,21 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
         "type": "FINRA-Audit",
         "credentialValue": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZpbnJhLWtleS0xIn0.eyJpc3MiOiJodHRwczovL2F1ZGl0LmZpbnJhLm9yZyIsInN1YiI6ImRpZDpleGFtcGxlOmFnZW50LWZpbmFuY2UtMDAxIiwiZXhwIjoxNzYyMjM2MDAwLCJhdHRlc3RhdGlvbiI6eyJ0eXBlIjoiRklOUkEtQXVkaXQiLCJzdGF0dXMiOiJhY3RpdmUifX0.VGhpcy1pcy1hLXZlcnktc2FtcGxlLXNpZ25hdHVyZQ"
       }
-    ]
+    ],
+    "privacyPolicyUrl": "https://acme-finance.com/legal/privacy",
+    "termsOfServiceUrl": "https://acme-finance.com/legal/terms"
   },
   
-  "services": [
-    {
+  "services": {
+    "a2a": {
       "type": "a2a",
       "name": "Finance Agent (A2A Interface)",
-      "endpoint": "https://api.acme-finance.com/a2a/v1",
+      "endpoints": [
+        {
+          "url": "https://api.acme-finance.com/a2a/v1",
+          "transport": "http"
+        }
+      ],
       "authentication": {
         "type": "oauth2",
         "description": "OAuth 2.0 Client Credentials Flow",
@@ -77,10 +89,15 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
         ]
       }
     },
-    {
+    "mcp": {
       "type": "mcp",
       "name": "Finance Agent (MCP Interface)",
-      "endpoint": "https://api.acme-finance.com/mcp/v1",
+      "endpoints": [
+        {
+          "url": "https://api.acme-finance.com/mcp/v1",
+          "transport": "http"
+        }
+      ],
       "authentication": {
         "type": "http",
         "scheme": "bearer",
@@ -102,7 +119,7 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
         "resources": "dynamic"
       }
     }
-  ],
+  },
   
   "createdAt": "2025-01-20T10:00:00Z",
   "updatedAt": "2025-11-01T15:00:00Z",
