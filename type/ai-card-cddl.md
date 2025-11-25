@@ -25,7 +25,7 @@ AICard = {
   ; Map of supported protocols (e.g. "a2a" => Service, "mcp" => Service)
   services: { * ServiceType => BaseService }, 
 
-  createdAt: tdate,           ; ISO 8601 Date when the agent was published
+  createdAt: tdate,           ; ISO 8601 Date when the agent was created
   updatedAt: tdate,           ; ISO 8601 Date when this card was last modified
   
   ? metadata: { * text => any } ; Open slot for custom/non-standard metadata
