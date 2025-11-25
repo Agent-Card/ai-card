@@ -7,23 +7,28 @@
 
 AICard = {
   $schema: text,              ; URI to the JSON schema
-  specVersion: text,          ; e.g. "1.0.0"
+  specVersion: text,          ; Version of the AI Card spec (e.g. "1.0.0")
+  
   id: text,                   ; Globally unique ID (DID or stable URL). MUST match trust.identity.id
-  name: text,                 ; Human-readable name
-  description: text,          ; Short description
-  ? logoUrl: text,            ; URL to logo (Data URI recommended)
-  ? tags: [* text],           ; Discovery keywords
-  ? maturity: MaturityLevel,  ; Lifecycle stage
+  name: text,                 ; Human-readable name for the agent
+  description: text,          ; Short description of the agent's purpose
+  
+  ? logoUrl: text,            ; URL to logo. Data URLs (RFC 2397) are recommended for privacy
+  ? tags: [* text],           ; List of keywords to aid in discovery
+  
+  ? maturity: MaturityLevel,  ; Lifecycle stage of the agent
   ? signature: text,          ; Detached JWS signing the card content
-  publisher: Publisher,       ; Who owns this agent
-  trust: Trust,               ; Security and Identity proofs
+  
+  publisher: Publisher,       ; Information about the entity that owns this agent
+  trust: Trust,               ; Security, identity, and compliance proofs
   
   ; Map of supported protocols (e.g. "a2a" => Service, "mcp" => Service)
   services: { * ServiceType => BaseService }, 
 
-  createdAt: tdate,           ; ISO 8601 Date
-  updatedAt: tdate,           ; ISO 8601 Date
-  ? metadata: { * text => any } ; Extensible metadata bucket
+  createdAt: tdate,           ; ISO 8601 Date when the agent was published
+  updatedAt: tdate,           ; ISO 8601 Date when this card was last modified
+  
+  ? metadata: { * text => any } ; Open slot for custom/non-standard metadata
 }
 
 ; Enum for maturity
@@ -35,36 +40,39 @@ ServiceType = "mcp" / "a2a" / text
 ; --- Core Components ---
 
 Publisher = {
-  identity: Identity,
-  name: text,
-  ? attestation: Attestation  ; Identity proof (e.g. verifying the DID)
+  identity: Identity,         ; Verifiable ID of the publisher organization
+  name: text,                 ; Human-readable name of the publisher
+  ? attestation: Attestation  ; Proof of the publisher's identity
 }
 
 Trust = {
-  identity: Identity,         ; The Agent's Identity. MUST match root ID.
-  ? attestations: [* Attestation], ; Compliance proofs (SOC2, HIPAA)
-  ? privacyPolicyUrl: text,
-  ? termsOfServiceUrl: text
+  identity: Identity,         ; The Agent's Identity. MUST match the root 'id'
+  ? attestations: [* Attestation], ; List of compliance credentials (SOC2, HIPAA, etc.)
+  ? privacyPolicyUrl: text,   ; URL to the privacy policy
+  ? termsOfServiceUrl: text   ; URL to the terms of service
 }
 
 Identity = {
-  type: text,                 ; e.g. "did", "spiffe"
-  id: text                    ; The identifier string
+  type: text,                 ; Identity type (e.g. "did", "spiffe")
+  id: text                    ; The identifier string itself
 }
 
 Attestation = {
-  type: text,                 ; e.g. "SOC2-Type2", "HIPAA-Audit"
-  ; Verifiable credentials
-  ? credentialUrl: text,      ; Remote JWT/Report
-  ? credentialValue: text     ; Embedded JWT/Proof
+  type: text,                 ; Type of proof (e.g. "SOC2-Type2", "HIPAA-Audit")
+  
+  ; Verifiable credentials (High-Trust)
+  ? credentialUrl: text,      ; Remote URL to a signed credential (e.g. JWT/PDF)
+  ? credentialValue: text     ; Embedded base64-encoded credential (e.g. JWT)
 }
 
 ; --- Interaction Services ---
 
 BaseService = {
-  type: text,                 ; Protocol ID (e.g. "a2a", "mcp")
-  name: text,                 ; Human-readable label for this interface  
-  endpoints: [* AgentEndpoint],
+  type: ServiceType,          ; Protocol ID (e.g. "a2a", "mcp"). Matches map key.
+  name: text,                 ; Human-readable name for this specific interface
+  
+  endpoints: [* AgentEndpoint], ; List of physical access points
+  
   ? authentication: any,      ; Recommended: OpenAPI Security Scheme Object
   
   ; The "Black Box" for protocol-specific data
@@ -73,7 +81,7 @@ BaseService = {
 }
 
 AgentEndpoint = {
-  url: text,                  ; Full URL
-  ? transport: text           ; e.g. "http", "ws", "grpc"
+  url: text,                  ; The full URL to the endpoint
+  ? transport: text           ; Transport hint (e.g. "http", "ws", "grpc")
 }
 ```
