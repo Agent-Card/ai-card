@@ -78,7 +78,7 @@ export interface AICard {
    * A map of interaction protocols this agent supports, keyed by protocol type.
    * e.g., { "a2a": { ... }, "mcp": { ... } }
    */
-  services: Record<string, BaseService>;
+  services: Record<ServiceType, BaseService>;
 
   /**
    * An ISO 8601 timestamp of when the agent was first published.
@@ -99,6 +99,16 @@ export interface AICard {
 // --8<-- [end:AICard]
 
 // --- CORE COMPONENTS ---
+
+// --8<-- [start:ServiceType]
+/**
+ * The protocol identifier for a service.
+ * Supports standard protocols ("a2a", "mcp") and custom strings.
+ * The `(string & {})` syntax preserves autocomplete for the known values
+ * while allowing any other string.
+ */
+export type ServiceType = "a2a" | "mcp" | (string & {});
+// --8<-- [end:ServiceType]
 
 // --8<-- [start:Publisher]
 /**
