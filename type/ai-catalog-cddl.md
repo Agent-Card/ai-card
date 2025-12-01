@@ -9,7 +9,7 @@ AICatalog = {
   $schema: text,              ; URI to the JSON schema
   specVersion: text,          ; Version of the Catalog spec (e.g. "1.0.0")
   host: HostInfo,             ; Who runs this server/registry
-  agents: [* AgentCatalogEntry] ; The list of available agents
+  agents: [* AICardEntry] ; The list of available agents
 }
 
 HostInfo = {
@@ -19,7 +19,7 @@ HostInfo = {
   ? logoUrl: text             ; A URL to the host's logo
 }
 
-AgentCatalogEntry = {
+AICardEntry = {
   id: text,                   ; Must match the id in the linked AI Card
   name: text,                 ; Human-readable name for the AI Card
   description: text,          ; Short description

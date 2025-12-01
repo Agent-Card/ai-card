@@ -6,28 +6,31 @@
 ; ============================================================================
 
 AICard = {
-  $schema: text,              ; URI to the JSON schema
-  specVersion: text,          ; Version of the AI Card spec (e.g. "1.0.0")
+  $schema: text,              ; URI to the JSON schema (e.g. "https://...")
+  specVersion: text,          ; Major.Minor version (e.g. "1.0")
   
-  id: text,                   ; Globally unique ID (DID or stable URL). MUST match trust.identity.id
+  ; --- Identity (Subject) ---
+  id: text,                   ; The Primary Key / Subject of this card (DID, SPIFFE, or URL)
+  ? identityType: text,       ; Type hint (e.g. "did", "spiffe"). Optional if clear from ID.
+
+  ; --- Metadata ---
   name: text,                 ; Human-readable name for the agent
   description: text,          ; Short description of the agent's purpose
-  
-  ? logoUrl: text,            ; URL to logo. Data URLs (RFC 2397) are recommended for privacy
+  ? logoUrl: text,            ; URL to logo. Data URL (RFC 2397) recommended for privacy
   ? tags: [* text],           ; List of keywords to aid in discovery
-  
   ? maturity: MaturityLevel,  ; Lifecycle stage of the agent
+  ; --- Ownership & Trust ---
+  publisher: Publisher,       ; Information about the entity that owns this agent
+  trust: Trust,               ; Security and compliance proofs
   ? signature: text,          ; Detached JWS signing the card content
   
-  publisher: Publisher,       ; Information about the entity that owns this agent
-  trust: Trust,               ; Security, identity, and compliance proofs
-  
+  ; --- Protocols ---
   ; Map of supported protocols (e.g. "a2a" => Service, "mcp" => Service)
   services: { * ServiceType => BaseService }, 
 
+  ; --- Housekeeping ---
   createdAt: tdate,           ; ISO 8601 Date when the agent was created
   updatedAt: tdate,           ; ISO 8601 Date when this card was last modified
-  
   ? metadata: { * text => any } ; Open slot for custom/non-standard metadata
 }
 
@@ -40,21 +43,17 @@ ServiceType = "mcp" / "a2a" / text
 ; --- Core Components ---
 
 Publisher = {
-  identity: Identity,         ; Verifiable ID of the publisher organization
+  id: text,                   ; Verifiable ID of the publisher organization
+  ? identityType: text,       ; Type hint (e.g. "did", "dns")
   name: text,                 ; Human-readable name of the publisher
   ? attestation: Attestation  ; Proof of the publisher's identity
 }
 
 Trust = {
-  identity: Identity,         ; The Agent's Identity. MUST match the root 'id'
+  ; Identity is now implicit (matches Root id)
   ? attestations: [* Attestation], ; List of compliance credentials (SOC2, HIPAA, etc.)
   ? privacyPolicyUrl: text,   ; URL to the privacy policy
   ? termsOfServiceUrl: text   ; URL to the terms of service
-}
-
-Identity = {
-  type: text,                 ; Identity type (e.g. "did", "spiffe")
-  id: text                    ; The identifier string itself
 }
 
 Attestation = {
@@ -68,20 +67,11 @@ Attestation = {
 ; --- Interaction Services ---
 
 BaseService = {
-  type: ServiceType,          ; Protocol ID (e.g. "a2a", "mcp"). Matches map key.
-  name: text,                 ; Human-readable name for this specific interface
-  
-  endpoints: [* AgentEndpoint], ; List of physical access points
-  
-  ? authentication: any,      ; Recommended: OpenAPI Security Scheme Object
+  type: ServiceType,          ; Protocol ID (matches key in services map)
+  ? name: text,               ; Human-readable label (e.g. "Primary Interface")
   
   ; The "Black Box" for protocol-specific data
-  ; Validated by the protocol's own schema (e.g. A2A or MCP schema)
+  ; Endpoints, Auth, and Skills are defined INSIDE here by the protocol spec.
   protocolSpecific: { * text => any } 
-}
-
-AgentEndpoint = {
-  url: text,                  ; The full URL to the endpoint
-  ? transport: text           ; Transport hint (e.g. "http", "ws", "grpc")
 }
 ```
