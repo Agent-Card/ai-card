@@ -21,7 +21,7 @@ AICard = {
   ? maturity: MaturityLevel,  ; Lifecycle stage of the agent
   ; --- Ownership & Trust ---
   publisher: Publisher,       ; Information about the entity that owns this agent
-  trust: Trust,               ; Security and compliance proofs
+  ? trust: Trust,               ; Security and compliance proofs
   ? signature: text,          ; Detached JWS signing the card content
   
   ; --- Protocols ---
