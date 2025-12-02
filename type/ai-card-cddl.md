@@ -10,7 +10,7 @@ AICard = {
   specVersion: text,          ; Major.Minor version (e.g. "1.0")
   
   ; --- Identity (Subject) ---
-  id: text,                   ; The Primary Key / Subject of this card (DID, SPIFFE, or URL)
+  id: text,                   ; The Primary Key / Subject of this card, Globally Unique URI (per RFC 3986), (DID, SPIFFE, or URL)
   ? identityType: text,       ; Type hint (e.g. "did", "spiffe"). Optional if clear from ID.
 
   ; --- Metadata ---
