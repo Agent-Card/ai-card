@@ -1,0 +1,185 @@
+{
+  "protocol_version": "0.3.0",
+  "name": "bobs-brain",
+  "version": "0.12.0",
+  "description": "Bob's Brain - Expert Google ADK Agent\n\n**Identity:** spiffe://intent.solutions/agent/bobs-brain/prod/us-central1/0.12.0\n\nBob is an expert Google Agent Development Kit (ADK) specialist who helps prodelopers:\n- Design and build AI agents using Google ADK\n- Understand ADK architecture patterns and best practices\n- Implement tools, multi-agent systems, and workflows\n- Deploy agents to Vertex AI Agent Engine\n- Debug agent issues and optimize performance\n- Integrate with Google Cloud services (BigQuery, Vertex AI Search, Memory Bank)\n\nBob has access to comprehensive ADK documentation and can provide expert guidance with accurate code examples, deployment commands, and architectural recommendations based on official Google patterns.\n",
+  "url": "https://bob.intent.solutions",
+  "preferred_transport": "JSONRPC",
+  "additional_interfaces": [
+    {
+      "url": "https://bob.intent.solutions",
+      "transport": "JSONRPC"
+    }
+  ],
+  "provider": {
+    "organization": "Intent Solutions",
+    "url": "https://intent.solutions"
+  },
+  "documentation_url": "https://github.com/jeremylongshore/bobs-brain",
+  "icon_url": null,
+  "capabilities": [
+    "adk_expertise",
+    "documentation_search",
+    "code_examples",
+    "deployment_guidance",
+    "architecture_review"
+  ],
+  "default_input_modes": [
+    "text"
+  ],
+  "default_output_modes": [
+    "text"
+  ],
+  "skills": [
+    {
+      "name": "Answer ADK Question",
+      "description": "Provide expert answers about Google ADK using documentation and examples",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "question"
+        ],
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "Question about Google ADK"
+          },
+          "context": {
+            "type": "string",
+            "description": "Additional context (optional)"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "answer"
+        ],
+        "properties": {
+          "answer": {
+            "type": "string",
+            "description": "Expert answer with code examples and references"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Relevant documentation references"
+          }
+        }
+      },
+      "id": "bob.answer_adk_question",
+      "tags": [
+        "bob",
+        "answer_adk_question"
+      ],
+      "examples": []
+    },
+    {
+      "name": "Search ADK Documentation",
+      "description": "Search local and Vertex AI Search documentation for ADK information",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query"
+          },
+          "max_results": {
+            "type": "integer",
+            "default": 5,
+            "description": "Maximum results to return"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "results"
+        ],
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "id": "bob.search_adk_docs",
+      "tags": [
+        "bob",
+        "search_adk_docs"
+      ],
+      "examples": []
+    },
+    {
+      "name": "Provide Deployment Guidance",
+      "description": "Guide users through deploying agents to Vertex AI Agent Engine",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "deployment_scenario"
+        ],
+        "properties": {
+          "deployment_scenario": {
+            "type": "string",
+            "description": "Description of what needs to be deployed"
+          },
+          "current_setup": {
+            "type": "string",
+            "description": "Current environment setup (optional)"
+          }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "required": [
+          "steps",
+          "commands"
+        ],
+        "properties": {
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Step-by-step deployment instructions"
+          },
+          "commands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Exact commands to run"
+          }
+        }
+      },
+      "id": "bob.provide_deployment_guidance",
+      "tags": [
+        "bob",
+        "provide_deployment_guidance"
+      ],
+      "examples": []
+    }
+  ],
+  "security": null,
+  "security_schemes": null,
+  "supports_authenticated_extended_card": false,
+  "spiffe_id": "spiffe://intent.solutions/agent/bobs-brain/prod/us-central1/0.12.0"
+}

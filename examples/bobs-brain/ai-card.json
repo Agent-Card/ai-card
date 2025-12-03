@@ -1,0 +1,228 @@
+{
+  "$schema": "https://a2a-protocol.org/ai-card/v1/schema.json",
+  "specVersion": "1.0",
+
+  "id": "spiffe://intent.solutions/agent/bobs-brain/prod/us-central1/0.12.0",
+  "identityType": "spiffe",
+  "name": "Bob's Brain - ADK Compliance Department",
+  "description": "Production-grade multi-agent system for Google ADK/Vertex compliance auditing and automated fixes. Enforces Hard Mode rules (R1-R8) with CI-driven drift detection.",
+  "logoUrl": null,
+  "maturity": "stable",
+
+  "publisher": {
+    "id": "spiffe://intent.solutions/org/intent-solutions",
+    "identityType": "spiffe",
+    "name": "Intent Solutions",
+    "url": "https://intent.solutions",
+    "attestation": {
+      "type": "OrganizationIdentity",
+      "description": "Verified organization identity via SPIFFE trust domain"
+    }
+  },
+
+  "trust": {
+    "attestations": [
+      {
+        "type": "HardModeCompliance",
+        "description": "R1-R8 architectural rules enforced via CI drift detection",
+        "details": {
+          "rules": [
+            "R1: ADK-Only (no LangChain/CrewAI mixing)",
+            "R2: Vertex AI Agent Engine runtime (managed only)",
+            "R3: Gateway separation (Cloud Run proxies)",
+            "R4: CI-only deployments (WIF auth)",
+            "R5: Dual memory wiring (Session + Memory Bank)",
+            "R6: Single docs folder (000-docs/)",
+            "R7: SPIFFE ID propagation",
+            "R8: Drift detection (CI-first gate)"
+          ],
+          "enforcement": "Automated CI checks block non-compliant code",
+          "verification": "scripts/ci/check_nodrift.sh"
+        }
+      },
+      {
+        "type": "CI-CD-Gates",
+        "description": "Comprehensive deployment pipeline with ARV validation",
+        "details": {
+          "workflows": 8,
+          "gates": ["drift-detection", "tests", "arv-minimum", "build", "deploy"],
+          "authentication": "Workload Identity Federation (keyless)",
+          "platform": "GitHub Actions"
+        }
+      },
+      {
+        "type": "InlineDeployment",
+        "description": "Source code deployment (not pickle/serialization)",
+        "details": {
+          "pattern": "inline-source",
+          "runtime": "Vertex AI Agent Engine",
+          "standard": "000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md"
+        }
+      },
+      {
+        "type": "DualMemoryArchitecture",
+        "description": "Session Cache + Memory Bank for real agent continuity",
+        "details": {
+          "session_service": "VertexAiSessionService",
+          "memory_service": "VertexAiMemoryBankService",
+          "pattern": "after_agent_callback wiring (R5 compliance)"
+        }
+      }
+    ],
+    "privacyPolicyUrl": null,
+    "termsOfServiceUrl": null
+  },
+
+  "services": {
+    "a2a": {
+      "type": "a2a",
+      "name": "Bob's Brain A2A Interface",
+      "description": "Expert Google ADK agent with documentation search and deployment guidance",
+      "protocolSpecific": {
+        "protocolVersion": "0.3.0",
+        "supportedInterfaces": [
+          {
+            "transport": "JSONRPC",
+            "url": "https://a2a-gateway.bobs-brain.run.app"
+          }
+        ],
+        "securitySchemes": {
+          "note": "OAuth2 client credentials planned for future release"
+        },
+        "skills": [
+          {
+            "id": "bob.answer_adk_question",
+            "name": "Answer ADK Question",
+            "description": "Provide expert answers about Google ADK using documentation and examples",
+            "inputModes": ["application/json"],
+            "outputModes": ["application/json", "text/plain"],
+            "inputSchema": {
+              "type": "object",
+              "required": ["question"],
+              "properties": {
+                "question": {
+                  "type": "string",
+                  "description": "Question about Google ADK"
+                },
+                "context": {
+                  "type": "string",
+                  "description": "Additional context (optional)"
+                }
+              }
+            },
+            "outputSchema": {
+              "type": "object",
+              "required": ["answer"],
+              "properties": {
+                "answer": {
+                  "type": "string",
+                  "description": "Expert answer with code examples and references"
+                },
+                "references": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Relevant documentation references"
+                }
+              }
+            },
+            "tags": ["adk", "documentation", "q-and-a"]
+          },
+          {
+            "id": "bob.search_adk_docs",
+            "name": "Search ADK Documentation",
+            "description": "Search local and Vertex AI Search documentation for ADK information",
+            "inputModes": ["application/json"],
+            "outputModes": ["application/json"],
+            "inputSchema": {
+              "type": "object",
+              "required": ["query"],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search query"
+                },
+                "max_results": {
+                  "type": "integer",
+                  "default": 5,
+                  "description": "Maximum results to return"
+                }
+              }
+            },
+            "outputSchema": {
+              "type": "object",
+              "required": ["results"],
+              "properties": {
+                "results": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": { "type": "string" },
+                      "content": { "type": "string" },
+                      "source": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "tags": ["adk", "search", "documentation"]
+          },
+          {
+            "id": "bob.provide_deployment_guidance",
+            "name": "Provide Deployment Guidance",
+            "description": "Guide users through deploying agents to Vertex AI Agent Engine",
+            "inputModes": ["application/json"],
+            "outputModes": ["application/json"],
+            "inputSchema": {
+              "type": "object",
+              "required": ["deployment_scenario"],
+              "properties": {
+                "deployment_scenario": {
+                  "type": "string",
+                  "description": "Description of what needs to be deployed"
+                },
+                "current_setup": {
+                  "type": "string",
+                  "description": "Current environment setup (optional)"
+                }
+              }
+            },
+            "outputSchema": {
+              "type": "object",
+              "required": ["steps", "commands"],
+              "properties": {
+                "steps": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Step-by-step deployment instructions"
+                },
+                "commands": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Exact commands to run"
+                }
+              }
+            },
+            "tags": ["deployment", "agent-engine", "vertex-ai"]
+          }
+        ]
+      }
+    }
+  },
+
+  "createdAt": "2025-01-15T10:00:00Z",
+  "updatedAt": "2025-12-02T18:00:00Z",
+
+  "metadata": {
+    "region": "us-central1",
+    "environment": "production",
+    "version": "0.12.0",
+    "runtime": "Vertex AI Agent Engine",
+    "architecture": "multi-agent-department",
+    "agents_count": 10,
+    "documentation_files": 141,
+    "canonical_standards": 28,
+    "test_coverage": "65%+",
+    "repository": "https://github.com/jeremylongshore/bobs-brain"
+  }
+}
