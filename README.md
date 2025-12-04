@@ -26,7 +26,7 @@ In this repo, we will establish a new open standard for creating, discovering, s
 
 The project will define a schema for a secure, tamper-resistant AI Card. This may include items (potential examples):
 
-* **Common server metadata**, such as publishing company, links to documentation, description, icon, and server version.
+* **Common agent metadata**, such as publishing company, links to documentation, description, icon, and agent version.
 * **Verifiable metadata**, such as accreditations, certifications, reputational scores, and badges.
 * **Identity metadata**, such as Decentralized Identifiers (DID) or Secure Production Identity Framework For Everyone (SPIFFE).
 * **Custom data** defined by individual producers or consumers for their own needs.
@@ -35,7 +35,7 @@ Actual properties for inclusion will be debated in PRs.
 
 #### AI Protocol Services
 
-AI Card will include `services` information indicating which AI protocols the server supports, their network addresses, and protocol-specific extension metadata such as capabilities.
+AI Card will include `services` information indicating which AI protocols the agent supports, their network addresses, and protocol-specific extension metadata such as capabilities.
 
 For example, an AI Card that supports MCP, A2A, and a custom “Foo” protocol, would have entries for each of MCP, A2A, and Foo. Each entry would contain their own specific metadata (such as “MCP tools” or “A2A skills”).
 
@@ -43,7 +43,7 @@ This protocol-specific metadata would NOT be part of the AI Card spec. As noted 
 
 #### Static Discovery
 
-As part of the specification, this project would define a standard for how a server can make an individual card, and a catalog of cards, available at a well-known URL for a given domain (e.g. at `./well-known/ai-card.json`).
+As part of the specification, this project would define a standard for how a host can make an individual card, and a catalog of cards, available at a well-known URL for a given domain (e.g. at `./well-known/ai-card.json`).
 
 Implementing protocols may support dynamic card creation and discovery through their own methods for scenarios such as providing different card content based on a caller's identity.
 
