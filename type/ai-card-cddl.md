@@ -2,7 +2,7 @@
 ```ini
 ; ============================================================================
 ; AI Card Specification (v1)
-; A unified metadata format for AI Agents
+; A unified metadata format for AI Services (Agents/Tools)
 ; ============================================================================
 
 AICard = {
@@ -14,30 +14,28 @@ AICard = {
   ? identityType: text,       ; Type hint (e.g. "did", "spiffe"). Optional if clear from ID.
 
   ; --- Metadata ---
-  name: text,                 ; Human-readable name for the agent
-  description: text,          ; Short description of the agent's purpose
+  name: text,                 ; Human-readable name for the AI service
+  description: text,          ; Short description of the AI service's purpose
   ? logoUrl: text,            ; URL to logo. Data URL (RFC 2397) recommended for privacy
   ? tags: [* text],           ; List of keywords to aid in discovery
-  ? maturity: MaturityLevel,  ; Lifecycle stage of the agent
+  ? maturity: MaturityLevel,  ; Lifecycle stage of the AI service
+  
   ; --- Ownership & Trust ---
-  publisher: Publisher,       ; Information about the entity that owns this agent
-  ? trust: Trust,               ; Security and compliance proofs
-  ? signature: text,          ; Detached JWS signing the card content
+  publisher: Publisher,       ; Information about the entity that owns this AI service
+  ? trust: Trust,             ; Security and compliance proofs (Optional)
+  ? signature: text,          ; Detached JWS signing the card content (Integrity)
   
   ; --- Protocols ---
-  ; Map of supported protocols (e.g. "a2a" => Service, "mcp" => Service)
-  services: { * ServiceType => BaseService }, 
+  ; Map of supported protocol interfaces (e.g. "a2a" => Interface, "mcp" => Interface)
+  interfaces: { * ServiceType => ProtocolInterface }, 
 
   ; --- Housekeeping ---
-  createdAt: tdate,           ; ISO 8601 Date when the agent was created
+  createdAt: tdate,           ; ISO 8601 Date when the AI service was first created
   updatedAt: tdate,           ; ISO 8601 Date when this card was last modified
   ? metadata: { * text => any } ; Open slot for custom/non-standard metadata
 }
 
-; Enum for maturity
 MaturityLevel = "preview" / "stable" / "deprecated"
-
-; Service type choices (Standard + Custom)
 ServiceType = "mcp" / "a2a" / text
 
 ; --- Core Components ---
@@ -59,19 +57,24 @@ Trust = {
 Attestation = {
   type: text,                 ; Type of proof (e.g. "SOC2-Type2", "HIPAA-Audit")
   
-  ; Verifiable credentials (High-Trust)
-  ? credentialUrl: text,      ; Remote URL to a signed credential (e.g. JWT/PDF)
-  ? credentialValue: text     ; Embedded base64-encoded credential (e.g. JWT)
+  ; Reference Pattern (Generic for Remote or Inline)
+  uri: text,                  ; remote location: "https://..." or inline "data:..."
+  mediaType: text,            ; Format: "application/pdf", "application/jwt"
+  
+  ? digest: text,             ; Hash for integrity (e.g. "sha256:...")
+  ? size: uint,               ; Size in bytes
+  ? description: text         ; Human-readable label
 }
 
-; --- Interaction Services ---
+; --- Interaction Interfaces ---
 
-BaseService = {
-  type: ServiceType,          ; Protocol ID (matches key in services map)
+ProtocolInterface = {
+  type: ServiceType,          ; Protocol ID (matches key in interfaces map)
   ? name: text,               ; Human-readable label (e.g. "Primary Interface")
   
   ; The "Black Box" for protocol-specific data
   ; Endpoints, Auth, and Skills are defined INSIDE here by the protocol spec.
   protocolSpecific: { * text => any } 
 }
+
 ```

@@ -16,7 +16,7 @@ The Client's Workflow
     "name": "Acme Services Inc.",
     "id": "did:example:org-acme-corp"
   },
-  "agents": [
+  "services": [
     {
       "id": "did:example:agent-finance-001",
       "name": "Acme Finance Agent",

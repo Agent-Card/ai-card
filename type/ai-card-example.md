@@ -21,7 +21,8 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
     "name": "Acme Financial Corp",
     "attestation": { 
       "type": "IdentityProof", 
-      "credentialUrl": "https://trust.acme.com/identity.jwt" 
+      "uri": "https://trust.acme.com/identity.jwt",
+      "mediaType": "application/jwt"
     }
   },
   
@@ -29,18 +30,23 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
     "attestations": [
       { 
         "type": "SOC2-Type2", 
-        "credentialUrl": "https://trust.acme-finance.com/reports/soc2-latest.pdf" 
+        "description": "2025 SOC2 Type II Report",
+        "uri": "https://trust.acme-finance.com/reports/soc2-latest.pdf",
+        "mediaType": "application/pdf",
+        "digest": "sha256:a1b2c3d4..."
       },
       { 
         "type": "FINRA-Audit", 
-        "credentialValue": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZpbnJhLWtleS0xIn0.eyJpc3MiOiJodHRwczovL2F1ZGl0LmZpbnJhLm9yZyIsInN1YiI6ImRpZDpleGFtcGxlOmFnZW50LWZpbmFuY2UtMDAxIiwiZXhwIjoxNzYyMjM2MDAwLCJhdHRlc3RhdGlvbiI6eyJ0eXBlIjoiRklOUkEtQXVkaXQiLCJzdGF0dXMiOiJhY3RpdmUifX0.VGhpcy1pcy1hLXZlcnktc2FtcGxlLXNpZ25hdHVyZQ" 
+        "description": "Embedded Audit Token",
+        "uri": "data:application/jwt;base64,eyJhbGciOiJSUzI1NiIsImtpZCI6ImZpbnJhLWtleS0xIn0...",
+        "mediaType": "application/jwt"
       }
     ],
     "privacyPolicyUrl": "https://acme-finance.com/legal/privacy",
     "termsOfServiceUrl": "https://acme-finance.com/legal/terms"
   },
   
-  "services": {
+  "interfaces": {
     "a2a": {
       "type": "a2a",
       "name": "Finance A2A Interface",
@@ -59,8 +65,7 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
               "clientCredentials": {
                 "tokenUrl": "https://auth.acme-finance.com/token",
                 "scopes": {
-                  "stocks:read": "Allows getting stock quotes",
-                  "stocks:write": "Allows executing trades"
+                  "stocks:read": "Allows getting stock quotes"
                 }
               }
             }
@@ -92,9 +97,7 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
           "required": true
         },
         "capabilities": {
-          "tools": { "listChanged": true },
-          "prompts": { "listChanged": true },
-          "resources": { "subscribe": true }
+          "tools": { "listChanged": true }
         },
         "tools": "dynamic",
         "prompts": "dynamic",
