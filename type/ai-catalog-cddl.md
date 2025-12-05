@@ -20,7 +20,7 @@ HostInfo = {
 }
 
 AIServiceEntry = {
-  id: text,                   ; Must match the id in the linked AI Card
+  id: text,                   ; Must match the id in the linked AI Service Card
   name: text,                 ; Human-readable name for the AI Service
   description: text,          ; Short description
   ? tags: [* text],           ; A list of tags for filtering and discovery
