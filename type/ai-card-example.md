@@ -46,7 +46,7 @@ Notice here the top-level `name` is for the agent, and the `name` field *inside*
     "termsOfServiceUrl": "https://acme-finance.com/legal/terms"
   },
   
-  "interfaces": {
+  "protocols": {
     "a2a": {
       "type": "a2a",
       "name": "Finance A2A Interface",

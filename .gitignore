@@ -3,3 +3,5 @@ node_modules/
 tsconfig.json
 type/*.md
 specification/json/
+package-lock.json
+package.json

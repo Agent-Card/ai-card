@@ -27,7 +27,7 @@ AICard = {
   
   ; --- Protocols ---
   ; Map of supported protocol interfaces (e.g. "a2a" => Interface, "mcp" => Interface)
-  interfaces: { * ServiceType => ProtocolInterface }, 
+  protocols: { * ProtocolType => Protocol }, 
 
   ; --- Housekeeping ---
   createdAt: tdate,           ; ISO 8601 Date when the AI service was first created
@@ -36,7 +36,7 @@ AICard = {
 }
 
 MaturityLevel = "preview" / "stable" / "deprecated"
-ServiceType = "mcp" / "a2a" / text
+ProtocolType = "mcp" / "a2a" / text
 
 ; --- Core Components ---
 
@@ -66,9 +66,9 @@ Attestation = {
   ? description: text         ; Human-readable label
 }
 
-; --- Interaction Interfaces ---
+; --- Interaction Protocol ---
 
-ProtocolInterface = {
+Protocol = {
   type: ServiceType,          ; Protocol ID (matches key in interfaces map)
   ? name: text,               ; Human-readable label (e.g. "Primary Interface")
   

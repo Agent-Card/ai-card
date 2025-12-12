@@ -5,7 +5,7 @@
 export interface AICard {
   /**
    * Declares the schema this card adheres to.
-   * e.g., "https://ai-service-protocol.org/ai-card/v1/schema.json"
+   * e.g., "https://a2a-protocol.org/ai-card/v1/schema.json"
    */
   $schema: string;
 
@@ -16,7 +16,7 @@ export interface AICard {
   specVersion: string;
   
   /**
-   * The primary verifiable ID for the AI service (e.g., DID, SPIFFE, or stable URL).
+   * The primary verifiable ID for the service (e.g., DID, SPIFFE, or stable URL).
    * This acts as the Subject of the card.
    */
   id: string; 
@@ -27,17 +27,17 @@ export interface AICard {
   identityType?: string;
   
   /**
-   * A human-readable name for the AI service.
+   * A human-readable name for the service.
    */
   name: string;
 
   /**
-   * A short, human-readable description of the AI service's purpose.
+   * A short, human-readable description of the service's purpose.
    */
   description: string;
 
   /**
-   * A URL to the AI service's logo image. Data URLs (RFC 2397) are recommended.
+   * A URL to the service's logo image. Data URLs (RFC 2397) are recommended.
    */
   logoUrl?: string;
 
@@ -47,12 +47,12 @@ export interface AICard {
   tags?: string[];
 
   /**
-   * The lifecycle stage of the AI service.
+   * The lifecycle stage of the service.
    */
   maturity?: "preview" | "stable" | "deprecated";
 
   /**
-   * Information about the entity (company or individual) that owns this AI service.
+   * Information about the entity (company or individual) that owns this service.
    */
   publisher: Publisher;
 
@@ -67,12 +67,12 @@ export interface AICard {
   signature?: string;
 
   /**
-   * A map of all interaction protocols this AI service supports, keyed by protocol type (e.g. 'a2a', 'mcp').
+   * A map of all interaction protocols this service supports, keyed by protocol type (e.g. 'a2a', 'mcp').
    */
-  interfaces: Record<InterfaceType, ProtocolInterface>;
+  protocols: Record<ProtocolType, Protocol>;
 
   /**
-   * An ISO 8601 timestamp of when the AI service was first published.
+   * An ISO 8601 timestamp of when the service was first published.
    */
   createdAt: string; 
 
@@ -90,19 +90,19 @@ export interface AICard {
 
 // --- CORE COMPONENTS ---
 
-// --8<-- [start:ServiceType]
+// --8<-- [start:ProtocolType]
 /**
- * The protocol identifier for an AI service interface.
+ * The identifier for a supported protocol.
  * Supports standard protocols ("a2a", "mcp") and custom strings.
  * The `(string & {})` syntax preserves autocomplete for the known values
  * while allowing any other string.
  */
-export type InterfaceType = "a2a" | "mcp" | (string & {});
-// --8<-- [end:ServiceType]
+export type ProtocolType = "a2a" | "mcp" | (string & {});
+// --8<-- [end:ProtocolType]
 
 // --8<-- [start:Publisher]
 /**
- * Defines the entity (company, individual) that published the AI service.
+ * Defines the entity (company, individual) that published the service.
  */
 export interface Publisher {
   /**
@@ -129,7 +129,7 @@ export interface Publisher {
 
 // --8<-- [start:Trust]
 /**
- * Defines the security, identity, and compliance posture of the AI service.
+ * Defines the security, identity, and compliance posture of the service.
  */
 export interface Trust {
   /**
@@ -138,12 +138,12 @@ export interface Trust {
   attestations?: Attestation[];
 
   /**
-   * A URL to the AI service's Privacy Policy.
+   * A URL to the service's Privacy Policy.
    */
   privacyPolicyUrl?: string;
 
   /**
-   * A URL to the AI service's Terms of Service.
+   * A URL to the service's Terms of Service.
    */
   termsOfServiceUrl?: string;  
 }
@@ -193,13 +193,13 @@ export interface Attestation {
 }
 // --8<-- [end:Attestation]
 
-// --8<-- [start:ProtocolInterface]
+// --8<-- [start:Protocol]
 /**
- * A generic wrapper for a specific protocol interface.
+ * The data structure containing specific configuration for a protocol (e.g., endpoints, auth schemes).
  */
-export interface ProtocolInterface {
+export interface Protocol {
   /**
-   * The protocol identifier (e.g., "a2a", "mcp"). Must match the key in the interfaces map.
+   * The protocol identifier (e.g., "a2a", "mcp"). Must match the key in the protocols map.
    */
   type: string;
   
@@ -214,4 +214,4 @@ export interface ProtocolInterface {
    */
   protocolSpecific: Record<string, any>; 
 }
-// --8<-- [end:ProtocolInterface]
+// --8<-- [end:Protocol]
