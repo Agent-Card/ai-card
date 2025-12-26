@@ -13,8 +13,8 @@ This table shows how the fields from A2A and MCP map to the unified AI Card stru
 | **Logo** | `icon_url` | `iconUrl` | **`logoUrl`** (Rec: Data URI) |
 | **Publisher** | `provider` (Object) | `serverInfo` | **`publisher`** (Object with `id`, `name`) |
 | **Trust / Security** | `signatures` (Optional) | Not Defined | **`trust`** (Optional Object: Proofs, Policies) |
-| **Protocol Support** | Implied (A2A Only) | Implied (MCP Only) | **`services`** (Map: `"a2a": {...}`, `"mcp": {...}`) |
-| **Endpoint URL** | `url` | `transport.endpoint` | `services[x].protocolSpecific` (**Delegated**) |
-| **Authentication** | `securitySchemes` | `authentication` | `services[x].protocolSpecific` (**Delegated**) |
-| **Capabilities** | `skills` | `tools`, `resources` | `services[x].protocolSpecific` (**Delegated**) |
+| **Protocol Support** | Implied (A2A Only) | Implied (MCP Only) | **`protocols`** (Map: `"a2a": {...}`, `"mcp": {...}`) |
+| **Endpoint URL** | `url` | `transport.endpoint` | `protocols[x].protocolSpecific` (**Delegated**) |
+| **Authentication** | `securitySchemes` | `authentication` | `protocols[x].protocolSpecific` (**Delegated**) |
+| **Capabilities** | `skills` | `tools`, `resources` | `protocols[x].protocolSpecific` (**Delegated**) |
 | **Versioning** | `version` | `serverInfo.version` | **`specVersion`** (Card Ver) + `updatedAt` |

@@ -27,7 +27,7 @@ AICard = {
   
   ; --- Protocols ---
   ; Map of supported protocol interfaces (e.g. "a2a" => Interface, "mcp" => Interface)
-  protocols: { * ProtocolType => Protocol }, 
+  protocols: { * ProtocolType => ProtocolDetail }, 
 
   ; --- Housekeeping ---
   createdAt: tdate,           ; ISO 8601 Date when the AI service was first created
@@ -68,9 +68,9 @@ Attestation = {
 
 ; --- Interaction Protocol ---
 
-Protocol = {
-  type: ServiceType,          ; Protocol ID (matches key in interfaces map)
-  ? name: text,               ; Human-readable label (e.g. "Primary Interface")
+ProtocolDetail = {
+  type: ProtocolType,          ; Protocol ID (matches key in protocols map)
+  ? name: text,               ; Human-readable label (e.g. "Fiance Agent A2A")
   
   ; The "Black Box" for protocol-specific data
   ; Endpoints, Auth, and Skills are defined INSIDE here by the protocol spec.

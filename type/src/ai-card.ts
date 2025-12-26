@@ -69,7 +69,7 @@ export interface AICard {
   /**
    * A map of all interaction protocols this service supports, keyed by protocol type (e.g. 'a2a', 'mcp').
    */
-  protocols: Record<ProtocolType, Protocol>;
+  protocols: Record<ProtocolType, ProtocolDetail[]>;
 
   /**
    * An ISO 8601 timestamp of when the service was first published.
@@ -193,11 +193,11 @@ export interface Attestation {
 }
 // --8<-- [end:Attestation]
 
-// --8<-- [start:Protocol]
+// --8<-- [start:ProtocolDetail]
 /**
  * The data structure containing specific configuration for a protocol (e.g., endpoints, auth schemes).
  */
-export interface Protocol {
+export interface ProtocolDetail {
   /**
    * The protocol identifier (e.g., "a2a", "mcp"). Must match the key in the protocols map.
    */
@@ -214,4 +214,4 @@ export interface Protocol {
    */
   protocolSpecific: Record<string, any>; 
 }
-// --8<-- [end:Protocol]
+// --8<-- [end:ProtocolDetail]
