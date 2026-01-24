@@ -149,6 +149,7 @@ The content and structure of metadata files referenced by `metadata.url` are **o
 - **A2A Agent Cards**: Already defined by the A2A specification. The A2A community maintains full control over this schema.
 
 This SEP **intentionally does not mandate** any particular structure for these metadata files. It only defines the discovery mechanism that points to them.
+The scope could be increased to also indicating the version(s) of the protocols and metadata files that are provided.
 
 ## Rationale
 
