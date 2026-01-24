@@ -348,11 +348,20 @@ ORD **can** handle AI protocol discovery today, but targets a different audience
 - **AI-focused environments**: Use lightweight `/.well-known/ai-cards.json`
 - **Hybrid deployments**: Implement both as needed
 
-## Related Work
+## Links
 
-- [RFC 8615: Well-Known Uniform Resource Identifiers (URIs)](https://www.rfc-editor.org/rfc/rfc8615.html) - Foundation for .well-known URIs
-- [RFC 9727: api-catalog](https://datatracker.ietf.org/doc/rfc9727/) - Generic API discovery (see Prior Art for detailed comparison)
-- [Open Resource Discovery (ORD)](https://open-resource-discovery.org/spec-v1) - Enterprise-grade resource discovery (see Prior Art for detailed comparison)
-- [RFC 9264: Linkset](https://www.rfc-editor.org/rfc/rfc9264.html) - Link set format used by api-catalog
-- [OAuth 2.0 Authorization Server Metadata (RFC 8414)](https://www.rfc-editor.org/rfc/rfc8414.html) - Similar discovery pattern for OAuth servers
-- [OpenID Connect Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html) - Well-known endpoint for identity providers
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io) - Protocol for connecting AI assistants to data sources and tools
+  - [MCP SEP-2127: Server Cards](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127) - Proposed MCP Server Card format
+  - [MCP Registry](https://github.com/modelcontextprotocol/registry) - Existing registry format
+- [Agent-to-Agent Protocol (A2A)](https://a2a-protocol.org) - Protocol for agent-to-agent communication
+  - [A2A Specification](https://a2a-protocol.org/latest/specification/)
+  - [A2A Well-Known URI Registration](https://github.com/protocol-registries/well-known-uris/issues/66)
+
+- Discovery protocols
+  - [RFC 9727: api-catalog](https://datatracker.ietf.org/doc/rfc9727/) - Generic API discovery (see Prior Art for detailed comparison)
+  - [Open Resource Discovery (ORD)](https://open-resource-discovery.org/spec-v1) - Enterprise-grade resource discovery (see Prior Art for detailed comparison)
+  - [Entity Discovery Protocol (EDP)](https://github.com/edp-protocol/entity-discovery-protocol) - Protocol for discovering business entities
+
+- Foundational standards
+  - [RFC 8615: Well-Known Uniform Resource Identifiers (URIs)](https://www.rfc-editor.org/rfc/rfc8615.html) - Foundation for .well-known URIs
+  - [RFC 3986: Uniform Resource Identifier (URI): Generic Syntax](https://www.rfc-editor.org/rfc/rfc3986) - URL resolution rules used in this specification
