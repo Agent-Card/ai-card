@@ -178,9 +178,9 @@ This is a new feature and does not introduce backward compatibility concerns. Se
 
 ## Open Questions
 
-### 1. Protocol Versioning Strategy
+### 1. Protocol and Metadata Format Versioning Strategy
 
-**Question**: If a service supports multiple versions of a protocol (e.g., MCP v1 and v2), how should this be represented?
+**Question**: If a service supports multiple versions of a protocol (e.g., MCP v1 and v2) and metadata formats (e.g. Agent Card v1 and v2), how should this be represented?
 Should the protocol `type` field include version information (e.g., `"mcp/v1"`, `"a2a/v2"`)?
 
 **Options**:
@@ -196,6 +196,7 @@ Should the protocol `type` field include version information (e.g., `"mcp/v1"`, 
 ### 2. Access Control for Metadata
 
 **Question**: Should the discovery document indicate when metadata requires authentication?
+Do we have to support public and internal metadata (internal could be richer)?
 
 **Options**:
 - **A)** Add `metadata.accessStrategy` field (e.g., `"public"`, `"oauth2"`, `"api-key"`)
@@ -317,25 +318,25 @@ A2A has defined [`/.well-known/agent.json`](https://a2a-protocol.org/latest/spec
 | Aspect | RFC 9727 | This SEP |
 |--------|----------|----------|
 | **Scope** | Generic APIs (REST, GraphQL, SOAP, etc.) | AI-native protocols (MCP, A2A) |
-| **Protocol Awareness** | Protocol-agnostic | Protocol-specific (`type: mcp` vs `type: a2a`) |
+| **Protocol Awareness** | Protocol-agnostic, undefined | Protocol-specific (`type: mcp` vs `type: a2a`) |
 | **Metadata** | Links to OpenAPI specs, generic docs | Links to AI-specific card formats (MCP Server Cards, A2A Agent Cards) |
 
-**Relationship**: RFC 9727 is too generic for AI protocol discovery; this SEP provides AI-specific protocol identification and metadata.
+**Relationship**: RFC 9727 is too generic for AI protocol discovery. It does neither state which protocol nor which metadata format is provided, just a generic MIME type. This SEP provides AI-specific protocol identification and metadata.
 
 ### Open Resource Discovery: `.well-known/open-resource-discovery`
 
-[ORD](https://open-resource-discovery.org/spec-v1) (Linux Foundation) is an enterprise-grade discovery protocol for APIs, events, data products, domain objects, and taxonomy.
+[ORD](https://open-resource-discovery.org/spec-v1) (Linux Foundation) is an enterprise-grade discovery protocol for APIs, events, data products, domain objects, (business) taxonomy and more.
 
 **ORD capabilities include:**
 - Multiple resource types and protocols supported (APIs, events, data products, agents, lightweight system landscape model)
 - Includes defining and linking of taxonomies and business-concepts (vendors, products, domain / business objects) 
-- Static vs dynamic perspectives (system-type vs tenant-specific)
-- Aggregation across multi-system landscapes
-- Access strategies and governance
+- Static vs dynamic perspectives (design-time vs tenant-specific run-time metadata)
+- Access strategies and governance aspects
 
 **Relationship to this SEP:**
 
-ORD **can** handle AI protocol discovery today, but targets a different audience:
+ORD **can** handle AI protocol discovery today, but due to enterprise requirements it is quite complex. 
+This proposal assumes that for the AI ecosystem a simpler approach is desired and more realistic.
 
 | Aspect | ORD | This SEP |
 |--------|-----|----------|
