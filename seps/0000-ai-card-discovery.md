@@ -327,7 +327,8 @@ A2A has defined [`/.well-known/agent.json`](https://a2a-protocol.org/latest/spec
 [ORD](https://open-resource-discovery.org/spec-v1) (Linux Foundation) is an enterprise-grade discovery protocol for APIs, events, data products, domain objects, and taxonomy.
 
 **ORD capabilities include:**
-- Comprehensive resource types (APIs, events, data products, domain objects)
+- Multiple resource types and protocols supported (APIs, events, data products, agents, lightweight system landscape model)
+- Includes defining and linking of taxonomies and business-concepts (vendors, products, domain / business objects) 
 - Static vs dynamic perspectives (system-type vs tenant-specific)
 - Aggregation across multi-system landscapes
 - Access strategies and governance
