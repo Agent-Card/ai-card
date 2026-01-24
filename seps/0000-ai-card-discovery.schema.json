@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-card.org/schemas/ai-card-v0.schema.json",
+  "title": "AI Card Discovery Document",
+  "description": "Discovery document for AI-native protocols (MCP, A2A, etc.) exposed by a host via /.well-known/ai-cards.json",
+  "type": "object",
+  "required": ["protocols"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URI reference to the JSON Schema for this document",
+      "format": "uri",
+      "examples": [
+        "https://ai-card.org/schemas/ai-card-v0.schema.json"
+      ]
+    },
+    "protocols": {
+      "type": "array",
+      "description": "Array of protocol objects describing AI-native protocols (servers/agents) available on this host. A single host can expose multiple MCP servers and/or multiple A2A agents.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/protocol"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "protocol": {
+      "type": "object",
+      "description": "Describes a single MCP server or A2A agent exposed by this host",
+      "required": ["protocolType", "endpoints", "metadata"],
+      "properties": {
+        "protocolType": {
+          "type": "string",
+          "description": "The AI protocol type identifier. Current values: 'mcp' for Model Context Protocol servers, 'a2a' for Agent-to-Agent agents. Future AI protocols may be added.",
+          "enum": ["mcp", "a2a"],
+          "examples": ["mcp", "a2a"]
+        },
+        "endpoints": {
+          "type": "array",
+          "description": "Array of endpoint objects where this protocol server/agent can be accessed",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/endpoint"
+          }
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata",
+          "description": "Reference to the protocol-specific card metadata file (MCP Server Card or A2A Agent Card)"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [
+        {
+          "protocolType": "mcp",
+          "endpoints": [
+            {
+              "url": "https://example.com/mcp/petstore"
+            }
+          ],
+          "metadata": {
+            "url": "https://example.com/.well-known/petstore.mcp.json"
+          }
+        },
+        {
+          "protocolType": "a2a",
+          "endpoints": [
+            {
+              "url": "https://api.example.com/agents/customer-service"
+            }
+          ],
+          "metadata": {
+            "url": "https://api.example.com/.well-known/CustomerServiceAgent.json"
+          }
+        }
+      ]
+    },
+    "endpoint": {
+      "type": "object",
+      "description": "A single endpoint URL where the protocol can be accessed",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The endpoint URL where this protocol server/agent can be accessed. May be absolute (https://...) or relative (./path, /path). Relative URLs are resolved relative to the location of the discovery document (/.well-known/ai-cards.json). For example, ./mcp-endpoint resolves to /.well-known/mcp-endpoint, and /api/mcp resolves to /api/mcp.",
+          "pattern": "^(https?://|/|\\./)",
+          "examples": [
+            "https://example.com/mcp-endpoint",
+            "https://api.example.com/agents/customer-service",
+            "/api/mcp",
+            "./mcp-endpoint",
+            "../mcp/server"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Reference to protocol-specific card metadata. The structure of the metadata file is owned and defined by the protocol community (MCP or A2A). This SEP only defines the discovery mechanism.",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "URL to the protocol-specific card metadata file. May be absolute (https://...) or relative (./path, /path). Relative URLs are resolved relative to the location of the discovery document (/.well-known/ai-cards.json). For example, ./petstore.mcp.json resolves to /.well-known/petstore.mcp.json. For MCP: points to an MCP Server Card. For A2A: points to an A2A Agent Card.",
+          "pattern": "^(https?://|/|\\./)",
+          "examples": [
+            "https://example.com/.well-known/petstore.mcp.json",
+            "https://api.example.com/metadata/CustomerServiceAgent.json",
+            "./petstore.mcp.json",
+            "./PetAgent.json",
+            "/metadata/inventory.mcp.json"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
