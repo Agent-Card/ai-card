@@ -22,50 +22,32 @@ By providing a protocol-agnostic discovery layer, this SEP enables a single host
 
 ## Motivation
 
-### The Current Landscape
+### The Problem: Single-Service Assumption
 
-**A2A** has defined [`/.well-known/agent.json`](https://github.com/protocol-registries/well-known-uris/issues/66) for agent discovery, with A2A Agent Cards providing comprehensive metadata about agents. However, the endpoint assumes **one agent per host** and the discovery mechanism is exclusive to A2A.
+Both **A2A** and **MCP** are defining protocol-specific discovery mechanisms:
+- **A2A**: [`/.well-known/agent.json`](https://github.com/protocol-registries/well-known-uris/issues/66) 
+- **MCP**: `/.well-known/mcp/server-card.json` ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
 
-**MCP** has proposed [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127) defining `/.well-known/mcp/server-card.json` for server discovery, with comprehensive server metadata. However, it also assumes **one MCP server per host** and the discovery mechanism is exclusive to MCP.
+Both share a critical **single-service assumption**: one agent or server per host.
 
-Both protocols also have existing metadata formats:
-- **A2A Agent Cards**: Already well-defined for agent metadata
-- **MCP Registry `server.json`**: Exists for registry entries but is incomplete (missing tools, prompts, resources)
+**This breaks down in real-world scenarios:**
+- A host needs to expose multiple specialized services (e.g., petstore + inventory MCP servers, or sales + support A2A agents)
+- A platform provides both MCP servers and A2A agents
+- Registries must discover all available services, not just a "primary" one
 
-In reality, a single host can and should be able to expose:
-- Multiple MCP servers (e.g., a petstore server and an inventory server)
-- Multiple A2A agents (e.g., a customer service agent and a sales agent)
-- A mix of both protocols
+### The Problem: Discovery Fragmentation
 
-### The Single-Service Assumption Problem
-
-**Both A2A and MCP discovery mechanisms share the same critical limitation: the single-service assumption.**
-- A2A: `/.well-known/agent.json` (singular) → single-service assumption (one agent per host)
-- MCP: `/.well-known/mcp/server-card.json` (singular) → single-service assumption (one server per host)
-
-This breaks down in real-world scenarios:
-- A company may host multiple specialized agents (sales, support, analytics)
-- A domain may host multiple distinct MCP servers (petstore, inventory, analytics)
-- A platform may provide both MCP servers and A2A agents
-- Registries need to discover all available services, not just the "primary" one
-
-### The Multi-Protocol Discovery Problem
-
-Beyond the single-service limitation, having separate protocol-specific discovery endpoints creates additional friction:
-- **Clients must probe multiple endpoints**: Try `/.well-known/agent.json`, then `/.well-known/mcp/server-card.json`, then future protocols
-- **Registries must implement multiple discovery protocols**: Each protocol adds complexity
-- **No standard way to discover what protocols a domain supports**: Clients must guess and try each one
-- **N+1 HTTP requests**: One request per protocol, with failures for unsupported ones
+Having separate protocol-specific endpoints creates additional friction:
+- **Multiple probes required**: Clients must try `/.well-known/agent.json`, then `/.well-known/mcp/server-card.json`, then future protocols
+- **N+1 HTTP requests**: One per protocol, with many failures for unsupported protocols
+- **No capability indication**: No standard way to discover what AI protocols a domain supports
 
 ### This Proposal
 
-This SEP addresses these challenges by:
-
-1. **Solving discovery once**: Provides a single, protocol-agnostic discovery mechanism
-2. **Avoiding model proliferation**: Each protocol maintains its own card definitions (A2A Agent Cards, MCP Server Cards)
-3. **Supporting multiple servers/agents**: Explicitly designed for hosts exposing multiple services
-4. **Reducing coordination overhead**: Protocols only need to agree on discovery, not on card formats
-5. **Simplifying the ecosystem**: One endpoint to discover all AI capabilities on a domain
+This SEP provides a **single, protocol-agnostic discovery endpoint** (`/.well-known/ai-cards.json`) that:
+1. Enables **multi-service discovery** (multiple MCP servers and/or A2A agents per host)
+2. Enables **multi-protocol discovery** (single request reveals all AI capabilities)
+3. Allows each protocol to **maintain full ownership** of their metadata formats
 
 ## Specification
 
@@ -176,59 +158,35 @@ The scope could be expanded in the future to indicate version(s) of protocols an
 
 ## Rationale
 
-### Why a Well-Known URI?
+### Why Not a Shared Metadata Model?
 
-The `.well-known` URI scheme ([RFC 8615](https://www.rfc-editor.org/rfc/rfc8615)) is a well-established standard for service discovery, making it a natural fit for AI Card discovery. It allows clients to probe a service for capabilities without prior configuration.
-Compared to a centralized registry push model, this approach provides local self-description and a decentralized discovery mechanism.
+Rather than creating a unified card format for MCP and A2A, this SEP keeps card definitions protocol-specific to avoid:
+- Ongoing coordination overhead between protocol groups
+- Potential compromises that don't serve either protocol well
+- Slower evolution requiring multi-party consensus
 
-### Why Not a Shared Model?
+### Design Principles
 
-Creating a shared model between MCP and A2A would require:
-
-1. Ongoing coordination between protocol groups
-2. Libraries to support an additional standard
-3. Potential compromises that don't serve either protocol well
-4. Slower evolution as changes require multi-party consensus
-
-By keeping card definitions protocol-specific, each group maintains autonomy while still enabling discovery.
-
-### Minimal Coordination Surface
-
-This proposal minimizes the coordination surface to just three pieces of information:
+**Minimal Coordination Surface**: This SEP minimizes cross-protocol coordination to just three pieces of information:
 1. Protocol type identifier (the `type` field)
-2. Where to connect (the `endpoints` array)
-3. Where to find metadata (the `metadata` object with `type` and `url`)
+2. Connection endpoints (the `endpoints` array)  
+3. Metadata location (the `metadata` object with `type` and `url`)
 
-This allows protocols to evolve their metadata formats independently while sharing a common discovery mechanism.
+Each protocol maintains **full ownership** of their card formats and can evolve independently.
 
-### Relationship to Existing Discovery Mechanisms
+**Standard Discovery Pattern**: Uses the well-established `.well-known` URI scheme ([RFC 8615](https://www.rfc-editor.org/rfc/rfc8615)) for decentralized, client-initiated discovery without requiring centralized registries.
 
-Both MCP and A2A have defined protocol-specific discovery endpoints:
+### Integration with Existing Mechanisms
 
-**A2A: `/.well-known/agent.json`**
-- **Status**: [Registered with IANA](https://github.com/protocol-registries/well-known-uris/issues/66)
-- **Specification**: [A2A Protocol](https://a2a-protocol.org/latest/specification/)
-- **Limitation**: Assumes one agent per host (singular `agent.json`)
+This SEP **coexists** with protocol-specific discovery endpoints:
+- A2A's `/.well-known/agent.json`
+- MCP's proposed `/.well-known/mcp/server-card.json` (SEP-2127)
 
-**MCP: `/.well-known/mcp/server-card.json`** 
-- **Status**: [Proposed in SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
-- **Limitation**: Assumes one MCP server per host
-
-**This SEP addresses the shared limitations:**
-
-1. **Supporting multiple services per host**: The `protocols` array can list many MCP servers and/or A2A agents
-2. **Enabling multi-protocol discovery**: A single request reveals all available AI services
-3. **Avoiding discovery fragmentation**: One shared endpoint instead of N protocol-specific endpoints
-4. **Backward compatibility**: Can coexist with protocol-specific endpoints (see Integration Path in Alternatives)
-
-### MCP Server Card Format Evolution
-
-This SEP **does not define** the MCP Server Card format itself. Instead MCP Server Cards should evolve to:
-- Ideally merge with the existing MCP Registry `server.json` format, by adding the missing elements. We should avoid having two different formats to describe an MCP server, depending on where/how we publish. MCP Server Cards could be a convention on top of the existing format, describing which elements are required and optional.
-- **Remain MCP-owned**: The MCP community maintains full control over the MCP Server Card schema
-- **Be discoverable via** this shared `/.well-known/ai-cards.json` mechanism
-
-Similarly, **A2A Agent Cards** (already defined) would be discoverable through the same mechanism, allowing both protocols to evolve independently while sharing a common discovery layer.
+**How it works:**
+- The `protocols` array enables multi-service discovery
+- `metadata.url` can point to protocol-specific card files
+- Single-protocol deployments can use protocol-specific endpoints
+- Multi-protocol deployments and registries benefit from unified discovery at `/.well-known/ai-cards.json`
 
 ## Backward Compatibility
 
@@ -240,13 +198,10 @@ This is a new feature and does not introduce backward compatibility concerns. Se
 
 ## Security Implications
 
-1. **HTTPS Required**: Implementations SHOULD require HTTPS for all URLs in the discovery document to prevent man-in-the-middle attacks
-
-2. **URL Validation**: Clients MUST validate that `metadata.url` and endpoint URLs are properly formatted URLs
-
-3. **Size Limits**: Implementations SHOULD enforce reasonable size limits on the discovery document (e.g., 2MB) to prevent denial-of-service attacks
-
-4. **Access Control**: Implementations SHOULD have an unprotected discovery document, but MAY implement access control for the linked metadata files
+1. **HTTPS Required**: SHOULD require HTTPS for all URLs to prevent man-in-the-middle attacks
+2. **URL Validation**: Clients MUST validate `metadata.url` and endpoint URLs are properly formatted
+3. **Size Limits**: SHOULD enforce reasonable limits on discovery documents (e.g., 2MB) to prevent DoS attacks
+4. **Access Control**: Discovery documents SHOULD be unprotected; MAY protect linked metadata files
 
 ## Open Questions
 
@@ -384,156 +339,85 @@ This approach could be rejected or be allowed as an alternative to the .well-kno
 
 | Standard | Endpoint | Scope | Single/Multi-Service | Relationship to This SEP |
 |----------|----------|-------|----------------------|-------------------------|
-| **A2A Agent Discovery** | `/.well-known/agent.json` | A2A agents only | Single-service | This SEP enables multi-agent discovery |
-| **MCP SEP-2127** | `/.well-known/mcp/server-card.json` | MCP servers only | Single-service | This SEP enables multi-server discovery |
-| **RFC 9727 (API Catalog)** | `/.well-known/api-catalog` | All API types | Multi-service | Generic, not AI-protocol-aware |
-| **ORD** | `/.well-known/open-resource-discovery` | APIs, Events, Data Products | Multi-service | Enterprise-grade, broader scope than AI |
+| **[A2A Agent Discovery](#a2a-well-knownagentjson)** | `/.well-known/agent.json` | A2A agents only | Single-service | This SEP enables multi-agent discovery |
+| **[MCP SEP-2127](#mcp-sep-2127-mcp-server-cards---http-server-discovery)** | `/.well-known/mcp/server-card.json` | MCP servers only | Single-service | This SEP enables multi-server discovery |
+| **[RFC 9727](#rfc-9727-well-knownapi-catalog)** | `/.well-known/api-catalog` | All API types | Multi-service | Generic, not AI-protocol-aware |
+| **[ORD](#open-resource-discovery-well-knownopen-resource-discovery)** | `/.well-known/open-resource-discovery` | APIs, Events, Data Products | Multi-service | Enterprise-grade, broader scope than AI |
 
 ### MCP SEP-2127: MCP Server Cards - HTTP Server Discovery
 
-- **Issue**: [#1649](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649)
-- **Pull Request**: [#2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
-- **Proposed Endpoint**: `/.well-known/mcp/server-card.json` (single server assumption)
-
-SEP-2127 proposes a comprehensive MCP Server Card format including:
+[SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127) proposes a comprehensive MCP Server Card format including:
 - Server identification and versioning
 - Transport configuration (streamable-http, stdio, SSE)
 - Capabilities (tools, prompts, resources)
 - Authentication requirements
-- Static or dynamic primitive declarations
-- Protocol version information
+
+Proposed at `/.well-known/mcp/server-card.json` with a **single-server assumption**.
 
 **Relationship to this SEP:**
-- SEP-2127's card format provides excellent detail on **what metadata to include**
-- This SEP addresses **how to discover** that metadata, especially when multiple servers/agents exist
-- The MCP Server Card format should evolve from MCP Registry's `server.json`, enhanced with SEP-2127's additions
-- Discovery should use this SEP's shared `/.well-known/ai-cards.json` mechanism rather than protocol-specific endpoints
+- SEP-2127 defines **what metadata to include** in server cards
+- This SEP addresses **how to discover** multiple servers on a single host
+- Discovery uses `/.well-known/ai-cards.json` pointing to individual server card files
 
 ### MCP Registry server.json Format
-- **Repository**: [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry)
-- **JSON Schema**: [2025-12-11.json](https://github.com/modelcontextprotocol/registry/blob/main/internal/validators/schemas/2025-12-11.json)
-- **Current use**: Registry entries for MCP servers
-- **Limitations**: Missing tools, prompts, resources definitions
 
-**Relationship to this SEP:**
-- Provides the foundation for MCP Server Card format
-- Needs enhancement with primitives (tools, prompts, resources, etc.) as proposed in SEP-2127
-- Would be discoverable via `metadata.url` in this proposal
+The [MCP Registry `server.json` format](https://github.com/modelcontextprotocol/registry/blob/main/internal/validators/schemas/2025-12-11.json) provides a foundation for MCP Server Cards but lacks tools, prompts, and resources. It should be enhanced (per SEP-2127) and made discoverable via `metadata.url`.
 
 ### A2A: `/.well-known/agent.json`
 
-- **Issue**: [IANA Well-Known URI Registration](https://github.com/protocol-registries/well-known-uris/issues/66)
-- **Specification**: [A2A Protocol](https://a2a-protocol.org/latest/specification/)
-- **Endpoint**: `/.well-known/agent.json` (singular - one agent assumption)
-- **Status**: Registered/In progress with IANA
+A2A has defined [`/.well-known/agent.json`](https://a2a-protocol.org/latest/specification/) ([IANA registration](https://github.com/protocol-registries/well-known-uris/issues/66)) for agent discovery.
 
-A2A has defined a well-known URI for agent discovery with comprehensive A2A Agent Cards including:
+**A2A Agent Cards include:**
 - Agent identification and metadata
 - Capabilities and supported operations
 - Authentication and authorization requirements
 - Endpoint information
 
 **Relationship to this SEP:**
-- A2A's agent card format is well-defined and should remain A2A-owned
-- The `/.well-known/agent.json` endpoint assumes one agent per host (singular filename)
-- This SEP enables discovery of **multiple agents** on a single host
-- The `metadata.url` in this proposal can point to individual A2A Agent Card files
+- A2A's card format remains **A2A-owned** and unchanged
+- The single-agent assumption is addressed by this SEP
+- `metadata.url` in the discovery document points to individual Agent Card files
+- Enables discovery of **multiple agents** on a single host
 
 ### RFC 9727: `/.well-known/api-catalog`
 
-- **RFC**: [RFC 9727](https://datatracker.ietf.org/doc/rfc9727/)
-- **Endpoint**: `/.well-known/api-catalog`
-- **Format**: Linkset (application/linkset+json) per RFC 9264
-- **Scope**: Generic API discovery across all API types
-- **Status**: Published IETF Standards Track (June 2025)
+[RFC 9727](https://datatracker.ietf.org/doc/rfc9727/) (IETF Standards Track, June 2025) defines generic API discovery using Linkset format for **any API type** (REST, GraphQL, SOAP).
 
-RFC 9727 defines a well-known URI for discovering **any** APIs published by a domain, using a Linkset format that provides:
-- Links to API endpoints (`item` relation)
-- Links to API descriptions (OpenAPI specs via `service-desc`)
-- Links to documentation (`service-doc`)
-- Metadata about APIs (`service-meta`)
-- Support for nested catalogs
+**Key differences from this SEP:**
 
-**Relationship to this SEP:**
+| Aspect | RFC 9727 | This SEP |
+|--------|----------|----------|
+| **Scope** | Generic APIs (REST, GraphQL, SOAP, etc.) | AI-native protocols (MCP, A2A) |
+| **Protocol Awareness** | Protocol-agnostic | Protocol-specific (`type: mcp` vs `type: a2a`) |
+| **Metadata** | Links to OpenAPI specs, generic docs | Links to AI-specific card formats (MCP Server Cards, A2A Agent Cards) |
 
-**Similarities:**
-- Both use `.well-known` URIs for discovery
-- Both support multiple services per host (RFC 9727 via Linkset arrays)
-- Both enable machine-readable discovery
-
-**Key Differences:**
-
-1. **Scope**: 
-   - RFC 9727: **Generic API catalog** - works for REST APIs, GraphQL, SOAP, or any API type
-   - This SEP: **AI-native protocol discovery** - specifically for MCP servers and A2A agents
-
-2. **Protocol Awareness**:
-   - RFC 9727: **Protocol-agnostic** - doesn't specify what protocol or metadata format the APIs use (only mediaType like `application/json`)
-   - This SEP: **Protocol-specific** - explicitly identifies `protocolType` (mcp, a2a) and the metadata format and links to protocol-specific metadata
-
-3. **Metadata Structure**:
-   - RFC 9727: Links to generic metadata (OpenAPI specs, docs) using standard link relations
-   - This SEP: Points to protocol-specific card formats (MCP Server Cards, A2A Agent Cards) that include protocol-specific capabilities
+**Relationship**: RFC 9727 is too generic for AI protocol discovery; this SEP provides AI-specific protocol identification and metadata.
 
 ### Open Resource Discovery: `.well-known/open-resource-discovery`
 
-- **Specification**: [Open Resource Discovery (ORD)](https://open-resource-discovery.org/spec-v1)
-- **Governance**: Linux Foundation
-- **Endpoint**: `/.well-known/open-resource-discovery`
-- **Scope**: Enterprise-grade discovery of APIs, Events, Data Products, Domain Objects, Taxonomy and more
-- **Complexity**: Comprehensive, feature-rich standard
- 
-ORD is an **enterprise-grade** discovery protocol that provides comprehensive resource discovery capabilities far beyond simple API discovery:
+[ORD](https://open-resource-discovery.org/spec-v1) (Linux Foundation) is an enterprise-grade discovery protocol for APIs, events, data products, domain objects, and taxonomy.
 
-**ORD Capabilities:**
-- **API Resources**: REST APIs, MCP, A2A, OData, GraphQL, etc.
-- **Event Resources**: Cloud Events, AsyncAPI, etc.
-- **Data Products**: Data sets, data models, Delta Sharing, etc.
-- **Domain Objects**: Business entities and domain models
-- **Static vs Dynamic Perspectives**: Distinguishes between system-type-level (static) and system-instance-level (tenant-specific, runtime) metadata
-- **Aggregation**: Complex aggregation capabilities for multi-system landscapes
-- **Access Strategies**: Multiple authentication and authorization patterns
+**ORD capabilities include:**
+- Comprehensive resource types (APIs, events, data products, domain objects)
+- Static vs dynamic perspectives (system-type vs tenant-specific)
+- Aggregation across multi-system landscapes
+- Access strategies and governance
 
 **Relationship to this SEP:**
 
-**ORD can handle AI protocol discovery today:**
-- ORD's flexible resource model already represents MCP servers and A2A agents as "API Resources". Agents can be described as dedicated entity to describe and govern the non-technical, product qualities.
-- ORD's static/dynamic perspectives can distinguish between server/agent capabilities and tenant-specific configurations
-- ORD provides a shared high-level meta-model across API protocols and even resource types
-- ORD's taxonomy can categorize AI resources
+ORD **can** handle AI protocol discovery today, but targets a different audience:
 
-**Why this SEP is still valuable:**
+| Aspect | ORD | This SEP |
+|--------|-----|----------|
+| **Target Audience** | Enterprise IT, governance teams | AI developers |
+| **Scope** | APIs, events, data products, taxonomy | AI protocols only (MCP, A2A) |
+| **Complexity** | Comprehensive, extensive specification | Simple (5 required fields) |
+| **Adoption Barrier** | High (complex data models) | Low (small JSON schema) |
 
-1. **Simplicity vs Complexity**:
-   - ORD: Enterprise-grade with extensive features (perspectives, aggregation, taxonomy, access strategies)
-   - This SEP: **Simple, focused** - just protocol type, endpoints, and metadata URL
-   - AI Card implementers want **minimal overhead**, not enterprise complexity
-
-2. **Scope Focus**:
-   - ORD: **Broad** - APIs, events, data products, domain objects, business taxonomy
-   - This SEP: **Narrow** - AI protocols only (MCP, A2A, future AI protocols)
-   - AI registries don't need data products, domain objects, or business taxonomy
-
-3. **Adoption Barrier**:
-   - ORD: Requires understanding extensive specification, implementing complex data models
-   - This SEP: Small JSON Schema contract, 5 required fields per protocol (type, endpoints, metadata with type and url)
-   - Lower barrier → faster ecosystem adoption
-
-4. **Protocol Specificity**:
-   - ORD: Generic resource discovery (protocol-agnostic)
-   - This SEP: **Protocol-aware** - explicitly identifies MCP vs A2A with protocol-specific card links
-   - Makes it trivial for AI clients to distinguish tools from agents
-
-5. **Target Audience**:
-   - ORD: **Enterprise IT** - managing complex multi-system landscapes holistically with governance requirements
-   - This SEP: **AI developers** - building and discovering AI agents and tools quickly
-
-**Could they coexist?**
-
-Yes, they target different audiences:
-- **Enterprise environments** with ORD: Could list AI Cards as one category of API resources within ORD
-- **AI-focused environments**: Implement lightweight `/.well-known/ai-cards.json` without ORD overhead
-- **Hybrid**: Implement both - ORD for comprehensive enterprise discovery, AI Cards for simple AI-specific discovery
+**Coexistence options:**
+- **Enterprise environments**: Use ORD for comprehensive discovery
+- **AI-focused environments**: Use lightweight `/.well-known/ai-cards.json`
+- **Hybrid deployments**: Implement both as needed
 
 ## Related Work
 
