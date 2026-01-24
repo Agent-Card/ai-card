@@ -73,6 +73,8 @@ This SEP addresses these challenges by:
 
 Services supporting AI Card discovery MUST provide a JSON document at `/.well-known/ai-cards.json`.
 
+By appending `.json` it is easier to host this and the linked metadata files on a static file server.
+
 ### Discovery Document Format
 
 The discovery document MUST be a JSON object following the [ai-card-v0.schema.json](./0000-ai-card-discovery.schema.json) schema.
@@ -82,19 +84,28 @@ The discovery document MUST be a JSON object following the [ai-card-v0.schema.js
   "$schema": "https://ai-card.org/schemas/ai-card-v0.schema.json",
   "protocols": [
     {
-      "protocolType": "a2a",
+      "type": "a2a",
       "endpoints": [{"url": "https://example.com/a2a-endpoint"}],
-      "metadata": {"url": "https://example.com/.well-known/PetAgent.json"}
+      "metadata": {
+        "type": "agent-card",
+        "url": "https://example.com/.well-known/PetAgent.json"
+      }
     },
     {
-      "protocolType": "mcp",
+      "type": "mcp",
       "endpoints": [{"url": "https://example.com/mcp-endpoint"}],
-      "metadata": {"url": "https://example.com/.well-known/petstore.mcp.json"}
+      "metadata": {
+        "type": "mcp-server-card",
+        "url": "https://example.com/.well-known/petstore.mcp.json"
+      }
     },
     {
-      "protocolType": "mcp",
+      "type": "mcp",
       "endpoints": [{"url": "https://example.com/mcp-endpoint-inventory"}],
-      "metadata": {"url": "https://example.com/.well-known/inventory.mcp.json"}
+      "metadata": {
+        "type": "mcp-server-card",
+        "url": "https://example.com/.well-known/inventory.mcp.json"
+      }
     }
   ]
 }
@@ -122,20 +133,6 @@ Relative URLs are resolved **relative to the location of the discovery document*
 **Absolute-path URLs** (start with `/`):
 - `/api/mcp` → resolves to `/api/mcp` (relative to host root)
 - `/metadata/petstore.mcp.json` → resolves to `/metadata/petstore.mcp.json`
-
-**Examples:**
-
-```json
-{
-  "protocols": [
-    {
-      "protocolType": "mcp",
-      "endpoints": [{"url": "./mcp"}],
-      "metadata": {"url": "./petstore.mcp.json"}
-    }
-  ]
-}
-```
 
 For a discovery document served at `https://example.com/.well-known/ai-cards.json`:
 - `./mcp` resolves to `https://example.com/.well-known/mcp`
@@ -232,7 +229,7 @@ This is a new feature and does not introduce backward compatibility concerns. Se
 
 2. **Metadata Definition Versioning**: Should there be a mechanism to indicate which version of the metadata definition format is being used?
 
-3. **Multiple Versions**: If a service supports multiple versions of a protocol, should they be separate entries in the `protocols` array or should version information be embedded in each protocol object?
+3. **Multiple Versions**: If a service supports multiple versions of a protocol, should they be separate entries in `protocols` (e.g. "a2a-v1", "a2a-v2") and metadata types ("a2a-agent-card-v1", "a2a-agent-card-v2") or should version information be only available by actually fetching the metadata files / connecting to the endpoints?
 
 4. **Coordination with MCP SEP-2127**: Should this SEP be proposed to the MCP community, or should it be maintained as a separate cross-protocol specification? If the latter, how do we ensure adoption across both ecosystems?
 
@@ -366,8 +363,8 @@ RFC 9727 defines a well-known URI for discovering **any** APIs published by a do
    - This SEP: **AI-native protocol discovery** - specifically for MCP servers and A2A agents
 
 2. **Protocol Awareness**:
-   - RFC 9727: **Protocol-agnostic** - doesn't specify what protocol the APIs use (only mediaType like `application/json`)
-   - This SEP: **Protocol-specific** - explicitly identifies `protocolType` (mcp, a2a) and links to protocol-specific metadata
+   - RFC 9727: **Protocol-agnostic** - doesn't specify what protocol or metadata format the APIs use (only mediaType like `application/json`)
+   - This SEP: **Protocol-specific** - explicitly identifies `protocolType` (mcp, a2a) and the metadata format and links to protocol-specific metadata
 
 3. **Metadata Structure**:
    - RFC 9727: Links to generic metadata (OpenAPI specs, docs) using standard link relations
@@ -414,7 +411,7 @@ ORD is an **enterprise-grade** discovery protocol that provides comprehensive re
 
 3. **Adoption Barrier**:
    - ORD: Requires understanding extensive specification, implementing complex data models
-   - This SEP: Small JSON Schema contract, 3 required fields
+   - This SEP: Small JSON Schema contract, 5 required fields per protocol (type, endpoints, metadata with type and url)
    - Lower barrier → faster ecosystem adoption
 
 4. **Protocol Specificity**:

@@ -28,9 +28,9 @@
     "protocol": {
       "type": "object",
       "description": "Describes a single MCP server or A2A agent exposed by this host",
-      "required": ["protocolType", "endpoints", "metadata"],
+      "required": ["type", "endpoints", "metadata"],
       "properties": {
-        "protocolType": {
+        "type": {
           "type": "string",
           "description": "The AI protocol type identifier. Current values: 'mcp' for Model Context Protocol servers, 'a2a' for Agent-to-Agent agents. Future AI protocols may be added.",
           "enum": ["mcp", "a2a"],
@@ -52,24 +52,26 @@
       "additionalProperties": false,
       "examples": [
         {
-          "protocolType": "mcp",
+          "type": "mcp",
           "endpoints": [
             {
               "url": "https://example.com/mcp/petstore"
             }
           ],
           "metadata": {
+            "type": "mcp-server-card",
             "url": "https://example.com/.well-known/petstore.mcp.json"
           }
         },
         {
-          "protocolType": "a2a",
+          "type": "a2a",
           "endpoints": [
             {
               "url": "https://api.example.com/agents/customer-service"
             }
           ],
           "metadata": {
+            "type": "agent-card",
             "url": "https://api.example.com/.well-known/CustomerServiceAgent.json"
           }
         }
@@ -98,8 +100,14 @@
     "metadata": {
       "type": "object",
       "description": "Reference to protocol-specific card metadata. The structure of the metadata file is owned and defined by the protocol community (MCP or A2A). This SEP only defines the discovery mechanism.",
-      "required": ["url"],
+      "required": ["type", "url"],
       "properties": {
+        "type": {
+          "type": "string",
+          "description": "The metadata card type. Identifies the format/schema of the metadata file. Current values: 'mcp-server-card' for MCP Server Cards, 'agent-card' for A2A Agent Cards. Future card types may be added.",
+          "enum": ["mcp-server-card", "agent-card"],
+          "examples": ["mcp-server-card", "agent-card"]
+        },
         "url": {
           "type": "string",
           "description": "URL to the protocol-specific card metadata file. May be absolute (https://...) or relative (./path, /path). Relative URLs are resolved relative to the location of the discovery document (/.well-known/ai-cards.json). For example, ./petstore.mcp.json resolves to /.well-known/petstore.mcp.json. For MCP: points to an MCP Server Card. For A2A: points to an A2A Agent Card.",
