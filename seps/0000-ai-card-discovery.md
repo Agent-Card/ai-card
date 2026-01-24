@@ -156,6 +156,7 @@ The scope could be increased to also indicating the version(s) of the protocols 
 ### Why a Well-Known URI?
 
 The `.well-known` URI scheme ([RFC 8615](https://www.rfc-editor.org/rfc/rfc8615)) is a well-established standard for service discovery, making it a natural fit for AI Card discovery. It allows clients to probe a service for capabilities without prior configuration.
+Compared to a centralized registry push model, this approach provides local self-description and a decentralized discovery mechanism.
 
 ### Why Not a Shared Model?
 
