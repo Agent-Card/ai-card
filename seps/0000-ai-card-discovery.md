@@ -213,7 +213,12 @@ Should the protocol `type` field include version information (e.g., `"mcp/v1"`, 
 - **B)** Use query parameters: `/.well-known/ai-cards.json?tenant=acme`
 - **C)** Document that discovery is static; dynamic capabilities in metadata files
 
-**Security consideration**: Tenant isolation and information disclosure.
+### 4. Metadata that is not tied to an API protocol
+
+**Question**: Should metadata that is not tied to an API protocol implementation be discoverable? Do we see use-cases for this?
+
+Examples: 
+- https://github.com/edp-protocol/entity-discovery-protocol
 
 ## Alternatives Considered
 
@@ -222,6 +227,7 @@ Should the protocol `type` field include version information (e.g., `"mcp/v1"`, 
 Creating a single card format that both MCP and A2A adopt. Proposal is to reject this due to the coordination overhead and risk of creating yet another standard.
 
 ### Protocol-Specific Discovery (Status Quo)
+
 Having each protocol define its own discovery mechanism:
 - MCP: `/.well-known/mcp/server-card.json` ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
 - A2A: `/.well-known/a2a/agent-card.json` (proposed)
