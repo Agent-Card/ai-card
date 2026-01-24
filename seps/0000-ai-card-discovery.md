@@ -1,7 +1,7 @@
 ---
 SEP: 0000
 Title: AI Card Discovery via Well-Known URI
-Author: [Simon Heimler] <simon.heimler@sap.com>
+Author: Simon Heimler <simon.heimler@sap.com>
 Status: draft
 Type: Standards Track
 Created: 2026-01-24
@@ -33,7 +33,7 @@ Both share a critical **single-service assumption**: one agent or server per hos
 **This breaks down in real-world scenarios:**
 - A host needs to expose multiple specialized services (e.g., petstore + inventory MCP servers, or sales + support A2A agents)
 - A platform provides both MCP servers and A2A agents
-- Registries must discover all available services, not just a "primary" one
+- Registries ideally cover both both Agents and Tools (MCP) together, as agents often rely on external tools and other agents.
 
 ### The Problem: Discovery Fragmentation
 
@@ -47,7 +47,7 @@ Having separate protocol-specific endpoints creates additional friction:
 This SEP provides a **single, protocol-agnostic discovery endpoint** (`/.well-known/ai-cards.json`) that:
 1. Enables **multi-service discovery** (multiple MCP servers and/or A2A agents per host)
 2. Enables **multi-protocol discovery** (single request reveals all AI capabilities)
-3. Allows each protocol to **maintain full ownership** of their metadata formats
+3. Allows each protocol to **maintain full ownership** and separate lifecycle of their metadata formats
 
 ## Specification
 
@@ -55,7 +55,7 @@ This SEP provides a **single, protocol-agnostic discovery endpoint** (`/.well-kn
 
 Services supporting AI Card discovery MUST provide a JSON document at `/.well-known/ai-cards.json`.
 
-By appending `.json` it is easier to host this and the linked metadata files on a static file server.
+> By appending `.json` it is easier to host this and the linked metadata files on a static file server.
 
 ### Discovery Document Format
 
@@ -103,11 +103,13 @@ The discovery document MUST be a JSON object following the [ai-card-v0.schema.js
 URLs in the discovery document (both `endpoints[].url` and `metadata.url`) **MAY be relative or absolute**.
 
 #### Absolute URLs
+
 Absolute URLs include the full protocol and authority:
 - `https://example.com/mcp-endpoint`
 - `https://api.example.com/.well-known/petstore.mcp.json`
 
 #### Relative URLs
+
 Relative URLs are resolved **relative to the location of the discovery document** (`/.well-known/ai-cards.json`), following [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) URL resolution rules:
 
 **Path-relative URLs** (start with `./` or `../`):
@@ -118,17 +120,6 @@ Relative URLs are resolved **relative to the location of the discovery document*
 **Absolute-path URLs** (start with `/`):
 - `/api/mcp` → resolves to `/api/mcp` (relative to host root)
 - `/metadata/petstore.mcp.json` → resolves to `/metadata/petstore.mcp.json`
-
-#### URL Resolution Examples
-
-For a discovery document served at `https://example.com/.well-known/ai-cards.json`:
-
-| URL Type | Example in Document | Resolves To |
-|----------|---------------------|-------------|
-| Absolute | `https://api.example.com/mcp` | `https://api.example.com/mcp` |
-| Path-relative | `./petstore.mcp.json` | `https://example.com/.well-known/petstore.mcp.json` |
-| Path-relative | `../metadata/server.json` | `https://example.com/metadata/server.json` |
-| Absolute-path | `/api/mcp` | `https://example.com/api/mcp` |
 
 **Recommendation**: Use relative URLs when metadata and endpoints are co-located with the discovery document. Use absolute URLs when pointing to external services or different domains.
 
@@ -150,8 +141,8 @@ Each protocol community maintains **full ownership** of their metadata format. T
 #### Scope of This SEP
 
 This SEP **intentionally does not mandate** any particular structure for metadata files. It only standardizes:
-1. How to **discover** multiple services on a single host
-2. How to **identify** protocol types (`type` field)
+1. How to **discover** multiple AI protocols and metadata files on a single host
+2. How to **identify** protocol and metadata format types (`type` field)
 3. How to **locate** metadata files (`metadata.url` field)
 
 The scope could be expanded in the future to indicate version(s) of protocols and metadata formats (see Open Questions).
@@ -165,28 +156,11 @@ Rather than creating a unified card format for MCP and A2A, this SEP keeps card 
 - Potential compromises that don't serve either protocol well
 - Slower evolution requiring multi-party consensus
 
-### Design Principles
-
-**Minimal Coordination Surface**: This SEP minimizes cross-protocol coordination to just three pieces of information:
-1. Protocol type identifier (the `type` field)
-2. Connection endpoints (the `endpoints` array)  
-3. Metadata location (the `metadata` object with `type` and `url`)
-
-Each protocol maintains **full ownership** of their card formats and can evolve independently.
-
-**Standard Discovery Pattern**: Uses the well-established `.well-known` URI scheme ([RFC 8615](https://www.rfc-editor.org/rfc/rfc8615)) for decentralized, client-initiated discovery without requiring centralized registries.
-
 ### Integration with Existing Mechanisms
 
-This SEP **coexists** with protocol-specific discovery endpoints:
-- A2A's `/.well-known/agent.json`
-- MCP's proposed `/.well-known/mcp/server-card.json` (SEP-2127)
-
-**How it works:**
-- The `protocols` array enables multi-service discovery
-- `metadata.url` can point to protocol-specific card files
-- Single-protocol deployments can use protocol-specific endpoints
-- Multi-protocol deployments and registries benefit from unified discovery at `/.well-known/ai-cards.json`
+This SEP coexists or supersedes protocol-specific discovery endpoints:
+- A2A's `/.well-known/agent.json` (coexists)
+- MCP's proposed `/.well-known/mcp/server-card.json` (SEP-2127) (supersedes)
 
 ## Backward Compatibility
 
@@ -199,78 +173,27 @@ This is a new feature and does not introduce backward compatibility concerns. Se
 ## Security Implications
 
 1. **HTTPS Required**: SHOULD require HTTPS for all URLs to prevent man-in-the-middle attacks
-2. **URL Validation**: Clients MUST validate `metadata.url` and endpoint URLs are properly formatted
-3. **Size Limits**: SHOULD enforce reasonable limits on discovery documents (e.g., 2MB) to prevent DoS attacks
-4. **Access Control**: Discovery documents SHOULD be unprotected; MAY protect linked metadata files
+2. **Size Limits**: SHOULD enforce reasonable limits on discovery documents (e.g., 2MB) to prevent DoS attacks
+3. **Access Control**: Well-known discovery entry-point SHOULD be unprotected; linked metadata files MAY be protected
 
 ## Open Questions
 
 ### 1. Protocol Versioning Strategy
 
-**Question**: Should the protocol `type` field include version information (e.g., `"mcp/v1"`, `"a2a/v2"`)?
+**Question**: If a service supports multiple versions of a protocol (e.g., MCP v1 and v2), how should this be represented?
+Should the protocol `type` field include version information (e.g., `"mcp/v1"`, `"a2a/v2"`)?
 
 **Options**:
 - **A)** Include in `type`: `"mcp/v1"`, `"a2a/v2"`
 - **B)** Separate `version` field: `{"type": "mcp", "version": "1.0"}`
-- **C)** Only in metadata files: Extract from `$schema` or dedicated version field
+- **C)** Only in metadata files or protocol endpoint: Extract it from the linked metadata files or by connecting to endpoint where server will respond with the version(s) of the protocol it implements
 
 **Trade-offs**:
 - Option A enables protocol version filtering without fetching metadata
-- Option C keeps discovery simpler but requires metadata fetch to determine version
 - Option B provides structured versioning but adds a required field
+- Option C keeps discovery simpler but requires metadata fetch to determine version
 
-**Recommendation needed**: How important is version-based filtering at the discovery layer?
-
-### 2. Metadata Format Versioning
-
-**Question**: How should clients determine which version of a metadata format (e.g., MCP Server Card schema) is being used?
-
-**Options**:
-- **A)** Add `metadata.schemaVersion` field in discovery document
-- **B)** Rely on `$schema` field within the metadata file itself
-- **C)** Include version in `metadata.type`: `"mcp-server-card-v1"`
-
-**Impact**: Affects whether clients can validate compatibility before fetching metadata files.
-
-### 3. Supporting Multiple Protocol Versions
-
-**Question**: If a service supports multiple versions of a protocol (e.g., MCP v1 and v2), how should this be represented?
-
-**Options**:
-- **A)** Separate entries in `protocols` array (one per version)
-- **B)** Single entry with version negotiation at connection time
-- **C)** List supported versions within the metadata file
-
-**Example scenario**: A server supports both legacy clients (MCP v1) and new clients (MCP v2).
-
-### 4. Governance and Coordination
-
-**Question**: Should this SEP be:
-- **A)** Proposed to MCP community (as MCP SEP) with A2A adoption?
-- **B)** Maintained as separate cross-protocol specification?
-- **C)** Submitted to IETF/W3C as a broader standard?
-
-**Adoption strategy**: How do we ensure both MCP and A2A ecosystems adopt this approach?
-
-### 5. Registry Discovery Requirements
-
-**Question**: Should registries that index multiple protocols:
-- **A)** **Require** `/.well-known/ai-cards.json` as primary discovery
-- **B)** **Support** both AI Cards and protocol-specific endpoints (e.g., `/.well-known/agent.json`)
-- **C)** **Also support** advanced protocols like ORD for enterprise environments
-
-**Recommendation**: Option B provides maximum compatibility during transition period.
-
-### 6. Registry Data Model Separation
-
-**Question**: How should registry-specific metadata (ratings, download counts, verification status) be handled?
-
-**Proposal**: Clarify that:
-- **Service metadata** (MCP Server Cards, A2A Agent Cards) describes the service itself
-- **Registry metadata** (ratings, stats) is a registry concern, potentially a superset model
-- Registries are **optional** and can define their own API/data models
-
-### 7. Access Control for Metadata
+### 2. Access Control for Metadata
 
 **Question**: Should the discovery document indicate when metadata requires authentication?
 
@@ -279,7 +202,7 @@ This is a new feature and does not introduce backward compatibility concerns. Se
 - **B)** Clients discover through HTTP 401/403 responses
 - **C)** No indication - assume public discovery, protected metadata requires docs
 
-### 8. Dynamic and Tenant-Specific Metadata
+### 3. Dynamic and Tenant-Specific Metadata
 
 **Question**: How should dynamic or tenant-specific metadata be handled?
 
