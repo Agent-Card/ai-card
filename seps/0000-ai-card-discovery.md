@@ -41,6 +41,7 @@ Having separate protocol-specific endpoints creates additional friction:
 - **Multiple probes required**: Clients must try `/.well-known/agent.json`, then `/.well-known/mcp/server-card.json`, then future protocols
 - **N+1 HTTP requests**: One per protocol, with many failures for unsupported protocols
 - **No capability indication**: No standard way to discover what AI protocols a domain supports
+- **Duplicated standardization efforts**: Since MCP has not standardized yet how a .well-known discovery would work, going for AI Card discovery directly reduces one option for the ecosystem to support.
 
 ### This Proposal
 
@@ -125,7 +126,9 @@ Relative URLs are resolved **relative to the location of the discovery document*
 
 ### Metadata Files
 
-Each protocol community maintains **full ownership** of their metadata format. This SEP only defines the discovery mechanism that points to these files.
+Each protocol community maintains **full ownership** of their metadata format. 
+The attached metadata files remain fully self-contained.
+This SEP only defines the discovery mechanism that points to these files.
 
 #### Protocol-Specific Metadata Formats
 
@@ -211,7 +214,7 @@ Do we have to support public and internal metadata (internal could be richer)?
 
 **Options**:
 - **A)** Allow dynamic generation of discovery document and metadata files
-- **B)** Use query parameters: `/.well-known/ai-cards.json?tenant=acme`
+- **B)** Use query/header params or bearer token
 - **C)** Document that discovery is static; dynamic capabilities in metadata files
 
 ### 4. Metadata that is not tied to an API protocol
@@ -220,6 +223,13 @@ Do we have to support public and internal metadata (internal could be richer)?
 
 Examples: 
 - https://github.com/edp-protocol/entity-discovery-protocol
+
+### 5. Add lightweight shared model with public information to the discovery document? 
+
+A few more field could be added to the discovery document to provide public information about the service, such as:
+- ID / Name
+- Short Description
+- Links (to documentation, terms of service, etc.)
 
 ## Alternatives Considered
 
@@ -321,7 +331,11 @@ A2A has defined [`/.well-known/agent.json`](https://a2a-protocol.org/latest/spec
 | **Protocol Awareness** | Protocol-agnostic, undefined | Protocol-specific (`type: mcp` vs `type: a2a`) |
 | **Metadata** | Links to OpenAPI specs, generic docs | Links to AI-specific card formats (MCP Server Cards, A2A Agent Cards) |
 
-**Relationship**: RFC 9727 is too generic for AI protocol discovery. It does neither state which protocol nor which metadata format is provided, just a generic MIME type. This SEP provides AI-specific protocol identification and metadata.
+**Relationship**: RFC 9727 is too generic for AI protocol discovery. 
+It does neither state which protocol nor which metadata format is provided, just a generic MIME type. 
+This SEP provides AI-specific protocol identification and metadata.
+
+**Counterargument**: We could register a more precise MIME type for the AI protocol metadata formats (e.g. `application/a2a-agent-card+json`), making this approach work better (although still no protocol defined).
 
 ### Open Resource Discovery: `.well-known/open-resource-discovery`
 
@@ -348,7 +362,7 @@ This proposal assumes that for the AI ecosystem a simpler approach is desired an
 **Coexistence options:**
 - **Enterprise environments**: Use ORD for comprehensive discovery
 - **AI-focused environments**: Use lightweight `/.well-known/ai-cards.json`
-- **Hybrid deployments**: Implement both as needed
+- **Hybrid deployments**: Implement both as needed, only AI Card when describing pure Agents / MCP Servers. 
 
 ## Links
 
