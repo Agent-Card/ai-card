@@ -1,5 +1,5 @@
 ---
-SEP: 0000
+SEP: 0014
 Title: AI Card Discovery via Well-Known URI
 Author: Simon Heimler <simon.heimler@sap.com>
 Status: draft
