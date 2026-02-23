@@ -1,0 +1,26 @@
+; ==========================================================================
+; SEP-0015 Converged AI Catalog CDDL
+; ==========================================================================
+
+AICatalog = {
+  $schema: text,
+  specVersion: text,
+  host: HostInfo,
+  services: [* CatalogEntry]
+}
+
+HostInfo = {
+  name: text,
+  ? id: text,
+  ? documentationUrl: text,
+  ? logoUrl: text
+}
+
+CatalogEntry = {
+  id: text,
+  name: text,
+  description: text,
+  ? tags: [* text],
+  cardUrl: text,
+  updatedAt: tdate
+}

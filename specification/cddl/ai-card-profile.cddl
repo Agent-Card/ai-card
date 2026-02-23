@@ -1,0 +1,80 @@
+; ==========================================================================
+; SEP-0015 Converged AI Card Profile CDDL
+; ==========================================================================
+
+AICard = {
+  $schema: text,
+  specVersion: text,
+  cardVersion: text,
+  cardKind: "live-service" / "data-asset" / "hybrid",
+  id: text,
+  ? identityType: text,
+  name: text,
+  description: text,
+  ? logoUrl: text,
+  ? tags: [* text],
+  ? maturity: "preview" / "stable" / "deprecated",
+  publisher: Publisher,
+  ? trust: Trust,
+  ? signatures: [* Signature],
+  ? modules: [* Module],
+  ? locators: [* Locator],
+  ? artifacts: [* Artifact],
+  ? metadata: { * text => any },
+  createdAt: tdate,
+  updatedAt: tdate
+}
+
+Publisher = {
+  id: text,
+  name: text,
+  ? identityType: text,
+  ? attestation: Attestation
+}
+
+Trust = {
+  ? attestations: [* Attestation],
+  ? privacyPolicyUrl: text,
+  ? termsOfServiceUrl: text
+}
+
+Attestation = {
+  type: text,
+  uri: text,
+  mediaType: text,
+  ? digest: text,
+  ? size: uint,
+  ? description: text
+}
+
+Signature = {
+  format: text,
+  value: text,
+  keyId: text,
+  createdAt: tdate
+}
+
+Module = {
+  id: text,
+  version: text,
+  ? required: bool,
+  ? digest: text,
+  data: { * text => any }
+}
+
+Locator = {
+  type: text,
+  role: "card" / "catalog" / "api" / "artifact",
+  uri: text,
+  ? digest: text,
+  ? mediaType: text
+}
+
+Artifact = {
+  uri: text,
+  mediaType: text,
+  ? digest: text,
+  ? size: uint,
+  ? schemaUri: text,
+  ? description: text
+}

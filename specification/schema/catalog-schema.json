@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-card.github.io/spec/sep-0015/catalog-schema.json",
+  "title": "Converged AI Catalog",
+  "type": "object",
+  "required": ["$schema", "specVersion", "host", "services"],
+  "properties": {
+    "$schema": { "type": "string", "format": "uri" },
+    "specVersion": { "type": "string" },
+    "host": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "id": { "type": "string", "format": "uri-reference" },
+        "documentationUrl": { "type": "string", "format": "uri-reference" },
+        "logoUrl": { "type": "string", "format": "uri-reference" }
+      },
+      "additionalProperties": false
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "description", "cardUrl", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uri-reference" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "cardUrl": { "type": "string", "format": "uri-reference" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

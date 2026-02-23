@@ -74,6 +74,10 @@ If adopted, MCP and A2A steering committees will recommend duplicative card-adja
 ## Draft Specifications
 
 - `specification/sep-0015-converged-ai-card-profile.md`: converged AI Card profile proposal with modular protocol delegation, security requirements, and dual discovery bindings.
+- `specification/schema/schema.json`: JSON Schema for converged AI Card payloads.
+- `specification/schema/catalog-schema.json`: JSON Schema for converged AI catalog payloads.
+- `specification/cddl/ai-card-profile.cddl`: CDDL for converged AI Card payloads.
+- `specification/cddl/ai-catalog.cddl`: CDDL for converged AI catalog payloads.
 - `specification/examples/converged-live-service-card.json`: example for live-service cards.
 - `specification/examples/converged-data-asset-card.json`: example for data-asset cards.
 - `specification/examples/converged-ai-catalog.json`: example catalog including live and at-rest cards.

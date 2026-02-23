@@ -189,6 +189,21 @@ This profile absorbs previous draft variants using `services`, `interfaces`, or 
 
 ## 10. Next Steps
 
-1. Publish JSON Schema and CDDL for this profile.
-2. Add test vectors for `live-service`, `data-asset`, and `hybrid` cards.
+This draft now includes:
+
+1. JSON Schemas for card and catalog payloads:
+   - `specification/schema/schema.json`
+   - `specification/schema/catalog-schema.json`
+2. CDDL definitions for card and catalog payloads:
+   - `specification/cddl/ai-card-profile.cddl`
+   - `specification/cddl/ai-catalog.cddl`
+3. Example payloads for:
+   - `live-service`
+   - `data-asset`
+   - mixed catalog entries
+
+Remaining work:
+
+1. Add automated schema validation in CI for all examples.
+2. Add a `hybrid` card example.
 3. Run interop tests across at least two protocols and two registry backends.
