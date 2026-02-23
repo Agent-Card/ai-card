@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-card.github.io/spec/sep-0015/schema.json",
+  "specVersion": "1.0",
+  "cardVersion": "2026.02.22",
+  "cardKind": "data-asset",
+  "id": "urn:example:data:market-dataset-2026q1",
+  "name": "Market Dataset Q1 2026",
+  "description": "Historical market data prepared for model training and evaluation.",
+  "publisher": {
+    "id": "did:example:org-acme",
+    "name": "Acme Financial Corp"
+  },
+  "artifacts": [
+    {
+      "uri": "oci://registry.example.com/ai-data/market-dataset:2026q1",
+      "mediaType": "application/parquet",
+      "digest": "sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
+      "size": 24599124,
+      "description": "Primary dataset artifact"
+    }
+  ],
+  "locators": [
+    {
+      "type": "https",
+      "role": "card",
+      "uri": "https://api.acme-corp.com/cards/market-dataset-2026q1.json"
+    },
+    {
+      "type": "oci",
+      "role": "artifact",
+      "uri": "oci://registry.example.com/ai-data/market-dataset:2026q1",
+      "digest": "sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
+      "mediaType": "application/parquet"
+    }
+  ],
+  "createdAt": "2026-02-22T16:00:00Z",
+  "updatedAt": "2026-02-22T16:00:00Z"
+}

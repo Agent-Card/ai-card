@@ -1,0 +1,85 @@
+{
+  "$schema": "https://agent-card.github.io/spec/sep-0015/schema.json",
+  "specVersion": "1.0",
+  "cardVersion": "2026.02.22",
+  "cardKind": "live-service",
+  "id": "did:example:agent-finance-001",
+  "identityType": "did",
+  "name": "Acme Finance Agent",
+  "description": "Executes finance workflows through multiple protocol adapters.",
+  "publisher": {
+    "id": "did:example:org-acme",
+    "name": "Acme Financial Corp",
+    "identityType": "did"
+  },
+  "modules": [
+    {
+      "id": "protocol/a2a",
+      "version": "0.1.0",
+      "required": true,
+      "data": {
+        "protocolVersion": "0.3.0",
+        "skills": [
+          {
+            "id": "skill-stock-analysis",
+            "name": "Run Stock Analysis"
+          }
+        ]
+      }
+    },
+    {
+      "id": "protocol/mcp",
+      "version": "0.1.0",
+      "required": true,
+      "data": {
+        "protocolVersion": "2025-06-18",
+        "capabilities": {
+          "tools": {
+            "listChanged": true
+          }
+        }
+      }
+    }
+  ],
+  "locators": [
+    {
+      "type": "https",
+      "role": "api",
+      "uri": "https://api.acme-finance.com/a2a/v1"
+    },
+    {
+      "type": "https",
+      "role": "api",
+      "uri": "https://api.acme-finance.com/mcp/v1"
+    },
+    {
+      "type": "oci",
+      "role": "card",
+      "uri": "oci://registry.example.com/ai-cards/acme-finance:2026.02.22",
+      "digest": "sha256:1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff",
+      "mediaType": "application/vnd.agent-card+json"
+    }
+  ],
+  "trust": {
+    "privacyPolicyUrl": "https://acme-finance.com/legal/privacy",
+    "termsOfServiceUrl": "https://acme-finance.com/legal/terms",
+    "attestations": [
+      {
+        "type": "SOC2-Type2",
+        "uri": "https://trust.acme-finance.com/reports/soc2-latest.pdf",
+        "mediaType": "application/pdf",
+        "digest": "sha256:a1b2c3d4"
+      }
+    ]
+  },
+  "signatures": [
+    {
+      "format": "jws-compact",
+      "keyId": "did:example:org-acme#keys-1",
+      "createdAt": "2026-02-22T16:30:00Z",
+      "value": "eyJhbGciOiJFUzI1NiJ9..detached-signature"
+    }
+  ],
+  "createdAt": "2026-02-22T16:00:00Z",
+  "updatedAt": "2026-02-22T16:30:00Z"
+}
