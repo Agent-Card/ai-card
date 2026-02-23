@@ -135,6 +135,32 @@ Each artifact SHOULD include:
 
 - `digest`, `size`, `schemaUri`, `description`.
 
+### 4.7 Runtime Materialization Behavior (Data-at-Rest to Live Service)
+
+This profile is intended to support lifecycle transitions where an artifact card can be transformed into a live runtime and exposed as a service.
+
+Target behavior:
+
+1. A `data-asset` card can describe immutable deployable content (for example, OCI-referenced assets).
+2. A runtime system can materialize that content into a running workload.
+3. The running workload can expose runtime identity (process/container/task identity) and/or service endpoints.
+4. A corresponding `live-service` card can represent the active runtime view.
+5. Producers and registries can preserve traceability between the at-rest card and the live-service card.
+
+OCI-style analogy:
+
+1. A manifest (at-rest reference) identifies immutable image content.
+2. A runtime pulls and instantiates that content.
+3. The instantiated workload has runtime identity (for example, PID/container/task ID) and can expose a network endpoint.
+4. The service-facing metadata is discoverable through a live-service card.
+
+Recommended linkage patterns:
+
+1. Use `locators` with `role=artifact` for immutable artifact references and `role=api` for active endpoints.
+2. Include signed provenance references in `trust.attestations` so verifiers can validate source-to-runtime lineage.
+3. Use a module (or profile extension) to capture runtime binding details (for example deployment digest, workload identity, startup time, and endpoint activation status).
+4. Keep logical subject identity stable when possible; if runtime identity is ephemeral, bind ephemeral runtime identifiers to a stable subject through signed claims.
+
 ## 5. Discovery Bindings
 
 ### 5.1 HTTP Well-known Binding
