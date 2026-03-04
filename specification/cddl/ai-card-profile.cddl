@@ -6,20 +6,20 @@ AICard = {
   $schema: text,
   specVersion: text,
   cardVersion: text,
-  cardKind: "live-service" / "data-asset" / "hybrid",
   id: text,
   ? identityType: text,
   name: text,
   description: text,
   ? logoUrl: text,
   ? tags: [* text],
+  ? domains: [* text],
+  ? skills: [* text],
+  ? capabilities: { * text => any },
   ? maturity: "preview" / "stable" / "deprecated",
   publisher: Publisher,
   ? trust: Trust,
   ? signatures: [* Signature],
-  ? modules: [* Module],
-  ? locators: [* Locator],
-  ? artifacts: [* Artifact],
+  ? modules: ModuleMap,
   ? metadata: { * text => any },
   createdAt: tdate,
   updatedAt: tdate
@@ -62,19 +62,8 @@ Module = {
   data: { * text => any }
 }
 
-Locator = {
-  type: text,
-  role: "card" / "catalog" / "api" / "artifact",
-  uri: text,
-  ? digest: text,
-  ? mediaType: text
+ModuleMap = {
+  ? protocols: { * text => Module },
+  ? artifacts: { * text => Module }
 }
 
-Artifact = {
-  uri: text,
-  mediaType: text,
-  ? digest: text,
-  ? size: uint,
-  ? schemaUri: text,
-  ? description: text
-}

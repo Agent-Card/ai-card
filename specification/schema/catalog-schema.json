@@ -3,7 +3,7 @@
   "$id": "https://agent-card.github.io/spec/sep-0015/catalog-schema.json",
   "title": "Converged AI Catalog",
   "type": "object",
-  "required": ["$schema", "specVersion", "host", "services"],
+  "required": ["$schema", "specVersion", "host", "records"],
   "properties": {
     "$schema": { "type": "string", "format": "uri" },
     "specVersion": { "type": "string" },
@@ -18,7 +18,7 @@
       },
       "additionalProperties": false
     },
-    "services": {
+    "records": {
       "type": "array",
       "items": {
         "type": "object",

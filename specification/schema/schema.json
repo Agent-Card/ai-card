@@ -1,13 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agent-card.github.io/spec/sep-0015/schema.json",
-  "title": "Converged AI Card Profile",
+  "title": "Converged AI Card",
   "type": "object",
   "required": [
     "$schema",
     "specVersion",
     "cardVersion",
-    "cardKind",
     "id",
     "name",
     "description",
@@ -19,7 +18,6 @@
     "$schema": { "type": "string", "format": "uri" },
     "specVersion": { "type": "string" },
     "cardVersion": { "type": "string" },
-    "cardKind": { "type": "string", "enum": ["live-service", "data-asset", "hybrid"] },
     "id": { "type": "string", "format": "uri-reference" },
     "identityType": { "type": "string" },
     "name": { "type": "string" },
@@ -29,7 +27,31 @@
       "type": "array",
       "items": { "type": "string" }
     },
+    "domains": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": true
+    },
     "maturity": { "type": "string", "enum": ["preview", "stable", "deprecated"] },
+    "publisher": { "$ref": "#/$defs/publisher" },
+    "trust": { "$ref": "#/$defs/trust" },
+    "signatures": { "$ref": "#/$defs/signatures" },
+    "modules": { "$ref": "#/$defs/moduleMap" },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
     "publisher": {
       "type": "object",
       "required": ["id", "name"],
@@ -67,73 +89,32 @@
         "additionalProperties": false
       }
     },
-    "modules": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "version", "data"],
-        "properties": {
-          "id": { "type": "string" },
-          "version": { "type": "string" },
-          "required": { "type": "boolean" },
-          "digest": { "type": "string" },
-          "data": { "type": "object" }
-        },
-        "additionalProperties": false
-      }
-    },
-    "locators": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["type", "role", "uri"],
-        "properties": {
-          "type": { "type": "string" },
-          "role": { "type": "string", "enum": ["card", "catalog", "api", "artifact"] },
-          "uri": { "type": "string", "format": "uri-reference" },
-          "digest": { "type": "string" },
-          "mediaType": { "type": "string" }
-        },
-        "additionalProperties": false
-      }
-    },
-    "artifacts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["uri", "mediaType"],
-        "properties": {
-          "uri": { "type": "string", "format": "uri-reference" },
-          "mediaType": { "type": "string" },
-          "digest": { "type": "string" },
-          "size": { "type": "integer", "minimum": 0 },
-          "schemaUri": { "type": "string", "format": "uri-reference" },
-          "description": { "type": "string" }
-        },
-        "additionalProperties": false
-      }
-    },
-    "metadata": {
+    "module": {
       "type": "object",
-      "additionalProperties": true
-    },
-    "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" }
-  },
-  "allOf": [
-    {
-      "if": {
-        "properties": {
-          "cardKind": { "const": "data-asset" }
-        },
-        "required": ["cardKind"]
+      "required": ["id", "version", "data"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": { "type": "string" },
+        "required": { "type": "boolean" },
+        "digest": { "type": "string" },
+        "data": { "type": "object" }
       },
-      "then": {
-        "required": ["artifacts"]
-      }
-    }
-  ],
-  "$defs": {
+      "additionalProperties": false
+    },
+    "moduleMap": {
+      "type": "object",
+      "properties": {
+        "protocols": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/module" }
+        },
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/module" }
+        }
+      },
+      "additionalProperties": false
+    },
     "attestation": {
       "type": "object",
       "required": ["type", "uri", "mediaType"],

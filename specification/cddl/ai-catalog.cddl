@@ -6,7 +6,7 @@ AICatalog = {
   $schema: text,
   specVersion: text,
   host: HostInfo,
-  services: [* CatalogEntry]
+  records: [* CatalogEntry]
 }
 
 HostInfo = {

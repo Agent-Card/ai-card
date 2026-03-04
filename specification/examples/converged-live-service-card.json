@@ -2,7 +2,6 @@
   "$schema": "https://agent-card.github.io/spec/sep-0015/schema.json",
   "specVersion": "1.0",
   "cardVersion": "2026.02.22",
-  "cardKind": "live-service",
   "id": "did:example:agent-finance-001",
   "identityType": "did",
   "name": "Acme Finance Agent",
@@ -12,54 +11,57 @@
     "name": "Acme Financial Corp",
     "identityType": "did"
   },
-  "modules": [
-    {
-      "id": "protocol/a2a",
-      "version": "0.1.0",
-      "required": true,
-      "data": {
-        "protocolVersion": "0.3.0",
-        "skills": [
-          {
-            "id": "skill-stock-analysis",
-            "name": "Run Stock Analysis"
-          }
-        ]
-      }
-    },
-    {
-      "id": "protocol/mcp",
-      "version": "0.1.0",
-      "required": true,
-      "data": {
-        "protocolVersion": "2025-06-18",
-        "capabilities": {
-          "tools": {
-            "listChanged": true
+  "domains": [
+    "finance"
+  ],
+  "skills": [
+    "stock-analysis"
+  ],
+  "modules": {
+    "protocols": {
+      "a2a": {
+        "id": "protocol/a2a",
+        "version": "0.1.0",
+        "required": true,
+        "data": {
+          "protocolVersion": "0.3.0",
+          "locators": [
+            {
+              "type": "https",
+              "role": "api",
+              "uri": "https://api.acme-finance.com/a2a/v1"
+            }
+          ],
+          "skills": [
+            {
+              "id": "skill-stock-analysis",
+              "name": "Run Stock Analysis"
+            }
+          ]
+        }
+      },
+      "mcp": {
+        "id": "protocol/mcp",
+        "version": "0.1.0",
+        "required": true,
+        "data": {
+          "protocolVersion": "2025-06-18",
+          "locators": [
+            {
+              "type": "https",
+              "role": "api",
+              "uri": "https://api.acme-finance.com/mcp/v1"
+            }
+          ],
+          "capabilities": {
+            "tools": {
+              "listChanged": true
+            }
           }
         }
       }
     }
-  ],
-  "locators": [
-    {
-      "type": "https",
-      "role": "api",
-      "uri": "https://api.acme-finance.com/a2a/v1"
-    },
-    {
-      "type": "https",
-      "role": "api",
-      "uri": "https://api.acme-finance.com/mcp/v1"
-    },
-    {
-      "type": "oci",
-      "role": "card",
-      "uri": "oci://registry.example.com/ai-cards/acme-finance:2026.02.22",
-      "digest": "sha256:1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff",
-      "mediaType": "application/vnd.agent-card+json"
-    }
-  ],
+  },
   "trust": {
     "privacyPolicyUrl": "https://acme-finance.com/legal/privacy",
     "termsOfServiceUrl": "https://acme-finance.com/legal/terms",

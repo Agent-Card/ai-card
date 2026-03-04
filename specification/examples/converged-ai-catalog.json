@@ -6,7 +6,7 @@
     "id": "did:example:org-acme-corp",
     "documentationUrl": "https://docs.acme-corp.com/agents"
   },
-  "services": [
+  "records": [
     {
       "id": "did:example:agent-finance-001",
       "name": "Acme Finance Agent",
@@ -21,7 +21,7 @@
     {
       "id": "urn:example:data:market-dataset-2026q1",
       "name": "Market Dataset Q1 2026",
-      "description": "At-rest data asset card for training and evaluation.",
+      "description": "Artifact-focused card for training and evaluation.",
       "tags": [
         "dataset",
         "finance"

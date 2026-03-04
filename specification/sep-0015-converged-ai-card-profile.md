@@ -1,7 +1,7 @@
 # SEP 0015 - Converged AI Card Profile (Draft)
 
-Status: Draft proposal  
-Authors: AI Card contributors  
+Status: Draft proposal
+Authors: AI Card contributors
 Target: Common profile for service and artifact metadata across protocol ecosystems
 
 ## 1. Summary
@@ -36,14 +36,13 @@ This profile does not define protocol internals (for example, A2A skills or MCP 
 
 ## 4. Data Model
 
-### 4.1 Card Envelope
+### 4.1 Card Envelope (AICard)
 
-A card document MUST include:
+An AICard document MUST include:
 
 - `$schema`: URI for this profile schema.
 - `specVersion`: profile version.
 - `cardVersion`: version of this card document (publisher-controlled).
-- `cardKind`: `live-service`, `data-asset`, or `hybrid`.
 - `id`: globally unique URI for the subject.
 - `name`: human-readable name.
 - `description`: concise description.
@@ -51,17 +50,27 @@ A card document MUST include:
 - `createdAt`: RFC 3339 timestamp.
 - `updatedAt`: RFC 3339 timestamp.
 
-A card MAY include:
+An AICard MAY include:
 
 - `identityType`: type hint for `id`.
 - `logoUrl`, `tags`, `maturity`, `metadata`.
+- `domains`: high-level domain taxonomy for discovery.
+- `skills`: problem/skill taxonomy for discovery.
+- `capabilities`: optional high-level capability descriptors.
 - `trust`: trust and compliance references.
 - `signatures`: one or more detached signatures.
-- `modules`: extension modules.
-- `locators`: live endpoints and artifact locations.
-- `artifacts`: immutable at-rest assets.
+- `modules`: extension modules grouped by type.
 
-### 4.2 Publisher Object
+Discovery labels (`tags`, `domains`, `skills`, `capabilities`) provide a generic, protocol-agnostic index for search and filtering.
+Module data remains the authoritative, protocol- or artifact-specific metadata.
+Consumers SHOULD use discovery labels to find candidates and then read module data to understand precise protocol behaviors or artifact details.
+
+### 4.2 Protocol and Artifact Cards
+
+Protocol and artifact cards are represented inside the `modules` map.
+Each module entry represents a protocol-specific or artifact-specific card and MAY be independently signed.
+
+### 4.3 Publisher Object
 
 `publisher` MUST include:
 
@@ -73,7 +82,7 @@ A card MAY include:
 - `identityType`.
 - `attestation`: optional identity proof reference.
 
-### 4.3 Trust and Provenance
+### 4.4 Trust and Provenance
 
 `trust` MAY include:
 
@@ -94,9 +103,14 @@ Each signature entry SHOULD include:
 - `keyId`,
 - `createdAt`.
 
-### 4.4 Modules (Delegated Metadata)
+### 4.5 Modules (Delegated Metadata)
 
 `modules` is the extension mechanism for protocol/domain metadata.
+
+`modules` is a map grouped by type:
+
+- `protocols`: protocol-specific modules (example keys: `a2a`, `mcp`).
+- `artifacts`: artifact-specific modules (example keys: `dataset`, `model`).
 
 Each module MUST include:
 
@@ -111,52 +125,41 @@ Each module MAY include:
 
 Core profile MUST NOT define module-internal fields.
 
-### 4.5 Locators (Discovery and Access)
+### 4.6 Locators (Discovery and Access)
 
-`locators` provides normalized references to live services or cards in registries.
+Locators are protocol- or artifact-card specific and are defined inside the relevant module data.
+The core profile does not standardize locator fields because routing is protocol-specific.
 
-Each locator SHOULD include:
+### 4.7 Artifacts (At-rest Assets)
 
-- `type`: `https`, `oci`, or other scheme category.
-- `uri`: concrete URI.
-- `role`: one of `card`, `catalog`, `api`, `artifact`.
-- `digest` (recommended for immutable content).
-- `mediaType`.
-
-### 4.6 Artifacts (At-rest Assets)
-
-`artifacts` MUST be present when `cardKind = data-asset`.
-
-Each artifact MUST include:
+Artifacts are described inside artifact-card modules.
+Artifact modules SHOULD use the following fields:
 
 - `uri`, `mediaType`.
-
-Each artifact SHOULD include:
-
 - `digest`, `size`, `schemaUri`, `description`.
 
-### 4.7 Runtime Materialization Behavior (Data-at-Rest to Live Service)
+### 4.8 Runtime Materialization Behavior (Data-at-Rest to Live Service)
 
 This profile is intended to support lifecycle transitions where an artifact card can be transformed into a live runtime and exposed as a service.
 
 Target behavior:
 
-1. A `data-asset` card can describe immutable deployable content (for example, OCI-referenced assets).
+1. An artifact-focused card can describe immutable deployable content (for example, OCI-referenced assets).
 2. A runtime system can materialize that content into a running workload.
 3. The running workload can expose runtime identity (process/container/task identity) and/or service endpoints.
-4. A corresponding `live-service` card can represent the active runtime view.
-5. Producers and registries can preserve traceability between the at-rest card and the live-service card.
+4. A corresponding protocol-focused card can represent the active runtime view.
+5. Producers and registries can preserve traceability between the at-rest card and the runtime service card.
 
 OCI-style analogy:
 
 1. A manifest (at-rest reference) identifies immutable image content.
 2. A runtime pulls and instantiates that content.
 3. The instantiated workload has runtime identity (for example, PID/container/task ID) and can expose a network endpoint.
-4. The service-facing metadata is discoverable through a live-service card.
+4. The service-facing metadata is discoverable through a protocol-focused card.
 
 Recommended linkage patterns:
 
-1. Use `locators` with `role=artifact` for immutable artifact references and `role=api` for active endpoints.
+1. Use module-defined locators for immutable artifact references and active endpoints.
 2. Include signed provenance references in `trust.attestations` so verifiers can validate source-to-runtime lineage.
 3. Use a module (or profile extension) to capture runtime binding details (for example deployment digest, workload identity, startup time, and endpoint activation status).
 4. Keep logical subject identity stable when possible; if runtime identity is ephemeral, bind ephemeral runtime identifiers to a stable subject through signed claims.
@@ -170,7 +173,7 @@ Producers SHOULD expose:
 - `/.well-known/ai-catalog.json` for collection discovery.
 - Optional direct card location via catalog entries.
 
-Catalog entries MUST include:
+Catalog records MUST include:
 
 - `id`, `name`, `description`, `cardUrl`, `updatedAt`.
 
@@ -197,7 +200,7 @@ Registry publication SHOULD preserve:
 1. `L0-Base`: required core envelope only.
 2. `L1-Signed`: `L0` + at least one valid signature.
 3. `L2-Trust`: `L1` + trust attestations and policy URLs.
-4. `L3-Portable`: `L2` + HTTP and registry locators with immutable digests.
+4. `L3-Portable`: `L2` + module-defined locators with immutable digests for registry publication.
 
 ## 8. Backward Compatibility and Migration
 
@@ -224,12 +227,12 @@ This draft now includes:
    - `specification/cddl/ai-card-profile.cddl`
    - `specification/cddl/ai-catalog.cddl`
 3. Example payloads for:
-   - `live-service`
-   - `data-asset`
+   - protocol-focused cards
+   - artifact-focused cards
    - mixed catalog entries
 
 Remaining work:
 
 1. Add automated schema validation in CI for all examples.
-2. Add a `hybrid` card example.
+2. Add a multi-card record example.
 3. Run interop tests across at least two protocols and two registry backends.
