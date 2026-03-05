@@ -9,12 +9,9 @@ AICard = {
   $schema: text,              ; URI to the JSON schema (e.g. "https://...")
   specVersion: text,          ; Major.Minor version (e.g. "1.0")
   
-  ; --- Identity (Subject) ---
-  id: text,                   ; The Primary Key / Subject of this card, Globally Unique URI (per RFC 3986), (DID, SPIFFE, or URL)
-  ? identityType: text,       ; Type hint (e.g. "did", "spiffe"). Optional if clear from ID.
-
+  identifier: text,           ; agent global unqiue identifier in URN format (see: https://github.com/Agent-Card/ai-card/pull/18)
   ; --- Metadata ---
-  name: text,                 ; Human-readable name for the AI service
+  displayName: text,                 ; Human-readable name for the AI service
   description: text,          ; Short description of the AI service's purpose
   ? logoUrl: text,            ; URL to logo. Data URL (RFC 2397) recommended for privacy
   ? tags: [* text],           ; List of keywords to aid in discovery
@@ -42,16 +39,37 @@ ProtocolType = "mcp" / "a2a" / text
 
 Publisher = {
   id: text,                   ; Verifiable ID of the publisher organization
-  ? identityType: text,       ; Type hint (e.g. "did", "dns")
   name: text,                 ; Human-readable name of the publisher
+  ? identityType: text,       ; Type hint (e.g. "did", "dns")
   ? attestation: Attestation  ; Proof of the publisher's identity
 }
 
 Trust = {
-  ; Identity is now implicit (matches Root id)
+  ; --- Identity (Subject) ---
+  identity: text,            ; The Primary Key / Subject of this card, Globally Unique URI (per RFC 3986), (DID, SPIFFE, or URL)
+  ? identityType: text,      ; Type hint (e.g. "did", "spiffe"). Optional if clear from ID.
+
+  ? trustSchema: TrustSchema, 
   ? attestations: [* Attestation], ; List of compliance credentials (SOC2, HIPAA, etc.)
+  ? provenance: [* ProvenanceLink],
   ? privacyPolicyUrl: text,   ; URL to the privacy policy
   ? termsOfServiceUrl: text   ; URL to the terms of service
+}
+
+TrustSchema = {
+  id: text,
+  version: text,
+  ? governanceUri: text,
+  ? verificationMethods: [* text]
+}
+
+ProvenanceLink = {
+  relation: text,
+  sourceId: text,
+  ? sourceDigest: text,
+  ? registryUri: text,
+  ? statementUri: text,
+  ? signatureRef: text
 }
 
 Attestation = {

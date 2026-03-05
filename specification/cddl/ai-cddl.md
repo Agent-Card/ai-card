@@ -8,8 +8,8 @@
 AICatalog = {
   $schema: text,              ; URI to the JSON schema
   specVersion: text,          ; Version of the Catalog spec (e.g. "1.0.0")
-  host: HostInfo,             ; Who runs this server/registry
-  services: [* AIServiceEntry] ; The list of available AI services
+  ? host: HostInfo,             ; Who runs this server/registry
+  entry: [* CatalogEntry] ; The list of available AI services
 }
 
 HostInfo = {
@@ -19,7 +19,7 @@ HostInfo = {
   ? logoUrl: text             ; A URL to the host's logo
 }
 
-AIServiceEntry = {
+CatalogEntry = {
   id: text,                   ; Must match the id in the linked AI Service Card
   name: text,                 ; Human-readable name for the AI Service
   description: text,          ; Short description
