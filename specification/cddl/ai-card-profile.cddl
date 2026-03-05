@@ -7,7 +7,7 @@ AICard = {
   specVersion: text,
   cardVersion: text,
   id: text,
-  ? identityType: text,
+  ? identifierType: text,
   name: text,
   description: text,
   ? logoUrl: text,
@@ -28,14 +28,32 @@ AICard = {
 Publisher = {
   id: text,
   name: text,
-  ? identityType: text,
+  ? identifierType: text,
   ? attestation: Attestation
 }
 
 Trust = {
+  ? trustSchema: TrustSchema,
   ? attestations: [* Attestation],
+  ? provenance: [* ProvenanceLink],
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text
+}
+
+TrustSchema = {
+  id: text,
+  version: text,
+  ? governanceUri: text,
+  ? verificationMethods: [* text]
+}
+
+ProvenanceLink = {
+  relation: text,
+  sourceId: text,
+  ? sourceDigest: text,
+  ? registryUri: text,
+  ? statementUri: text,
+  ? signatureRef: text
 }
 
 Attestation = {

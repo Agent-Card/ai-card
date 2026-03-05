@@ -18,8 +18,15 @@
     "$schema": { "type": "string", "format": "uri" },
     "specVersion": { "type": "string" },
     "cardVersion": { "type": "string" },
-    "id": { "type": "string", "format": "uri-reference" },
-    "identityType": { "type": "string" },
+    "id": {
+      "type": "string",
+      "format": "uri-reference",
+      "description": "Logical identifier for the subject (name), such as a URN or DID."
+    },
+    "identifierType": {
+      "type": "string",
+      "description": "Verification domain or scheme hint for validating the identifier or signature binding."
+    },
     "name": { "type": "string" },
     "description": { "type": "string" },
     "logoUrl": { "type": "string", "format": "uri-reference" },
@@ -56,8 +63,15 @@
       "type": "object",
       "required": ["id", "name"],
       "properties": {
-        "id": { "type": "string", "format": "uri-reference" },
-        "identityType": { "type": "string" },
+        "id": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Publisher identifier (logical name) such as a URN or DID."
+        },
+        "identifierType": {
+          "type": "string",
+          "description": "Verification domain or scheme hint for publisher identity."
+        },
         "name": { "type": "string" },
         "attestation": { "$ref": "#/$defs/attestation" }
       },
@@ -66,12 +80,44 @@
     "trust": {
       "type": "object",
       "properties": {
+        "trustSchema": { "$ref": "#/$defs/trustSchema" },
         "attestations": {
           "type": "array",
           "items": { "$ref": "#/$defs/attestation" }
         },
+        "provenance": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/provenanceLink" }
+        },
         "privacyPolicyUrl": { "type": "string", "format": "uri-reference" },
         "termsOfServiceUrl": { "type": "string", "format": "uri-reference" }
+      },
+      "additionalProperties": false
+    },
+    "trustSchema": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string", "format": "uri-reference" },
+        "version": { "type": "string" },
+        "governanceUri": { "type": "string", "format": "uri-reference" },
+        "verificationMethods": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "provenanceLink": {
+      "type": "object",
+      "required": ["relation", "sourceId"],
+      "properties": {
+        "relation": { "type": "string" },
+        "sourceId": { "type": "string", "format": "uri-reference" },
+        "sourceDigest": { "type": "string" },
+        "registryUri": { "type": "string", "format": "uri-reference" },
+        "statementUri": { "type": "string", "format": "uri-reference" },
+        "signatureRef": { "type": "string" }
       },
       "additionalProperties": false
     },

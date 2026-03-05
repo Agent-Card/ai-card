@@ -3,13 +3,13 @@
   "specVersion": "1.0",
   "cardVersion": "2026.02.22",
   "id": "did:example:agent-finance-001",
-  "identityType": "did",
+  "identifierType": "did",
   "name": "Acme Finance Agent",
   "description": "Executes finance workflows through multiple protocol adapters.",
   "publisher": {
     "id": "did:example:org-acme",
     "name": "Acme Financial Corp",
-    "identityType": "did"
+    "identifierType": "did"
   },
   "domains": [
     "finance"
@@ -63,8 +63,28 @@
     }
   },
   "trust": {
+    "trustSchema": {
+      "id": "https://trust.acme-finance.com/schemas/ai-card-trust-profile",
+      "version": "1.0",
+      "governanceUri": "https://trust.acme-finance.com/policies/ai-card-trust",
+      "verificationMethods": [
+        "did",
+        "x509",
+        "dns-01"
+      ]
+    },
     "privacyPolicyUrl": "https://acme-finance.com/legal/privacy",
     "termsOfServiceUrl": "https://acme-finance.com/legal/terms",
+    "provenance": [
+      {
+        "relation": "materializedFrom",
+        "sourceId": "urn:example:data:market-dataset-2026q1",
+        "sourceDigest": "sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
+        "registryUri": "oci://registry.example.com/ai-data/market-dataset@sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
+        "statementUri": "https://trust.acme-finance.com/provenance/finance-agent-runtime-20260222.dsse.json",
+        "signatureRef": "did:example:org-acme#keys-1"
+      }
+    ],
     "attestations": [
       {
         "type": "SOC2-Type2",

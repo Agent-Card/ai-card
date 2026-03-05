@@ -3,10 +3,12 @@
   "specVersion": "1.0",
   "cardVersion": "2026.02.22",
   "id": "urn:example:data:market-dataset-2026q1",
+  "identifierType": "urn",
   "name": "Market Dataset Q1 2026",
   "description": "Historical market data prepared for model training and evaluation.",
   "publisher": {
     "id": "did:example:org-acme",
+    "identifierType": "did",
     "name": "Acme Financial Corp"
   },
   "domains": [
@@ -31,6 +33,26 @@
         }
       }
     }
+  },
+  "trust": {
+    "trustSchema": {
+      "id": "https://trust.acme-finance.com/schemas/ai-card-trust-profile",
+      "version": "1.0",
+      "governanceUri": "https://trust.acme-finance.com/policies/ai-card-trust",
+      "verificationMethods": [
+        "did",
+        "x509"
+      ]
+    },
+    "provenance": [
+      {
+        "relation": "publishedFrom",
+        "sourceId": "oci://registry.example.com/ai-data/market-dataset:2026q1",
+        "sourceDigest": "sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
+        "registryUri": "oci://registry.example.com/ai-data/market-dataset@sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
+        "statementUri": "https://trust.acme-finance.com/provenance/market-dataset-2026q1.dsse.json"
+      }
+    ]
   },
   "createdAt": "2026-02-22T16:00:00Z",
   "updatedAt": "2026-02-22T16:00:00Z"

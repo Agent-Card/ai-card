@@ -52,7 +52,7 @@ An AICard document MUST include:
 
 An AICard MAY include:
 
-- `identityType`: type hint for `id`.
+- `identifierType`: type hint for `id`.
 - `logoUrl`, `tags`, `maturity`, `metadata`.
 - `domains`: high-level domain taxonomy for discovery.
 - `skills`: problem/skill taxonomy for discovery.
@@ -79,16 +79,37 @@ Each module entry represents a protocol-specific or artifact-specific card and M
 
 `publisher` MAY include:
 
-- `identityType`.
+- `identifierType`.
 - `attestation`: optional identity proof reference.
 
 ### 4.4 Trust and Provenance
 
 `trust` MAY include:
 
+- `trustSchema`: declaration of the trust model and verification policy used for this card.
 - `attestations`: list of trust artifacts (audits, certifications, compliance proofs).
+- `provenance`: signed or verifiable lineage links to source artifacts, source cards, and registry records.
 - `privacyPolicyUrl`.
 - `termsOfServiceUrl`.
+
+If present, `trustSchema` SHOULD include:
+
+- `id`: stable URI for the trust schema/profile.
+- `version`: trust schema version.
+- optional `governanceUri`: policy or governance document for the trust domain.
+- optional `verificationMethods`: supported verification mechanisms (for example `dns-01`, `http-01`, `did`, `x509`, `spiffe`).
+
+Each `provenance` entry SHOULD include:
+
+- `relation`: lineage relationship (for example `derivedFrom`, `materializedFrom`, `publishedFrom`).
+- `sourceId`: identifier of the source card or source subject.
+- optional `sourceDigest`: immutable digest of the source payload.
+- optional `registryUri`: registry record URI used for retrieval.
+- optional `statementUri`: URI of a signed provenance statement (for example DSSE/in-toto/SLSA predicate).
+- optional `signatureRef`: key or signature reference used to verify the provenance statement.
+
+To avoid self-referential dependency loops, provenance data embedded in the card MUST be reference-oriented.
+The card SHOULD carry links to immutable external evidence (for example registry attestations or transparency-log entries) instead of embedding full signed statements whose subject is the same card bytes.
 
 Each attestation SHOULD follow a reference pattern:
 
@@ -187,13 +208,55 @@ Registry publication SHOULD preserve:
 - Media type declaration.
 - Stable linkage from catalog/discovery to immutable card versions.
 
+For generic registries (that do not natively model trust relationships), publishers SHOULD provide explicit lineage links in `trust.provenance` so consumers can reconstruct source-to-card and artifact-to-runtime provenance.
+
+When provenance needs to bind a card publication event, producers SHOULD use an acyclic two-phase flow:
+
+1. Produce and sign the card version.
+2. Publish the card to a registry and let registry-native provenance be generated over immutable registry subjects (for example manifest digest).
+3. Reference that external provenance from a later card revision or a catalog/registry side record.
+
+This prevents a card version from needing to contain provenance that depends on signatures computed over that same final card version.
+
 ## 6. Identifier and Security Requirements
 
-1. `id` MUST be globally unique and stable over time for the same logical subject.
-2. `id` MUST be a URI and SHOULD use decentralized or domain-anchored schemes.
-3. Signed cards SHOULD be verifiable without a central trust broker.
-4. If `signatures` are present, verifiers MUST validate signature and subject binding.
-5. Trust assertions without signatures MUST be treated as self-asserted.
+1. `id` is the identifier (the logical name) for the subject and MUST be globally unique and stable over time.
+2. `id` MUST be a URI and SHOULD use decentralized or domain-anchored schemes (for example `did:` or `urn:`).
+3. The identifier namespace MUST be verifiable by a trust mechanism appropriate to the scheme and publishing domain.
+4. Namespace verification MAY include DNS or HTTP challenges, DID method proofs, workload identity systems, or other externally defined trust schemes.
+5. The identifier is a name; it is distinct from an identity credential or account that proves control.
+6. `identifierType` MAY indicate the verification domain or scheme used to validate the identifier or signature binding.
+7. Signed cards SHOULD be verifiable without a central trust broker.
+8. If `signatures` are present, verifiers MUST validate signature and subject binding.
+9. Trust roots and verification policy are external to this profile and SHOULD be referenced through `trust.trustSchema`.
+10. Trust assertions without signatures MUST be treated as self-asserted.
+11. Verifiers SHOULD prefer immutable external provenance evidence (registry or transparency log) when available, and treat card-embedded provenance as linkage metadata.
+
+### 6.1 Subject Commitment Model (Normative)
+
+To ensure interoperability across registries and prevent circular verification dependencies, this profile defines two digest scopes:
+
+1. **subject scope**: digest over a canonicalized logical payload.
+2. **blob scope**: digest over the exact stored bytes in a transport or registry.
+
+Normative requirements:
+
+1. Producers MUST distinguish subject-scope and blob-scope digests and MUST NOT compare them as if they were equivalent values.
+2. Producers MUST define one canonicalization method for subject-scope hashing for each profile version.
+3. Subject-scope signatures and attestations MUST bind to the canonical subject bytes, not to mutable or transport-specific encodings.
+4. Card validity MUST NOT depend on resolving provenance that cryptographically commits to the same full card bytes for that same card revision.
+5. Card-embedded provenance MUST be reference-oriented and SHOULD point to immutable external evidence (for example registry attestations or transparency-log entries).
+6. If provenance for a card publication event is generated after publication, producers SHOULD reference it from a later card revision or from a side record.
+7. Verifiers MUST perform signature and digest checks within the declared scope (`subject` or `blob`) and MUST reject scope-ambiguous claims.
+
+Recommended verifier order:
+
+1. Verify blob-scope integrity for retrieved registry content.
+2. Derive and canonicalize the subject payload.
+3. Verify subject-scope signatures and attestations.
+4. Resolve provenance links and validate lineage constraints.
+
+This model allows different registries to maintain their native blob digests while preserving a portable subject-level trust model for cross-registry verification.
 
 ## 7. Conformance Levels
 

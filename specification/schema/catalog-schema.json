@@ -12,7 +12,11 @@
       "required": ["name"],
       "properties": {
         "name": { "type": "string" },
-        "id": { "type": "string", "format": "uri-reference" },
+        "id": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Catalog host identifier (logical name) such as a URN or DID."
+        },
         "documentationUrl": { "type": "string", "format": "uri-reference" },
         "logoUrl": { "type": "string", "format": "uri-reference" }
       },
@@ -24,7 +28,11 @@
         "type": "object",
         "required": ["id", "name", "description", "cardUrl", "updatedAt"],
         "properties": {
-          "id": { "type": "string", "format": "uri-reference" },
+          "id": {
+            "type": "string",
+            "format": "uri-reference",
+            "description": "Card subject identifier (logical name) such as a URN or DID."
+          },
           "name": { "type": "string" },
           "description": { "type": "string" },
           "tags": {
