@@ -146,8 +146,6 @@ The config blob MUST include:
 - `identifierType`: verification domain or scheme hint (e.g. `"did"`, `"urn"`).
 - `logoUrl`, `tags`, `domains`, `skills`, `capabilities`, `maturity`.
 
-The config blob MUST NOT include `trust` or `signatures` fields. Signing and attestation are handled via OCI Referrers (Section 7).
-
 Example:
 
 ```json
