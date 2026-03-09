@@ -1,33 +1,35 @@
 {
-  "$schema": "https://agent-card.github.io/spec/sep-0015/catalog-schema.json",
-  "specVersion": "1.0",
-  "host": {
-    "name": "Acme Services Inc.",
-    "id": "did:example:org-acme-corp",
-    "documentationUrl": "https://docs.acme-corp.com/agents"
-  },
-  "records": [
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "artifactType": "application/vnd.lf.ai.catalog.v1+json",
+  "manifests": [
     {
-      "id": "did:example:agent-finance-001",
-      "name": "Acme Finance Agent",
-      "description": "Multi-protocol finance agent.",
-      "tags": [
-        "finance",
-        "trading"
-      ],
-      "cardUrl": "https://api.acme-corp.com/cards/acme-finance-agent.json",
-      "updatedAt": "2026-02-22T16:30:00Z"
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.lf.ai.manifest.v1+json",
+      "digest": "sha256:b94d27b9934d3e08a52e52d7da7dabfac484efe04aebe4a60e3b37f1e6a42bb0",
+      "size": 972,
+      "urls": ["https://api.acme-corp.com/cards/acme-finance-agent.json"],
+      "annotations": {
+        "org.opencontainers.image.title": "Acme Finance Agent",
+        "org.opencontainers.image.description": "Executes finance workflows through multiple protocol adapters.",
+        "org.lf.ai.card.id": "did:example:agent-finance-001"
+      }
     },
     {
-      "id": "urn:example:data:market-dataset-2026q1",
-      "name": "Market Dataset Q1 2026",
-      "description": "Artifact-focused card for training and evaluation.",
-      "tags": [
-        "dataset",
-        "finance"
-      ],
-      "cardUrl": "https://api.acme-corp.com/cards/market-dataset-2026q1.json",
-      "updatedAt": "2026-02-22T16:00:00Z"
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.lf.ai.manifest.v1+json",
+      "digest": "sha256:a87ff679a2f3e71d9181a67b7542122c441e3b8ad8f027e3078d8b86cf3d6799",
+      "size": 841,
+      "urls": ["https://api.acme-corp.com/cards/market-dataset-2026q1.json"],
+      "annotations": {
+        "org.opencontainers.image.title": "Market Dataset Q1 2026",
+        "org.opencontainers.image.description": "Historical market data prepared for model training and evaluation.",
+        "org.lf.ai.card.id": "urn:example:data:market-dataset-2026q1"
+      }
     }
-  ]
+  ],
+  "annotations": {
+    "org.opencontainers.image.title": "Acme Services Inc.",
+    "org.opencontainers.image.created": "2026-02-22T16:00:00Z"
+  }
 }

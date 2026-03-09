@@ -1,107 +1,31 @@
 {
-  "$schema": "https://agent-card.github.io/spec/sep-0015/schema.json",
-  "specVersion": "1.0",
-  "cardVersion": "2026.02.22",
-  "id": "did:example:agent-finance-001",
-  "identifierType": "did",
-  "name": "Acme Finance Agent",
-  "description": "Executes finance workflows through multiple protocol adapters.",
-  "publisher": {
-    "id": "did:example:org-acme",
-    "name": "Acme Financial Corp",
-    "identifierType": "did"
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "artifactType": "application/vnd.lf.ai.manifest.v1+json",
+  "config": {
+    "mediaType": "application/vnd.lf.ai.card.config.v1+json",
+    "digest": "sha256:b94d27b9934d3e08a52e52d7da7dabfac484efe04aebe4a60e3b37f1e6a42bb0",
+    "size": 621
   },
-  "domains": [
-    "finance"
-  ],
-  "skills": [
-    "stock-analysis"
-  ],
-  "modules": {
-    "protocols": {
-      "a2a": {
-        "id": "protocol/a2a",
-        "version": "0.1.0",
-        "required": true,
-        "data": {
-          "protocolVersion": "0.3.0",
-          "locators": [
-            {
-              "type": "https",
-              "role": "api",
-              "uri": "https://api.acme-finance.com/a2a/v1"
-            }
-          ],
-          "skills": [
-            {
-              "id": "skill-stock-analysis",
-              "name": "Run Stock Analysis"
-            }
-          ]
-        }
-      },
-      "mcp": {
-        "id": "protocol/mcp",
-        "version": "0.1.0",
-        "required": true,
-        "data": {
-          "protocolVersion": "2025-06-18",
-          "locators": [
-            {
-              "type": "https",
-              "role": "api",
-              "uri": "https://api.acme-finance.com/mcp/v1"
-            }
-          ],
-          "capabilities": {
-            "tools": {
-              "listChanged": true
-            }
-          }
-        }
-      }
-    }
-  },
-  "trust": {
-    "trustSchema": {
-      "id": "https://trust.acme-finance.com/schemas/ai-card-trust-profile",
-      "version": "1.0",
-      "governanceUri": "https://trust.acme-finance.com/policies/ai-card-trust",
-      "verificationMethods": [
-        "did",
-        "x509",
-        "dns-01"
-      ]
-    },
-    "privacyPolicyUrl": "https://acme-finance.com/legal/privacy",
-    "termsOfServiceUrl": "https://acme-finance.com/legal/terms",
-    "provenance": [
-      {
-        "relation": "materializedFrom",
-        "sourceId": "urn:example:data:market-dataset-2026q1",
-        "sourceDigest": "sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
-        "registryUri": "oci://registry.example.com/ai-data/market-dataset@sha256:9999888877776666555544443333222211110000aaaabbbbccccddddeeeeffff",
-        "statementUri": "https://trust.acme-finance.com/provenance/finance-agent-runtime-20260222.dsse.json",
-        "signatureRef": "did:example:org-acme#keys-1"
-      }
-    ],
-    "attestations": [
-      {
-        "type": "SOC2-Type2",
-        "uri": "https://trust.acme-finance.com/reports/soc2-latest.pdf",
-        "mediaType": "application/pdf",
-        "digest": "sha256:a1b2c3d4"
-      }
-    ]
-  },
-  "signatures": [
+  "layers": [
     {
-      "format": "jws-compact",
-      "keyId": "did:example:org-acme#keys-1",
-      "createdAt": "2026-02-22T16:30:00Z",
-      "value": "eyJhbGciOiJFUzI1NiJ9..detached-signature"
+      "mediaType": "application/vnd.lf.ai.card.a2a.v1+json",
+      "digest": "sha256:c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2",
+      "size": 542
+    },
+    {
+      "mediaType": "application/vnd.lf.ai.card.mcp.v1+json",
+      "digest": "sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+      "size": 298
     }
   ],
-  "createdAt": "2026-02-22T16:00:00Z",
-  "updatedAt": "2026-02-22T16:30:00Z"
+  "annotations": {
+    "org.opencontainers.image.title": "Acme Finance Agent",
+    "org.opencontainers.image.description": "Executes finance workflows through multiple protocol adapters.",
+    "org.opencontainers.image.created": "2026-02-22T16:00:00Z",
+    "org.opencontainers.image.version": "2026.02.22",
+    "org.opencontainers.image.vendor": "Acme Financial Corp",
+    "org.lf.ai.card.id": "did:example:agent-finance-001",
+    "org.lf.ai.card.specVersion": "1.0"
+  }
 }

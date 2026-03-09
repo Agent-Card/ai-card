@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-card.github.io/spec/sep-0015/config-schema.json",
+  "title": "AI Card Config",
+  "description": "Schema for the AI Card config blob (mediaType: application/vnd.lf.ai.card.config.v1+json).",
+  "type": "object",
+  "required": ["specVersion", "descriptor"],
+  "properties": {
+    "specVersion": { "type": "string" },
+    "descriptor": { "$ref": "#/$defs/descriptor" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "descriptor": {
+      "type": "object",
+      "required": ["id", "name", "description", "publisher", "createdAt", "updatedAt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Globally unique logical identifier (name) for the subject, such as a DID or URN."
+        },
+        "identifierType": {
+          "type": "string",
+          "description": "Verification domain or scheme hint for validating the identifier."
+        },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "logoUrl": { "type": "string", "format": "uri-reference" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "domains": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "skills": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "maturity": {
+          "type": "string",
+          "enum": ["preview", "stable", "deprecated"]
+        },
+        "publisher": { "$ref": "#/$defs/publisher" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "publisher": {
+      "type": "object",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "Publisher identifier (logical name) such as a URN or DID."
+        },
+        "identifierType": {
+          "type": "string",
+          "description": "Verification domain or scheme hint for publisher identity."
+        },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

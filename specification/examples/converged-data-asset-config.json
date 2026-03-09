@@ -1,0 +1,19 @@
+{
+  "specVersion": "1.0",
+  "descriptor": {
+    "id": "urn:example:data:market-dataset-2026q1",
+    "identifierType": "urn",
+    "name": "Market Dataset Q1 2026",
+    "description": "Historical market data prepared for model training and evaluation.",
+    "tags": ["dataset", "finance"],
+    "domains": ["finance"],
+    "maturity": "stable",
+    "publisher": {
+      "id": "did:example:org-acme",
+      "name": "Acme Financial Corp",
+      "identifierType": "did"
+    },
+    "createdAt": "2026-02-22T16:00:00Z",
+    "updatedAt": "2026-02-22T16:00:00Z"
+  }
+}

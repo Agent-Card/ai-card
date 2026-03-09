@@ -1,301 +1,485 @@
-# SEP 0015 - Converged AI Card Profile (Draft)
+# SEP 0015 - OCI-Compatible AI Manifest Spec (Draft)
 
 Status: Draft proposal
 Authors: AI Card contributors
-Target: Common profile for service and artifact metadata across protocol ecosystems
+Target: OCI-native AI agent and artifact metadata for multi-registry distribution
 
 ## 1. Summary
 
-This proposal defines a converged AI Card profile that:
+This proposal defines an OCI-native AI Manifest specification that:
 
-1. Supports rich metadata for all AI assets (live services and data/model artifacts).
-2. Delegates protocol-specific metadata to protocol owners without forcing core-spec changes.
-3. Works across multiple registry and transport technologies.
-4. Provides verifiable identity and cryptographic provenance.
-5. Preserves simple HTTP discovery while enabling registry-native publication.
+1. Represents AI agent and artifact metadata as standard OCI Image Manifests.
+2. Delegates protocol-specific metadata to protocol owners as typed OCI layers.
+3. Distributes natively through any OCI-compliant registry (Harbor, GHCR, DockerHub, etc.).
+4. Composes with the existing OCI signing and attestation ecosystem (cosign, notation, SLSA, in-toto).
+5. Enables simple HTTP discovery while supporting registry-native publication.
 
 ## 2. Scope
 
 This profile defines:
 
-1. Core card envelope and required common fields.
-2. Extension module model for protocol and domain-specific metadata.
-3. Discovery bindings for HTTP well-known and registry publication.
-4. Security model for card signing and attestation references.
-5. Conformance levels for gradual adoption.
+1. OCI manifest structure for AI agent and artifact metadata.
+2. Config blob schema for AI identity and publisher metadata.
+3. Layer mediaTypes for protocol cards and data asset references.
+4. OCI Image Index structure for AI catalogs.
+5. Discovery bindings for HTTP well-known and OCI registry publication.
+6. Security model using OCI Referrers for signing and attestation.
+7. Conformance levels for gradual adoption.
 
-This profile does not define protocol internals (for example, A2A skills or MCP capabilities).
+This profile does not define protocol internals (for example, A2A skills or MCP capabilities). Layer content schemas are owned by their respective upstream projects.
 
 ## 3. Design Principles
 
-1. Core fields are minimal, stable, and shared.
-2. Protocols are autonomous: each protocol owns its own module schema and versioning.
-3. Multiple distribution channels are first-class (HTTP and registry-backed).
-4. Security is explicit and machine-verifiable.
-5. One schema supports both live services and assets at rest.
+1. AI manifests are first-class OCI artifacts.
+2. Protocols are autonomous: each protocol project owns its own layer schema and versioning.
+3. OCI distribution is the canonical registry model; HTTP well-known is a lightweight serving mode.
+4. Signing and attestation are handled entirely via OCI Referrers — no embedded signatures.
+5. Content integrity is guaranteed by OCI content-addressable digests.
 
-## 4. Data Model
+## 4. Media Types
 
-### 4.1 Card Envelope (AICard)
+| Type | MediaType | Description |
+|---|---|---|
+| AI Manifest | `application/vnd.oci.image.manifest.v1+json` | Top-level OCI manifest |
+| AI Manifest artifactType | `application/vnd.lf.ai.manifest.v1+json` | Identifies manifest as an AI manifest |
+| AI Card Config | `application/vnd.lf.ai.card.config.v1+json` | Config blob with AI identity/publisher metadata |
+| A2A Card Layer | `application/vnd.lf.ai.card.a2a.v1+json` | A2A protocol card layer blob |
+| MCP Card Layer | `application/vnd.lf.ai.card.mcp.v1+json` | MCP protocol card layer blob |
+| Dataset Layer | `application/vnd.cncf.model.dataset.v1.tar` | Reused from ModelPack spec (+ gzip/zstd variants) |
+| AI Catalog | `application/vnd.oci.image.index.v1+json` | OCI Image Index catalog |
+| AI Catalog artifactType | `application/vnd.lf.ai.catalog.v1+json` | Identifies index as an AI catalog |
 
-An AICard document MUST include:
+## 5. Data Model
 
-- `$schema`: URI for this profile schema.
-- `specVersion`: profile version.
-- `cardVersion`: version of this card document (publisher-controlled).
-- `id`: globally unique URI for the subject.
+### 5.1 AI Manifest (OCI Image Manifest)
+
+An AI Manifest is a standard OCI Image Manifest with:
+
+- `schemaVersion`: MUST be `2`.
+- `mediaType`: MUST be `application/vnd.oci.image.manifest.v1+json`.
+- `artifactType`: MUST be `application/vnd.lf.ai.manifest.v1+json`.
+- `config`: descriptor pointing to the AI Card Config blob (`application/vnd.lf.ai.card.config.v1+json`).
+- `layers`: zero or more layer descriptors with defined AI mediaTypes.
+- `annotations`: standard OCI annotations plus AI-specific annotations.
+
+Required annotations:
+
+- `org.opencontainers.image.title`: human-readable name.
+- `org.opencontainers.image.created`: RFC 3339 creation timestamp.
+- `org.lf.ai.card.id`: globally unique URI for the subject (logical identifier / name).
+- `org.lf.ai.card.specVersion`: this spec version, e.g. `"1.0"`.
+
+Optional annotations:
+
+- `org.opencontainers.image.description`: concise description.
+- `org.opencontainers.image.version`: publisher-controlled version string.
+- `org.opencontainers.image.vendor`: publisher name.
+
+Example:
+
+```json
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "artifactType": "application/vnd.lf.ai.manifest.v1+json",
+  "config": {
+    "mediaType": "application/vnd.lf.ai.card.config.v1+json",
+    "digest": "sha256:<config-blob-digest>",
+    "size": 1234
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.lf.ai.card.a2a.v1+json",
+      "digest": "sha256:<a2a-layer-digest>",
+      "size": 567
+    },
+    {
+      "mediaType": "application/vnd.lf.ai.card.mcp.v1+json",
+      "digest": "sha256:<mcp-layer-digest>",
+      "size": 890
+    }
+  ],
+  "annotations": {
+    "org.opencontainers.image.title": "Acme Finance Agent",
+    "org.opencontainers.image.description": "Executes finance workflows through multiple protocol adapters.",
+    "org.opencontainers.image.created": "2026-02-22T16:00:00Z",
+    "org.opencontainers.image.version": "2026.02.22",
+    "org.opencontainers.image.vendor": "Acme Financial Corp",
+    "org.lf.ai.card.id": "did:example:agent-finance-001",
+    "org.lf.ai.card.specVersion": "1.0"
+  }
+}
+```
+
+### 5.2 AI Card Config Blob
+
+The config blob has mediaType `application/vnd.lf.ai.card.config.v1+json`. It carries AI identity and publisher metadata following the ModelPack pattern.
+
+The config blob MUST include:
+
+- `specVersion`: this spec version.
+- `descriptor`: identity and publisher metadata object.
+
+`descriptor` MUST include:
+
+- `id`: globally unique URI for the subject (logical identifier / name), such as a DID or URN.
 - `name`: human-readable name.
 - `description`: concise description.
-- `publisher`: publisher identity object.
-- `createdAt`: RFC 3339 timestamp.
-- `updatedAt`: RFC 3339 timestamp.
+- `publisher`: publisher identity object (see Section 5.3).
+- `createdAt`: RFC 3339 creation timestamp.
+- `updatedAt`: RFC 3339 last-updated timestamp.
 
-An AICard MAY include:
+`descriptor` MAY include:
 
-- `identifierType`: type hint for `id`.
-- `logoUrl`, `tags`, `maturity`, `metadata`.
-- `domains`: high-level domain taxonomy for discovery.
-- `skills`: problem/skill taxonomy for discovery.
-- `capabilities`: optional high-level capability descriptors.
-- `trust`: trust and compliance references.
-- `signatures`: one or more detached signatures.
-- `modules`: extension modules grouped by type.
+- `identifierType`: verification domain or scheme hint (e.g. `"did"`, `"urn"`).
+- `logoUrl`, `tags`, `domains`, `skills`, `capabilities`, `maturity`.
 
-Discovery labels (`tags`, `domains`, `skills`, `capabilities`) provide a generic, protocol-agnostic index for search and filtering.
-Module data remains the authoritative, protocol- or artifact-specific metadata.
-Consumers SHOULD use discovery labels to find candidates and then read module data to understand precise protocol behaviors or artifact details.
+Trust fields (`trust`, `signatures`) are NOT present in the config blob. Signing and attestation are handled entirely via OCI Referrers (Section 7).
 
-### 4.2 Protocol and Artifact Cards
+Example:
 
-Protocol and artifact cards are represented inside the `modules` map.
-Each module entry represents a protocol-specific or artifact-specific card and MAY be independently signed.
+```json
+{
+  "specVersion": "1.0",
+  "descriptor": {
+    "id": "did:example:agent-finance-001",
+    "identifierType": "did",
+    "name": "Acme Finance Agent",
+    "description": "Executes finance workflows through multiple protocol adapters.",
+    "logoUrl": "https://acme-finance.com/logo.png",
+    "tags": ["finance", "trading"],
+    "domains": ["finance"],
+    "skills": ["stock-analysis"],
+    "capabilities": {},
+    "maturity": "stable",
+    "publisher": {
+      "id": "did:example:org-acme",
+      "name": "Acme Financial Corp",
+      "identifierType": "did"
+    },
+    "createdAt": "2026-02-22T16:00:00Z",
+    "updatedAt": "2026-02-22T16:30:00Z"
+  }
+}
+```
 
-### 4.3 Publisher Object
+### 5.3 Publisher Object
 
 `publisher` MUST include:
 
-- `id`: globally unique publisher URI.
+- `id`: globally unique publisher URI (logical identifier / name).
 - `name`: human-readable publisher name.
 
 `publisher` MAY include:
 
-- `identifierType`.
-- `attestation`: optional identity proof reference.
+- `identifierType`: verification domain or scheme hint.
+
+### 5.4 Layer Blobs
+
+Each layer is a JSON blob pushed separately to the registry. The content schema for each layer type is defined and owned by the respective upstream project. This spec defines only the mediaType identifier and the governing project.
+
+#### A2A Layer (`application/vnd.lf.ai.card.a2a.v1+json`)
+
+Content is an A2A `AgentCard` JSON document as defined by the [A2A specification](https://github.com/a2aproject/A2A).
+
+Example:
+
+```json
+{
+  "protocolVersions": ["1.0"],
+  "name": "Acme Finance Agent",
+  "description": "Executes finance workflows through multiple protocol adapters.",
+  "supportedInterfaces": [
+    {
+      "url": "https://api.acme-finance.com/a2a/v1",
+      "protocolBinding": "JSONRPC"
+    }
+  ],
+  "provider": {
+    "url": "https://acme-finance.com",
+    "organization": "Acme Financial Corp"
+  },
+  "version": "1.0.0",
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true
+  },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "skills": [
+    {
+      "id": "skill-stock-analysis",
+      "name": "Run Stock Analysis",
+      "description": "Analyzes stock market data and provides investment insights.",
+      "tags": ["finance", "analysis"]
+    }
+  ]
+}
+```
+
+#### MCP Layer (`application/vnd.lf.ai.card.mcp.v1+json`)
+
+Content is an MCP server info document as defined by the [Model Context Protocol specification](https://spec.modelcontextprotocol.io).
+
+Example:
+
+```json
+{
+  "protocolVersion": "2025-03-26",
+  "serverInfo": {
+    "name": "Acme MCP Server",
+    "version": "1.0.0",
+    "url": "https://api.acme-finance.com/mcp/v1"
+  },
+  "capabilities": {
+    "tools": { "listChanged": true },
+    "resources": { "subscribe": true },
+    "prompts": {}
+  }
+}
+```
+
+#### Dataset Layers
+
+Dataset layers reuse mediaTypes from the [CNCF ModelPack specification](https://github.com/modelpack/model-spec):
+
+- `application/vnd.cncf.model.dataset.v1.tar`
+- `application/vnd.cncf.model.dataset.v1.tar+gzip`
+- `application/vnd.cncf.model.dataset.v1.tar+zstd`
+
+This spec does not redefine these types. Consumers SHOULD follow the ModelPack specification for dataset layer content.
+
+### 5.5 AI Catalog (OCI Image Index)
+
+An AI Catalog is a standard OCI Image Index with:
+
+- `schemaVersion`: MUST be `2`.
+- `mediaType`: MUST be `application/vnd.oci.image.index.v1+json`.
+- `artifactType`: MUST be `application/vnd.lf.ai.catalog.v1+json`.
+- `manifests`: list of OCI descriptor entries for AI Manifests.
+- `annotations`: OCI annotations for catalog-level metadata.
+
+Each manifest entry MUST have `artifactType: "application/vnd.lf.ai.manifest.v1+json"`.
+
+Each manifest entry SHOULD include annotations:
+
+- `org.opencontainers.image.title`: name of the referenced agent or asset.
+- `org.lf.ai.card.id`: subject identifier.
+
+In well-known serving mode, each manifest entry SHOULD include `urls` with one or more HTTP URLs where the AI Manifest JSON can be fetched directly.
+
+Example:
+
+```json
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "artifactType": "application/vnd.lf.ai.catalog.v1+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "artifactType": "application/vnd.lf.ai.manifest.v1+json",
+      "digest": "sha256:<manifest-digest>",
+      "size": 1234,
+      "urls": ["https://api.acme.com/cards/finance-agent.json"],
+      "annotations": {
+        "org.opencontainers.image.title": "Acme Finance Agent",
+        "org.opencontainers.image.description": "Executes finance workflows through multiple protocol adapters.",
+        "org.lf.ai.card.id": "did:example:agent-finance-001"
+      }
+    }
+  ],
+  "annotations": {
+    "org.opencontainers.image.title": "Acme Services Inc.",
+    "org.opencontainers.image.created": "2026-02-22T16:00:00Z"
+  }
+}
+```
+
+## 6. Discovery Bindings
+
+### 6.1 Statically Hosted
+
+A statically hosted registry is an OCI Distribution Spec–compatible read-only endpoint served from a static file store — an object storage bucket (S3, Azure Blob, GCS), a CDN origin, or a plain web server. No mutable registry process is required. Blobs and manifests are pre-computed offline and uploaded as files; the serving layer has no write path.
+
+The registry is rooted at `/.well-known/ai-registry` on the serving origin. All OCI Distribution API paths are relative to this prefix. For example:
+
+```
+https://acme-finance.com/.well-known/ai-registry/v2/default/tags/list
+```
 
-### 4.4 Trust and Provenance
+#### 6.1.1 Repository Catalog
 
-`trust` MAY include:
+A static registry MUST expose a repository listing at:
 
-- `trustSchema`: declaration of the trust model and verification policy used for this card.
-- `attestations`: list of trust artifacts (audits, certifications, compliance proofs).
-- `provenance`: signed or verifiable lineage links to source artifacts, source cards, and registry records.
-- `privacyPolicyUrl`.
-- `termsOfServiceUrl`.
+```
+GET /.well-known/ai-registry/v2/_catalog.json
+```
 
-If present, `trustSchema` SHOULD include:
+The response body MUST be a JSON object listing all repository names available in the registry:
 
-- `id`: stable URI for the trust schema/profile.
-- `version`: trust schema version.
-- optional `governanceUri`: policy or governance document for the trust domain.
-- optional `verificationMethods`: supported verification mechanisms (for example `dns-01`, `http-01`, `did`, `x509`, `spiffe`).
+```json
+{
+  "repositories": ["default", "finance-agent", "market-dataset"]
+}
+```
 
-Each `provenance` entry SHOULD include:
+This is the static equivalent of the `GET /v2/_catalog` endpoint defined in the OCI Distribution Specification. Consumers use this document as the entry point for zero-configuration discovery of all hosted AI Manifests.
 
-- `relation`: lineage relationship (for example `derivedFrom`, `materializedFrom`, `publishedFrom`).
-- `sourceId`: identifier of the source card or source subject.
-- optional `sourceDigest`: immutable digest of the source payload.
-- optional `registryUri`: registry record URI used for retrieval.
-- optional `statementUri`: URI of a signed provenance statement (for example DSSE/in-toto/SLSA predicate).
-- optional `signatureRef`: key or signature reference used to verify the provenance statement.
+#### 6.1.2 Read-Only Endpoint Subset
 
-To avoid self-referential dependency loops, provenance data embedded in the card MUST be reference-oriented.
-The card SHOULD carry links to immutable external evidence (for example registry attestations or transparency-log entries) instead of embedding full signed statements whose subject is the same card bytes.
+A static host MUST implement the following subset of the [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec) read endpoints, all prefixed by `/.well-known/ai-registry`:
 
-Each attestation SHOULD follow a reference pattern:
+| ID | Method | Full Path | Description |
+|---|---|---|---|
+| end-1 | `GET` | `/.well-known/ai-registry/v2/` | Version check — return `{}` with `200 OK` |
+| end-2 | `GET` / `HEAD` | `/.well-known/ai-registry/v2/<name>/blobs/<digest>` | Fetch or check a blob by digest |
+| end-3 | `GET` / `HEAD` | `/.well-known/ai-registry/v2/<name>/manifests/<reference>` | Fetch or check a manifest by tag or digest |
+| end-8a | `GET` | `/.well-known/ai-registry/v2/<name>/tags/list` | List available tags |
+| end-12a | `GET` | `/.well-known/ai-registry/v2/<name>/referrers/<digest>` | List referrers for a given digest |
+| end-12b | `GET` | `/.well-known/ai-registry/v2/<name>/referrers/<digest>?artifactType=<type>` | Filtered referrer listing |
 
-- `type`, `uri`, `mediaType`, optional `digest`, optional `size`, optional `description`.
+All write endpoints (end-4 through end-7, end-9 through end-11, end-13 through end-14) are not implemented. The server SHOULD return `405 Method Not Allowed` for any POST, PUT, PATCH, or DELETE request.
 
-`signatures` is preferred over a single `signature` string and SHOULD support key rotation and multiple signers.
+#### 6.1.3 Static File Layout
 
-Each signature entry SHOULD include:
+The entire registry tree is rooted under `/.well-known/ai-registry/`. Content is organised in a content-addressable layout. Each repository `<name>` is a path segment, and blobs are stored keyed by their algorithm-encoded digest:
 
-- `format` (for example `jws-compact`),
-- `value` (detached signature),
-- `keyId`,
-- `createdAt`.
+```
+.well-known/ai-registry/
+  v2/
+    _catalog.json                        # repository listing
+    <name>/
+      blobs/
+        sha256/
+          <encoded>                      # blob content (config blob, layer blob)
+      manifests/
+        <tag>                            # manifest JSON, served by tag
+        sha256/
+          <encoded>                      # manifest JSON, served by digest
+      tags/
+        list.json                        # tags/list response body
+      referrers/
+        sha256:<encoded>/
+          index.json                     # referrers image index for each subject digest
+```
 
-### 4.5 Modules (Delegated Metadata)
+The URL paths defined in Section 6.1.2 map directly to file paths within this layout. A web server with static file serving (or an object storage bucket with path-based access) is sufficient to serve all required endpoints with no application logic.
 
-`modules` is the extension mechanism for protocol/domain metadata.
+#### 6.1.4 Publication Workflow
 
-`modules` is a map grouped by type:
+Because there is no write API, publication is an offline pre-computation step:
 
-- `protocols`: protocol-specific modules (example keys: `a2a`, `mcp`).
-- `artifacts`: artifact-specific modules (example keys: `dataset`, `model`).
+1. Serialise each blob (config blob, layer blobs) to canonical JSON.
+2. Compute the SHA-256 digest of each blob. Store the blob at `v2/<name>/blobs/sha256/<encoded>`.
+3. Construct the AI Manifest referencing each blob descriptor (mediaType, digest, size). Serialise it to canonical JSON and compute its digest. Store at `v2/<name>/manifests/sha256/<encoded>` and `v2/<name>/manifests/<tag>`.
+4. Build the tags list response (`{"name":"<name>","tags":["<tag>",…]}`) and store at `v2/<name>/tags/list.json`.
+5. Build a referrers image index (an OCI Image Index with `manifests` listing any attached signature or attestation manifests) for the AI Manifest digest. Store at `v2/<name>/referrers/sha256:<encoded>/index.json`. Update this file whenever a new referrer (cosign signature, notation signature, SLSA provenance, SBOM) is added.
+6. Rebuild `v2/_catalog.json` to include any newly added repository names.
+7. Upload the entire tree under `.well-known/ai-registry/` to the file store and configure the web server or bucket to serve files at the matching URL paths.
 
-Each module MUST include:
+#### 6.1.5 Consumer Discovery Flow
 
-- `id`: stable module namespace identifier (example: `protocol/a2a`, `protocol/mcp`, `domain/healthcare`).
-- `version`: module schema version.
-- `data`: JSON object payload validated by the module owner schema.
+1. Fetch `GET /.well-known/ai-registry/v2/_catalog.json` to obtain the list of repository names.
+2. For each repository `<name>`, fetch `GET /.well-known/ai-registry/v2/<name>/tags/list` to enumerate available tags.
+3. For each tag, fetch `GET /.well-known/ai-registry/v2/<name>/manifests/<tag>` to retrieve the AI Manifest.
+4. From the AI Manifest, resolve config and layer blobs via `GET /.well-known/ai-registry/v2/<name>/blobs/<digest>`.
+5. Enumerate signatures and attestations via `GET /.well-known/ai-registry/v2/<name>/referrers/<manifest-digest>`.
 
-Each module MAY include:
+### 6.2 OCI Registry Binding
 
-- `required`: boolean. If `true`, consumers that do not understand the module MUST reject processing.
-- `digest`: digest for externalized module data.
+Producers MAY publish AI Manifests to any OCI-compliant registry using the OCI Distribution Specification.
 
-Core profile MUST NOT define module-internal fields.
+Registry publication workflow:
 
-### 4.6 Locators (Discovery and Access)
+1. Push each layer blob to the registry.
+2. Push the config blob to the registry.
+3. Push the AI Manifest referencing config and layer descriptors by digest.
+4. Optionally push an AI Catalog (OCI Image Index) referencing multiple AI Manifests.
 
-Locators are protocol- or artifact-card specific and are defined inside the relevant module data.
-The core profile does not standardize locator fields because routing is protocol-specific.
+Content-addressable retrieval is guaranteed by OCI digest references. Consumers can retrieve AI Manifests by tag or digest using standard OCI Distribution API calls.
 
-### 4.7 Artifacts (At-rest Assets)
+## 7. Signing and Attestation (OCI Referrers)
 
-Artifacts are described inside artifact-card modules.
-Artifact modules SHOULD use the following fields:
+Signing and attestation are handled entirely outside the AI Manifest payload, using the OCI Referrers API. This eliminates embedded `signatures` arrays and circular digest dependencies.
 
-- `uri`, `mediaType`.
-- `digest`, `size`, `schemaUri`, `description`.
+### 7.1 Signing
 
-### 4.8 Runtime Materialization Behavior (Data-at-Rest to Live Service)
+Producers SHOULD sign AI Manifests using cosign or notation. A signature is attached as a referrer to the AI Manifest digest.
 
-This profile is intended to support lifecycle transitions where an artifact card can be transformed into a live runtime and exposed as a service.
+cosign example:
 
-Target behavior:
+```
+cosign sign registry.example.com/ai/finance-agent@sha256:<manifest-digest>
+```
 
-1. An artifact-focused card can describe immutable deployable content (for example, OCI-referenced assets).
-2. A runtime system can materialize that content into a running workload.
-3. The running workload can expose runtime identity (process/container/task identity) and/or service endpoints.
-4. A corresponding protocol-focused card can represent the active runtime view.
-5. Producers and registries can preserve traceability between the at-rest card and the runtime service card.
+notation example:
 
-OCI-style analogy:
+```
+notation sign registry.example.com/ai/finance-agent@sha256:<manifest-digest>
+```
 
-1. A manifest (at-rest reference) identifies immutable image content.
-2. A runtime pulls and instantiates that content.
-3. The instantiated workload has runtime identity (for example, PID/container/task ID) and can expose a network endpoint.
-4. The service-facing metadata is discoverable through a protocol-focused card.
+The `subject` field of the referrer manifest points to the AI Manifest descriptor (digest + mediaType + size).
 
-Recommended linkage patterns:
+### 7.2 Attestations and Provenance
 
-1. Use module-defined locators for immutable artifact references and active endpoints.
-2. Include signed provenance references in `trust.attestations` so verifiers can validate source-to-runtime lineage.
-3. Use a module (or profile extension) to capture runtime binding details (for example deployment digest, workload identity, startup time, and endpoint activation status).
-4. Keep logical subject identity stable when possible; if runtime identity is ephemeral, bind ephemeral runtime identifiers to a stable subject through signed claims.
+Producers MAY attach SLSA provenance, SBOMs, or in-toto attestations as referrers:
 
-## 5. Discovery Bindings
+```
+cosign attest --predicate slsa-provenance.json --type slsaprovenance \
+  registry.example.com/ai/finance-agent@sha256:<manifest-digest>
+```
 
-### 5.1 HTTP Well-known Binding
+### 7.3 Verification
 
-Producers SHOULD expose:
+Consumers SHOULD verify signatures via cosign or notation before trusting AI Manifest content:
 
-- `/.well-known/ai-catalog.json` for collection discovery.
-- Optional direct card location via catalog entries.
+```
+cosign verify registry.example.com/ai/finance-agent@sha256:<manifest-digest>
+```
 
-Catalog records MUST include:
+Consumers MAY enumerate referrers via the OCI Referrers API (`GET /v2/<name>/referrers/<digest>`) to discover available signatures and attestations.
 
-- `id`, `name`, `description`, `cardUrl`, `updatedAt`.
+## 8. Identifier Requirements
 
-### 5.2 Registry Binding
+1. `org.lf.ai.card.id` (in manifest annotations) and `descriptor.id` (in config blob) MUST be identical.
+2. `id` MUST be a URI and SHOULD use decentralized or domain-anchored schemes (e.g. `did:` or `urn:`).
+3. The identifier namespace SHOULD be verifiable by a trust mechanism appropriate to the scheme.
+4. `id` is a logical name; it is distinct from an identity credential or account that proves control.
+5. OCI content-addressable digests provide immutable content integrity; `id` is the stable logical name.
 
-The same card payload MAY be published to registry technologies.
+## 9. Conformance Levels
 
-Registry publication SHOULD preserve:
+- `L0-Base`: Valid OCI manifest + valid config blob. No layers required.
+- `L1-Discovery`: L0 + published to an OCI registry or served via a statically hosted registry at `/.well-known/ai-registry`.
+- `L2-Signed`: L1 + cosign or notation signature attached via OCI Referrers API.
+- `L3-Attested`: L2 + provenance or SBOM referrers attached (SLSA, in-toto, etc.).
 
-- Content-addressable retrieval (`digest`).
-- Media type declaration.
-- Stable linkage from catalog/discovery to immutable card versions.
+## 10. Schemas and Examples
 
-For generic registries (that do not natively model trust relationships), publishers SHOULD provide explicit lineage links in `trust.provenance` so consumers can reconstruct source-to-card and artifact-to-runtime provenance.
+JSON Schemas:
 
-When provenance needs to bind a card publication event, producers SHOULD use an acyclic two-phase flow:
+- `specification/schema/schema.json` — OCI Image Manifest schema
+- `specification/schema/catalog-schema.json` — OCI Image Index schema
+- `specification/schema/config-schema.json` — AI Card Config blob schema
 
-1. Produce and sign the card version.
-2. Publish the card to a registry and let registry-native provenance be generated over immutable registry subjects (for example manifest digest).
-3. Reference that external provenance from a later card revision or a catalog/registry side record.
+CDDL definitions:
 
-This prevents a card version from needing to contain provenance that depends on signatures computed over that same final card version.
+- `specification/cddl/ai-card-profile.cddl` — OCI manifest CDDL
+- `specification/cddl/ai-catalog.cddl` — OCI index CDDL
 
-## 6. Identifier and Security Requirements
+Example payloads:
 
-1. `id` is the identifier (the logical name) for the subject and MUST be globally unique and stable over time.
-2. `id` MUST be a URI and SHOULD use decentralized or domain-anchored schemes (for example `did:` or `urn:`).
-3. The identifier namespace MUST be verifiable by a trust mechanism appropriate to the scheme and publishing domain.
-4. Namespace verification MAY include DNS or HTTP challenges, DID method proofs, workload identity systems, or other externally defined trust schemes.
-5. The identifier is a name; it is distinct from an identity credential or account that proves control.
-6. `identifierType` MAY indicate the verification domain or scheme used to validate the identifier or signature binding.
-7. Signed cards SHOULD be verifiable without a central trust broker.
-8. If `signatures` are present, verifiers MUST validate signature and subject binding.
-9. Trust roots and verification policy are external to this profile and SHOULD be referenced through `trust.trustSchema`.
-10. Trust assertions without signatures MUST be treated as self-asserted.
-11. Verifiers SHOULD prefer immutable external provenance evidence (registry or transparency log) when available, and treat card-embedded provenance as linkage metadata.
+- `specification/examples/converged-live-service-card.json` — AI Manifest for live service (A2A + MCP layers)
+- `specification/examples/converged-live-service-config.json` — Config blob for live service
+- `specification/examples/converged-live-service-a2a-layer.json` — A2A layer blob
+- `specification/examples/converged-live-service-mcp-layer.json` — MCP layer blob
+- `specification/examples/converged-data-asset-card.json` — AI Manifest for data asset (dataset layer)
+- `specification/examples/converged-data-asset-config.json` — Config blob for data asset
+- `specification/examples/converged-ai-catalog.json` — AI Catalog (OCI Image Index)
 
-### 6.1 Subject Commitment Model (Normative)
+## 11. Open Questions
 
-To ensure interoperability across registries and prevent circular verification dependencies, this profile defines two digest scopes:
-
-1. **subject scope**: digest over a canonicalized logical payload.
-2. **blob scope**: digest over the exact stored bytes in a transport or registry.
-
-Normative requirements:
-
-1. Producers MUST distinguish subject-scope and blob-scope digests and MUST NOT compare them as if they were equivalent values.
-2. Producers MUST define one canonicalization method for subject-scope hashing for each profile version.
-3. Subject-scope signatures and attestations MUST bind to the canonical subject bytes, not to mutable or transport-specific encodings.
-4. Card validity MUST NOT depend on resolving provenance that cryptographically commits to the same full card bytes for that same card revision.
-5. Card-embedded provenance MUST be reference-oriented and SHOULD point to immutable external evidence (for example registry attestations or transparency-log entries).
-6. If provenance for a card publication event is generated after publication, producers SHOULD reference it from a later card revision or from a side record.
-7. Verifiers MUST perform signature and digest checks within the declared scope (`subject` or `blob`) and MUST reject scope-ambiguous claims.
-
-Recommended verifier order:
-
-1. Verify blob-scope integrity for retrieved registry content.
-2. Derive and canonicalize the subject payload.
-3. Verify subject-scope signatures and attestations.
-4. Resolve provenance links and validate lineage constraints.
-
-This model allows different registries to maintain their native blob digests while preserving a portable subject-level trust model for cross-registry verification.
-
-## 7. Conformance Levels
-
-1. `L0-Base`: required core envelope only.
-2. `L1-Signed`: `L0` + at least one valid signature.
-3. `L2-Trust`: `L1` + trust attestations and policy URLs.
-4. `L3-Portable`: `L2` + module-defined locators with immutable digests for registry publication.
-
-## 8. Backward Compatibility and Migration
-
-This profile absorbs previous draft variants using `services`, `interfaces`, or `protocols` by mapping them into `modules`:
-
-1. A prior `protocols.a2a.protocolSpecific` payload maps to module `protocol/a2a`.
-2. A prior `protocols.mcp.protocolSpecific` payload maps to module `protocol/mcp`.
-3. Existing top-level trust fields remain valid with no semantic change.
-
-## 9. Open Questions
-
-1. Should the profile require one canonical signature format in v1?
-2. Should module IDs be centrally registered or convention-based?
-3. Should `cardVersion` follow semver or monotonically increasing revision?
-
-## 10. Next Steps
-
-This draft now includes:
-
-1. JSON Schemas for card and catalog payloads:
-   - `specification/schema/schema.json`
-   - `specification/schema/catalog-schema.json`
-2. CDDL definitions for card and catalog payloads:
-   - `specification/cddl/ai-card-profile.cddl`
-   - `specification/cddl/ai-catalog.cddl`
-3. Example payloads for:
-   - protocol-focused cards
-   - artifact-focused cards
-   - mixed catalog entries
-
-Remaining work:
-
-1. Add automated schema validation in CI for all examples.
-2. Add a multi-card record example.
-3. Run interop tests across at least two protocols and two registry backends.
+1. Should `org.lf.ai.card.id` be required in both manifest annotations and the config blob, or only one?
+2. Should the spec define a canonical set of `skills` and `domains` taxonomy values?
+3. Should the spec define a layer ordering convention (e.g. A2A before MCP)?
