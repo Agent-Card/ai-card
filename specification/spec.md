@@ -12,15 +12,21 @@ This specification defines an OCI-native format for publishing and distributing 
 
 ---
 
-## 1. Conformance
+## 1. Related Work
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
-
-An implementation is conformant with this specification if it satisfies the normative requirements in Sections 2 through 8 applicable to its role (producer or consumer). Conformance levels are defined in Section 9.
+**[CNCF ModelPack](https://github.com/modelpack/model-spec)** follows the same OCI-native approach as this specification, but targets AI models rather than AI agents and services. A ModelPack artifact is an OCI Image Manifest whose config blob carries model identity and provenance metadata, and whose layers carry model weights, datasets, and code using defined MediaTypes. This specification adopts the same structural pattern — OCI manifest envelope, typed config blob, typed layers, OCI Referrers for signing — and reuses ModelPack's dataset layer mediaTypes directly rather than redefining them.
 
 ---
 
-## 2. Scope
+## 2. Conformance
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
+
+An implementation is conformant with this specification if it satisfies the normative requirements in Sections 3 through 9 applicable to its role (producer or consumer). Conformance levels are defined in Section 10.
+
+---
+
+## 3. Scope
 
 This specification defines:
 
@@ -36,7 +42,7 @@ This specification does not define protocol internals (for example, A2A skills o
 
 ---
 
-## 3. Design Goals
+## 4. Design Goals
 
 1. AI manifests are first-class OCI artifacts.
 2. Protocols are autonomous: each protocol project owns its own layer schema and versioning.
@@ -46,7 +52,7 @@ This specification does not define protocol internals (for example, A2A skills o
 
 ---
 
-## 4. Media Types
+## 5. Media Types
 
 | Type | MediaType | Description |
 |---|---|---|
@@ -61,9 +67,9 @@ This specification does not define protocol internals (for example, A2A skills o
 
 ---
 
-## 5. Data Model
+## 6. Data Model
 
-### 5.1 AI Manifest
+### 6.1 AI Manifest
 
 An AI Manifest is a standard OCI Image Manifest. The following fields are normative:
 
@@ -71,7 +77,7 @@ An AI Manifest is a standard OCI Image Manifest. The following fields are normat
 - `mediaType`: MUST be `application/vnd.oci.image.manifest.v1+json`.
 - `artifactType`: MUST be `application/vnd.lf.ai.manifest.v1+json`.
 - `config`: MUST be a descriptor pointing to the AI Card Config blob (`application/vnd.lf.ai.card.config.v1+json`).
-- `layers`: zero or more layer descriptors with mediaTypes defined in Section 4.
+- `layers`: zero or more layer descriptors with mediaTypes defined in Section 5.
 - `annotations`: MUST include the required annotations below; MAY include optional annotations.
 
 **Required annotations:**
@@ -123,7 +129,7 @@ Example:
 }
 ```
 
-### 5.2 AI Card Config Blob
+### 6.2 AI Card Config Blob
 
 The config blob has mediaType `application/vnd.lf.ai.card.config.v1+json`. It carries AI identity and publisher metadata.
 
@@ -134,10 +140,10 @@ The config blob MUST include:
 
 `descriptor` MUST include:
 
-- `id`: globally unique URI for the subject, such as a DID or URN. MUST match `org.lf.ai.card.id` in the manifest annotations (see Section 8).
+- `id`: globally unique URI for the subject, such as a DID or URN. MUST match `org.lf.ai.card.id` in the manifest annotations (see Section 9).
 - `name`: human-readable name.
 - `description`: concise description.
-- `publisher`: publisher identity object (see Section 5.3).
+- `publisher`: publisher identity object (see Section 6.3).
 - `createdAt`: RFC 3339 creation timestamp.
 - `updatedAt`: RFC 3339 last-updated timestamp.
 
@@ -173,7 +179,7 @@ Example:
 }
 ```
 
-### 5.3 Publisher Object
+### 6.3 Publisher Object
 
 `publisher` MUST include:
 
@@ -184,7 +190,7 @@ Example:
 
 - `identifierType`: verification domain or scheme hint.
 
-### 5.4 Layer Blobs
+### 6.4 Layer Blobs
 
 Each layer is a content-addressable blob stored separately. The content schema for each layer type is defined and owned by the respective upstream project. This specification defines only the mediaType identifier and the governing project reference.
 
@@ -259,7 +265,7 @@ Dataset layers reuse mediaTypes from the [CNCF ModelPack specification](https://
 
 This specification does not redefine these types. Consumers SHOULD follow the ModelPack specification for dataset layer content.
 
-### 5.5 AI Catalog
+### 6.5 AI Catalog
 
 An AI Catalog is a standard OCI Image Index with:
 
@@ -305,9 +311,9 @@ Example:
 
 ---
 
-## 6. Distribution
+## 7. Distribution
 
-### 6.1 Statically Hosted Registry
+### 7.1 Statically Hosted Registry
 
 A statically hosted registry is an OCI Distribution Spec–compatible read-only endpoint served from a static file store — an object storage bucket (S3, Azure Blob, GCS), a CDN origin, or a plain web server. No mutable registry process is required. Blobs and manifests are pre-computed offline and uploaded as files; the serving layer has no write path.
 
@@ -317,7 +323,7 @@ The registry MUST be rooted at `/.well-known/ai-registry` on the serving origin.
 https://acme-finance.com/.well-known/ai-registry/v2/default/tags/list
 ```
 
-#### 6.1.1 Repository Catalog
+#### 7.1.1 Repository Catalog
 
 A statically hosted registry MUST expose a repository listing at:
 
@@ -335,7 +341,7 @@ The response body MUST be a JSON object listing all repository names available i
 
 This is the static equivalent of the `GET /v2/_catalog` endpoint defined in the OCI Distribution Specification. Consumers use this document as the entry point for zero-configuration discovery of all hosted AI Manifests.
 
-#### 6.1.2 Read-Only Endpoint Subset
+#### 7.1.2 Read-Only Endpoint Subset
 
 A statically hosted registry MUST implement the following subset of the [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec) read endpoints, all prefixed by `/.well-known/ai-registry`:
 
@@ -350,7 +356,7 @@ A statically hosted registry MUST implement the following subset of the [OCI Dis
 
 All write endpoints (end-4 through end-7, end-9 through end-11, end-13 through end-14) are not implemented. The server SHOULD return `405 Method Not Allowed` for any POST, PUT, PATCH, or DELETE request.
 
-#### 6.1.3 File Layout
+#### 7.1.3 File Layout
 
 The entire registry tree is rooted under `/.well-known/ai-registry/`. Content is organised in a content-addressable layout. Each repository `<name>` is a path segment, and blobs are stored keyed by their algorithm-encoded digest:
 
@@ -373,9 +379,9 @@ The entire registry tree is rooted under `/.well-known/ai-registry/`. Content is
           index.json                     # referrers image index for each subject digest
 ```
 
-The URL paths defined in Section 6.1.2 map directly to file paths within this layout. A web server with static file serving, or an object storage bucket with path-based access, is sufficient to serve all required endpoints with no application logic.
+The URL paths defined in Section 7.1.2 map directly to file paths within this layout. A web server with static file serving, or an object storage bucket with path-based access, is sufficient to serve all required endpoints with no application logic.
 
-#### 6.1.4 Publication Workflow
+#### 7.1.4 Publication Workflow
 
 Because there is no write API, publication is an offline pre-computation step:
 
@@ -387,7 +393,7 @@ Because there is no write API, publication is an offline pre-computation step:
 6. Rebuild `v2/_catalog.json` to include any newly added repository names.
 7. Upload the entire tree under `.well-known/ai-registry/` to the file store and configure the web server or bucket to serve files at the matching URL paths.
 
-#### 6.1.5 Consumer Discovery Flow
+#### 7.1.5 Consumer Discovery Flow
 
 1. Fetch `GET /.well-known/ai-registry/v2/_catalog.json` to obtain the list of repository names.
 2. For each repository `<name>`, fetch `GET /.well-known/ai-registry/v2/<name>/tags/list` to enumerate available tags.
@@ -395,7 +401,7 @@ Because there is no write API, publication is an offline pre-computation step:
 4. From the AI Manifest, resolve config and layer blobs via `GET /.well-known/ai-registry/v2/<name>/blobs/<digest>`.
 5. Enumerate signatures and attestations via `GET /.well-known/ai-registry/v2/<name>/referrers/<manifest-digest>`.
 
-### 6.2 OCI Registry
+### 7.2 OCI Registry
 
 Producers MAY publish AI Manifests to any OCI-compliant registry using the OCI Distribution Specification.
 
@@ -410,11 +416,11 @@ Content-addressable retrieval is guaranteed by OCI digest references. Consumers 
 
 ---
 
-## 7. Signing and Attestation
+## 8. Signing and Attestation
 
 Signing and attestation are handled entirely outside the AI Manifest payload using the OCI Referrers API. This eliminates embedded `signatures` arrays and circular digest dependencies.
 
-### 7.1 Signing
+### 8.1 Signing
 
 Producers SHOULD sign AI Manifests using cosign or notation. A signature is attached as a referrer to the AI Manifest digest. The `subject` field of the referrer manifest points to the AI Manifest descriptor (digest + mediaType + size).
 
@@ -430,7 +436,7 @@ notation:
 notation sign registry.example.com/ai/finance-agent@sha256:<manifest-digest>
 ```
 
-### 7.2 Attestations and Provenance
+### 8.2 Attestations and Provenance
 
 Producers MAY attach SLSA provenance, SBOMs, or in-toto attestations as referrers:
 
@@ -439,7 +445,7 @@ cosign attest --predicate slsa-provenance.json --type slsaprovenance \
   registry.example.com/ai/finance-agent@sha256:<manifest-digest>
 ```
 
-### 7.3 Verification
+### 8.3 Verification
 
 Consumers SHOULD verify signatures before trusting AI Manifest content:
 
@@ -455,7 +461,7 @@ GET /v2/<name>/referrers/<digest>
 
 ---
 
-## 8. Identifier Requirements
+## 9. Identifier Requirements
 
 1. `org.lf.ai.card.id` in manifest annotations and `descriptor.id` in the config blob MUST be identical.
 2. `id` MUST be a URI and SHOULD use decentralized or domain-anchored schemes (e.g. `did:` or `urn:`).
@@ -465,7 +471,7 @@ GET /v2/<name>/referrers/<digest>
 
 ---
 
-## 9. Conformance
+## 10. Conformance
 
 Implementations are classified by conformance level. Each level is cumulative.
 
@@ -476,7 +482,7 @@ Implementations are classified by conformance level. Each level is cumulative.
 
 ---
 
-## 10. Schemas and Examples
+## 11. Schemas and Examples
 
 JSON Schemas:
 
