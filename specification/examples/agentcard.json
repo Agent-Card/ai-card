@@ -1,0 +1,36 @@
+{
+  "name": "Acme Finance Agent",
+  "description": "Executes finance workflows through multiple protocol adapters.",
+  "version": "1.0.0",
+  "supportedInterfaces": [
+    {
+      "url": "https://api.acme-finance.com/a2a/v1",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "provider": {
+    "url": "https://acme-finance.com",
+    "organization": "Acme Financial Corp"
+  },
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": true,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": ["application/json", "text/plain"],
+  "defaultOutputModes": ["application/json", "text/plain"],
+  "skills": [
+    {
+      "id": "skill-stock-analysis",
+      "name": "Run Stock Analysis",
+      "description": "Analyzes stock market data and provides investment insights.",
+      "tags": ["finance", "analysis"],
+      "examples": [
+        "Analyze AAPL and TSLA momentum for this week"
+      ],
+      "inputModes": ["application/json", "text/plain"],
+      "outputModes": ["application/json", "text/plain"]
+    }
+  ]
+}
