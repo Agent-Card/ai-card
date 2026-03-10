@@ -341,12 +341,4 @@ CDDL definitions:
 - `cddl/ai-card-profile.cddl` — AI Manifest CDDL
 - `cddl/ai-catalog.cddl` — AI Catalog CDDL
 
-Example payloads:
-
-- `examples/converged-live-service-card.json` — AI Manifest for a live service (A2A + MCP layers)
-- `examples/converged-live-service-config.json` — Config blob for the live service example
-- `examples/converged-live-service-a2a-layer.json` — A2A layer blob
-- `examples/converged-live-service-mcp-layer.json` — MCP layer blob
-- `examples/converged-data-asset-card.json` — AI Manifest for a data asset (dataset layer)
-- `examples/converged-data-asset-config.json` — Config blob for the data asset example
-- `examples/converged-ai-catalog.json` — AI Catalog (OCI Image Index)
+Check [examples](examples/README.md) for a simple reference implementation of the specification captured in this document.
