@@ -14,8 +14,8 @@ This specification defines an OCI-native format for representing, publishing and
 
 ## 1. Related Work
 
-**[CNCF ModelPack](https://github.com/modelpack/model-spec)** follows the same OCI-native approach as this specification, but targets AI models rather than AI agents and services. A ModelPack artifact is an OCI Image Manifest whose config blob carries model identity and provenance metadata, and whose layers carry model weights, datasets, and code using defined MediaTypes. This specification adopts the same structural pattern — OCI manifest envelope, typed config blob, typed layers, OCI Referrers for signing — and reuses ModelPack's dataset layer mediaTypes directly rather than redefining them.
-**[AGNTCY OASF](https://spec.dir.agntcy.org)** follows the same OCI-native approach and describes agents as records with config layer for metadata and layers as modular components that describe agent capabilities through an OCI Manifest.
+- **[CNCF ModelPack](https://github.com/modelpack/model-spec)** follows the same OCI-native approach as this specification, but targets AI models rather than AI agents and services. A ModelPack artifact is an OCI Image Manifest whose config blob carries model identity and provenance metadata, and whose layers carry model weights, datasets, and code using defined MediaTypes. This specification adopts the same structural pattern — OCI manifest envelope, typed config blob, typed layers, OCI Referrers for signing — and reuses ModelPack's dataset layer mediaTypes directly rather than redefining them.
+- **[AGNTCY OASF](https://spec.dir.agntcy.org)** follows the same OCI-native approach and describes agents as records with config layer for metadata and layers as modular components that describe agent capabilities through an OCI Manifest.
 
 ---
 
@@ -38,8 +38,7 @@ This specification defines:
 5. Application-layer support via OCI Referrers (e.g. signing and attestation)
 6. Conformance levels for gradual adoption
 
-This specification does not define protocol internals (for example, A2A skills or MCP capabilities).
-Layer content schemas are owned by their respective upstream projects.
+This specification does not define protocol internals (for example, A2A skills or MCP capabilities). Layer content schemas are owned by their respective upstream projects.
 
 ---
 
@@ -48,7 +47,7 @@ Layer content schemas are owned by their respective upstream projects.
 1. AI Manifests are first-class OCI artifacts
 2. Protocols are autonomous: each protocol project owns its own artifact schema and versioning
 3. Discovery served through OCI Distribution API
-4. Signing and attestation are handled entirely via OCI Referrers — no embedded signatures
+4. Signing and attestation are handled entirely via OCI Referrers - no embedded signatures
 5. Content integrity is guaranteed by OCI content-addressable digests
 
 ---
@@ -77,7 +76,7 @@ An AI Manifest is a standard OCI Image Manifest. The following fields are normat
 
 Example:
 
-```jsonc
+```json
 {
   "schemaVersion": 2,
   "mediaType": "application/vnd.oci.image.manifest.v1+json",
@@ -229,10 +228,9 @@ Example:
 
 ## 6. Distribution
 
-An AI Catalog MAY be served from any OCI-compliant registry or a statically hosted registry at `/.well-known/ai-registry` on a web server or object storage bucket.
-Consumers MAY fetch the catalog, enumerate available AI Manifests, and retrieve individual manifests and blobs as needed.
+An AI Catalog MAY be served from any OCI-compliant registry or a statically hosted registry at `/.well-known/ai-registry` on a web server or object storage bucket. Consumers MAY fetch the catalog, enumerate available AI Manifests, and retrieve individual manifests and blobs as needed.
 
-The registry MUST support the following subset of the [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec) read endpoints, all prefixed by `/.well-known/ai-registry`:
+The registry MUST support the following subset of the [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec) read endpoints:
 
 | Method | Full Path | Description |
 |---|---|---|
@@ -246,15 +244,14 @@ The registry MUST support the following subset of the [OCI Distribution Specific
 
 #### 6.1 Publication Workflow
 
-Producers MAY publish AI Manifests to any OCI-compliant registry (local filesystem or remote webserver) using the OCI Distribution Specification.
-Publication workflow MAY be private or public depending on the access controls.
+Producers MAY publish AI Manifests to any OCI-compliant registry (local filesystem or remote webserver) using the OCI Distribution Specification. Publication workflow MAY be private or public depending on the access controls defined by the registry.
 
 **Publication workflow:**
 
-1. Push each layer blob/manifest to the registry.
-2. Push the config blob/manifest to the registry.
-3. Push the AI Manifest referencing config and layer descriptors by digest.
-4. Optionally push an AI Catalog (OCI Image Index) referencing multiple AI Manifests.
+1. Push each layer blob/manifest to the registry
+2. Push the config blob/manifest to the registry
+3. Push the AI Manifest referencing config and layer descriptors by digest
+4. Optionally push an AI Catalog (OCI Image Index) referencing multiple AI Manifests
 
 #### 6.2 Discovery Workflow
 
@@ -262,11 +259,11 @@ Consumers MAY discover and retrieve AI Catalogs and Manifests using the OCI Dist
 
 **Discovery workflow:**
 
-1. Fetch `GET /.well-known/ai-registry/_catalog.json` to obtain the list of repository names.
+1. Fetch `GET /.well-known/ai-registry/_catalog.json` to obtain the list of repository names
 2. For each repository `<name>`, fetch `GET /.well-known/ai-registry/<name>/tags/list` to enumerate available tags.
-3. For each tag, fetch `GET /.well-known/ai-registry/<name>/manifests/<tag>` to retrieve the AI Manifest.
-4. For each AI Manifest, resolve config and layer data via matching endpoint by fetching blobs and manifests.
-5. For each AI Manifest, resolve links such as signatures and attestations via `GET /.well-known/ai-registry/<name>/referrers/<digest>`.
+3. For each tag, fetch `GET /.well-known/ai-registry/<name>/manifests/<tag>` to retrieve the AI Manifes
+4. For each AI Manifest, resolve config and layer data via matching endpoint by fetching blobs and manifests
+5. For each AI Manifest, resolve links such as signatures and attestations via `GET /.well-known/ai-registry/<name>/referrers/<digest>`
 
 ---
 
@@ -276,8 +273,7 @@ Application layer support MAY be handled outside the AI Manifest payload using t
 
 ### 7.1 Signing and Verification
 
-Signatures MUST be attached to AI Manifests as OCI Referrers. This eliminates embedded `signatures` arrays and circular digest dependencies.
-Tools like Cosign and Notation can be used to sign and verify AI Manifests.
+Signatures MUST be attached to AI Manifests as OCI Referrers. This eliminates embedded `signatures` arrays and circular digest dependencies. Tools like Cosign and Notation can be used to sign and verify AI Manifests.
 
 **Signing workflow:**
 
