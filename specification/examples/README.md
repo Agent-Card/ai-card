@@ -65,6 +65,15 @@ for MEDIA_TYPE in "application/vnd.a2a.card.v1+json" "application/vnd.mcp.card.v
 done
 ```
 
+### List AI Manifest OCI Referrers
+
+```bash
+# Show all links to OCI Manifest (e.g. signatures, metrics, etc)
+oras discover \
+    --oci-layout ai-registry:example-agent \
+    --format json
+```
+
 ### Verify AI Manifest Signature
 
 ```bash
@@ -95,13 +104,4 @@ notation policy import /tmp/trustpolicy.json
 NOTATION_EXPERIMENTAL=1 notation verify \
     --oci-layout ai-registry:example-agent \
     --scope "local/ai-registry"
-```
-
-### List AI Manifest OCI Referrers
-
-```bash
-# Show all links to OCI Manifest (e.g. signatures, metrics, etc)
-oras discover \
-    --oci-layout ai-registry:example-agent \
-    --format json
 ```
