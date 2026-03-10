@@ -5,7 +5,7 @@
 AIManifest = {
   schemaVersion: 2,
   mediaType: "application/vnd.oci.image.manifest.v1+json",
-  artifactType: "application/vnd.lf.ai.manifest.v1+json",
+  artifactType: "application/vnd.aaif.ai.manifest.v1+json",
   config: Descriptor,
   layers: [* Descriptor],
   annotations: ManifestAnnotations,
@@ -13,13 +13,8 @@ AIManifest = {
 }
 
 ManifestAnnotations = {
-  "org.opencontainers.image.title" => text,
-  "org.opencontainers.image.created" => text,
-  "org.lf.ai.card.id" => text,
-  "org.lf.ai.card.specVersion" => text,
-  ? "org.opencontainers.image.description" => text,
-  ? "org.opencontainers.image.version" => text,
-  ? "org.opencontainers.image.vendor" => text,
+  "org.aaif.ai.card.id" => text,
+  "org.aaif.ai.card.specVersion" => text,
   * text => text
 }
 
