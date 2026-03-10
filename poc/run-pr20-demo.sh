@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-OUT_DIR="$ROOT_DIR/demo/output"
+OUT_DIR="$ROOT_DIR/poc/output"
 OCI_LAYOUT_DIR="$OUT_DIR/oci-layout"
 MANIFEST_JSON="$OUT_DIR/ai-manifest.demo.json"
 TAG="pr20-demo"
@@ -96,4 +96,4 @@ echo "Demo complete."
 echo "  Manifest JSON: $MANIFEST_JSON"
 echo "  OCI layout:    $OCI_LAYOUT_DIR"
 echo "  ORAS inspect:  oras manifest fetch --oci-layout \"$OCI_LAYOUT_DIR:$TAG\" | jq ."
-echo "  Verify again:  oras manifest fetch --oci-layout \"$OCI_LAYOUT_DIR:$TAG\" | jq ."
+echo "  Verify again:  oras manifest fetch --oci-layout \"$OCI_LAYOUT_DIR:$TAG\" | jq .t pu"
