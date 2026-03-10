@@ -1,0 +1,14 @@
+{
+  "specVersion": "1.0",
+  "descriptor": {
+    "id": "did:example:agent-finance-001",
+    "name": "Acme Finance Agent",
+    "description": "Executes finance workflows through multiple protocol adapters.",
+    "publisher": {
+      "id": "did:example:org-acme",
+      "name": "Acme Financial Corp"
+    },
+    "createdAt": "2026-02-22T16:00:00Z",
+    "updatedAt": "2026-02-22T16:30:00Z"
+  }
+}

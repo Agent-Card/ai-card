@@ -1,11 +1,42 @@
 ; ==========================================================================
-; SEP-0015 Converged AI Card Profile CDDL
+; SEP-0015 AI Manifest Profile CDDL (OCI Image Manifest)
 ; ==========================================================================
 
-AICard = {
-  $schema: text,
+AIManifest = {
+  schemaVersion: 2,
+  mediaType: "application/vnd.oci.image.manifest.v1+json",
+  artifactType: "application/vnd.aaif.ai.manifest.v1+json",
+  config: Descriptor,
+  layers: [* Descriptor],
+  annotations: ManifestAnnotations,
+  ? subject: Descriptor
+}
+
+ManifestAnnotations = {
+  "org.aaif.ai.card.id" => text,
+  "org.aaif.ai.card.specVersion" => text,
+  * text => text
+}
+
+Descriptor = {
+  mediaType: text,
+  digest: text,
+  size: uint,
+  ? urls: [* text],
+  ? annotations: { * text => text },
+  ? artifactType: text
+}
+
+; ==========================================================================
+; AI Card Config Blob (application/vnd.aaif.ai.card.config.v1+json)
+; ==========================================================================
+
+AICardConfig = {
   specVersion: text,
-  cardVersion: text,
+  descriptor: CardDescriptor
+}
+
+CardDescriptor = {
   id: text,
   ? identifierType: text,
   name: text,
@@ -17,10 +48,6 @@ AICard = {
   ? capabilities: { * text => any },
   ? maturity: "preview" / "stable" / "deprecated",
   publisher: Publisher,
-  ? trust: Trust,
-  ? signatures: [* Signature],
-  ? modules: ModuleMap,
-  ? metadata: { * text => any },
   createdAt: tdate,
   updatedAt: tdate
 }
@@ -28,60 +55,5 @@ AICard = {
 Publisher = {
   id: text,
   name: text,
-  ? identifierType: text,
-  ? attestation: Attestation
+  ? identifierType: text
 }
-
-Trust = {
-  ? trustSchema: TrustSchema,
-  ? attestations: [* Attestation],
-  ? provenance: [* ProvenanceLink],
-  ? privacyPolicyUrl: text,
-  ? termsOfServiceUrl: text
-}
-
-TrustSchema = {
-  id: text,
-  version: text,
-  ? governanceUri: text,
-  ? verificationMethods: [* text]
-}
-
-ProvenanceLink = {
-  relation: text,
-  sourceId: text,
-  ? sourceDigest: text,
-  ? registryUri: text,
-  ? statementUri: text,
-  ? signatureRef: text
-}
-
-Attestation = {
-  type: text,
-  uri: text,
-  mediaType: text,
-  ? digest: text,
-  ? size: uint,
-  ? description: text
-}
-
-Signature = {
-  format: text,
-  value: text,
-  keyId: text,
-  createdAt: tdate
-}
-
-Module = {
-  id: text,
-  version: text,
-  ? required: bool,
-  ? digest: text,
-  data: { * text => any }
-}
-
-ModuleMap = {
-  ? protocols: { * text => Module },
-  ? artifacts: { * text => Module }
-}
-

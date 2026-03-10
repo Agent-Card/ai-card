@@ -1,26 +1,39 @@
 ; ==========================================================================
-; SEP-0015 Converged AI Catalog CDDL
+; SEP-0015 AI Catalog CDDL (OCI Image Index)
 ; ==========================================================================
 
 AICatalog = {
-  $schema: text,
-  specVersion: text,
-  host: HostInfo,
-  records: [* CatalogEntry]
+  schemaVersion: 2,
+  mediaType: "application/vnd.oci.image.index.v1+json",
+  artifactType: "application/vnd.aaif.ai.catalog.v1+json",
+  manifests: [* ManifestDescriptor],
+  ? annotations: CatalogAnnotations,
+  ? subject: Descriptor
 }
 
-HostInfo = {
-  name: text,
-  ? id: text,
-  ? documentationUrl: text,
-  ? logoUrl: text
+ManifestDescriptor = {
+  mediaType: "application/vnd.oci.image.manifest.v1+json",
+  artifactType: "application/vnd.aaif.ai.manifest.v1+json",
+  digest: text,
+  size: uint,
+  ? urls: [* text],
+  ? annotations: ManifestEntryAnnotations
 }
 
-CatalogEntry = {
-  id: text,
-  name: text,
-  description: text,
-  ? tags: [* text],
-  cardUrl: text,
-  updatedAt: tdate
+ManifestEntryAnnotations = {
+  ? "org.aaif.ai.card.id" => text,
+  * text => text
+}
+
+CatalogAnnotations = {
+  * text => text
+}
+
+Descriptor = {
+  mediaType: text,
+  digest: text,
+  size: uint,
+  ? urls: [* text],
+  ? annotations: { * text => text },
+  ? artifactType: text
 }

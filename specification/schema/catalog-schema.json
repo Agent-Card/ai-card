@@ -1,50 +1,91 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agent-card.github.io/spec/sep-0015/catalog-schema.json",
-  "title": "Converged AI Catalog",
+  "title": "AI Catalog (OCI Image Index)",
+  "description": "Schema for an OCI Image Index representing an AI catalog.",
   "type": "object",
-  "required": ["$schema", "specVersion", "host", "records"],
+  "required": ["schemaVersion", "mediaType", "artifactType", "manifests"],
   "properties": {
-    "$schema": { "type": "string", "format": "uri" },
-    "specVersion": { "type": "string" },
-    "host": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "mediaType": {
+      "type": "string",
+      "const": "application/vnd.oci.image.index.v1+json"
+    },
+    "artifactType": {
+      "type": "string",
+      "const": "application/vnd.aaif.ai.catalog.v1+json"
+    },
+    "manifests": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/manifestDescriptor" }
+    },
+    "annotations": {
       "type": "object",
-      "required": ["name"],
+      "additionalProperties": { "type": "string" }
+    },
+    "subject": { "$ref": "#/$defs/descriptor" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "descriptor": {
+      "type": "object",
+      "required": ["mediaType", "digest", "size"],
       "properties": {
-        "name": { "type": "string" },
-        "id": {
+        "mediaType": { "type": "string" },
+        "digest": {
           "type": "string",
-          "format": "uri-reference",
-          "description": "Catalog host identifier (logical name) such as a URN or DID."
+          "pattern": "^[a-z0-9]+:[a-f0-9]+$"
         },
-        "documentationUrl": { "type": "string", "format": "uri-reference" },
-        "logoUrl": { "type": "string", "format": "uri-reference" }
+        "size": { "type": "integer", "minimum": 0 },
+        "urls": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "artifactType": { "type": "string" }
       },
       "additionalProperties": false
     },
-    "records": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "name", "description", "cardUrl", "updatedAt"],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uri-reference",
-            "description": "Card subject identifier (logical name) such as a URN or DID."
-          },
-          "name": { "type": "string" },
-          "description": { "type": "string" },
-          "tags": {
-            "type": "array",
-            "items": { "type": "string" }
-          },
-          "cardUrl": { "type": "string", "format": "uri-reference" },
-          "updatedAt": { "type": "string", "format": "date-time" }
+    "manifestDescriptor": {
+      "type": "object",
+      "required": ["mediaType", "artifactType", "digest", "size"],
+      "properties": {
+        "mediaType": {
+          "type": "string",
+          "const": "application/vnd.oci.image.manifest.v1+json"
         },
-        "additionalProperties": false
-      }
+        "artifactType": {
+          "type": "string",
+          "const": "application/vnd.aaif.ai.manifest.v1+json"
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+:[a-f0-9]+$"
+        },
+        "size": { "type": "integer", "minimum": 0 },
+        "urls": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" },
+          "description": "HTTP URLs for well-known serving mode."
+        },
+        "annotations": {
+          "type": "object",
+          "properties": {
+            "org.aaif.ai.card.id": {
+              "type": "string",
+              "format": "uri-reference"
+            }
+          },
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
     }
-  },
-  "additionalProperties": false
+  }
 }

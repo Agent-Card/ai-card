@@ -1,179 +1,70 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agent-card.github.io/spec/sep-0015/schema.json",
-  "title": "Converged AI Card",
+  "title": "AI Manifest (OCI Image Manifest)",
+  "description": "Schema for an OCI Image Manifest representing an AI agent or artifact.",
   "type": "object",
-  "required": [
-    "$schema",
-    "specVersion",
-    "cardVersion",
-    "id",
-    "name",
-    "description",
-    "publisher",
-    "createdAt",
-    "updatedAt"
-  ],
+  "required": ["schemaVersion", "mediaType", "artifactType", "config", "layers", "annotations"],
   "properties": {
-    "$schema": { "type": "string", "format": "uri" },
-    "specVersion": { "type": "string" },
-    "cardVersion": { "type": "string" },
-    "id": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "mediaType": {
       "type": "string",
-      "format": "uri-reference",
-      "description": "Logical identifier for the subject (name), such as a URN or DID."
+      "const": "application/vnd.oci.image.manifest.v1+json"
     },
-    "identifierType": {
+    "artifactType": {
       "type": "string",
-      "description": "Verification domain or scheme hint for validating the identifier or signature binding."
+      "const": "application/vnd.aaif.ai.manifest.v1+json"
     },
-    "name": { "type": "string" },
-    "description": { "type": "string" },
-    "logoUrl": { "type": "string", "format": "uri-reference" },
-    "tags": {
+    "config": { "$ref": "#/$defs/descriptor" },
+    "layers": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": { "$ref": "#/$defs/descriptor" }
     },
-    "domains": {
-      "type": "array",
-      "items": { "type": "string" }
-    },
-    "skills": {
-      "type": "array",
-      "items": { "type": "string" }
-    },
-    "capabilities": {
+    "annotations": {
       "type": "object",
-      "additionalProperties": true
-    },
-    "maturity": { "type": "string", "enum": ["preview", "stable", "deprecated"] },
-    "publisher": { "$ref": "#/$defs/publisher" },
-    "trust": { "$ref": "#/$defs/trust" },
-    "signatures": { "$ref": "#/$defs/signatures" },
-    "modules": { "$ref": "#/$defs/moduleMap" },
-    "metadata": {
-      "type": "object",
-      "additionalProperties": true
-    },
-    "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" }
-  },
-  "$defs": {
-    "publisher": {
-      "type": "object",
-      "required": ["id", "name"],
+      "required": [
+        "org.aaif.ai.card.id",
+        "org.aaif.ai.card.specVersion"
+      ],
       "properties": {
-        "id": {
+        "org.aaif.ai.card.id": {
           "type": "string",
           "format": "uri-reference",
-          "description": "Publisher identifier (logical name) such as a URN or DID."
+          "description": "Globally unique logical identifier (name) for the subject, such as a DID or URN."
         },
-        "identifierType": {
-          "type": "string",
-          "description": "Verification domain or scheme hint for publisher identity."
-        },
-        "name": { "type": "string" },
-        "attestation": { "$ref": "#/$defs/attestation" }
+        "org.aaif.ai.card.specVersion": { "type": "string" }
       },
-      "additionalProperties": false
+      "additionalProperties": { "type": "string" }
     },
-    "trust": {
+    "subject": { "$ref": "#/$defs/descriptor" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "descriptor": {
       "type": "object",
+      "required": ["mediaType", "digest", "size"],
       "properties": {
-        "trustSchema": { "$ref": "#/$defs/trustSchema" },
-        "attestations": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/attestation" }
-        },
-        "provenance": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/provenanceLink" }
-        },
-        "privacyPolicyUrl": { "type": "string", "format": "uri-reference" },
-        "termsOfServiceUrl": { "type": "string", "format": "uri-reference" }
-      },
-      "additionalProperties": false
-    },
-    "trustSchema": {
-      "type": "object",
-      "required": ["id", "version"],
-      "properties": {
-        "id": { "type": "string", "format": "uri-reference" },
-        "version": { "type": "string" },
-        "governanceUri": { "type": "string", "format": "uri-reference" },
-        "verificationMethods": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      },
-      "additionalProperties": false
-    },
-    "provenanceLink": {
-      "type": "object",
-      "required": ["relation", "sourceId"],
-      "properties": {
-        "relation": { "type": "string" },
-        "sourceId": { "type": "string", "format": "uri-reference" },
-        "sourceDigest": { "type": "string" },
-        "registryUri": { "type": "string", "format": "uri-reference" },
-        "statementUri": { "type": "string", "format": "uri-reference" },
-        "signatureRef": { "type": "string" }
-      },
-      "additionalProperties": false
-    },
-    "signatures": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["format", "value", "keyId", "createdAt"],
-        "properties": {
-          "format": { "type": "string" },
-          "value": { "type": "string" },
-          "keyId": { "type": "string" },
-          "createdAt": { "type": "string", "format": "date-time" }
-        },
-        "additionalProperties": false
-      }
-    },
-    "module": {
-      "type": "object",
-      "required": ["id", "version", "data"],
-      "properties": {
-        "id": { "type": "string" },
-        "version": { "type": "string" },
-        "required": { "type": "boolean" },
-        "digest": { "type": "string" },
-        "data": { "type": "object" }
-      },
-      "additionalProperties": false
-    },
-    "moduleMap": {
-      "type": "object",
-      "properties": {
-        "protocols": {
-          "type": "object",
-          "additionalProperties": { "$ref": "#/$defs/module" }
-        },
-        "artifacts": {
-          "type": "object",
-          "additionalProperties": { "$ref": "#/$defs/module" }
-        }
-      },
-      "additionalProperties": false
-    },
-    "attestation": {
-      "type": "object",
-      "required": ["type", "uri", "mediaType"],
-      "properties": {
-        "type": { "type": "string" },
-        "uri": { "type": "string", "format": "uri-reference" },
         "mediaType": { "type": "string" },
-        "digest": { "type": "string" },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+:[a-f0-9]+$",
+          "description": "Content-addressable digest in the form algorithm:hex."
+        },
         "size": { "type": "integer", "minimum": 0 },
-        "description": { "type": "string" }
+        "urls": {
+          "type": "array",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "artifactType": { "type": "string" }
       },
       "additionalProperties": false
     }
-  },
-  "additionalProperties": false
+  }
 }
