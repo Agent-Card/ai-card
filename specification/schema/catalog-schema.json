@@ -16,7 +16,7 @@
     },
     "artifactType": {
       "type": "string",
-      "const": "application/vnd.lf.ai.catalog.v1+json"
+      "const": "application/vnd.aaif.ai.catalog.v1+json"
     },
     "manifests": {
       "type": "array",
@@ -24,10 +24,6 @@
     },
     "annotations": {
       "type": "object",
-      "properties": {
-        "org.opencontainers.image.title": { "type": "string" },
-        "org.opencontainers.image.created": { "type": "string", "format": "date-time" }
-      },
       "additionalProperties": { "type": "string" }
     },
     "subject": { "$ref": "#/$defs/descriptor" }
@@ -66,7 +62,7 @@
         },
         "artifactType": {
           "type": "string",
-          "const": "application/vnd.lf.ai.manifest.v1+json"
+          "const": "application/vnd.aaif.ai.manifest.v1+json"
         },
         "digest": {
           "type": "string",
@@ -81,9 +77,7 @@
         "annotations": {
           "type": "object",
           "properties": {
-            "org.opencontainers.image.title": { "type": "string" },
-            "org.opencontainers.image.description": { "type": "string" },
-            "org.lf.ai.card.id": {
+            "org.aaif.ai.card.id": {
               "type": "string",
               "format": "uri-reference"
             }

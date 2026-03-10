@@ -16,7 +16,7 @@
     },
     "artifactType": {
       "type": "string",
-      "const": "application/vnd.lf.ai.manifest.v1+json"
+      "const": "application/vnd.aaif.ai.manifest.v1+json"
     },
     "config": { "$ref": "#/$defs/descriptor" },
     "layers": {
@@ -26,23 +26,16 @@
     "annotations": {
       "type": "object",
       "required": [
-        "org.opencontainers.image.title",
-        "org.opencontainers.image.created",
-        "org.lf.ai.card.id",
-        "org.lf.ai.card.specVersion"
+        "org.aaif.ai.card.id",
+        "org.aaif.ai.card.specVersion"
       ],
       "properties": {
-        "org.opencontainers.image.title": { "type": "string" },
-        "org.opencontainers.image.description": { "type": "string" },
-        "org.opencontainers.image.created": { "type": "string", "format": "date-time" },
-        "org.opencontainers.image.version": { "type": "string" },
-        "org.opencontainers.image.vendor": { "type": "string" },
-        "org.lf.ai.card.id": {
+        "org.aaif.ai.card.id": {
           "type": "string",
           "format": "uri-reference",
           "description": "Globally unique logical identifier (name) for the subject, such as a DID or URN."
         },
-        "org.lf.ai.card.specVersion": { "type": "string" }
+        "org.aaif.ai.card.specVersion": { "type": "string" }
       },
       "additionalProperties": { "type": "string" }
     },

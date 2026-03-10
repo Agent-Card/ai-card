@@ -28,7 +28,7 @@ Descriptor = {
 }
 
 ; ==========================================================================
-; AI Card Config Blob (application/vnd.lf.ai.card.config.v1+json)
+; AI Card Config Blob (application/vnd.aaif.ai.card.config.v1+json)
 ; ==========================================================================
 
 AICardConfig = {

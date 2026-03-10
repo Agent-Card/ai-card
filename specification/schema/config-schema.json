@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agent-card.github.io/spec/sep-0015/config-schema.json",
   "title": "AI Card Config",
-  "description": "Schema for the AI Card config blob (mediaType: application/vnd.lf.ai.card.config.v1+json).",
+  "description": "Schema for the AI Card config blob (mediaType: application/vnd.aaif.ai.card.config.v1+json).",
   "type": "object",
   "required": ["specVersion", "descriptor"],
   "properties": {

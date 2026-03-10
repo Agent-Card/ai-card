@@ -10,6 +10,8 @@
 
 This specification defines an OCI-native format for representing, publishing and distributing AI Cards. AI Manifest is an AI Card packaged as OCI Image Manifest that carries common AI agent metadata and delegates protocol-specific details as layers to enable modular composition. AI Catalog is a collection of AI Cards represented as an OCI Image Index that aggregate AI Manifests for discovery.
 
+Check [examples](examples/README.md) for a simple reference implementation of the specification captured in this document.
+
 ---
 
 ## 1. Related Work
@@ -133,7 +135,7 @@ The config blob MUST include:
 
 `descriptor` MUST include:
 
-- `id`: globally unique URI for the subject, such as a DID or URN. MUST match `org.lf.ai.card.id` in the manifest annotations (see Section 9)
+- `id`: globally unique URI for the subject, such as a DID or URN. MUST match `org.aaif.ai.card.id` in the manifest annotations (see Section 9)
 - `name`: human-readable name
 - `description`: concise description
 - `publisher`: publisher identity object
@@ -177,12 +179,11 @@ Example:
 
 ### 5.3 AI Manifest Layers
 
-Each layer is a content-addressable blob or manifest stored separately. The content schema for each layer type is defined and owned by the respective upstream project.
-This specification defines only the artifactType identifier and the governing project reference.
+Each layer is a content-addressable blob or manifest stored separately. The content schema for each layer type is defined and owned by the respective upstream project. This specification defines only the artifactType identifier and the governing project reference.
 
 - A2A Layer (`application/vnd.a2a.card.v1+json`): Content is an A2A `AgentCard` JSON document as defined by the [A2A specification](https://github.com/a2aproject/A2A).
 - MCP Layer (`application/vnd.mcp.card.v1+json`): Content is an MCP server info document as defined by the [Model Context Protocol specification](https://spec.modelcontextprotocol.io).
-- Dataset Manifest (`application/vnd.cncf.model.manifest.v1+json): Content is an OCI Manifest as defined by the [CNCF ModelPack specification](https://github.com/modelpack/model-spec).
+- Dataset Manifest (`application/vnd.cncf.model.manifest.v1+json`): Content is an OCI Manifest as defined by the [CNCF ModelPack specification](https://github.com/modelpack/model-spec).
 
 ### 5.4 AI Catalog
 
@@ -320,10 +321,10 @@ cosign attest --predicate slsa-provenance.json --type slsaprovenance \
 
 Implementations are classified by conformance level. Each level is cumulative.
 
-- **L0-Base**: Produces or consumes a valid OCI manifest with a valid AI Card Config blob. No layers required.
-- **L1-Discovery**: L0 + publishes to an OCI registry or serves a registry at `/.well-known/ai-registry`.
-- **L2-Signed**: L1 + attaches a cosign or notation signature via the OCI Referrers API.
-- **L3-Attested**: L2 + attaches provenance or SBOM referrers (SLSA, in-toto, etc.).
+- **L0-Base**: Produces or consumes a valid OCI manifest with a valid AI Card Config blob. No layers required
+- **L1-Discovery**: L0 + publishes to an OCI registry or serves a registry at `/.well-known/ai-registry`
+- **L2-Signed**: L1 + attaches a cosign or notation signature via the OCI Referrers API
+- **L3-Attested**: L2 + attaches provenance or SBOM referrers (SLSA, in-toto, etc)
 
 ---
 
