@@ -8,8 +8,8 @@
 AICatalog = {
   $schema: text,              ; URI to the JSON schema
   specVersion: text,          ; Version of the Catalog spec (e.g. "1.0.0")
-  ? host: HostInfo,             ; Who runs this server/registry
-  entry: [* CatalogEntry] ; The list of available AI services
+  ? host: HostInfo,           ; Who runs this server/registry
+  records: [* CatalogEntry]     ; The list of available AI services
 }
 
 HostInfo = {
