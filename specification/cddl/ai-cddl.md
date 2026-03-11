@@ -24,7 +24,7 @@ CatalogEntry = {
   name: text,                 ; Human-readable name for the AI Service
   description: text,          ; Short description
   ? tags: [* text],           ; A list of tags for filtering and discovery
-  cardUrl: text,              ; URL to the full ai-card.json 
-  updatedAt: tdate            ; Last modified time of the AI Card (for crawler optimization)
+  cardUrl: text,              ; URL to the full card (agent.json, mcp.json, ai-card.json, etc) 
+  updatedAt: tdate            ; Last modified time of the card (for crawler optimization)
 }
 ```
