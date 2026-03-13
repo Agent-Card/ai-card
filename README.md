@@ -70,14 +70,3 @@ Protocol-specific cards would be standardized as a common AI Card structure, wit
 #### Ecosystem
 
 If adopted, MCP and A2A steering committees will recommend duplicative card-adjacent efforts be consolidated, such as Registry, Agent Identity, and others.
-
-## Draft Specifications
-
-- `specification/sep-0015-converged-ai-card-profile.md`: converged AI Card profile proposal with modular protocol delegation, security requirements, and dual discovery bindings.
-- `specification/schema/schema.json`: JSON Schema for converged AI Card payloads.
-- `specification/schema/catalog-schema.json`: JSON Schema for converged AI catalog payloads.
-- `specification/cddl/ai-card-profile.cddl`: CDDL for converged AI Card payloads.
-- `specification/cddl/ai-catalog.cddl`: CDDL for converged AI catalog payloads.
-- `specification/examples/converged-live-service-card.json`: example for protocol-focused cards.
-- `specification/examples/converged-data-asset-card.json`: example for artifact-focused cards.
-- `specification/examples/converged-ai-catalog.json`: example catalog including live and at-rest cards.
