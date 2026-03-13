@@ -1,6 +1,19 @@
-# Example AI Manifest/Catalog usage
+# Example Reference Implementation
+
+This document provides a reference implementation of the AI Card specification using a local OCI registry layout and common OCI tooling.
+
+No custom implementations are required - any OCI-compliant registry and tooling should work as long as they support the necessary OCI Distribution Specification (v1.1).
 
 ## Requirements
+
+All commands in this example are executed relative to the path of this file.
+
+```bash
+git clone https://github.com/agent-card/ai-card.git
+cd ai-card/specification/examples
+```
+
+**Dependencies**
 
 - [jq](https://github.com/jqlang/jq)
 - [cddl](https://github.com/anweiss/cddl)
@@ -8,6 +21,8 @@
 - [notation](https://github.com/notaryproject/notation)
 
 ## Producer Workflow
+
+This workflow demonstrates how to create and publish AI Manifests and AI Catalogs to an OCI registry, as well as signing for content authenticity and integrity verification.
 
 ### Create AI Manifest
 
@@ -28,7 +43,7 @@ oras push \
 
 ```bash
 # Generate sample signing key
-notation cert generate-test --default "ai-manifest.io"
+notation cert generate-test --default "ai-manifest.test.io"
 
 # Sign using notation
 NOTATION_EXPERIMENTAL=1 notation sign \
@@ -47,6 +62,8 @@ oras manifest index create \
 
 ## Consumer Workflow
 
+This workflow demonstrates how to discover and retrieve AI Manifests and AI Catalogs from an OCI registry, as well as how to verify AI Manifest signatures.
+
 ### List AI Catalog
 
 ```bash
@@ -54,16 +71,6 @@ oras manifest index create \
 oras manifest fetch \
     --oci-layout ai-registry:catalog \
     --format go-template --template '{{ toPrettyJson .content }}'
-```
-
-### List auto-discovered AI Manifests
-
-```bash
-# Get AI Manifests using constant subject digest for auto-discovery
-oras discover \
-    --oci-layout ai-registry@sha256:ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356 \
-    --artifact-type "application/vnd.aaif.ai.manifest.v1+json" \
-    --format json
 ```
 
 ### Get A2A/MCP Data
@@ -107,7 +114,7 @@ cat <<EOF > /tmp/trustpolicy.json
             "signatureVerification": {
                 "level" : "strict"
             },
-            "trustStores": [ "ca:ai-manifest.io" ],
+            "trustStores": [ "ca:ai-manifest.test.io" ],
             "trustedIdentities": [
                 "*"
             ]
@@ -126,6 +133,8 @@ NOTATION_EXPERIMENTAL=1 notation verify \
 ```
 
 ## Autodiscovery Workflow
+
+This workflow demonstrates how to use a constant subject descriptor in the AI Manifest to enable auto-discovery of AI Manifests via OCI Referrers API without relying on AI Catalog.
 
 ```bash
 # Push empty manifest as constant for auto-discovery.
@@ -161,6 +170,8 @@ oras discover \
 ```
 
 ## CDDL Conformance
+
+Validate that the implementation conforms to the specification using the provided CDDL schemas and `cddl` CLI tool.
 
 ### AI Card metadata
 
