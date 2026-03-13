@@ -57,6 +57,48 @@ This specification does not define protocol internals (for example, A2A skills o
 
 ## 5. Data Model
 
+The data model can be expressed using a MerkleDAG:
+- AI Manifest is a node linking common AI card metadata with protocol-specific layers
+- AI Catalog is a node that aggregates multiple AI Manifests for discovery
+- Referrers are nodes linking external data to AI Manifests for application-layer logic
+
+```mermaid
+graph TB
+  subgraph Catalog["OCI Index"]
+    AICatalog["AI Catalog"]
+  end
+
+  AICatalog --> AIM1["AI Manifest 1"]
+  AICatalog --> AIMn["AI Manifest N"]
+
+  subgraph Manifest1["OCI Manifest"]
+    AIM1 --> Config1["AI Card Metadata"]
+    AIM1 --> Layer1A["A2A Card"]
+    AIM1 --> Layer1B["AGNTCY DIR Record"]
+    Config1 ~~~ Layer1A ~~~ Layer1B
+  end
+
+  subgraph ManifestN["OCI Manifest"]
+    AIMn --> ConfigN["AI Card Metadata"]
+    AIMn --> LayerN1["MCP Server"]
+    AIMn --> LayerN2["HuggingFace Model"]
+    ConfigN ~~~ LayerN1 ~~~ LayerN2
+  end
+
+  subgraph AppLayer["OCI Referrers"]
+    Ext1["Signature"]
+    Ext2["Identity Claims"]
+  end
+
+  Ext1 --> AIM1
+  Ext2 --> AIMn
+
+  style Catalog fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
+  style Manifest1 fill:#dcfce7,stroke:#22c55e
+  style ManifestN fill:#dcfce7,stroke:#22c55e
+  style AppLayer fill:#fef3c7,stroke:#f59e0b
+```
+
 ### 5.1 AI Manifest
 
 An AI Manifest is a standard OCI Image Manifest. The following fields are normative:
