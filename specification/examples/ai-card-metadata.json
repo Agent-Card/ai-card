@@ -1,0 +1,11 @@
+{
+  "id": "did:example:agent-finance-001",
+  "name": "Acme Finance Agent",
+  "description": "Executes finance workflows through multiple protocol adapters.",
+  "logoUrl": "https://example.com/logo.png",
+  "publisher": {
+    "id": "did:example:org-acme",
+    "name": "Acme Financial Corp"
+  },
+  "tags": ["finance", "accounting", "payroll"]
+}

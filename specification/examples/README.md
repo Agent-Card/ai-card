@@ -1,3 +1,11 @@
+# Example AI Manifest/Catalog usage
+
+## Requirements
+
+- [cddl](https://github.com/anweiss/cddl)
+- [oras](https://github.com/oras-project/oras)
+- [notation](https://github.com/notaryproject/notation)
+
 ## Producer Workflow
 
 ### Create AI Manifest
@@ -10,9 +18,9 @@ oras push \
     --annotation "org.aaif.ai.card.id=did:example:agent-finance-001" \
     --annotation "org.aaif.ai.card.specVersion=1.0" \
     --annotation "org.opencontainers.image.created=2026-03-10T15:00:00Z" \
-    --config ai_config.json:application/vnd.aaif.ai.card.config.v1+json \
-    a2a_card.json:application/vnd.a2a.card.v1+json \
-    mcp_server.json:application/vnd.mcp.card.v1+json
+    --config ai-card-metadata.json:application/vnd.aaif.ai.card.metadata.v1+json \
+    a2a-card.json:application/vnd.a2a.card.v1+json \
+    mcp-server.json:application/vnd.mcp.card.v1+json
 ```
 
 ### Sign AI Manifest
@@ -104,4 +112,25 @@ notation policy import /tmp/trustpolicy.json
 NOTATION_EXPERIMENTAL=1 notation verify \
     --oci-layout ai-registry:example-agent \
     --scope "local/ai-registry"
+```
+
+## CDDL Conformance
+
+### AI Card metadata
+
+```bash
+cddl validate --cddl ../cddl/ai-card-metadata.cddl --json ./ai-card-metadata.json
+```
+
+### AI Manifest
+
+```bash
+# Validate linked manifest
+oras manifest fetch \
+    --oci-layout ai-registry:example-agent \
+    --format go-template --template '{{ toPrettyJson .content }}' \
+    | cddl validate --cddl ../cddl/ai-manifest.cddl --stdin
+
+# Validate flat manifest
+
 ```
