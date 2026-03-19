@@ -1,0 +1,39 @@
+; ==========================================================================
+; SEP-0015 AI Catalog Profile CDDL (OCI Image Index)
+; ==========================================================================
+
+Catalog = {
+  schemaVersion: 2
+  mediaType: "application/vnd.oci.image.index.v1+json"
+  artifactType: "application/vnd.aaif.ai.catalog.v1+json"
+  manifests: [* ManifestDescriptor]
+  ? annotations: {
+    * text => text
+  }
+  ? subject: Descriptor
+}
+
+ManifestDescriptor = {
+  mediaType: "application/vnd.oci.image.manifest.v1+json"
+  artifactType: "application/vnd.aaif.ai.manifest.v1+json"
+  digest: text
+  size: uint
+  ? urls: [* text],
+  ? annotations: {
+    "org.aaif.ai.card.id": text
+    "org.aaif.ai.card.specVersion": text
+    * text => text
+  }
+}
+
+Descriptor = {
+  mediaType: text
+  digest: text
+  size: uint
+  ? data: text
+  ? urls: [ * text ]
+  ? annotations: {
+    * text => text
+  }
+  ? artifactType: text
+}

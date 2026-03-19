@@ -1,0 +1,17 @@
+; ==========================================================================
+; SEP-0015 AI Card Metadata Profile CDDL
+; ==========================================================================
+
+Card = {
+  id: text
+  name: text
+  description: text
+  publisher: Publisher
+  ? logoUrl: text
+  ? tags: [ * text ]
+}
+
+Publisher = {
+  id: text
+  name: text
+}
