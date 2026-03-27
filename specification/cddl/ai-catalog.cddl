@@ -15,7 +15,7 @@ Catalog = {
 
 ManifestDescriptor = {
   mediaType: "application/vnd.oci.image.manifest.v1+json"
-  artifactType: "application/vnd.aaif.ai.manifest.v1+json"
+  artifactType: "application/vnd.aaif.ai.card.v1+json"
   digest: text
   size: uint
   ? urls: [* text],

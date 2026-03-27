@@ -1,13 +1,13 @@
 ; ==========================================================================
-; SEP-0015 AI Manifest Profile CDDL (OCI Image Manifest)
+; SEP-0015 AI Card Profile CDDL (OCI Image Manifest)
 ; ==========================================================================
 
-Manifest = {
+Card = {
   schemaVersion: 2
   mediaType: "application/vnd.oci.image.manifest.v1+json"
-  artifactType: "application/vnd.aaif.ai.manifest.v1+json"
+  artifactType: "application/vnd.aaif.ai.card.v1+json"
   config: ConfigDescriptor
-  layers: [ * Descriptor ]
+  layers: [ LayerDescriptor ]
   annotations: {
     "org.aaif.ai.card.id": text
     "org.aaif.ai.card.specVersion": text
@@ -24,6 +24,18 @@ ConfigDescriptor = {
   ? annotations: {
     * text => text
   }
+}
+
+LayerDescriptor = {
+  mediaType: text
+  digest: text
+  size: uint
+  ? data: text
+  ? urls: [ * text ]
+  ? annotations: {
+    * text => text
+  }
+  ? artifactType: text
 }
 
 Descriptor = {
