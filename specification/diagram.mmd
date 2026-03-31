@@ -1,0 +1,65 @@
+classDiagram
+    class AICatalog {
+        specVersion string
+        entries CatalogEntry[]
+        host HostInfo
+        collections CollectionRef[]
+    }
+    class HostInfo {
+        name string
+        id string
+        trustManifest TrustManifest
+    }
+    class CatalogEntry {
+        id string
+        name string
+        mediaType string
+        url | inline
+        version string
+        publisher Publisher
+        trustManifest TrustManifest
+    }
+    class CollectionRef {
+        name string
+        url string
+        description string
+        tags string[]
+    }
+    class Publisher {
+        id string
+        name string
+    }
+    class TrustManifest {
+        identity string
+        trustSchema TrustSchema
+        attestations Attestation[]
+        provenance ProvenanceLink[]
+        signature string
+    }
+    class TrustSchema {
+        id string
+        version string
+        verificationMethods string[]
+    }
+    class Attestation {
+        type string
+        uri string
+        mediaType string
+        digest string
+    }
+    class ProvenanceLink {
+        relation string
+        sourceId string
+        sourceDigest string
+    }
+    AICatalog --> "*" CatalogEntry : entries
+    AICatalog --> "0..1" HostInfo : host
+    AICatalog --> "*" CollectionRef : collections
+    CatalogEntry --> "0..1" Publisher : publisher
+    CatalogEntry --> "0..1" TrustManifest : trustManifest
+    HostInfo --> "0..1" TrustManifest : trustManifest
+    TrustManifest --> "0..1" TrustSchema : trustSchema
+    TrustManifest --> "*" Attestation : attestations
+    TrustManifest --> "*" ProvenanceLink : provenance
+    CatalogEntry --> "0..1" AICatalog : bundle
+    CollectionRef ..> AICatalog : references

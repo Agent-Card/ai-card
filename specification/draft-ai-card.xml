@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- name="GENERATOR" content="github.com/mmarkdown/mmark Mmark Markdown Processor - mmark.miek.nl" -->
+<rfc version="3" ipr="trust200902" docName="draft-ai-catalog-spec-01" submissionType="IETF" category="info" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" indexInclude="true">
+
+<front>
+<title abbrev="AI Catalog">AI Catalog and Trust Card: A Discovery and Trust Standard for AI Artifacts</title><seriesInfo value="draft-ai-catalog-spec-01" stream="IETF" status="informational" name="Internet-Draft"></seriesInfo>
+<author initials="T." surname="Segal" fullname="Todd Segal"><organization></organization><address><postal><street></street>
+</postal><email>todd@example.com</email>
+</address></author><author initials="D." surname="Soria Parra" fullname="David Soria Parra"><organization></organization><address><postal><street></street>
+</postal><email>dsp@example.com</email>
+</address></author><date/>
+<area>Applications and Real-Time</area>
+<workgroup>AI Card Working Group</workgroup>
+<keyword>ai</keyword>
+<keyword>agent</keyword>
+<keyword>catalog</keyword>
+<keyword>discovery</keyword>
+<keyword>trust</keyword>
+<keyword>card</keyword>
+
+</front>
+
+<middle>
+
+<section anchor="introduction"><name>Introduction</name>
+<t>The AI ecosystem comprises a growing number of protocols, artifact
+formats, and service types. Model Context Protocol (MCP) servers,
+Agent-to-Agent (A2A) agents, Anthropic skills, datasets, model cards,
+and other AI artifacts each define their own metadata and discovery
+mechanisms. This fragmentation forces clients and registries to
+implement bespoke logic for each artifact type, increasing complexity
+and reducing interoperability.</t>
+<t>This document defines two complementary standards:</t>
+
+<dl spacing="compact">
+<dt>AI Catalog</dt>
+<dd>A typed, nestable container for discovering heterogeneous AI
+artifacts. Each entry declares its artifact type via a media type
+and may reference or inline the native artifact metadata. Catalogs
+themselves may be nested as entries, enabling composable bundles
+analogous to plugin packages.</dd>
+<dt>Trust Card (AI Card)</dt>
+<dd>A portable, verifiable identity and trust document that accompanies
+any AI artifact as a peer element. The Trust Card functions as a
+&quot;passport&quot; for an AI artifact: it proves the artifact's identity
+and carries attestations, provenance, and compliance metadata
+without wrapping or modifying the artifact's native format.</dd>
+</dl>
+<t>The AI Catalog is intentionally agnostic about the artifacts it
+indexes. It does not define or constrain the schema of MCP server
+manifests, A2A agent cards, or any other artifact format. Instead, it
+relies on media types to identify what each entry is, and delegates
+the definition of artifact-specific metadata to the respective protocol
+specifications.</t>
+
+<section anchor="conventions-and-definitions"><name>Conventions and Definitions</name>
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;,
+&quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and
+&quot;OPTIONAL&quot; in this document are to be interpreted as described in
+BCP 14 <xref target="RFC2119"></xref> <xref target="RFC8174"></xref> when, and only when, they appear in all
+capitals, as shown here.</t>
+<t>The following terms are used throughout this document:</t>
+
+<dl spacing="compact">
+<dt>AI Catalog</dt>
+<dd>A JSON document conforming to the <tt>application/ai-catalog+json</tt>
+media type that contains an ordered list of catalog entries.</dd>
+<dt>Catalog Entry</dt>
+<dd>A single item in an AI Catalog, identified by a media type and
+referencing or inlining an AI artifact.</dd>
+<dt>Trust Card (AI Card)</dt>
+<dd>A JSON object providing verifiable identity, attestation, and
+provenance metadata for an AI artifact.</dd>
+<dt>Artifact</dt>
+<dd>Any AI resource described by a catalog entry, such as an MCP server
+manifest, an A2A agent card, an Anthropic skill definition, a
+dataset descriptor, or a nested AI Catalog.</dd>
+</dl>
+</section>
+</section>
+
+<section anchor="design-goals"><name>Design Goals</name>
+
+<ol>
+<li><t><strong>Artifact Agnosticism</strong>: The catalog MUST be capable of indexing
+any type of AI artifact without requiring knowledge of the
+artifact's internal schema.</t>
+</li>
+<li><t><strong>Media Type Identification</strong>: Each catalog entry MUST declare its
+artifact type using a media type, enabling clients to select,
+filter, and route entries without parsing artifact content.</t>
+</li>
+<li><t><strong>Composability</strong>: Catalogs MUST support nesting, allowing a catalog
+entry to reference another AI Catalog. This enables plugin-style
+packaging where a single catalog bundles multiple related artifacts.</t>
+</li>
+<li><t><strong>Trust as a Peer</strong>: Identity and trust metadata MUST NOT wrap or
+modify the native artifact. Instead, a Trust Card accompanies an
+entry as a peer element, keeping artifact formats pristine.</t>
+</li>
+<li><t><strong>Static Discovery</strong>: The standard MUST define a well-known URL for
+serving AI Catalogs, enabling crawlers and clients to discover
+available artifacts for a given domain.</t>
+</li>
+</ol>
+</section>
+
+<section anchor="ai-catalog"><name>AI Catalog</name>
+
+<section anchor="media-type"><name>Media Type</name>
+<t>An AI Catalog document is identified by the media type:</t>
+
+<artwork><![CDATA[application/ai-catalog+json
+]]></artwork>
+<t>This media type is registered with IANA as specified in
+<xref target="media-type-registration"></xref>.</t>
+</section>
+
+<section anchor="top-level-structure"><name>Top-Level Structure</name>
+<t>An AI Catalog document is a JSON object that MUST contain the following
+members:</t>
+
+<dl spacing="compact">
+<dt><tt>$schema</tt></dt>
+<dd>A string containing a URI <xref target="RFC3986"></xref> to the JSON Schema for this
+catalog format.</dd>
+<dt><tt>specVersion</tt></dt>
+<dd>A string indicating the version of this specification that the
+catalog conforms to, in &quot;Major.Minor&quot; format (e.g., &quot;1.0&quot;).</dd>
+<dt><tt>entries</tt></dt>
+<dd>An array of Catalog Entry objects as defined in <xref target="catalog-entry"></xref>.
+This array MAY be empty.</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>host</tt></dt>
+<dd>A Host Info object as defined in <xref target="host-info"></xref> identifying the
+operator of this catalog.</dd>
+<dt><tt>metadata</tt></dt>
+<dd>An open map of string keys to arbitrary values for custom or
+non-standard metadata.</dd>
+</dl>
+</section>
+
+<section anchor="host-info"><name>Host Info</name>
+<t>The Host Info object identifies the operator of the catalog. It MUST
+contain:</t>
+
+<dl spacing="compact">
+<dt><tt>name</tt></dt>
+<dd>A string containing the human-readable name of the host (e.g., the
+organization name).</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>id</tt></dt>
+<dd>A string containing a verifiable identifier for the host (e.g., a
+DID or domain name).</dd>
+<dt><tt>documentationUrl</tt></dt>
+<dd>A string containing a URL to the host's documentation.</dd>
+<dt><tt>logoUrl</tt></dt>
+<dd>A string containing a URL to the host's logo.</dd>
+<dt><tt>trustCard</tt></dt>
+<dd>A Trust Card object as defined in <xref target="trust-card-schema"></xref> providing
+verifiable identity and trust metadata for the host itself.</dd>
+</dl>
+</section>
+
+<section anchor="catalog-entry"><name>Catalog Entry</name>
+<t>A Catalog Entry object describes a single AI artifact in the catalog.
+It MUST contain the following members:</t>
+
+<dl>
+<dt><tt>id</tt></dt>
+<dd>A string containing a globally unique identifier for this entry.
+This SHOULD be a URN <xref target="RFC8141"></xref> or URI <xref target="RFC3986"></xref>.</dd>
+<dt><tt>name</tt></dt>
+<dd>A string containing a human-readable name for the artifact.</dd>
+<dt><tt>mediaType</tt></dt>
+<dd><t>A string containing the media type that identifies the type of the
+referenced artifact. This is the mechanism by which clients
+determine what kind of AI artifact the entry represents. Well-known
+values include (but are not limited to):</t>
+
+<ul spacing="compact">
+<li><tt>application/ai-catalog+json</tt> — a nested AI Catalog</li>
+<li><tt>application/a2a-agent+json</tt> — an A2A Agent Card</li>
+<li><tt>application/mcp-server+json</tt> — an MCP Server manifest</li>
+<li>Other media types as defined by respective protocol specifications</li>
+</ul></dd>
+</dl>
+<t>A Catalog Entry MUST contain exactly one of the following members to
+provide the artifact content:</t>
+
+<dl spacing="compact">
+<dt><tt>url</tt></dt>
+<dd>A string containing a URL where the full artifact document can be
+retrieved. The document served at this URL SHOULD be served with
+the media type declared in the <tt>mediaType</tt> field.</dd>
+<dt><tt>inline</tt></dt>
+<dd>A JSON value containing the complete artifact document inline. The
+structure of this value is determined by the <tt>mediaType</tt> field and
+is opaque to this specification.</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>description</tt></dt>
+<dd>A string containing a short description of the artifact.</dd>
+<dt><tt>tags</tt></dt>
+<dd>An array of strings serving as keywords for filtering and discovery.</dd>
+<dt><tt>publisher</tt></dt>
+<dd>A Publisher object as defined in <xref target="publisher-object"></xref> identifying
+the entity that publishes this artifact. This is the sole location
+for publisher information; it is not duplicated in the Trust Card.</dd>
+<dt><tt>trustCard</tt></dt>
+<dd>A Trust Card object as defined in <xref target="trust-card-schema"></xref> providing
+verifiable identity and trust metadata for this specific artifact.
+This is the &quot;passport&quot; that travels alongside the artifact as a
+peer element.</dd>
+<dt><tt>updatedAt</tt></dt>
+<dd>A string containing an ISO 8601 <xref target="RFC3339"></xref> timestamp indicating
+when this entry was last modified.</dd>
+<dt><tt>metadata</tt></dt>
+<dd>An open map of string keys to arbitrary values for custom data.</dd>
+</dl>
+
+<section anchor="nested-catalogs"><name>Nested Catalogs</name>
+<t>When the <tt>mediaType</tt> of a Catalog Entry is <tt>application/ai-catalog+json</tt>,
+the entry represents a nested AI Catalog. The nested catalog MAY be
+provided via the <tt>url</tt> field (referencing an external catalog document)
+or via the <tt>inline</tt> field (embedding the full catalog).</t>
+<t>Nested catalogs enable composable packaging. For example, a vendor may
+publish a single catalog entry that bundles an A2A agent, an MCP server,
+and a dataset as a plugin package:</t>
+
+<artwork><![CDATA[Vendor Catalog (application/ai-catalog+json)
+  └── Entry: "Finance Plugin" (application/ai-catalog+json)
+        ├── Entry: Finance A2A Agent (application/a2a-agent+json)
+        ├── Entry: Finance MCP Server (application/mcp-server+json)
+        └── Entry: Market Dataset (application/parquet)
+]]></artwork>
+<t>Clients processing nested catalogs SHOULD impose a maximum nesting
+depth to prevent circular references. A depth limit of 8 is
+RECOMMENDED.</t>
+</section>
+</section>
+
+<section anchor="publisher-object"><name>Publisher Object</name>
+<t>The Publisher object identifies the entity responsible for an artifact.
+It appears on the Catalog Entry and is the canonical location for
+publisher information. It MUST contain:</t>
+
+<dl spacing="compact">
+<dt><tt>id</tt></dt>
+<dd>A string containing a verifiable identifier for the publisher
+organization.</dd>
+<dt><tt>name</tt></dt>
+<dd>A string containing the human-readable name of the publisher.</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>identityType</tt></dt>
+<dd>A string providing a type hint for the publisher identifier (e.g.,
+&quot;did&quot;, &quot;dns&quot;).</dd>
+</dl>
+</section>
+</section>
+
+<section anchor="trust-card-schema"><name>Trust Card (AI Card)</name>
+<t>The Trust Card is a JSON object that provides verifiable identity and
+trust metadata for any AI artifact. It functions as a &quot;passport&quot;:
+proving the artifact's identity and carrying attestations, provenance,
+and compliance metadata.</t>
+<t>The Trust Card does NOT wrap the artifact. It sits alongside the
+artifact as a peer element within a Catalog Entry, keeping the native
+artifact format unmodified.</t>
+<t>Publisher information is NOT duplicated in the Trust Card. The
+informational publisher identity is carried on the Catalog Entry
+(see <xref target="catalog-entry"></xref>). The Trust Card can verify publisher identity
+through an attestation of type &quot;publisher-identity&quot; in its
+<tt>attestations</tt> array.</t>
+
+<section anchor="identity-binding"><name>Identity Binding</name>
+<t>A Trust Card object MUST contain:</t>
+
+<dl spacing="compact">
+<dt><tt>identity</tt></dt>
+<dd>A string containing a globally unique URI <xref target="RFC3986"></xref> that serves as
+the primary subject identifier for this artifact. This SHOULD be a
+DID, SPIFFE ID, or URL.</dd>
+</dl>
+<t>When a Trust Card appears within a Catalog Entry, the Trust Card's
+<tt>identity</tt> field MUST match the entry's <tt>id</tt> field. This binding
+ensures the trust claims are unambiguously associated with the
+catalog artifact. Consumers MUST reject a Trust Card whose <tt>identity</tt>
+does not match the containing entry's <tt>id</tt>.</t>
+<t>When a Trust Card appears on a Host Info object, the Trust Card's
+<tt>identity</tt> SHOULD match the host's <tt>id</tt> field when present.</t>
+</section>
+
+<section anchor="optional-members"><name>Optional Members</name>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>identityType</tt></dt>
+<dd>A string providing a type hint for the identity URI (e.g., &quot;did&quot;,
+&quot;spiffe&quot;, &quot;dns&quot;). This field is OPTIONAL when the type is evident
+from the URI scheme.</dd>
+<dt><tt>trustSchema</tt></dt>
+<dd>A Trust Schema object as defined in <xref target="trust-schema-object"></xref>.</dd>
+<dt><tt>attestations</tt></dt>
+<dd>An array of Attestation objects as defined in <xref target="attestation-object-1"></xref>.
+This is the mechanism for verifiable claims including publisher
+identity verification (using attestation type &quot;publisher-identity&quot;),
+compliance certifications, and other proofs.</dd>
+<dt><tt>provenance</tt></dt>
+<dd>An array of Provenance Link objects as defined in
+<xref target="provenance-link-object-1"></xref>.</dd>
+<dt><tt>privacyPolicyUrl</tt></dt>
+<dd>A string containing a URL to the privacy policy governing this
+artifact.</dd>
+<dt><tt>termsOfServiceUrl</tt></dt>
+<dd>A string containing a URL to the terms of service.</dd>
+<dt><tt>signature</tt></dt>
+<dd>A string containing a detached JWS <xref target="RFC7515"></xref> signature computed
+over the Trust Card content. This enables integrity verification
+of the trust metadata independent of the artifact.</dd>
+<dt><tt>metadata</tt></dt>
+<dd>An open map of string keys to arbitrary values for extending trust
+metadata.</dd>
+</dl>
+</section>
+
+<section anchor="trust-schema-object"><name>Trust Schema Object</name>
+<t>A Trust Schema object describes the trust framework applied to the
+artifact. It MUST contain:</t>
+
+<dl spacing="compact">
+<dt><tt>id</tt></dt>
+<dd>A string identifying the trust schema.</dd>
+<dt><tt>version</tt></dt>
+<dd>A string indicating the schema version.</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>governanceUri</tt></dt>
+<dd>A string containing a URI to the governance policy document.</dd>
+<dt><tt>verificationMethods</tt></dt>
+<dd>An array of strings identifying the verification methods supported
+(e.g., &quot;did&quot;, &quot;x509&quot;, &quot;dns-01&quot;).</dd>
+</dl>
+</section>
+
+<section anchor="attestation-object-1"><name>Attestation Object</name>
+<t>An Attestation object provides verifiable proof of a claim. It MUST
+contain:</t>
+
+<dl spacing="compact">
+<dt><tt>type</tt></dt>
+<dd>A string identifying the attestation type (e.g., &quot;SOC2-Type2&quot;,
+&quot;HIPAA-Audit&quot;, &quot;ISO27001&quot;).</dd>
+<dt><tt>uri</tt></dt>
+<dd>A string containing the location of the attestation document.
+This may be an HTTPS URL or an inline Data URI <xref target="RFC2397"></xref>.</dd>
+<dt><tt>mediaType</tt></dt>
+<dd>A string indicating the format (e.g., &quot;application/pdf&quot;,
+&quot;application/jwt&quot;).</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>digest</tt></dt>
+<dd>A string containing a cryptographic hash for integrity verification
+(e.g., &quot;sha256:abcd1234...&quot;).</dd>
+<dt><tt>size</tt></dt>
+<dd>An unsigned integer indicating the size of the attestation in bytes.</dd>
+<dt><tt>description</tt></dt>
+<dd>A string containing a human-readable label.</dd>
+</dl>
+</section>
+
+<section anchor="provenance-link-object-1"><name>Provenance Link Object</name>
+<t>A Provenance Link records lineage information. It MUST contain:</t>
+
+<dl spacing="compact">
+<dt><tt>relation</tt></dt>
+<dd>A string describing the relationship (e.g., &quot;materializedFrom&quot;,
+&quot;derivedFrom&quot;, &quot;publishedFrom&quot;).</dd>
+<dt><tt>sourceId</tt></dt>
+<dd>A string identifying the source artifact or data.</dd>
+</dl>
+<t>The following members are OPTIONAL:</t>
+
+<dl spacing="compact">
+<dt><tt>sourceDigest</tt></dt>
+<dd>A string containing the digest of the source.</dd>
+<dt><tt>registryUri</tt></dt>
+<dd>A string containing the URI of the registry holding the source.</dd>
+<dt><tt>statementUri</tt></dt>
+<dd>A string containing the URI of a provenance statement document.</dd>
+<dt><tt>signatureRef</tt></dt>
+<dd>A string referencing the key used to sign the provenance statement.</dd>
+</dl>
+</section>
+</section>
+
+<section anchor="static-discovery"><name>Static Discovery</name>
+
+<section anchor="well-known-uri"><name>Well-Known URI</name>
+<t>Hosts that wish to advertise AI artifacts MUST serve an AI Catalog
+document at the following well-known URI <xref target="RFC8615"></xref>:</t>
+
+<artwork><![CDATA[/.well-known/ai-catalog.json
+]]></artwork>
+<t>The document MUST be served with the media type
+<tt>application/ai-catalog+json</tt>.</t>
+<t>Clients discovering AI artifacts for a given domain SHOULD attempt to
+retrieve this well-known URL. If a valid AI Catalog document is
+returned, the client SHOULD use the <tt>url</tt> entries to retrieve
+individual artifacts and their associated Trust Cards.</t>
+</section>
+
+<section anchor="dynamic-discovery"><name>Dynamic Discovery</name>
+<t>Implementing protocols MAY support dynamic catalog generation through
+their own mechanisms, such as providing different catalog content based
+on a caller's identity or query parameters. Defining dynamic discovery
+behavior is out of scope for this specification.</t>
+</section>
+</section>
+
+<section anchor="security-considerations"><name>Security Considerations</name>
+
+<section anchor="trust-card-integrity"><name>Trust Card Integrity</name>
+<t>Publishers SHOULD sign Trust Cards using a detached JWS <xref target="RFC7515"></xref> in
+the <tt>signature</tt> field. Consumers SHOULD verify the signature before
+trusting the identity and attestation claims in the Trust Card.</t>
+</section>
+
+<section anchor="transport-security"><name>Transport Security</name>
+<t>AI Catalogs, artifacts, and Trust Cards MUST be served over HTTPS
+(TLS 1.2 or later) to prevent tampering and eavesdropping.</t>
+</section>
+
+<section anchor="nested-catalog-depth"><name>Nested Catalog Depth</name>
+<t>Clients processing nested catalogs MUST enforce a maximum recursion
+depth to prevent denial-of-service attacks via deeply nested or
+circular catalog references. A maximum depth of 8 is RECOMMENDED.</t>
+</section>
+
+<section anchor="publisher-identity-verification"><name>Publisher Identity Verification</name>
+<t>Consumers SHOULD verify publisher identity through the verification
+methods described in the Trust Card's trust schema before granting
+elevated trust to an artifact.</t>
+</section>
+
+<section anchor="privacy-considerations"><name>Privacy Considerations</name>
+<t>Logo URLs SHOULD use Data URIs <xref target="RFC2397"></xref> to avoid leaking client
+information through image fetch requests. Publishers SHOULD carefully
+consider what information is included in <tt>metadata</tt> extension fields.</t>
+</section>
+</section>
+
+<section anchor="iana-considerations"><name>IANA Considerations</name>
+
+<section anchor="well-known-uri-registration"><name>Well-Known URI Registration</name>
+<t>This document requests registration of the following well-known URI
+per <xref target="RFC8615"></xref>:</t>
+
+<dl spacing="compact">
+<dt>URI suffix: ai-catalog.json</dt>
+<dd>Change controller: IETF.
+Specification document: This document, <xref target="well-known-uri"></xref>.
+Related information: Media type <tt>application/ai-catalog+json</tt>.</dd>
+</dl>
+</section>
+
+<section anchor="media-type-registration"><name>Media Type Registration</name>
+<t>This document requests registration of the following media type per</t>
+
+<dl spacing="compact">
+<dt>Type name: application</dt>
+<dd>Subtype name: ai-catalog+json.
+Required parameters: N/A.
+Optional parameters: N/A.
+Encoding considerations: binary (UTF-8 JSON).
+Security considerations: See <xref target="security-considerations"></xref> of this document.
+Interoperability considerations: This media type identifies AI Catalog documents as defined in this specification.
+Published specification: This document.
+Applications that use this media type: AI service registries, agent orchestrators, tool discovery clients, and AI artifact crawlers.
+Fragment identifier considerations: N/A.
+Additional information: Magic number(s): N/A. File extension(s): .json. Macintosh file type code(s): N/A.
+Person and email address to contact for further information: See Authors' Addresses.
+Intended usage: COMMON.
+Restrictions on usage: None.
+Change controller: IETF.</dd>
+</dl>
+</section>
+</section>
+
+</middle>
+
+<back>
+<references><name>Normative References</name>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2397.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.3339.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.3986.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.7515.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8141.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8610.xml"/>
+<xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8615.xml"/>
+</references>
+
+<section anchor="cddl-schema"><name>CDDL Schema</name>
+<t>The following CDDL <xref target="RFC8610"></xref> defines the normative schema for AI
+Catalog and Trust Card documents.</t>
+
+<section anchor="ai-catalog-1"><name>AI Catalog</name>
+
+<artwork><![CDATA[AICatalog = {
+  $schema: text,
+  specVersion: text,
+  ? host: HostInfo,
+  entries: [* CatalogEntry],
+  ? metadata: { * text => any }
+}
+
+HostInfo = {
+  name: text,
+  ? id: text,
+  ? documentationUrl: text,
+  ? logoUrl: text,
+  ? trustCard: TrustCard
+}
+
+CatalogEntry = {
+  id: text,
+  name: text,
+  mediaType: text,
+  (url: text // inline: any),
+  ? description: text,
+  ? tags: [* text],
+  ? publisher: Publisher,
+  ? trustCard: TrustCard,
+  ? updatedAt: tdate,
+  ? metadata: { * text => any }
+}
+]]></artwork>
+</section>
+
+<section anchor="trust-card-ai-card"><name>Trust Card (AI Card)</name>
+
+<artwork><![CDATA[TrustCard = {
+  identity: text,
+  ? identityType: text,
+  ? trustSchema: TrustSchema,
+  ? attestations: [* Attestation],
+  ? provenance: [* ProvenanceLink],
+  ? privacyPolicyUrl: text,
+  ? termsOfServiceUrl: text,
+  ? signature: text,
+  ? metadata: { * text => any }
+}
+
+Publisher = {
+  id: text,
+  name: text,
+  ? identityType: text
+}
+
+TrustSchema = {
+  id: text,
+  version: text,
+  ? governanceUri: text,
+  ? verificationMethods: [* text]
+}
+
+Attestation = {
+  type: text,
+  uri: text,
+  mediaType: text,
+  ? digest: text,
+  ? size: uint,
+  ? description: text
+}
+
+ProvenanceLink = {
+  relation: text,
+  sourceId: text,
+  ? sourceDigest: text,
+  ? registryUri: text,
+  ? statementUri: text,
+  ? signatureRef: text
+}
+]]></artwork>
+</section>
+</section>
+
+<section anchor="example-multi-artifact-catalog-with-nested-plugin"><name>Example: Multi-Artifact Catalog with Nested Plugin</name>
+<t>The following example shows an AI Catalog served at
+<tt>/.well-known/ai-catalog.json</tt> that contains a mix of artifact types
+including a nested catalog acting as a plugin bundle:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "$schema": "https://agent-card.github.io/ai-catalog/schema.json",
+  "specVersion": "1.0",
+  "host": {
+    "name": "Acme Services Inc.",
+    "id": "did:example:org-acme-corp",
+    "documentationUrl": "https://docs.acme-corp.com/ai"
+  },
+  "entries": [
+    {
+      "id": "urn:acme:agent:finance-a2a",
+      "name": "Acme Finance A2A Agent",
+      "mediaType": "application/a2a-agent+json",
+      "url": "https://api.acme-corp.com/agents/finance.json",
+      "description": "A2A agent for financial workflows.",
+      "tags": ["finance", "a2a"],
+      "publisher": {
+        "id": "did:example:org-acme",
+        "name": "Acme Financial Corp"
+      },
+      "trustCard": {
+        "identity": "urn:acme:agent:finance-a2a",
+        "identityType": "did",
+        "attestations": [
+          {
+            "type": "publisher-identity",
+            "uri": "https://trust.acme.com/certs/publisher.jwt",
+            "mediaType": "application/jwt",
+            "description": "Verifies did:example:org-acme as publisher"
+          },
+          {
+            "type": "SOC2-Type2",
+            "uri": "https://trust.acme.com/reports/soc2.pdf",
+            "mediaType": "application/pdf",
+            "digest": "sha256:a1b2c3d4e5f6"
+          }
+        ],
+        "privacyPolicyUrl": "https://acme.com/legal/privacy",
+        "termsOfServiceUrl": "https://acme.com/legal/terms"
+      },
+      "updatedAt": "2026-03-15T10:00:00Z"
+    },
+    {
+      "id": "urn:acme:server:finance-mcp",
+      "name": "Acme Finance MCP Server",
+      "mediaType": "application/mcp-server+json",
+      "url": "https://api.acme-corp.com/mcp/finance.json",
+      "description": "MCP server with finance tools.",
+      "tags": ["finance", "mcp"],
+      "updatedAt": "2026-03-15T10:00:00Z"
+    },
+    {
+      "id": "urn:acme:plugin:finance-suite",
+      "name": "Acme Finance Suite",
+      "mediaType": "application/ai-catalog+json",
+      "description": "Plugin bundle: A2A agent + MCP server + dataset.",
+      "tags": ["finance", "plugin", "bundle"],
+      "inline": {
+        "$schema": "https://agent-card.github.io/ai-catalog/schema.json",
+        "specVersion": "1.0",
+        "entries": [
+          {
+            "id": "urn:acme:agent:finance-a2a",
+            "name": "Finance A2A Agent",
+            "mediaType": "application/a2a-agent+json",
+            "url": "https://api.acme-corp.com/agents/finance.json"
+          },
+          {
+            "id": "urn:acme:server:finance-mcp",
+            "name": "Finance MCP Server",
+            "mediaType": "application/mcp-server+json",
+            "url": "https://api.acme-corp.com/mcp/finance.json"
+          },
+          {
+            "id": "urn:acme:data:market-2026q1",
+            "name": "Market Dataset Q1 2026",
+            "mediaType": "application/parquet",
+            "url": "https://data.acme-corp.com/market-2026q1.parquet",
+            "trustCard": {
+              "identity": "urn:acme:data:market-2026q1",
+              "provenance": [
+                {
+                  "relation": "publishedFrom",
+                  "sourceId": "oci://registry.acme.com/data/market:2026q1",
+                  "sourceDigest": "sha256:99998888..."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "trustCard": {
+        "identity": "did:example:plugin-finance-suite",
+        "identityType": "did",
+        "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
+      },
+      "updatedAt": "2026-03-20T14:00:00Z"
+    }
+  ]
+}
+]]></sourcecode>
+</section>
+
+<section anchor="example-anthropic-skill-entry"><name>Example: Anthropic Skill Entry</name>
+<t>An AI Catalog entry for an Anthropic skill:</t>
+
+<sourcecode type="json"><![CDATA[{
+  "id": "urn:anthropic:skill:code-review",
+  "name": "Code Review Skill",
+  "mediaType": "application/vnd.anthropic.skill+json",
+  "url": "https://skills.anthropic.com/code-review/manifest.json",
+  "description": "Automated code review powered by Claude.",
+  "tags": ["code-review", "anthropic", "skill"],
+  "publisher": {
+    "id": "did:web:anthropic.com",
+    "name": "Anthropic"
+  },
+  "trustCard": {
+    "identity": "urn:anthropic:skill:code-review",
+    "identityType": "did",
+    "attestations": [
+      {
+        "type": "publisher-identity",
+        "uri": "https://trust.anthropic.com/certs/publisher.jwt",
+        "mediaType": "application/jwt",
+        "description": "Verifies did:web:anthropic.com as publisher"
+      },
+      {
+        "type": "ISO27001",
+        "uri": "https://trust.anthropic.com/certs/iso27001.pdf",
+        "mediaType": "application/pdf"
+      }
+    ]
+  }
+}
+]]></sourcecode>
+</section>
+
+<section anchor="trust-card-as-a-passport-conceptual-model"><name>Trust Card as a Passport — Conceptual Model</name>
+<t>The Trust Card is designed as a peer to the artifact, not a wrapper.
+This keeps the native artifact format pristine while still enabling
+rich trust and identity verification.</t>
+
+<artwork><![CDATA[┌─────────────────────────────────────────────────┐
+│              Catalog Entry                      │
+│                                                 │
+│  ┌─────────────────┐   ┌─────────────────────┐ │
+│  │   AI Artifact    │   │   Trust Card         │ │
+│  │   (native fmt)   │   │   "Passport"         │ │
+│  │                  │   │                      │ │
+│  │  MCP Server      │   │  identity            │ │
+│  │  A2A Agent       │   │  publisher (verified)│ │
+│  │  Anthropic Skill │   │  attestations        │ │
+│  │  Dataset          │   │  provenance          │ │
+│  │  Nested Catalog  │   │  signature           │ │
+│  └─────────────────┘   └─────────────────────┘ │
+│         url/inline             trustCard         │
+└─────────────────────────────────────────────────┘
+]]></artwork>
+<t>The artifact and its passport are independent documents that can be
+verified separately. A client can fetch the artifact without examining
+trust metadata, or verify trust metadata without fetching the full
+artifact.</t>
+</section>
+
+<section anchor="acknowledgments"><name>Acknowledgments</name>
+<t>This specification was developed through collaboration among members of
+the A2A and MCP protocol communities under the governance of the Linux
+Foundation.</t>
+</section>
+
+</back>
+
+</rfc>
