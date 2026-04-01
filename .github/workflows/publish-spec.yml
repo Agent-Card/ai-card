@@ -23,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: spec-pages
+  group: spec-pages-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
