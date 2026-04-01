@@ -23,8 +23,7 @@ deploy it as a static website on Azure.
 |------|---------|
 | `specification/ai-catalog.md` | Markdown source of truth |
 | `specification/respec-config.json` | ReSpec configuration (title, abstract, appendix headers) |
-| `specification/ai-catalog-respec.html` | Intermediate ReSpec HTML (generated) |
-| `specification/ai-catalog-respec-static.html` | Final static HTML with TOC and styling (generated) |
+| `specification/ai-catalog-respec.html` | ReSpec HTML (generated) |
 
 ## Build Pipeline
 
@@ -40,28 +39,14 @@ python "C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py" `
 This converts the Markdown into a ReSpec-compatible HTML document using the
 config for title, abstract, and appendix header detection.
 
-### Step 2: Render static HTML with ReSpec
-
-```powershell
-npx respec `
-  -s "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" `
-  -o "D:\github\agentcard\ai-card\specification\ai-catalog-respec-static.html" `
-  --timeout 60
-```
-
-This runs the ReSpec processor to generate a fully self-contained static HTML
-with table of contents, section numbering, cross-references, and W3C styling.
-
-The "At least one editor is required" warning is cosmetic and does not affect output.
-
-### Step 3: Deploy to Azure
+### Step 2: Deploy to Azure
 
 ```powershell
 az storage blob upload `
   --account-name aicatalogspec `
   --container-name '$web' `
   --name index.html `
-  --file "D:\github\agentcard\ai-card\specification\ai-catalog-respec-static.html" `
+  --file "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" `
   --content-type "text/html" `
   --overwrite
 ```
@@ -80,12 +65,11 @@ az storage blob upload `
 ## One-Liner (Build + Deploy)
 
 ```powershell
-python "C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py" "D:\github\agentcard\ai-card\specification\ai-catalog.md" "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" --config "D:\github\agentcard\ai-card\specification\respec-config.json" && npx respec -s "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" -o "D:\github\agentcard\ai-card\specification\ai-catalog-respec-static.html" --timeout 60 && az storage blob upload --account-name aicatalogspec --container-name '$web' --name index.html --file "D:\github\agentcard\ai-card\specification\ai-catalog-respec-static.html" --content-type "text/html" --overwrite
+python "C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py" "D:\github\agentcard\ai-card\specification\ai-catalog.md" "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" --config "D:\github\agentcard\ai-card\specification\respec-config.json" && az storage blob upload --account-name aicatalogspec --container-name '$web' --name index.html --file "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" --content-type "text/html" --overwrite
 ```
 
 ## Prerequisites
 
 - Python 3 (for build_respec.py)
-- Node.js + npm (for `npx respec`)
 - Azure CLI (`az`) logged in to the Visual Studio Enterprise subscription
 - The ReSpec skill's build script at `C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py`

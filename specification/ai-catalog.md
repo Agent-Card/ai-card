@@ -154,13 +154,13 @@ The following members are OPTIONAL:
 The Host Info object identifies the operator of the catalog. It MUST
 contain:
 
-`name`
+`displayName`
 : A string containing the human-readable name of the host (e.g., the
   organization name).
 
 The following members are OPTIONAL:
 
-`id`
+`identifier`
 : A string containing a verifiable identifier for the host (e.g., a
   DID or domain name).
 
@@ -268,11 +268,11 @@ The Publisher object identifies the entity responsible for an artifact.
 It appears on the Catalog Entry and is the canonical location for
 publisher information. It MUST contain:
 
-`id`
+`identifier`
 : A string containing a verifiable identifier for the publisher
   organization.
 
-`name`
+`displayName`
 : A string containing the human-readable name of the publisher.
 
 The following members are OPTIONAL:
@@ -312,7 +312,7 @@ Consumers MUST reject a Trust Manifest whose `identity` does not
 match the containing entry's `identifier`.
 
 When a Trust Manifest appears on a Host Info object, `identity`
-SHOULD match the host's `id` field when present.
+SHOULD match the host's `identifier` field when present.
 
 When multiple entries share the same `identifier` (with different `version`
 values), each entry MAY carry its own Trust Manifest. There is no
@@ -362,7 +362,7 @@ The following members are OPTIONAL:
 A Trust Schema object describes the trust framework applied to the
 artifact. It MUST contain:
 
-`id`
+`identifier`
 : A string identifying the trust schema.
 
 `version`
@@ -493,7 +493,7 @@ To verify the host of a catalog:
 
 1. Confirm the catalog was retrieved over HTTPS from the expected
    domain.
-2. If `host.id` is a DID, resolve the DID Document and confirm the
+2. If `host.identifier` is a DID, resolve the DID Document and confirm the
    hosting domain appears in the DID Document's `service` endpoints.
 3. If `host.trustManifest` is present and signed, verify the
    signature as described above.
@@ -506,8 +506,8 @@ To verify the publisher of an artifact:
    Manifest's `attestations` array.
 2. Fetch the attestation document (typically a JWT) from the `uri`.
 3. Verify the JWT signature against the publisher's public key
-   (resolved from `publisher.id`).
-4. Confirm the JWT claims bind the `publisher.id` to the Trust
+   (resolved from `publisher.identifier`).
+4. Confirm the JWT claims bind the `publisher.identifier` to the Trust
    Manifest's `identity`.
 
 ### Verifying Artifact Integrity
@@ -584,7 +584,7 @@ Use collections when:
 
 A Collection Reference object MUST contain:
 
-`name`
+`displayName`
 : A string containing a human-readable name for this collection
   (e.g., "Finance Services", "ML Models").
 
@@ -784,8 +784,8 @@ classDiagram
         collections CollectionRef[]
     }
     class HostInfo {
-        name string
-        id string
+        displayName string
+        identifier string
         trustManifest TrustManifest
     }
     class CatalogEntry {
@@ -798,14 +798,14 @@ classDiagram
         trustManifest TrustManifest
     }
     class CollectionRef {
-        name string
+        displayName string
         url string
         description string
         tags string[]
     }
     class Publisher {
-        id string
-        name string
+        identifier string
+        displayName string
     }
     class TrustManifest {
         identity string
@@ -815,7 +815,7 @@ classDiagram
         signature string
     }
     class TrustSchema {
-        id string
+        identifier string
         version string
         verificationMethods string[]
     }
@@ -925,15 +925,15 @@ AICatalog = {
 }
 
 HostInfo = {
-  name: text,
-  ? id: text,
+  displayName: text,
+  ? identifier: text,
   ? documentationUrl: text,
   ? logoUrl: text,
   ? trustManifest: TrustManifest
 }
 
 CollectionRef = {
-  name: text,
+  displayName: text,
   url: text,
   ? description: text,
   ? tags: [* text]
@@ -954,8 +954,8 @@ CatalogEntry = {
 }
 
 Publisher = {
-  id: text,
-  name: text,
+  identifier: text,
+  displayName: text,
   ? identityType: text
 }
 ```
@@ -976,7 +976,7 @@ TrustManifest = {
 }
 
 TrustSchema = {
-  id: text,
+  identifier: text,
   version: text,
   ? governanceUri: text,
   ? verificationMethods: [* text]
@@ -1010,8 +1010,8 @@ artifact types including a nested catalog acting as a plugin bundle:
 {
   "specVersion": "1.0",
   "host": {
-    "name": "Acme Services Inc.",
-    "id": "did:web:acme-corp.com",
+    "displayName": "Acme Services Inc.",
+    "identifier": "did:web:acme-corp.com",
     "documentationUrl": "https://docs.acme-corp.com/ai"
   },
   "entries": [
@@ -1024,8 +1024,8 @@ artifact types including a nested catalog acting as a plugin bundle:
       "description": "A2A agent for financial workflows.",
       "tags": ["finance", "a2a"],
       "publisher": {
-        "id": "did:web:acme-corp.com",
-        "name": "Acme Financial Corp"
+        "identifier": "did:web:acme-corp.com",
+        "displayName": "Acme Financial Corp"
       },
       "trustManifest": {
         "identity": "urn:acme:agent:finance-a2a",
@@ -1117,8 +1117,8 @@ collection points to a separate AI Catalog document:
 {
   "specVersion": "1.0",
   "host": {
-    "name": "Acme Enterprise AI",
-    "id": "did:web:acme-corp.com"
+    "displayName": "Acme Enterprise AI",
+    "identifier": "did:web:acme-corp.com"
   },
   "entries": [
     {
@@ -1132,19 +1132,19 @@ collection points to a separate AI Catalog document:
   ],
   "collections": [
     {
-      "name": "Finance Services",
+      "displayName": "Finance Services",
       "url": "https://acme-corp.com/catalogs/finance.json",
       "description": "Financial agents, MCP servers, and datasets.",
       "tags": ["finance", "trading", "compliance"]
     },
     {
-      "name": "Engineering Tools",
+      "displayName": "Engineering Tools",
       "url": "https://acme-corp.com/catalogs/engineering.json",
       "description": "CI/CD agents, code review tools, and DevOps servers.",
       "tags": ["engineering", "devops", "ci-cd"]
     },
     {
-      "name": "ML Models",
+      "displayName": "ML Models",
       "url": "https://acme-corp.com/catalogs/ml-models.json",
       "description": "Model cards and inference endpoints.",
       "tags": ["ml", "models", "inference"]
@@ -1171,8 +1171,8 @@ An AI Catalog entry for a Claude Code plugin (per the
   "description": "Set up endorctl and use Endor Labs to scan, prioritize, and fix security risks across your software supply chain",
   "tags": ["security", "supply-chain"],
   "publisher": {
-    "id": "did:web:endorlabs.com",
-    "name": "Endor Labs"
+    "identifier": "did:web:endorlabs.com",
+    "displayName": "Endor Labs"
   },
   "trustManifest": {
     "identity": "urn:claude-plugin:endorlabs:ai-plugins",
@@ -1346,7 +1346,7 @@ authored by hand:
   ],
   "annotations": {
     "ai-catalog.specVersion": "1.0",
-    "ai-catalog.host.name": "Acme Services Inc."
+    "ai-catalog.host.displayName": "Acme Services Inc."
   }
 }
 ```
@@ -1468,8 +1468,8 @@ with `mediaType` set to `application/mcp-server+json`:
   "description": "MCP server for Brave Search API integration",
   "tags": ["search", "brave", "web"],
   "publisher": {
-    "id": "did:web:modelcontextprotocol.io",
-    "name": "Model Context Protocol"
+    "identifier": "did:web:modelcontextprotocol.io",
+    "displayName": "Model Context Protocol"
   },
   "trustManifest": {
     "identity": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
@@ -1511,8 +1511,8 @@ agents, skills, and other artifacts:
 {
   "specVersion": "1.0",
   "host": {
-    "name": "MCP Server Registry",
-    "id": "did:web:modelcontextprotocol.io",
+    "displayName": "MCP Server Registry",
+    "identifier": "did:web:modelcontextprotocol.io",
     "documentationUrl": "https://modelcontextprotocol.io/docs"
   },
   "entries": [
@@ -1543,8 +1543,8 @@ agents, skills, and other artifacts:
       "description": "Python MCP server for weather data access",
       "tags": ["weather", "python"],
       "publisher": {
-        "id": "did:web:example.github.io",
-        "name": "Example Corp"
+        "identifier": "did:web:example.github.io",
+        "displayName": "Example Corp"
       }
     }
   ]
@@ -1627,8 +1627,8 @@ server can reference the Server Card as its artifact content:
   "description": "MCP server for financial data and trading tools",
   "tags": ["finance", "mcp"],
   "publisher": {
-    "id": "did:web:acme-corp.com",
-    "name": "Acme Financial Corp"
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
   },
   "trustManifest": {
     "identity": "urn:mcp:example.com:finance-server",
@@ -1701,9 +1701,9 @@ plugins/
 | Claude Plugins Marketplace | AI Catalog Equivalent |
 |:---|:---|
 | `marketplace.json` (whole file) | AI Catalog document (top-level) |
-| Marketplace `name` | Catalog `host.name` |
+| Marketplace `name` | Catalog `host.displayName` |
 | Marketplace `description` | Catalog `metadata.description` |
-| Marketplace `owner` | Catalog `host` (with `id` derived from owner) |
+| Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
 | Plugin `name` | Entry `displayName` and `identifier` (derived as URN) |
 | Plugin `description` | Entry `description` |
@@ -1746,8 +1746,8 @@ maps to an AI Catalog where each plugin is an entry:
 {
   "specVersion": "1.0",
   "host": {
-    "name": "Claude Code Plugins Directory",
-    "id": "did:web:anthropic.com",
+    "displayName": "Claude Code Plugins Directory",
+    "identifier": "did:web:anthropic.com",
     "documentationUrl": "https://code.claude.com/docs/en/plugins"
   },
   "entries": [
@@ -1759,8 +1759,8 @@ maps to an AI Catalog where each plugin is an entry:
       "description": "Development kit for working with the Claude Agent SDK",
       "tags": ["development"],
       "publisher": {
-        "id": "did:web:anthropic.com",
-        "name": "Anthropic"
+        "identifier": "did:web:anthropic.com",
+        "displayName": "Anthropic"
       },
       "metadata": {
         "homepage": "https://github.com/anthropics/claude-plugins-public/tree/main/plugins/agent-sdk-dev"
@@ -1795,8 +1795,8 @@ maps to an AI Catalog where each plugin is an entry:
       "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
       "tags": ["security"],
       "publisher": {
-        "id": "did:web:aikido.dev",
-        "name": "Aikido Security"
+        "identifier": "did:web:aikido.dev",
+        "displayName": "Aikido Security"
       },
       "trustManifest": {
         "identity": "urn:claude-plugin:aikido:security",
@@ -1828,8 +1828,8 @@ contains multiple artifact types:
   "description": "Comprehensive plugin with commands, agents, skills, and MCP servers",
   "tags": ["development", "bundle"],
   "publisher": {
-    "id": "did:web:anthropic.com",
-    "name": "Anthropic"
+    "identifier": "did:web:anthropic.com",
+    "displayName": "Anthropic"
   },
   "inline": {
       "specVersion": "1.0",
