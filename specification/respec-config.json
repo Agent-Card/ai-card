@@ -1,0 +1,33 @@
+{
+  "title": "AI Catalog",
+  "shortName": "ai-catalog",
+  "edDraftURI": "https://github.com/Agent-Card/ai-card/pull/18",
+  "abstract": "This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.",
+  "appendixHeaders": ["Data Model", "CDDL", "Example", "Mapping", "Acknowledgment", "Appendix", "IANA"],
+  "localBiblio": {
+    "RFC8785": {
+      "title": "JSON Canonicalization Scheme (JCS)",
+      "href": "https://www.rfc-editor.org/rfc/rfc8785",
+      "status": "RFC",
+      "publisher": "IETF"
+    },
+    "RFC7517": {
+      "title": "JSON Web Key (JWK)",
+      "href": "https://www.rfc-editor.org/rfc/rfc7517",
+      "status": "RFC",
+      "publisher": "IETF"
+    },
+    "RFC6234": {
+      "title": "US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)",
+      "href": "https://www.rfc-editor.org/rfc/rfc6234",
+      "status": "RFC",
+      "publisher": "IETF"
+    },
+    "RFC8288": {
+      "title": "Web Linking",
+      "href": "https://www.rfc-editor.org/rfc/rfc8288",
+      "status": "RFC",
+      "publisher": "IETF"
+    }
+  }
+}

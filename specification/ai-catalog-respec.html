@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AI Catalog</title>
+  <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+  <script class="remove">
+    var respecConfig = {
+      "specStatus": "unofficial",
+      "shortName": "ai-catalog",
+      "editors": [],
+      "latestVersion": null,
+      "noRecTrack": true,
+      "localBiblio": {
+            "RFC2119": {
+                  "title": "Key words for use in RFCs to Indicate Requirement Levels",
+                  "href": "https://www.rfc-editor.org/rfc/rfc2119",
+                  "status": "BCP 14",
+                  "publisher": "IETF"
+            },
+            "RFC8174": {
+                  "title": "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8174",
+                  "status": "BCP 14",
+                  "publisher": "IETF"
+            },
+            "RFC3986": {
+                  "title": "Uniform Resource Identifier (URI): Generic Syntax",
+                  "href": "https://www.rfc-editor.org/rfc/rfc3986",
+                  "status": "STD 66",
+                  "publisher": "IETF"
+            },
+            "RFC8141": {
+                  "title": "Uniform Resource Names (URNs)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8141",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC3339": {
+                  "title": "Date and Time on the Internet: Timestamps",
+                  "href": "https://www.rfc-editor.org/rfc/rfc3339",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC2397": {
+                  "title": "The data URL scheme",
+                  "href": "https://www.rfc-editor.org/rfc/rfc2397",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC7515": {
+                  "title": "JSON Web Signature (JWS)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc7515",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC8615": {
+                  "title": "Well-Known Uniform Resource Identifiers (URIs)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8615",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC6838": {
+                  "title": "Media Type Specifications and Registration Procedures",
+                  "href": "https://www.rfc-editor.org/rfc/rfc6838",
+                  "status": "BCP 13",
+                  "publisher": "IETF"
+            },
+            "RFC8610": {
+                  "title": "Concise Data Definition Language (CDDL)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8610",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC8259": {
+                  "title": "The JavaScript Object Notation (JSON) Data Interchange Format",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8259",
+                  "status": "STD 90",
+                  "publisher": "IETF"
+            },
+            "RFC8785": {
+                  "title": "JSON Canonicalization Scheme (JCS)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8785",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC7517": {
+                  "title": "JSON Web Key (JWK)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc7517",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC6234": {
+                  "title": "US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)",
+                  "href": "https://www.rfc-editor.org/rfc/rfc6234",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            },
+            "RFC8288": {
+                  "title": "Web Linking",
+                  "href": "https://www.rfc-editor.org/rfc/rfc8288",
+                  "status": "RFC",
+                  "publisher": "IETF"
+            }
+      },
+      "edDraftURI": "https://github.com/Agent-Card/ai-card/pull/18"
+};
+  </script>
+  <style>
+    pre { background: #f8f8f8; padding: 1em; overflow-x: auto; }
+    pre.mermaid { background: white; border: 1px solid #e0e0e0; text-align: center; }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+    if (document.respec) {
+      await document.respec.ready;
+    }
+    await mermaid.run({ querySelector: 'pre.mermaid' });
+  </script>
+</head>
+<body>
+
+<section id="abstract">
+  <h2>Abstract</h2>
+  <p>This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.</p>
+</section>
+
+<section id="sotd">
+  <h2>Status of This Document</h2>
+  <p>This is a draft document and may be updated at any time.</p>
+</section>
+
+<section id="conformance">
+  <p>
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+    "OPTIONAL" in this document are to be interpreted as described in BCP 14
+    [[RFC2119]] [[RFC8174]] when, and only when, they appear in all capitals,
+    as shown here.
+  </p>
+</section>
+
+<section id="introduction">
+<h1>Introduction</h1>
+<p>The AI ecosystem comprises a growing number of protocols, artifact
+formats, and service types. Model Context Protocol (MCP) servers,
+Agent-to-Agent (A2A) agents, Claude Code plugins, datasets, model cards,
+and other AI artifacts each define their own metadata and discovery
+mechanisms. This fragmentation forces clients and registries to
+implement bespoke logic for each artifact type, increasing complexity
+and reducing interoperability.</p>
+<p>This document defines the <strong>AI Catalog</strong>: a typed, nestable JSON
+container for discovering heterogeneous AI artifacts. Each entry
+declares its artifact type via a media type and may reference or
+inline the native artifact metadata. A minimal catalog is simply a
+list of entries — names, types, and URLs — requiring no additional
+infrastructure.</p>
+<p>For environments that need verifiable identity, compliance evidence,
+or provenance tracking, this document also defines an optional <strong>Trust
+Manifest</strong> extension. A Trust Manifest accompanies an artifact as a
+peer element, carrying attestations and provenance metadata without
+wrapping or modifying the artifact's native format. Implementations
+that do not need trust metadata can ignore the Trust Manifest entirely.</p>
+<p>The AI Catalog is intentionally agnostic about the artifacts it
+indexes. It does not define or constrain the schema of MCP server
+manifests, A2A agent cards, or any other artifact format. Instead, it
+relies on media types to identify what each entry is, and delegates
+the definition of artifact-specific metadata to the respective protocol
+specifications.</p>
+<section id="terminology">
+<h2>Terminology</h2>
+<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in
+BCP 14 [[RFC2119]] [[RFC8174]] when, and only when, they appear in all
+capitals, as shown here.</p>
+<p>The following terms are used throughout this document:</p>
+<dl>
+<dt>AI Catalog</dt>
+<dd>A JSON document conforming to the <code>application/ai-catalog+json</code>
+  media type that contains an ordered list of catalog entries.</dd>
+<dt>Catalog Entry</dt>
+<dd>A single item in an AI Catalog, identified by a media type and
+  referencing or inlining an AI artifact.</dd>
+<dt>Trust Manifest</dt>
+<dd>A JSON object providing verifiable identity, attestation, and
+  provenance metadata for an AI artifact.</dd>
+<dt>Artifact</dt>
+<dd>Any AI resource described by a catalog entry, such as an MCP server
+  manifest, an A2A agent card, a Claude Code plugin, a
+  dataset descriptor, or a nested AI Catalog.</dd>
+</dl>
+</section>
+</section>
+<section id="design-goals">
+<h1>Design Goals</h1>
+<ol>
+<li>
+<p><strong>Artifact Agnosticism</strong>: The catalog MUST be capable of indexing
+   any type of AI artifact without requiring knowledge of the
+   artifact's internal schema.</p>
+</li>
+<li>
+<p><strong>Media Type Identification</strong>: Each catalog entry MUST declare its
+   artifact type using a media type, enabling clients to select,
+   filter, and route entries without parsing artifact content.</p>
+</li>
+<li>
+<p><strong>Composability</strong>: The catalog format supports nesting — a catalog
+   entry can reference another AI Catalog. This enables plugin-style
+   packaging where a single catalog bundles multiple related artifacts.</p>
+</li>
+<li>
+<p><strong>Progressive Complexity</strong>: The simplest catalog is just entries
+   with names and URLs. Trust, identity, and provenance metadata are
+   available as optional extensions that never modify the catalog
+   structure or artifact formats.</p>
+</li>
+<li>
+<p><strong>Scalable Federation</strong>: The catalog format enables partitioning
+   into sub-catalogs to manage size, and supports delegation to
+   sub-catalogs managed by independent publishers. Collections and
+   nested catalogs support a federated model where each segment of
+   the hierarchy may be authored, hosted, and updated independently.</p>
+</li>
+<li>
+<p><strong>Location Independence</strong>: An AI Catalog MAY be served from any URL.
+   The standard defines a well-known URL convention to enable
+   automated discovery, but catalogs are equally valid when hosted at
+   arbitrary paths, embedded in registries, or distributed as files.</p>
+</li>
+</ol>
+</section>
+<section id="ai-catalog">
+<h1>AI Catalog</h1>
+<section id="media-type">
+<h2>Media Type</h2>
+<p>An AI Catalog document is identified by the media type:</p>
+<pre><code>application/ai-catalog+json
+</code></pre>
+</section>
+<section id="top-level-structure">
+<h2>Top-Level Structure</h2>
+<p>An AI Catalog document is a JSON object that MUST contain the following
+members:</p>
+<dl>
+<dt><code>specVersion</code></dt>
+<dd>A string indicating the version of this specification that the
+  catalog conforms to, in "Major.Minor" format (e.g., "1.0").</dd>
+<dt><code>entries</code></dt>
+<dd>An array of Catalog Entry objects as defined in <a href="#catalog-entry">Catalog Entry</a>.
+  This array MAY be empty.</dd>
+</dl>
+<p>For example, a minimal catalog listing three AI artifacts:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:example:skill:code-review&quot;,
+      &quot;displayName&quot;: &quot;Code Review Assistant&quot;,
+      &quot;mediaType&quot;: &quot;application/ai-skill&quot;,
+      &quot;url&quot;: &quot;https://skills.example.com/code-review/skill.zip&quot;
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:example:mcp:weather&quot;,
+      &quot;displayName&quot;: &quot;Weather Service&quot;,
+      &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;url&quot;: &quot;https://api.example.com/.well-known/mcp/server-card.json&quot;
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:example:a2a:research&quot;,
+      &quot;displayName&quot;: &quot;Research Assistant&quot;,
+      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;url&quot;: &quot;https://agents.example.com/researchAssitant&quot;
+    }
+  ]
+}
+</code></pre>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>host</code></dt>
+<dd>A Host Info object as defined in <a href="#host-info">Host Info</a> identifying the
+  operator of this catalog.</dd>
+<dt><code>collections</code></dt>
+<dd>An array of Collection Reference objects as defined in
+  <a href="#organizing-catalogs">Organizing Catalogs</a>.</dd>
+<dt><code>metadata</code></dt>
+<dd>An open map of string keys to arbitrary values for custom or
+  non-standard metadata.</dd>
+</dl>
+</section>
+<section id="host-info">
+<h2>Host Info</h2>
+<p>The Host Info object identifies the operator of the catalog. It MUST
+contain:</p>
+<dl>
+<dt><code>displayName</code></dt>
+<dd>A string containing the human-readable name of the host (e.g., the
+  organization name).</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>identifier</code></dt>
+<dd>A string containing a verifiable identifier for the host (e.g., a
+  DID or domain name).</dd>
+<dt><code>documentationUrl</code></dt>
+<dd>A string containing a URL to the host's documentation.</dd>
+<dt><code>logoUrl</code></dt>
+<dd>A string containing a URL to the host's logo.</dd>
+<dt><code>trustManifest</code></dt>
+<dd>A Trust Manifest object as defined in <a href="#trust-manifest">Trust Manifest</a> providing
+  verifiable identity and trust metadata for the host itself.</dd>
+</dl>
+</section>
+<section id="catalog-entry">
+<h2>Catalog Entry</h2>
+<p>A Catalog Entry object describes a single AI artifact in the catalog.
+It MUST contain the following members:</p>
+<dl>
+<dt><code>identifier</code></dt>
+<dd>A string identifying this artifact. This SHOULD be a URN
+  [[RFC8141]] or URI [[RFC3986]] (e.g., <code>urn:example:agent:name</code>).
+  See <a href="#multi-version-entries">Multi-Version Entries</a> for uniqueness
+  rules when multiple versions are present.</dd>
+<dt><code>displayName</code></dt>
+<dd>A string containing a human-readable name for the artifact.</dd>
+<dt><code>mediaType</code></dt>
+<dd>A string containing the media type that identifies the type of the
+  referenced artifact. This is the mechanism by which clients
+  determine what kind of AI artifact the entry represents. Well-known
+  values include (but are not limited to):</dd>
+</dl>
+<ul>
+<li><code>application/ai-catalog+json</code> — a nested AI Catalog</li>
+<li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
+<li><code>application/mcp-server+json</code> — an MCP Server manifest</li>
+<li>Any other media type defined by a protocol specification (e.g.,
+    <code>application/ai-skill</code> for skill definitions)</li>
+</ul>
+<p>A Catalog Entry MUST contain exactly one of the following members to
+provide the artifact content:</p>
+<dl>
+<dt><code>url</code></dt>
+<dd>A string containing a URL where the full artifact document can be
+  retrieved. The document served at this URL SHOULD be served with
+  the media type declared in the <code>mediaType</code> field.</dd>
+<dt><code>inline</code></dt>
+<dd>A JSON value containing the complete artifact document inline. The
+  structure of this value is determined by the <code>mediaType</code> field and
+  is opaque to this specification.</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>description</code></dt>
+<dd>A string containing a short description of the artifact.</dd>
+<dt><code>tags</code></dt>
+<dd>An array of strings serving as keywords for filtering and discovery.</dd>
+<dt><code>version</code></dt>
+<dd>A string containing the version of this artifact.
+  <a href="https://semver.org/">Semantic Versioning</a> is RECOMMENDED but not
+  required. See <a href="#multi-version-entries">Multi-Version Entries</a> for
+  how versions interact with <code>identifier</code>.</dd>
+<dt><code>updatedAt</code></dt>
+<dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
+  when this entry was last modified.</dd>
+<dt><code>metadata</code></dt>
+<dd>An open map of string keys to arbitrary values for custom data.</dd>
+<dt><code>publisher</code></dt>
+<dd>A Publisher object as defined in <a href="#publisher-object">Publisher Object</a>
+  identifying the entity that publishes this artifact. This is the
+  sole location for publisher information; it is not duplicated in
+  the Trust Manifest.</dd>
+<dt><code>trustManifest</code></dt>
+<dd>A Trust Manifest object as defined in <a href="#trust-manifest">Trust Manifest</a>
+  providing verifiable identity and trust metadata for this artifact.
+  See <a href="#trust-manifest">Trust Manifest</a> for details.</dd>
+</dl>
+</section>
+<section id="multi-version-entries">
+<h2>Multi-Version Entries</h2>
+<p>A catalog MAY contain multiple entries with the same <code>identifier</code> and
+different <code>version</code> values, representing a version history for a
+single artifact — similar to a package registry.</p>
+<p>When <code>version</code> is present, the combination of <code>identifier</code> and <code>version</code>
+MUST be unique within the catalog. When <code>version</code> is absent, <code>identifier</code>
+alone MUST be unique. The <code>identifier</code> SHOULD be stable across versions
+and catalog locations so that the same logical artifact can be
+recognized wherever it appears.</p>
+<p>Clients that need only the latest version SHOULD sort entries
+sharing the same <code>identifier</code> by <code>version</code> (when parseable as a semantic
+version) or by <code>updatedAt</code>, and select the most recent. Clients
+that need a specific version SHOULD match on both <code>identifier</code> and <code>version</code>.</p>
+</section>
+<section id="publisher-object">
+<h2>Publisher Object</h2>
+<p>The Publisher object identifies the entity responsible for an artifact.
+It appears on the Catalog Entry and is the canonical location for
+publisher information. It MUST contain:</p>
+<dl>
+<dt><code>identifier</code></dt>
+<dd>A string containing a verifiable identifier for the publisher
+  organization.</dd>
+<dt><code>displayName</code></dt>
+<dd>A string containing the human-readable name of the publisher.</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>identityType</code></dt>
+<dd>A string providing a type hint for the publisher identifier (e.g.,
+  "did", "dns").</dd>
+</dl>
+</section>
+</section>
+<section id="trust-manifest">
+<h1>Trust Manifest</h1>
+<p>The Trust Manifest is an OPTIONAL companion to catalog entries and
+host objects. It is a JSON object that provides verifiable identity,
+attestation, and provenance metadata for AI artifacts.
+Implementations that do not require trust metadata MAY ignore this
+section entirely — a conformant AI Catalog does not require Trust
+Manifests.</p>
+<p>The Trust Manifest does NOT wrap the artifact. It sits alongside the
+artifact as a peer element within a Catalog Entry, keeping the native
+artifact format unmodified. Publisher information is NOT duplicated
+in the Trust Manifest — the informational publisher identity is
+carried on the Catalog Entry (see <a href="#publisher-object">Publisher Object</a>).</p>
+<section id="identity">
+<h2>Identity</h2>
+<p>A Trust Manifest MUST contain:</p>
+<dl>
+<dt><code>identity</code></dt>
+<dd>A string containing a globally unique URI [[RFC3986]] that serves as
+  the primary subject identifier for this artifact. This SHOULD be a
+  DID, SPIFFE ID, or URL.</dd>
+</dl>
+<p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
+field MUST match the entry's <code>identifier</code> field. This binding ensures trust
+claims are unambiguously associated with the catalog artifact.
+Consumers MUST reject a Trust Manifest whose <code>identity</code> does not
+match the containing entry's <code>identifier</code>.</p>
+<p>When a Trust Manifest appears on a Host Info object, <code>identity</code>
+SHOULD match the host's <code>identifier</code> field when present.</p>
+<p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
+values), each entry MAY carry its own Trust Manifest. There is no
+requirement that all versions carry identical trust metadata — trust
+properties may evolve across versions.</p>
+</section>
+<section id="optional-members">
+<h2>Optional Members</h2>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>identityType</code></dt>
+<dd>A string providing a type hint for the identity URI (e.g., "did",
+  "spiffe", "dns"). This field is OPTIONAL when the type is evident
+  from the URI scheme.</dd>
+<dt><code>trustSchema</code></dt>
+<dd>A Trust Schema object as defined in <a href="#trust-schema-object">Trust Schema</a>.</dd>
+<dt><code>attestations</code></dt>
+<dd>An array of Attestation objects as defined in <a href="#attestation-object">Attestation</a>.
+  This is the mechanism for verifiable claims including publisher
+  identity verification (using attestation type "publisher-identity"),
+  compliance certifications, and other proofs.</dd>
+<dt><code>provenance</code></dt>
+<dd>An array of Provenance Link objects as defined in
+  <a href="#provenance-link-object">Provenance Link</a>.</dd>
+<dt><code>privacyPolicyUrl</code></dt>
+<dd>A string containing a URL to the privacy policy governing this
+  artifact.</dd>
+<dt><code>termsOfServiceUrl</code></dt>
+<dd>A string containing a URL to the terms of service.</dd>
+<dt><code>signature</code></dt>
+<dd>A string containing a detached JWS [[RFC7515]] signature computed
+  over the Trust Manifest content. This enables integrity verification
+  of the trust metadata independent of the artifact.</dd>
+<dt><code>metadata</code></dt>
+<dd>An open map of string keys to arbitrary values for extending trust
+  metadata.</dd>
+</dl>
+</section>
+<section id="trust-schema-object">
+<h2>Trust Schema Object</h2>
+<p>A Trust Schema object describes the trust framework applied to the
+artifact. It MUST contain:</p>
+<dl>
+<dt><code>identifier</code></dt>
+<dd>A string identifying the trust schema.</dd>
+<dt><code>version</code></dt>
+<dd>A string indicating the schema version.</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>governanceUri</code></dt>
+<dd>A string containing a URI to the governance policy document.</dd>
+<dt><code>verificationMethods</code></dt>
+<dd>An array of strings identifying the verification methods supported
+  (e.g., "did", "x509", "dns-01").</dd>
+</dl>
+</section>
+<section id="attestation-object">
+<h2>Attestation Object</h2>
+<p>An Attestation object provides verifiable proof of a claim. It MUST
+contain:</p>
+<dl>
+<dt><code>type</code></dt>
+<dd>A string identifying the attestation type (e.g., "SOC2-Type2",
+  "HIPAA-Audit", "ISO27001").</dd>
+<dt><code>uri</code></dt>
+<dd>A string containing the location of the attestation document.
+  This may be an HTTPS URL or an inline Data URI [[RFC2397]].</dd>
+<dt><code>mediaType</code></dt>
+<dd>A string indicating the format (e.g., "application/pdf",
+  "application/jwt").</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>digest</code></dt>
+<dd>A string containing a cryptographic hash for integrity verification
+  (e.g., "sha256:abcd1234...").</dd>
+<dt><code>size</code></dt>
+<dd>An unsigned integer indicating the size of the attestation in bytes.</dd>
+<dt><code>description</code></dt>
+<dd>A string containing a human-readable label.</dd>
+</dl>
+</section>
+<section id="provenance-link-object">
+<h2>Provenance Link Object</h2>
+<p>A Provenance Link records lineage information. It MUST contain:</p>
+<dl>
+<dt><code>relation</code></dt>
+<dd>A string describing the relationship (e.g., "materializedFrom",
+  "derivedFrom", "publishedFrom").</dd>
+<dt><code>sourceId</code></dt>
+<dd>A string identifying the source artifact or data.</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>sourceDigest</code></dt>
+<dd>A string containing the digest of the source.</dd>
+<dt><code>registryUri</code></dt>
+<dd>A string containing the URI of the registry holding the source.</dd>
+<dt><code>statementUri</code></dt>
+<dd>A string containing the URI of a provenance statement document.</dd>
+<dt><code>signatureRef</code></dt>
+<dd>A string referencing the key used to sign the provenance statement.</dd>
+</dl>
+</section>
+<section id="verification-procedures">
+<h2>Verification Procedures</h2>
+<p>This section describes how consumers verify the trust metadata
+carried by a Trust Manifest. Verification is OPTIONAL — consumers
+that do not need trust assurance can skip this entirely.</p>
+<section id="digest-format">
+<h3>Digest Format</h3>
+<p>Digests in this specification use the format <code>algorithm:hex-value</code>,
+where <code>algorithm</code> is a hash algorithm identifier and <code>hex-value</code> is
+the lowercase hexadecimal encoding of the hash output. For example:</p>
+<pre><code>sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+</code></pre>
+<p>Producers SHOULD use SHA-256 [[RFC6234]] or stronger. Consumers
+MUST reject digest values using algorithms shorter than SHA-256.</p>
+</section>
+<section id="trust-manifest-signatures">
+<h3>Trust Manifest Signatures</h3>
+<p>The <code>signature</code> field carries a detached JWS [[RFC7515]] computed
+over the Trust Manifest content. To create or verify a signature:</p>
+<ol>
+<li><strong>Canonicalize</strong> the Trust Manifest JSON using JCS (JSON
+   Canonicalization Scheme) [[RFC8785]]. Remove the <code>signature</code>
+   field itself before canonicalization.</li>
+<li><strong>Sign</strong> (or verify) the canonical bytes as a detached JWS
+   payload using the publisher's private (or public) key.</li>
+<li><strong>Encode</strong> the resulting JWS in compact serialization and store
+   it in the <code>signature</code> field.</li>
+</ol>
+<p>This approach ensures the signature is stable regardless of JSON
+key ordering or whitespace, and can be verified independently of the
+artifact content.</p>
+</section>
+<section id="key-resolution">
+<h3>Key Resolution</h3>
+<p>Consumers resolve the signer's public key based on the <code>identity</code>
+URI scheme:</p>
+<dl>
+<dt>DID (e.g., <code>did:web:example.com</code>)</dt>
+<dd>Resolve the DID Document per the relevant DID method specification
+  and extract the verification key from the <code>verificationMethod</code>
+  array.</dd>
+<dt>HTTPS URL (e.g., <code>https://example.com/.well-known/jwks.json</code>)</dt>
+<dd>Fetch the JWK Set [[RFC7517]] at the specified URL and select the
+  key matching the JWS <code>kid</code> header.</dd>
+<dt>SPIFFE ID (e.g., <code>spiffe://example.com/service</code>)</dt>
+<dd>Obtain the X.509 SVID from the SPIFFE Workload API and extract
+  the public key from the leaf certificate.</dd>
+<dt>DNS</dt>
+<dd>Resolve the domain's TLS certificate and extract the public key,
+  or look up a DNSKEY/TXT record containing the JWK thumbprint.</dd>
+</dl>
+</section>
+<section id="verifying-host-identity">
+<h3>Verifying Host Identity</h3>
+<p>To verify the host of a catalog:</p>
+<ol>
+<li>Confirm the catalog was retrieved over HTTPS from the expected
+   domain.</li>
+<li>If <code>host.identifier</code> is a DID, resolve the DID Document and confirm the
+   hosting domain appears in the DID Document's <code>service</code> endpoints.</li>
+<li>If <code>host.trustManifest</code> is present and signed, verify the
+   signature as described above.</li>
+</ol>
+</section>
+<section id="verifying-publisher-identity">
+<h3>Verifying Publisher Identity</h3>
+<p>To verify the publisher of an artifact:</p>
+<ol>
+<li>Locate the <code>publisher-identity</code> attestation in the Trust
+   Manifest's <code>attestations</code> array.</li>
+<li>Fetch the attestation document (typically a JWT) from the <code>uri</code>.</li>
+<li>Verify the JWT signature against the publisher's public key
+   (resolved from <code>publisher.identifier</code>).</li>
+<li>Confirm the JWT claims bind the <code>publisher.identifier</code> to the Trust
+   Manifest's <code>identity</code>.</li>
+</ol>
+</section>
+<section id="verifying-artifact-integrity">
+<h3>Verifying Artifact Integrity</h3>
+<p>When a Trust Manifest includes <code>provenance</code> entries with <code>sourceDigest</code>:</p>
+<ol>
+<li>Fetch the artifact content from the entry's <code>url</code>.</li>
+<li>Compute the digest using the algorithm specified in the
+   <code>sourceDigest</code> field.</li>
+<li>Compare the computed digest to the declared value. Reject the
+   artifact if they differ.</li>
+</ol>
+</section>
+<section id="verifying-attestations">
+<h3>Verifying Attestations</h3>
+<p>For each attestation in the <code>attestations</code> array:</p>
+<ol>
+<li>Fetch the attestation document from <code>uri</code>.</li>
+<li>If <code>digest</code> is present, verify the fetched document matches the
+   declared digest.</li>
+<li>Validate the attestation per its <code>type</code> (e.g., verify a JWT
+   signature, confirm a PDF certificate is current).</li>
+</ol>
+</section>
+</section>
+</section>
+<section id="organizing-catalogs">
+<h1>Organizing Catalogs</h1>
+<p>As catalogs grow, a flat list of entries becomes unwieldy. This
+specification provides two complementary mechanisms for structuring
+catalogs at scale: <strong>bundles</strong> and <strong>collections</strong>. They serve
+fundamentally different purposes and appear in different parts of
+the document.</p>
+<section id="bundles-nested-catalog-entries">
+<h2>Bundles (Nested Catalog Entries)</h2>
+<p>A bundle is a catalog entry whose <code>mediaType</code> is
+<code>application/ai-catalog+json</code>. The entry's content (via <code>url</code> or
+<code>inline</code>) is itself an AI Catalog document containing the bundled
+artifacts. Bundles express <strong>dependency</strong>: the artifacts inside
+are related and intended to be acquired or deployed together.</p>
+<p>Use bundles when:</p>
+<ul>
+<li>A skill requires a companion MCP server to function</li>
+<li>A plugin ships with a dataset it depends on</li>
+<li>A vendor distributes a suite of agents as a single installable package</li>
+</ul>
+<pre><code>Vendor Catalog
+  └── Entry: &quot;Finance Plugin&quot; (mediaType: application/ai-catalog+json)
+        ├── Entry: Finance A2A Agent
+        ├── Entry: Finance MCP Server
+        └── Entry: Market Dataset
+</code></pre>
+<p>A bundle is a regular catalog entry — it has an <code>identifier</code>, may carry a
+<code>trustManifest</code>, and may include a <code>publisher</code>. An entry inside a
+bundle MAY reuse the same <code>identifier</code> as an entry elsewhere; this
+indicates the same logical artifact.</p>
+<p>Clients processing bundles SHOULD impose a maximum nesting depth to
+prevent circular references. A depth limit of 8 is RECOMMENDED.</p>
+</section>
+<section id="collections-catalog-hierarchy">
+<h2>Collections (Catalog Hierarchy)</h2>
+<p>Collections are an OPTIONAL top-level array on the AI Catalog. Each
+element is a Collection Reference that points to a child AI Catalog
+at a different URL. Collections express <strong>organization</strong>: they
+partition a large catalog into browsable subcategories without
+implying any dependency between the referenced catalogs.</p>
+<p>Use collections when:</p>
+<ul>
+<li>An enterprise has thousands of artifacts spread across departments</li>
+<li>A registry wants to offer a top-level directory of vendor catalogs</li>
+<li>A catalog needs to be partitioned for performance or governance</li>
+</ul>
+<p>A Collection Reference object MUST contain:</p>
+<dl>
+<dt><code>displayName</code></dt>
+<dd>A string containing a human-readable name for this collection
+  (e.g., "Finance Services", "ML Models").</dd>
+<dt><code>url</code></dt>
+<dd>A string containing a URL where the child AI Catalog document can
+  be retrieved. The document at this URL MUST be a valid AI Catalog.</dd>
+</dl>
+<p>The following members are OPTIONAL:</p>
+<dl>
+<dt><code>description</code></dt>
+<dd>A string describing what this collection contains.</dd>
+<dt><code>tags</code></dt>
+<dd>An array of strings serving as keywords for filtering and navigation.</dd>
+</dl>
+<pre><code>Enterprise Catalog
+  ├── Collection: &quot;Finance Services&quot; → https://acme.com/catalogs/finance.json
+  ├── Collection: &quot;ML Models&quot;        → https://acme.com/catalogs/ml.json
+  └── Collection: &quot;DevOps Tools&quot;     → https://acme.com/catalogs/devops.json
+        ├── Collection: &quot;CI/CD&quot;      → https://acme.com/catalogs/devops/cicd.json
+        └── Collection: &quot;Monitoring&quot; → https://acme.com/catalogs/devops/monitoring.json
+</code></pre>
+<p>Collections are recursive — a child catalog MAY itself contain
+<code>collections</code>, enabling multi-level organizational hierarchies.
+Clients SHOULD impose a maximum traversal depth.</p>
+</section>
+<section id="bundles-vs-collections">
+<h2>Bundles vs. Collections</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Bundle</th>
+<th>Collection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Where</strong></td>
+<td>An entry in <code>entries[]</code></td>
+<td>An element in <code>collections[]</code></td>
+</tr>
+<tr>
+<td><strong>Content</strong></td>
+<td>Inline or referenced AI Catalog</td>
+<td>URL to a separate AI Catalog</td>
+</tr>
+<tr>
+<td><strong>Semantics</strong></td>
+<td>Dependency — artifacts are consumed together</td>
+<td>Organization — catalogs are browsed independently</td>
+</tr>
+<tr>
+<td><strong>Identity</strong></td>
+<td>Has an <code>identifier</code>, may carry <code>trustManifest</code></td>
+<td>Named pointer, no artifact identity</td>
+</tr>
+<tr>
+<td><strong>Example</strong></td>
+<td>"Finance Plugin" shipping agent + server + data</td>
+<td>"Finance Department" grouping 50 artifacts</td>
+</tr>
+<tr>
+<td><strong>Trust</strong></td>
+<td>Bundle entry may have its own publisher and trust</td>
+<td>Child catalog has its own host and publisher(s)</td>
+</tr>
+</tbody>
+</table>
+<p>A single catalog MAY use both mechanisms. For example, an enterprise
+catalog could use collections to partition by department, while
+individual department catalogs contain bundle entries that package
+related artifacts together.</p>
+</section>
+</section>
+<section id="discovery">
+<h1>Discovery</h1>
+<section id="location-independence">
+<h2>Location Independence</h2>
+<p>An AI Catalog document MAY be served from any URL. It is identified
+by its media type (<code>application/ai-catalog+json</code>) and its <code>specVersion</code>
+field, not by its URL path. Catalogs are equally valid when hosted at
+an arbitrary path, embedded in a registry response, bundled in a
+package, or distributed as a local file.</p>
+<p>When served over HTTP, the document SHOULD be served with the media
+type <code>application/ai-catalog+json</code>.</p>
+</section>
+<section id="well-known-uri">
+<h2>Well-Known URI</h2>
+<p>To support automated discovery, hosts MAY serve an AI Catalog at the
+following well-known URI [[RFC8615]]:</p>
+<pre><code>/.well-known/ai-catalog.json
+</code></pre>
+<p>Clients performing domain-level discovery SHOULD attempt to retrieve
+this well-known URL. If a valid AI Catalog document is returned, the
+client SHOULD use the <code>url</code> entries to retrieve individual artifacts
+and their associated Trust Manifests.</p>
+<p>Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
+other locations (e.g., as part of an API response or a package
+registry) are fully conformant.</p>
+</section>
+<section id="dynamic-discovery">
+<h2>Dynamic Discovery</h2>
+<p>Implementing protocols MAY support dynamic catalog generation through
+their own mechanisms, such as providing different catalog content based
+on a caller's identity or query parameters. Defining dynamic discovery
+behavior is out of scope for this specification.</p>
+</section>
+<section id="link-relation-discovery">
+<h2>Link Relation Discovery</h2>
+<p>Websites MAY advertise their AI Catalog by including an <code>ai-catalog</code>
+link relation in HTTP responses or HTML documents. This enables AI
+agents, crawlers, and other automated clients to discover the catalog
+associated with any website without prior knowledge of its location.</p>
+<p><strong>HTTP Link header.</strong> A server MAY include a <code>Link</code> header [[RFC8288]]
+in HTTP responses:</p>
+<pre><code>Link: &lt;https://example.com/catalog/ai.json&gt;; rel="ai-catalog"
+</code></pre>
+<p><strong>HTML <code>&lt;link&gt;</code> element.</strong> An HTML page MAY include a link element in
+the document head:</p>
+<pre><code class="language-html">&lt;link rel=&quot;ai-catalog&quot; href=&quot;/catalog/ai.json&quot;
+      type=&quot;application/ai-catalog+json&quot;&gt;
+</code></pre>
+<p><strong>Agent-driven discovery.</strong> AI agents that interact with websites
+(for example, agents following user instructions to "find tools on
+this site" or browsing on behalf of a user) SHOULD check for the
+<code>ai-catalog</code> link relation on the target website. The discovery
+procedure is:</p>
+<ol>
+<li>Fetch the target URL and inspect the HTTP response headers for
+   a <code>Link</code> header with <code>rel="ai-catalog"</code>.</li>
+<li>If no <code>Link</code> header is present and the response is an HTML
+   document, parse the document for a <code>&lt;link&gt;</code> element with
+   <code>rel="ai-catalog"</code>.</li>
+<li>If neither is found, optionally fall back to the well-known URI
+   <code>/.well-known/ai-catalog.json</code> as described in
+   <a href="#well-known-uri">Well-Known URI</a>.</li>
+<li>Retrieve the discovered URL. If the response has a media type of
+   <code>application/ai-catalog+json</code> and contains a valid <code>specVersion</code>
+   field, treat it as the site's AI Catalog.</li>
+</ol>
+<p>This mechanism allows any website to surface its AI tools, agents,
+and services to visiting agents through a standard, machine-readable
+pointer — without requiring changes to the site's visible content.</p>
+</section>
+</section>
+<section id="conformance-levels">
+<h1>Conformance Levels</h1>
+<p>This specification defines three conformance levels. Each level builds
+on the previous one. Implementations MUST satisfy all requirements of
+their declared level.</p>
+<section id="level-1-minimal-catalog">
+<h2>Level 1: Minimal Catalog</h2>
+<p>A conformant Minimal Catalog is a JSON document with media type
+<code>application/ai-catalog+json</code> that contains:</p>
+<ul>
+<li><code>specVersion</code> — the specification version string</li>
+<li><code>entries</code> — an array of Catalog Entry objects, each containing at
+  minimum <code>identifier</code>, <code>displayName</code>, <code>mediaType</code>, and exactly one of <code>url</code> or
+  <code>inline</code></li>
+</ul>
+<p>All other fields (<code>host</code>, <code>collections</code>, <code>publisher</code>, <code>trustManifest</code>,
+<code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
+only need a simple list of AI artifacts — for example, a catalog of
+MCP servers or A2A agents.</p>
+</section>
+<section id="level-2-discoverable-catalog">
+<h2>Level 2: Discoverable Catalog</h2>
+<p>In addition to Level 1 requirements, a Discoverable Catalog:</p>
+<ul>
+<li>Includes a <code>host</code> object identifying the catalog operator</li>
+<li>MAY be served at the well-known URI <code>/.well-known/ai-catalog.json</code>
+  to enable automated domain-level discovery</li>
+<li>MAY include <code>collections</code> for organizational hierarchy</li>
+</ul>
+</section>
+<section id="level-3-trusted-catalog">
+<h2>Level 3: Trusted Catalog</h2>
+<p>In addition to Level 2 requirements, a Trusted Catalog:</p>
+<ul>
+<li>Includes <code>trustManifest</code> objects on entries and/or the host, as
+  defined in <a href="#trust-manifest">Trust Manifest</a></li>
+<li>MAY include <code>publisher</code> objects on entries with verifiable identifiers</li>
+<li>Enables verifiable identity, compliance attestations, and provenance
+  tracking</li>
+</ul>
+<p>Implementations at any level are fully conformant with this
+specification. Consumers MAY ignore fields defined at higher
+conformance levels and SHOULD gracefully handle their absence.</p>
+</section>
+</section>
+<section id="security-considerations">
+<h1>Security Considerations</h1>
+<section id="transport-security">
+<h2>Transport Security</h2>
+<p>AI Catalogs, artifacts, and Trust Manifests MUST be served over HTTPS
+(TLS 1.2 or later) to prevent tampering and eavesdropping.</p>
+</section>
+<section id="nested-catalog-depth">
+<h2>Nested Catalog Depth</h2>
+<p>Clients processing nested catalogs MUST enforce a maximum recursion
+depth to prevent denial-of-service attacks via deeply nested or
+circular catalog references. A maximum depth of 8 is RECOMMENDED.</p>
+</section>
+<section id="privacy-considerations">
+<h2>Privacy Considerations</h2>
+<p>Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
+information through image fetch requests. Publishers SHOULD carefully
+consider what information is included in <code>metadata</code> extension fields.</p>
+</section>
+</section>
+
+<section class="appendix" id="data-model-overview">
+<h1>Data Model Overview</h1>
+<p>The following diagram illustrates the relationships between the
+core objects defined in this specification:</p>
+<pre class="mermaid nohighlight">
+classDiagram
+    class AICatalog {
+        specVersion string
+        entries CatalogEntry[]
+        host HostInfo
+        collections CollectionRef[]
+    }
+    class HostInfo {
+        displayName string
+        identifier string
+        trustManifest TrustManifest
+    }
+    class CatalogEntry {
+        identifier string
+        displayName string
+        mediaType string
+        url | inline
+        version string
+        publisher Publisher
+        trustManifest TrustManifest
+    }
+    class CollectionRef {
+        displayName string
+        url string
+        description string
+        tags string[]
+    }
+    class Publisher {
+        identifier string
+        displayName string
+    }
+    class TrustManifest {
+        identity string
+        trustSchema TrustSchema
+        attestations Attestation[]
+        provenance ProvenanceLink[]
+        signature string
+    }
+    class TrustSchema {
+        identifier string
+        version string
+        verificationMethods string[]
+    }
+    class Attestation {
+        type string
+        uri string
+        mediaType string
+        digest string
+    }
+    class ProvenanceLink {
+        relation string
+        sourceId string
+        sourceDigest string
+    }
+    AICatalog --> "*" CatalogEntry : entries
+    AICatalog --> "0..1" HostInfo : host
+    AICatalog --> "*" CollectionRef : collections
+    CatalogEntry --> "0..1" Publisher : publisher
+    CatalogEntry --> "0..1" TrustManifest : trustManifest
+    HostInfo --> "0..1" TrustManifest : trustManifest
+    TrustManifest --> "0..1" TrustSchema : trustSchema
+    TrustManifest --> "*" Attestation : attestations
+    TrustManifest --> "*" ProvenanceLink : provenance
+    CatalogEntry --> "0..1" AICatalog : bundle
+    CollectionRef ..> AICatalog : references
+</pre>
+
+</section>
+<section class="appendix" id="iana-considerations">
+<h1>IANA Considerations</h1>
+<section id="media-type-registration-applicationai-catalogjson">
+<h2>Media Type Registration: application/ai-catalog+json</h2>
+<p>This section registers the <code>application/ai-catalog+json</code> media type
+[[RFC6838]] in the "Application" registry.</p>
+<dl>
+<dt>Type name:</dt>
+<dd>application</dd>
+<dt>Subtype name:</dt>
+<dd>ai-catalog+json</dd>
+<dt>Required parameters:</dt>
+<dd>N/A</dd>
+<dt>Optional parameters:</dt>
+<dd>N/A</dd>
+<dt>Encoding considerations:</dt>
+<dd>binary (UTF-8 encoded JSON [[RFC8259]])</dd>
+<dt>Security considerations:</dt>
+<dd>See <a href="#security-considerations">Security Considerations</a> of this document.</dd>
+<dt>Interoperability considerations:</dt>
+<dd>This media type identifies a JSON document conforming to the AI
+  Catalog schema defined in this specification. The document MUST
+  contain <code>specVersion</code> and <code>entries</code> fields.</dd>
+<dt>Published specification:</dt>
+<dd>This document</dd>
+<dt>Applications that use this media type:</dt>
+<dd>AI artifact registries, agent discovery clients, package managers,
+  and catalog aggregation services.</dd>
+<dt>Fragment identifier considerations:</dt>
+<dd>N/A</dd>
+<dt>Person &amp; email address to contact for further information:</dt>
+<dd>Agent Card Working Group</dd>
+<dt>Intended usage:</dt>
+<dd>COMMON</dd>
+<dt>Restrictions on usage:</dt>
+<dd>N/A</dd>
+</dl>
+</section>
+<section id="link-relation-registration-ai-catalog">
+<h2>Link Relation Registration: ai-catalog</h2>
+<p>This section registers the <code>ai-catalog</code> link relation type in the
+IANA "Link Relations" registry [[RFC8288]].</p>
+<dl>
+<dt>Relation Name:</dt>
+<dd>ai-catalog</dd>
+<dt>Description:</dt>
+<dd>Refers to an AI Catalog document (<code>application/ai-catalog+json</code>)
+  that describes AI artifacts, agents, and services associated with
+  the context resource. See <a href="#link-relation-discovery">Link Relation Discovery</a>.</dd>
+<dt>Reference:</dt>
+<dd>This document</dd>
+</dl>
+</section>
+</section>
+<section class="appendix" id="cddl-schema">
+<h1>CDDL Schema</h1>
+<p>The following CDDL [[RFC8610]] defines the normative schema for AI
+Catalog and Trust Manifest documents.</p>
+<section id="ai-catalog">
+<h2>AI Catalog</h2>
+<pre><code>AICatalog = {
+  specVersion: text,
+  ? host: HostInfo,
+  entries: [* CatalogEntry],
+  ? collections: [* CollectionRef],
+  ? metadata: { * text =&gt; any }
+}
+
+HostInfo = {
+  displayName: text,
+  ? identifier: text,
+  ? documentationUrl: text,
+  ? logoUrl: text,
+  ? trustManifest: TrustManifest
+}
+
+CollectionRef = {
+  displayName: text,
+  url: text,
+  ? description: text,
+  ? tags: [* text]
+}
+
+CatalogEntry = {
+  identifier: text,
+  displayName: text,
+  mediaType: text,
+  (url: text // inline: any),
+  ? version: text,
+  ? description: text,
+  ? tags: [* text],
+  ? publisher: Publisher,
+  ? trustManifest: TrustManifest,
+  ? updatedAt: tdate,
+  ? metadata: { * text =&gt; any }
+}
+
+Publisher = {
+  identifier: text,
+  displayName: text,
+  ? identityType: text
+}
+</code></pre>
+</section>
+<section id="trust-manifest">
+<h2>Trust Manifest</h2>
+<pre><code>TrustManifest = {
+  identity: text,
+  ? identityType: text,
+  ? trustSchema: TrustSchema,
+  ? attestations: [* Attestation],
+  ? provenance: [* ProvenanceLink],
+  ? privacyPolicyUrl: text,
+  ? termsOfServiceUrl: text,
+  ? signature: text,
+  ? metadata: { * text =&gt; any }
+}
+
+TrustSchema = {
+  identifier: text,
+  version: text,
+  ? governanceUri: text,
+  ? verificationMethods: [* text]
+}
+
+Attestation = {
+  type: text,
+  uri: text,
+  mediaType: text,
+  ? digest: text,
+  ? size: uint,
+  ? description: text
+}
+
+ProvenanceLink = {
+  relation: text,
+  sourceId: text,
+  ? sourceDigest: text,
+  ? registryUri: text,
+  ? statementUri: text,
+  ? signatureRef: text
+}
+</code></pre>
+</section>
+</section>
+<section class="appendix" id="example-multi-artifact-catalog-with-nested-plugin">
+<h1>Example: Multi-Artifact Catalog with Nested Plugin</h1>
+<p>The following example shows an AI Catalog that contains a mix of
+artifact types including a nested catalog acting as a plugin bundle:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;host&quot;: {
+    &quot;displayName&quot;: &quot;Acme Services Inc.&quot;,
+    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
+    &quot;documentationUrl&quot;: &quot;https://docs.acme-corp.com/ai&quot;
+  },
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+      &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
+      &quot;version&quot;: &quot;2.1.0&quot;,
+      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;,
+      &quot;description&quot;: &quot;A2A agent for financial workflows.&quot;,
+      &quot;tags&quot;: [&quot;finance&quot;, &quot;a2a&quot;],
+      &quot;publisher&quot;: {
+        &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
+        &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+      },
+      &quot;trustManifest&quot;: {
+        &quot;identity&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+        &quot;attestations&quot;: [
+          {
+            &quot;type&quot;: &quot;publisher-identity&quot;,
+            &quot;uri&quot;: &quot;https://trust.acme.com/certs/publisher.jwt&quot;,
+            &quot;mediaType&quot;: &quot;application/jwt&quot;,
+            &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
+          },
+          {
+            &quot;type&quot;: &quot;SOC2-Type2&quot;,
+            &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
+            &quot;mediaType&quot;: &quot;application/pdf&quot;,
+            &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+          }
+        ],
+        &quot;privacyPolicyUrl&quot;: &quot;https://acme.com/legal/privacy&quot;,
+        &quot;termsOfServiceUrl&quot;: &quot;https://acme.com/legal/terms&quot;
+      },
+      &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
+      &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
+      &quot;version&quot;: &quot;1.4.0&quot;,
+      &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/finance.json&quot;,
+      &quot;description&quot;: &quot;MCP server with finance tools.&quot;,
+      &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
+      &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
+      &quot;displayName&quot;: &quot;Acme Finance Suite&quot;,
+      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;description&quot;: &quot;Plugin bundle: A2A agent + MCP server + dataset.&quot;,
+      &quot;tags&quot;: [&quot;finance&quot;, &quot;plugin&quot;, &quot;bundle&quot;],
+      &quot;inline&quot;: {
+              &quot;specVersion&quot;: &quot;1.0&quot;,
+        &quot;entries&quot;: [
+          {
+            &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+            &quot;displayName&quot;: &quot;Finance A2A Agent&quot;,
+            &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+            &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;
+          },
+          {
+            &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
+            &quot;displayName&quot;: &quot;Finance MCP Server&quot;,
+            &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+            &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/finance.json&quot;
+          },
+          {
+            &quot;identifier&quot;: &quot;urn:acme:data:market-2026q1&quot;,
+            &quot;displayName&quot;: &quot;Market Dataset Q1 2026&quot;,
+            &quot;mediaType&quot;: &quot;application/parquet&quot;,
+            &quot;url&quot;: &quot;https://data.acme-corp.com/market-2026q1.parquet&quot;,
+            &quot;trustManifest&quot;: {
+              &quot;identity&quot;: &quot;urn:acme:data:market-2026q1&quot;,
+              &quot;provenance&quot;: [
+                {
+                  &quot;relation&quot;: &quot;publishedFrom&quot;,
+                  &quot;sourceId&quot;: &quot;oci://registry.acme.com/data/market:2026q1&quot;,
+                  &quot;sourceDigest&quot;: &quot;sha256:99998888...&quot;
+                }
+              ]
+            }
+          }
+        ]
+      },
+      &quot;trustManifest&quot;: {
+        &quot;identity&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
+        &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached&quot;
+      },
+      &quot;updatedAt&quot;: &quot;2026-03-20T14:00:00Z&quot;
+    }
+  ]
+}
+</code></pre>
+</section>
+<section class="appendix" id="example-catalog-with-collections">
+<h1>Example: Catalog with Collections</h1>
+<p>The following example shows how an enterprise uses <code>collections</code> to
+organize a large number of artifacts into browsable categories. Each
+collection points to a separate AI Catalog document:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;host&quot;: {
+    &quot;displayName&quot;: &quot;Acme Enterprise AI&quot;,
+    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;
+  },
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:acme:agent:assistant&quot;,
+      &quot;displayName&quot;: &quot;Acme Corporate Assistant&quot;,
+      &quot;version&quot;: &quot;3.0.0&quot;,
+      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/assistant.json&quot;,
+      &quot;description&quot;: &quot;General-purpose corporate assistant agent.&quot;
+    }
+  ],
+  &quot;collections&quot;: [
+    {
+      &quot;displayName&quot;: &quot;Finance Services&quot;,
+      &quot;url&quot;: &quot;https://acme-corp.com/catalogs/finance.json&quot;,
+      &quot;description&quot;: &quot;Financial agents, MCP servers, and datasets.&quot;,
+      &quot;tags&quot;: [&quot;finance&quot;, &quot;trading&quot;, &quot;compliance&quot;]
+    },
+    {
+      &quot;displayName&quot;: &quot;Engineering Tools&quot;,
+      &quot;url&quot;: &quot;https://acme-corp.com/catalogs/engineering.json&quot;,
+      &quot;description&quot;: &quot;CI/CD agents, code review tools, and DevOps servers.&quot;,
+      &quot;tags&quot;: [&quot;engineering&quot;, &quot;devops&quot;, &quot;ci-cd&quot;]
+    },
+    {
+      &quot;displayName&quot;: &quot;ML Models&quot;,
+      &quot;url&quot;: &quot;https://acme-corp.com/catalogs/ml-models.json&quot;,
+      &quot;description&quot;: &quot;Model cards and inference endpoints.&quot;,
+      &quot;tags&quot;: [&quot;ml&quot;, &quot;models&quot;, &quot;inference&quot;]
+    }
+  ]
+}
+</code></pre>
+<p>A catalog MAY contain both <code>entries</code> and <code>collections</code>. In this
+example, the corporate assistant agent is listed directly while
+department-specific artifacts are organized into child catalogs.</p>
+</section>
+<section class="appendix" id="example-claude-code-plugin-entry">
+<h1>Example: Claude Code Plugin Entry</h1>
+<p>An AI Catalog entry for a Claude Code plugin (per the
+<a href="https://github.com/anthropics/claude-plugins-official">Claude Plugins marketplace</a>):</p>
+<pre><code class="language-json">{
+  &quot;identifier&quot;: &quot;urn:claude-plugin:endorlabs:ai-plugins&quot;,
+  &quot;displayName&quot;: &quot;ai-plugins&quot;,
+  &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+  &quot;url&quot;: &quot;https://github.com/endorlabs/ai-plugins.git&quot;,
+  &quot;description&quot;: &quot;Set up endorctl and use Endor Labs to scan, prioritize, and fix security risks across your software supply chain&quot;,
+  &quot;tags&quot;: [&quot;security&quot;, &quot;supply-chain&quot;],
+  &quot;publisher&quot;: {
+    &quot;identifier&quot;: &quot;did:web:endorlabs.com&quot;,
+    &quot;displayName&quot;: &quot;Endor Labs&quot;
+  },
+  &quot;trustManifest&quot;: {
+    &quot;identity&quot;: &quot;urn:claude-plugin:endorlabs:ai-plugins&quot;,
+    &quot;identityType&quot;: &quot;did&quot;,
+    &quot;attestations&quot;: [
+      {
+        &quot;type&quot;: &quot;publisher-identity&quot;,
+        &quot;uri&quot;: &quot;https://trust.endorlabs.com/certs/publisher.jwt&quot;,
+        &quot;mediaType&quot;: &quot;application/jwt&quot;,
+        &quot;description&quot;: &quot;Verifies did:web:endorlabs.com as publisher&quot;
+      }
+    ],
+    &quot;provenance&quot;: [
+      {
+        &quot;relation&quot;: &quot;publishedFrom&quot;,
+        &quot;sourceId&quot;: &quot;https://github.com/endorlabs/ai-plugins&quot;,
+        &quot;sourceDigest&quot;: &quot;sha1:a0f1d5632b6f9e6c26eaa9806f5d8d454ca5b06f&quot;
+      }
+    ]
+  },
+  &quot;metadata&quot;: {
+    &quot;homepage&quot;: &quot;https://www.endorlabs.com&quot;
+  }
+}
+</code></pre>
+</section>
+<section class="appendix" id="mapping-to-oci-distribution">
+<h1>Mapping to OCI Distribution</h1>
+<p>This appendix describes how AI Catalog documents can be distributed
+through OCI registries, enabling content-addressed storage, signing,
+and replication using existing container infrastructure.</p>
+<section id="logical-format-vs-physical-distribution">
+<h2>Logical Format vs. Physical Distribution</h2>
+<p>The AI Catalog specification defines a <strong>logical format</strong>: a JSON
+document with <code>entries</code>, <code>displayName</code>, <code>mediaType</code>, and <code>trustManifest</code>
+fields that are immediately meaningful to anyone working with AI
+artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
+consume simple JSON.</p>
+<p>OCI provides a <strong>physical distribution layer</strong>: content-addressed
+storage, cryptographic signing via Cosign/Notation, global replication
+through registries, and referrer-based metadata association. These are
+valuable infrastructure capabilities, but OCI's data model uses
+container-oriented vocabulary (<code>manifests</code>, <code>layers</code>, <code>config</code>,
+<code>digest</code>) that does not naturally describe a catalog of AI artifacts.</p>
+<p>This specification treats OCI as one distribution option, not as the
+canonical data model. The logical AI Catalog format remains the
+authoring and consumption interface. Tooling bridges the two:</p>
+<pre><code>Authoring                         Distribution                    Consumption
+─────────                         ────────────                    ───────────
+ai-catalog.json    ──pack──►    OCI Registry     ──unpack──►   ai-catalog.json
+  entries[]                       Index/Manifests                  entries[]
+  trustManifest                   Referrers                        trustManifest
+</code></pre>
+<p>This separation means:</p>
+<ul>
+<li><strong>Simplicity for authors</strong>: Publishers write AI Catalog JSON using
+  domain vocabulary. No knowledge of OCI manifests, digests, or layer
+  descriptors is required.</li>
+<li><strong>Simplicity for consumers</strong>: Clients that fetch from
+  <code>/.well-known/ai-catalog.json</code> or a registry API receive the logical
+  JSON format. They never need to parse OCI structures.</li>
+<li><strong>Power for infrastructure</strong>: Registries that want content-addressed
+  integrity, signing, and replication can store catalogs as OCI
+  artifacts using the mapping defined below.</li>
+</ul>
+</section>
+<section id="conceptual-mapping">
+<h2>Conceptual Mapping</h2>
+<p>The OCI image specification (v1.1+) supports arbitrary artifact types
+through the <code>artifactType</code> field. The following table maps AI Catalog
+concepts to their OCI physical equivalents:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">AI Catalog (Logical)</th>
+<th style="text-align: left;">OCI (Physical)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">AI Catalog document</td>
+<td style="text-align: left;">OCI Image Index with <code>artifactType: "application/ai-catalog+json"</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Catalog Entry</td>
+<td style="text-align: left;">OCI Image Manifest with <code>artifactType</code> set to the entry's <code>mediaType</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Entry <code>mediaType</code></td>
+<td style="text-align: left;">Manifest <code>artifactType</code> field</td>
+</tr>
+<tr>
+<td style="text-align: left;">Entry artifact content</td>
+<td style="text-align: left;">Manifest <code>layers[0]</code> blob (the protocol-specific document)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Entry metadata (name, tags, publisher)</td>
+<td style="text-align: left;">Manifest <code>config</code> blob and/or <code>annotations</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Nested Catalog</td>
+<td style="text-align: left;">Nested OCI Image Index referenced from the parent index</td>
+</tr>
+<tr>
+<td style="text-align: left;">Trust Manifest</td>
+<td style="text-align: left;">OCI Referrer artifact with <code>subject</code> pointing to the entry manifest</td>
+</tr>
+<tr>
+<td style="text-align: left;">Trust Manifest attestations</td>
+<td style="text-align: left;">Individual OCI Referrer artifacts per attestation</td>
+</tr>
+<tr>
+<td style="text-align: left;">Signing</td>
+<td style="text-align: left;">Cosign / Notation signatures as OCI Referrers</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="packing-ai-catalog-to-oci">
+<h2>Packing: AI Catalog to OCI</h2>
+<p>Tooling converts an AI Catalog JSON document into OCI artifacts:</p>
+<ol>
+<li>
+<p><strong>Each catalog entry</strong> becomes an OCI Image Manifest. The entry's
+   artifact content (A2A card, MCP manifest, skill definition) is
+   stored as a <code>layers[0]</code> blob. Common metadata (name, description,
+   publisher) is stored as the <code>config</code> blob or as <code>annotations</code>.</p>
+</li>
+<li>
+<p><strong>The catalog itself</strong> becomes an OCI Image Index whose <code>manifests</code>
+   array references the per-entry manifests by digest.</p>
+</li>
+<li>
+<p><strong>Trust Manifests</strong> become OCI Referrer artifacts attached to their
+   entry manifests via the <code>subject</code> field. Attestation documents
+   (JWTs, PDFs, SLSA provenance) become individual referrer layers.</p>
+</li>
+<li>
+<p><strong>Nested catalogs</strong> become nested OCI Image Indexes.</p>
+</li>
+</ol>
+<pre><code>oci://registry.acme.com/ai-catalog:latest          (Image Index)
+  ├── manifest: finance-a2a-agent                   (Manifest)
+  │     ├── config: { name, description, publisher }
+  │     ├── layers[0]: a2a-card.json
+  │     └── referrer: trust-manifest                (Referrer)
+  │           ├── config: trust-manifest.json
+  │           └── layers: [publisher.jwt, soc2.pdf]
+  ├── manifest: finance-mcp-server                  (Manifest)
+  │     ├── config: { name, description }
+  │     └── layers[0]: mcp-server.json
+  └── index: finance-suite                          (Nested Index)
+        ├── manifest: suite-a2a-agent
+        └── manifest: suite-mcp-server
+</code></pre>
+</section>
+<section id="unpacking-oci-to-ai-catalog">
+<h2>Unpacking: OCI to AI Catalog</h2>
+<p>Tooling converts OCI artifacts back to an AI Catalog JSON document:</p>
+<ol>
+<li>Fetch the OCI Image Index for the catalog.</li>
+<li>For each manifest in the index, extract the <code>config</code> blob
+   (entry metadata) and <code>layers[0]</code> blob (artifact content).</li>
+<li>Query the Referrers API for each manifest to discover Trust
+   Manifests and attestations.</li>
+<li>Assemble the logical AI Catalog JSON with <code>entries[]</code> and
+   <code>trustManifest</code> fields.</li>
+</ol>
+<p>The result is a standard <code>application/ai-catalog+json</code> document
+indistinguishable from one authored by hand.</p>
+</section>
+<section id="oci-image-index-example">
+<h2>OCI Image Index Example</h2>
+<p>The following shows the OCI physical representation of an AI Catalog
+containing two entries. Note that this is generated by tooling, not
+authored by hand:</p>
+<pre><code class="language-json">{
+  &quot;schemaVersion&quot;: 2,
+  &quot;mediaType&quot;: &quot;application/vnd.oci.image.index.v1+json&quot;,
+  &quot;artifactType&quot;: &quot;application/ai-catalog+json&quot;,
+  &quot;manifests&quot;: [
+    {
+      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+      &quot;digest&quot;: &quot;sha256:aaa111...&quot;,
+      &quot;size&quot;: 1024,
+      &quot;artifactType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;annotations&quot;: {
+        &quot;ai-catalog.identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+        &quot;ai-catalog.displayName&quot;: &quot;Acme Finance A2A Agent&quot;
+      }
+    },
+    {
+      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+      &quot;digest&quot;: &quot;sha256:bbb222...&quot;,
+      &quot;size&quot;: 512,
+      &quot;artifactType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;annotations&quot;: {
+        &quot;ai-catalog.identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
+        &quot;ai-catalog.displayName&quot;: &quot;Acme Finance MCP Server&quot;
+      }
+    }
+  ],
+  &quot;annotations&quot;: {
+    &quot;ai-catalog.specVersion&quot;: &quot;1.0&quot;,
+    &quot;ai-catalog.host.displayName&quot;: &quot;Acme Services Inc.&quot;
+  }
+}
+</code></pre>
+</section>
+<section id="signing-and-verification">
+<h2>Signing and Verification</h2>
+<p>Because OCI distribution uses content-addressed digests, signing is
+handled by existing OCI tooling rather than embedded signature fields:</p>
+<pre><code># Sign an entry manifest
+cosign sign registry.example.com/ai/finance-a2a@sha256:aaa111...
+
+# Verify
+cosign verify registry.example.com/ai/finance-a2a@sha256:aaa111...
+
+# Attach SLSA provenance
+cosign attest --predicate provenance.json --type slsaprovenance \
+  registry.example.com/ai/finance-a2a@sha256:aaa111...
+</code></pre>
+<p>These signatures and attestations are discoverable via the OCI
+Referrers API and can be mapped back to Trust Manifest attestation
+objects during unpacking.</p>
+</section>
+<section id="relationship-to-oci-native-proposals">
+<h2>Relationship to OCI-Native Proposals</h2>
+<p>Some proposals (such as the AAIF AI Card OCI schema) take an
+OCI-native approach where the OCI Image Manifest <em>is</em> the data model.
+In that model, the AI Card is an OCI Manifest, protocol cards are
+OCI layers, and the catalog is an OCI Image Index consumed directly.</p>
+<p>This specification takes a different position: the logical JSON format
+is the primary interface, and OCI is a distribution substrate. The
+tradeoffs are:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Concern</th>
+<th style="text-align: left;">Logical-first (this spec)</th>
+<th style="text-align: left;">OCI-native</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Authoring</td>
+<td style="text-align: left;">Write simple JSON with domain vocabulary</td>
+<td style="text-align: left;">Write JSON conforming to OCI Manifest schema</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vocabulary</td>
+<td style="text-align: left;"><code>entries</code>, <code>displayName</code>, <code>mediaType</code>, <code>trustManifest</code></td>
+<td style="text-align: left;"><code>manifests</code>, <code>layers</code>, <code>config</code>, <code>annotations</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Minimum viable serving</td>
+<td style="text-align: left;">Static JSON file at any URL (optionally well-known)</td>
+<td style="text-align: left;">OCI registry or static OCI layout</td>
+</tr>
+<tr>
+<td style="text-align: left;">Signing</td>
+<td style="text-align: left;">Detached JWS in logical format; Cosign/Notation in OCI</td>
+<td style="text-align: left;">Cosign/Notation only</td>
+</tr>
+<tr>
+<td style="text-align: left;">Content integrity</td>
+<td style="text-align: left;">Optional digests in Trust Manifest</td>
+<td style="text-align: left;">Guaranteed by OCI content-addressing</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ecosystem compatibility</td>
+<td style="text-align: left;">Any HTTP server, any registry, any CDN</td>
+<td style="text-align: left;">OCI-compliant registries</td>
+</tr>
+<tr>
+<td style="text-align: left;">Adoption barrier</td>
+<td style="text-align: left;">Low — familiar JSON</td>
+<td style="text-align: left;">Higher — requires OCI familiarity</td>
+</tr>
+</tbody>
+</table>
+<p>Both approaches can coexist. A tooling bridge converts between them
+losslessly, allowing simple consumers to work with the logical format
+while infrastructure-oriented deployments leverage OCI distribution.</p>
+</section>
+</section>
+<section class="appendix" id="mapping-to-mcp-registry-serverjson">
+<h1>Mapping to MCP Registry server.json</h1>
+<p>This appendix describes how the MCP Registry <code>server.json</code> format
+(see <a href="https://github.com/modelcontextprotocol/registry">modelcontextprotocol/registry</a>)
+relates to AI Catalog, enabling MCP servers to be discovered alongside
+other AI artifacts through a unified catalog.</p>
+<section id="overview">
+<h2>Overview</h2>
+<p>The MCP Registry defines a <code>server.json</code> format for describing MCP
+servers. Each <code>server.json</code> document captures everything needed to
+install, configure, and connect to a single MCP server: package
+coordinates (npm, PyPI, NuGet, OCI), remote endpoints (streamable-http,
+SSE), transport configuration, environment variables, and CLI arguments.</p>
+<p>In AI Catalog terms, a <code>server.json</code> document is the <strong>artifact
+content</strong> — the native metadata that a Catalog Entry references. The
+AI Catalog does not duplicate or redefine <code>server.json</code> fields.
+Instead, it provides the discovery envelope and trust layer that
+<code>server.json</code> does not address.</p>
+</section>
+<section id="conceptual-mapping">
+<h2>Conceptual Mapping</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">MCP <code>server.json</code></th>
+<th style="text-align: left;">AI Catalog Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>server.json</code> document (whole file)</td>
+<td style="text-align: left;">Artifact content via entry <code>url</code> or <code>inline</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>name</code> (reverse-DNS identifier)</td>
+<td style="text-align: left;">Entry <code>identifier</code> (mapped to URI form)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>title</code></td>
+<td style="text-align: left;">Entry <code>displayName</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>description</code></td>
+<td style="text-align: left;">Entry <code>description</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>version</code></td>
+<td style="text-align: left;">Entry <code>version</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>repository</code></td>
+<td style="text-align: left;">Entry <code>metadata.repository</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>packages[]</code> (npm, pypi, nuget, oci)</td>
+<td style="text-align: left;">Inside the artifact — not surfaced in catalog</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>remotes[]</code> (streamable-http, sse)</td>
+<td style="text-align: left;">Inside the artifact — not surfaced in catalog</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>environmentVariables[]</code></td>
+<td style="text-align: left;">Inside the artifact — not surfaced in catalog</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>_meta</code></td>
+<td style="text-align: left;">Entry <code>metadata</code> for catalog-level hints; otherwise stays in artifact</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>(not in server.json)</em></td>
+<td style="text-align: left;">Entry <code>publisher</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>(not in server.json)</em></td>
+<td style="text-align: left;">Entry <code>trustManifest</code> (identity, attestations, provenance)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>(not in server.json)</em></td>
+<td style="text-align: left;">Entry <code>tags</code> for cross-artifact discovery</td>
+</tr>
+<tr>
+<td style="text-align: left;">MCP Registry (centralized service)</td>
+<td style="text-align: left;">AI Catalog (decentralized, any URL)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="separation-of-concerns">
+<h2>Separation of Concerns</h2>
+<p>The <code>server.json</code> format and AI Catalog address different concerns:</p>
+<dl>
+<dt>server.json (Operational)</dt>
+<dd>How do I install this server? What packages, transports, arguments,
+  and environment variables does it need?</dd>
+<dt>AI Catalog (Discovery + Trust)</dt>
+<dd>What servers exist? Who published them? Can I trust them? Where is
+  their metadata?</dd>
+</dl>
+<p>This separation means the AI Catalog entry is thin — it points at the
+<code>server.json</code> and adds only what <code>server.json</code> lacks: publisher
+identity, trust verification, and cross-ecosystem discoverability.</p>
+</section>
+<section id="mcp-server-as-catalog-entry">
+<h2>MCP Server as Catalog Entry</h2>
+<p>An MCP server described by a <code>server.json</code> maps to a Catalog Entry
+with <code>mediaType</code> set to <code>application/mcp-server+json</code>:</p>
+<pre><code class="language-json">{
+  &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
+  &quot;displayName&quot;: &quot;Brave Search&quot;,
+  &quot;version&quot;: &quot;1.0.2&quot;,
+  &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+  &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
+  &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
+  &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
+  &quot;publisher&quot;: {
+    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
+    &quot;displayName&quot;: &quot;Model Context Protocol&quot;
+  },
+  &quot;trustManifest&quot;: {
+    &quot;identity&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
+    &quot;attestations&quot;: [
+      {
+        &quot;type&quot;: &quot;publisher-identity&quot;,
+        &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;,
+        &quot;mediaType&quot;: &quot;application/jwt&quot;,
+        &quot;description&quot;: &quot;Verifies did:web:modelcontextprotocol.io as publisher&quot;
+      }
+    ],
+    &quot;provenance&quot;: [
+      {
+        &quot;relation&quot;: &quot;publishedFrom&quot;,
+        &quot;sourceId&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;,
+        &quot;registryUri&quot;: &quot;https://registry.npmjs.org&quot;
+      }
+    ]
+  },
+  &quot;metadata&quot;: {
+    &quot;repository&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;
+  },
+  &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+}
+</code></pre>
+<p>The <code>url</code> points to the complete <code>server.json</code>. A client fetches the
+catalog entry for discovery and trust evaluation, then retrieves the
+<code>server.json</code> for operational details (packages, transports, env vars).</p>
+</section>
+<section id="mcp-registry-as-ai-catalog">
+<h2>MCP Registry as AI Catalog</h2>
+<p>The MCP Registry — a centralized index of MCP servers — can be
+represented as an AI Catalog. This enables clients that understand
+<code>application/ai-catalog+json</code> to discover MCP servers alongside A2A
+agents, skills, and other artifacts:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;host&quot;: {
+    &quot;displayName&quot;: &quot;MCP Server Registry&quot;,
+    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
+    &quot;documentationUrl&quot;: &quot;https://modelcontextprotocol.io/docs&quot;
+  },
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
+      &quot;displayName&quot;: &quot;Brave Search&quot;,
+      &quot;version&quot;: &quot;1.0.2&quot;,
+      &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
+      &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
+      &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:mcp:io.github.modelcontextprotocol/filesystem&quot;,
+      &quot;displayName&quot;: &quot;Filesystem&quot;,
+      &quot;version&quot;: &quot;1.0.2&quot;,
+      &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
+      &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
+      &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:mcp:io.github.example/weather-mcp&quot;,
+      &quot;displayName&quot;: &quot;Weather&quot;,
+      &quot;version&quot;: &quot;0.5.0&quot;,
+      &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
+      &quot;description&quot;: &quot;Python MCP server for weather data access&quot;,
+      &quot;tags&quot;: [&quot;weather&quot;, &quot;python&quot;],
+      &quot;publisher&quot;: {
+        &quot;identifier&quot;: &quot;did:web:example.github.io&quot;,
+        &quot;displayName&quot;: &quot;Example Corp&quot;
+      }
+    }
+  ]
+}
+</code></pre>
+</section>
+<section id="decentralized-discovery">
+<h2>Decentralized Discovery</h2>
+<p>The MCP Registry is a centralized service. AI Catalog enables
+decentralized discovery: any domain can publish its MCP servers at
+<code>/.well-known/ai-catalog.json</code> without registering with a central
+authority.</p>
+<p>A vendor hosting its own MCP servers can publish:</p>
+<pre><code>https://api.acme-corp.com/.well-known/ai-catalog.json
+</code></pre>
+<p>Clients and crawlers discover the catalog via the well-known URL,
+find entries with <code>mediaType: "application/mcp-server+json"</code>, and
+fetch the <code>server.json</code> documents for operational details.</p>
+<p>The centralized MCP Registry and decentralized AI Catalogs are
+complementary. The registry can serve an AI Catalog as its response
+format, while individual domains publish their own catalogs for
+direct discovery.</p>
+</section>
+<section id="what-ai-catalog-adds-to-serverjson">
+<h2>What AI Catalog Adds to server.json</h2>
+<p>The <code>server.json</code> format has no trust or identity layer. AI Catalog
+fills this gap:</p>
+<ol>
+<li><strong>Publisher identity</strong>: Verifiable publisher with DID or domain
+   anchor, absent from <code>server.json</code>.</li>
+<li><strong>Trust verification</strong>: Attestations (SOC2, HIPAA, publisher
+   identity proofs) via the Trust Manifest.</li>
+<li><strong>Provenance</strong>: Links to source repositories, registries, and
+   build artifacts with cryptographic digests.</li>
+<li><strong>Signing</strong>: Detached JWS signature on the Trust Manifest for
+   integrity verification.</li>
+<li><strong>Cross-ecosystem discovery</strong>: MCP servers become discoverable
+   alongside A2A agents, plugins, and datasets through a single
+   catalog format.</li>
+<li><strong>Composability</strong>: MCP servers can be bundled with related
+   artifacts (A2A agents, datasets) in nested catalogs.</li>
+</ol>
+</section>
+<section id="relationship-to-mcp-server-cards-sep-1649">
+<h2>Relationship to MCP Server Cards (SEP-1649)</h2>
+<p>MCP Server Cards
+(<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649">SEP-1649</a>)
+define a static discovery document for individual HTTP-based MCP
+servers at <code>/.well-known/mcp/server-card.json</code>. A Server Card mirrors
+the MCP initialization handshake response: it carries the server's
+name, version, transport configuration, capabilities, authentication
+requirements, and optionally the full list of tools, resources, and
+prompts.</p>
+<p>AI Catalog and MCP Server Cards address different layers of discovery:</p>
+<dl>
+<dt>MCP Server Card (per-server)</dt>
+<dd>What does this specific MCP server offer? What transport does it
+  use? What tools and resources are available? What authentication
+  is required?</dd>
+<dt>AI Catalog (cross-artifact)</dt>
+<dd>What artifacts does this domain offer? Who published them? Can I
+  trust them? What other artifact types are available alongside MCP
+  servers?</dd>
+</dl>
+<p>The two mechanisms layer naturally. An AI Catalog entry for an MCP
+server can reference the Server Card as its artifact content:</p>
+<pre><code class="language-json">{
+  &quot;identifier&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
+  &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
+  &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
+  &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
+  &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
+  &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
+  &quot;publisher&quot;: {
+    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
+    &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+  },
+  &quot;trustManifest&quot;: {
+    &quot;identity&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
+    &quot;attestations&quot;: [
+      {
+        &quot;type&quot;: &quot;publisher-identity&quot;,
+        &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
+        &quot;mediaType&quot;: &quot;application/jwt&quot;
+      },
+      {
+        &quot;type&quot;: &quot;SOC2-Type2&quot;,
+        &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
+        &quot;mediaType&quot;: &quot;application/pdf&quot;,
+        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<p>A client discovering MCP servers follows this flow:</p>
+<ol>
+<li>Fetch <code>/.well-known/ai-catalog.json</code> to discover all artifacts on
+   a domain (MCP servers, A2A agents, plugins, etc.).</li>
+<li>Filter entries by <code>mediaType</code> to find MCP servers.</li>
+<li>Evaluate the Trust Manifest for publisher identity and attestations.</li>
+<li>Fetch the Server Card at the entry's <code>url</code> for operational details
+   (transport, capabilities, tools, authentication).</li>
+<li>Connect to the MCP server using the transport configuration from
+   the Server Card.</li>
+</ol>
+<p>This separation ensures that AI Catalog provides the trust and
+cross-ecosystem indexing layer, while the MCP Server Card provides the
+protocol-specific operational details. A domain with multiple MCP
+servers publishes one AI Catalog listing all of them, with each entry
+pointing to its respective Server Card.</p>
+</section>
+</section>
+<section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
+<h1>Mapping to Claude Code Plugins Marketplace</h1>
+<p>This appendix describes how the Anthropic Claude Code Plugins
+marketplace format (see
+<a href="https://github.com/anthropics/claude-plugins-official">claude-plugins-official</a>)
+maps to AI Catalog, enabling Claude Code plugins to be discovered,
+indexed, and distributed through a unified catalog alongside other AI
+artifacts.</p>
+<section id="overview">
+<h2>Overview</h2>
+<p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
+file that lists available plugins. Each plugin is a directory containing
+a <code>.claude-plugin/plugin.json</code> metadata file and optional components:
+MCP server configurations (<code>.mcp.json</code>), slash commands (<code>commands/</code>),
+agent definitions (<code>agents/</code>), and skill definitions (<code>skills/</code>).</p>
+<pre><code>marketplace.json                    # Top-level plugin directory
+plugins/
+  example-plugin/
+    .claude-plugin/
+      plugin.json                   # Plugin metadata (name, description, author)
+    .mcp.json                       # MCP server config (optional)
+    commands/                       # Slash commands (optional)
+    agents/                         # Agent definitions (optional)
+    skills/                         # Skill definitions (optional)
+    README.md
+</code></pre>
+</section>
+<section id="conceptual-mapping">
+<h2>Conceptual Mapping</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Claude Plugins Marketplace</th>
+<th style="text-align: left;">AI Catalog Equivalent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>marketplace.json</code> (whole file)</td>
+<td style="text-align: left;">AI Catalog document (top-level)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Marketplace <code>name</code></td>
+<td style="text-align: left;">Catalog <code>host.displayName</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Marketplace <code>description</code></td>
+<td style="text-align: left;">Catalog <code>metadata.description</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Marketplace <code>owner</code></td>
+<td style="text-align: left;">Catalog <code>host</code> (with <code>identifier</code> derived from owner)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>plugins[]</code> array</td>
+<td style="text-align: left;">Catalog <code>entries[]</code> array</td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>name</code></td>
+<td style="text-align: left;">Entry <code>displayName</code> and <code>identifier</code> (derived as URN)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>description</code></td>
+<td style="text-align: left;">Entry <code>description</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>category</code></td>
+<td style="text-align: left;">Entry <code>tags[]</code> (first tag)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>tags</code></td>
+<td style="text-align: left;">Entry <code>tags[]</code> (merged with category)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>author</code></td>
+<td style="text-align: left;">Entry <code>publisher</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>source</code> (url, git-subdir, or path)</td>
+<td style="text-align: left;">Entry <code>url</code> (pointing to the plugin repository)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>source.sha</code></td>
+<td style="text-align: left;">Entry <code>trustManifest.provenance[].sourceDigest</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>homepage</code></td>
+<td style="text-align: left;">Entry <code>metadata.homepage</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Plugin <code>.claude-plugin/plugin.json</code></td>
+<td style="text-align: left;">The artifact content (referenced via <code>url</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>(not in marketplace)</em></td>
+<td style="text-align: left;">Entry <code>trustManifest</code> (identity, attestations)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>(not in marketplace)</em></td>
+<td style="text-align: left;">Entry <code>mediaType</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Centralized marketplace repo</td>
+<td style="text-align: left;">AI Catalog (decentralized, any URL)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="source-types">
+<h2>Source Types</h2>
+<p>The marketplace supports three source types for plugins. Each maps
+differently to AI Catalog entry fields:</p>
+<dl>
+<dt>Direct URL source</dt>
+<dd><code>{"source": "url", "url": "https://github.com/org/repo.git", "sha": "..."}</code>
+  maps to entry <code>url</code> pointing at the repository, with <code>sha</code> captured
+  as provenance digest.</dd>
+<dt>Git subdirectory source</dt>
+<dd><code>{"source": "git-subdir", "url": "org/repo", "path": "plugins/name", "ref": "main"}</code>
+  maps to entry <code>url</code> constructed from the repository, path, and ref.</dd>
+<dt>Local path source</dt>
+<dd><code>"./plugins/name"</code> or <code>"./external_plugins/name"</code> maps to entry <code>url</code>
+  pointing at the known repository location for the plugin directory.</dd>
+</dl>
+</section>
+<section id="marketplace-as-ai-catalog">
+<h2>Marketplace as AI Catalog</h2>
+<p>The <code>marketplace.json</code> from
+<a href="https://github.com/anthropics/claude-plugins-official">claude-plugins-official</a>
+maps to an AI Catalog where each plugin is an entry:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;host&quot;: {
+    &quot;displayName&quot;: &quot;Claude Code Plugins Directory&quot;,
+    &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
+    &quot;documentationUrl&quot;: &quot;https://code.claude.com/docs/en/plugins&quot;
+  },
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
+      &quot;displayName&quot;: &quot;agent-sdk-dev&quot;,
+      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+      &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
+      &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
+      &quot;tags&quot;: [&quot;development&quot;],
+      &quot;publisher&quot;: {
+        &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
+        &quot;displayName&quot;: &quot;Anthropic&quot;
+      },
+      &quot;metadata&quot;: {
+        &quot;homepage&quot;: &quot;https://github.com/anthropics/claude-plugins-public/tree/main/plugins/agent-sdk-dev&quot;
+      }
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
+      &quot;displayName&quot;: &quot;adspirer-ads-agent&quot;,
+      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+      &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
+      &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
+      &quot;tags&quot;: [&quot;productivity&quot;, &quot;ads&quot;],
+      &quot;metadata&quot;: {
+        &quot;homepage&quot;: &quot;https://www.adspirer.com&quot;
+      },
+      &quot;trustManifest&quot;: {
+        &quot;identity&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
+        &quot;provenance&quot;: [
+          {
+            &quot;relation&quot;: &quot;publishedFrom&quot;,
+            &quot;sourceId&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin&quot;,
+            &quot;sourceDigest&quot;: &quot;sha1:aa70dbdbbbb843e94a794c10c2b13f5dd66b5e40&quot;
+          }
+        ]
+      }
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
+      &quot;displayName&quot;: &quot;aikido&quot;,
+      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+      &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
+      &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
+      &quot;tags&quot;: [&quot;security&quot;],
+      &quot;publisher&quot;: {
+        &quot;identifier&quot;: &quot;did:web:aikido.dev&quot;,
+        &quot;displayName&quot;: &quot;Aikido Security&quot;
+      },
+      &quot;trustManifest&quot;: {
+        &quot;identity&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
+        &quot;provenance&quot;: [
+          {
+            &quot;relation&quot;: &quot;publishedFrom&quot;,
+            &quot;sourceId&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin&quot;,
+            &quot;sourceDigest&quot;: &quot;sha1:d7fa8b8e192680d9a26c1a5dcaead7cf5cdb7139&quot;
+          }
+        ]
+      }
+    }
+  ]
+}
+</code></pre>
+</section>
+<section id="plugin-bundles-as-nested-catalogs">
+<h2>Plugin Bundles as Nested Catalogs</h2>
+<p>A plugin that bundles multiple components (MCP servers, skills,
+commands, agents) naturally maps to a nested AI Catalog. This
+mirrors the plugin directory structure where a single plugin
+contains multiple artifact types:</p>
+<pre><code class="language-json">{
+  &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin&quot;,
+  &quot;displayName&quot;: &quot;example-plugin&quot;,
+  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+  &quot;description&quot;: &quot;Comprehensive plugin with commands, agents, skills, and MCP servers&quot;,
+  &quot;tags&quot;: [&quot;development&quot;, &quot;bundle&quot;],
+  &quot;publisher&quot;: {
+    &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
+    &quot;displayName&quot;: &quot;Anthropic&quot;
+  },
+  &quot;inline&quot;: {
+      &quot;specVersion&quot;: &quot;1.0&quot;,
+    &quot;entries&quot;: [
+      {
+        &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;,
+        &quot;displayName&quot;: &quot;Example Plugin MCP Server&quot;,
+        &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+        &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/.mcp.json&quot;
+      },
+      {
+        &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:skills&quot;,
+        &quot;displayName&quot;: &quot;Example Plugin Skills&quot;,
+        &quot;mediaType&quot;: &quot;application/vnd.agentskills.skill+md&quot;,
+        &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+</section>
+<section id="what-ai-catalog-adds-to-the-marketplace">
+<h2>What AI Catalog Adds to the Marketplace</h2>
+<p>The <code>marketplace.json</code> format is a lightweight directory focused on
+listing available plugins. AI Catalog extends this with:</p>
+<ol>
+<li>
+<p><strong>Trust and identity</strong>: The marketplace has no signing, attestation,
+   or publisher verification. Trust Manifests provide verifiable
+   publisher identity and compliance metadata.</p>
+</li>
+<li>
+<p><strong>Source integrity</strong>: The marketplace includes optional <code>sha</code> fields
+   on source references. AI Catalog formalizes this as provenance links
+   with typed relations and cryptographic digests.</p>
+</li>
+<li>
+<p><strong>Cross-ecosystem discovery</strong>: Plugins become discoverable alongside
+   MCP servers, A2A agents, and other artifacts through the standard
+   <code>/.well-known/ai-catalog.json</code> convention — not only within Claude
+   Code's <code>/plugin</code> system.</p>
+</li>
+<li>
+<p><strong>Media type identification</strong>: The marketplace does not type its
+   plugins. AI Catalog assigns <code>application/vnd.anthropic.claude-plugin+json</code>
+   enabling clients to filter and route by artifact type.</p>
+</li>
+<li>
+<p><strong>Composability</strong>: Plugin bundles that combine skills, MCP servers,
+   and commands can be represented as nested catalogs, making the
+   internal structure of a plugin package explicit and independently
+   addressable.</p>
+</li>
+<li>
+<p><strong>Decentralized publishing</strong>: Any domain can publish Claude Code
+   plugins via AI Catalog without submitting to the centralized
+   marketplace repository.</p>
+</li>
+</ol>
+</section>
+</section>
+<section class="appendix" id="acknowledgments">
+<h1>Acknowledgments</h1>
+<p>This specification was developed through collaboration among members of
+the A2A and MCP protocol communities under the governance of the Linux
+Foundation.</p>
+</section>
+
+</body>
+</html>

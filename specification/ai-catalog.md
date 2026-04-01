@@ -116,20 +116,20 @@ For example, a minimal catalog listing three AI artifacts:
     {
       "identifier": "urn:example:skill:code-review",
       "displayName": "Code Review Assistant",
-      "mediaType": "application/ai-skill+json",
-      "url": "https://skills.example.com/code-review/SKILL.md"
+      "mediaType": "application/ai-skill",
+      "url": "https://skills.example.com/code-review/skill.zip"
     },
     {
       "identifier": "urn:example:mcp:weather",
       "displayName": "Weather Service",
       "mediaType": "application/mcp-server+json",
-      "url": "https://api.example.com/mcp/weather/manifest.json"
+      "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
       "identifier": "urn:example:a2a:research",
       "displayName": "Research Assistant",
       "mediaType": "application/a2a-agent-card+json",
-      "url": "https://agents.example.com/research/.well-known/agent-card.json"
+      "url": "https://agents.example.com/researchAssitant"
     }
   ]
 }
@@ -198,7 +198,7 @@ It MUST contain the following members:
   - `application/a2a-agent-card+json` — an A2A Agent Card
   - `application/mcp-server+json` — an MCP Server manifest
   - Any other media type defined by a protocol specification (e.g.,
-    `application/ai-skill+json` for skill definitions)
+    `application/ai-skill` for skill definitions)
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
