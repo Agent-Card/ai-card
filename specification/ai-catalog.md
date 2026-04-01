@@ -114,20 +114,20 @@ For example, a minimal catalog listing three AI artifacts:
   "specVersion": "1.0",
   "entries": [
     {
-      "id": "urn:example:skill:code-review",
-      "name": "Code Review Assistant",
+      "identifier": "urn:example:skill:code-review",
+      "displayName": "Code Review Assistant",
       "mediaType": "application/ai-skill+json",
       "url": "https://skills.example.com/code-review/SKILL.md"
     },
     {
-      "id": "urn:example:mcp:weather",
-      "name": "Weather Service",
+      "identifier": "urn:example:mcp:weather",
+      "displayName": "Weather Service",
       "mediaType": "application/mcp-server+json",
       "url": "https://api.example.com/mcp/weather/manifest.json"
     },
     {
-      "id": "urn:example:a2a:research",
-      "name": "Research Assistant",
+      "identifier": "urn:example:a2a:research",
+      "displayName": "Research Assistant",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://agents.example.com/research/.well-known/agent-card.json"
     }
@@ -179,13 +179,13 @@ The following members are OPTIONAL:
 A Catalog Entry object describes a single AI artifact in the catalog.
 It MUST contain the following members:
 
-`id`
+`identifier`
 : A string identifying this artifact. This SHOULD be a URN
   [[RFC8141]] or URI [[RFC3986]] (e.g., `urn:example:agent:name`).
   See [Multi-Version Entries](#multi-version-entries) for uniqueness
   rules when multiple versions are present.
 
-`name`
+`displayName`
 : A string containing a human-readable name for the artifact.
 
 `mediaType`
@@ -225,7 +225,7 @@ The following members are OPTIONAL:
 : A string containing the version of this artifact.
   [Semantic Versioning](https://semver.org/) is RECOMMENDED but not
   required. See [Multi-Version Entries](#multi-version-entries) for
-  how versions interact with `id`.
+  how versions interact with `identifier`.
 
 `updatedAt`
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
@@ -247,20 +247,20 @@ The following members are OPTIONAL:
 
 ## Multi-Version Entries
 
-A catalog MAY contain multiple entries with the same `id` and
+A catalog MAY contain multiple entries with the same `identifier` and
 different `version` values, representing a version history for a
 single artifact — similar to a package registry.
 
-When `version` is present, the combination of `id` and `version`
-MUST be unique within the catalog. When `version` is absent, `id`
-alone MUST be unique. The `id` SHOULD be stable across versions
+When `version` is present, the combination of `identifier` and `version`
+MUST be unique within the catalog. When `version` is absent, `identifier`
+alone MUST be unique. The `identifier` SHOULD be stable across versions
 and catalog locations so that the same logical artifact can be
 recognized wherever it appears.
 
 Clients that need only the latest version SHOULD sort entries
-sharing the same `id` by `version` (when parseable as a semantic
+sharing the same `identifier` by `version` (when parseable as a semantic
 version) or by `updatedAt`, and select the most recent. Clients
-that need a specific version SHOULD match on both `id` and `version`.
+that need a specific version SHOULD match on both `identifier` and `version`.
 
 ## Publisher Object
 
@@ -306,15 +306,15 @@ A Trust Manifest MUST contain:
   DID, SPIFFE ID, or URL.
 
 When a Trust Manifest appears within a Catalog Entry, the `identity`
-field MUST match the entry's `id` field. This binding ensures trust
+field MUST match the entry's `identifier` field. This binding ensures trust
 claims are unambiguously associated with the catalog artifact.
 Consumers MUST reject a Trust Manifest whose `identity` does not
-match the containing entry's `id`.
+match the containing entry's `identifier`.
 
 When a Trust Manifest appears on a Host Info object, `identity`
 SHOULD match the host's `id` field when present.
 
-When multiple entries share the same `id` (with different `version`
+When multiple entries share the same `identifier` (with different `version`
 values), each entry MAY carry its own Trust Manifest. There is no
 requirement that all versions carry identical trust metadata — trust
 properties may evolve across versions.
@@ -560,9 +560,9 @@ Vendor Catalog
         └── Entry: Market Dataset
 ```
 
-A bundle is a regular catalog entry — it has an `id`, may carry a
+A bundle is a regular catalog entry — it has an `identifier`, may carry a
 `trustManifest`, and may include a `publisher`. An entry inside a
-bundle MAY reuse the same `id` as an entry elsewhere; this
+bundle MAY reuse the same `identifier` as an entry elsewhere; this
 indicates the same logical artifact.
 
 Clients processing bundles SHOULD impose a maximum nesting depth to
@@ -620,7 +620,7 @@ Clients SHOULD impose a maximum traversal depth.
 | **Where** | An entry in `entries[]` | An element in `collections[]` |
 | **Content** | Inline or referenced AI Catalog | URL to a separate AI Catalog |
 | **Semantics** | Dependency — artifacts are consumed together | Organization — catalogs are browsed independently |
-| **Identity** | Has an `id`, may carry `trustManifest` | Named pointer, no artifact identity |
+| **Identity** | Has an `identifier`, may carry `trustManifest` | Named pointer, no artifact identity |
 | **Example** | "Finance Plugin" shipping agent + server + data | "Finance Department" grouping 50 artifacts |
 | **Trust** | Bundle entry may have its own publisher and trust | Child catalog has its own host and publisher(s) |
 
@@ -720,7 +720,7 @@ A conformant Minimal Catalog is a JSON document with media type
 
 - `specVersion` — the specification version string
 - `entries` — an array of Catalog Entry objects, each containing at
-  minimum `id`, `name`, `mediaType`, and exactly one of `url` or
+  minimum `identifier`, `displayName`, `mediaType`, and exactly one of `url` or
   `inline`
 
 All other fields (`host`, `collections`, `publisher`, `trustManifest`,
@@ -789,8 +789,8 @@ classDiagram
         trustManifest TrustManifest
     }
     class CatalogEntry {
-        id string
-        name string
+        identifier string
+        displayName string
         mediaType string
         url | inline
         version string
@@ -940,8 +940,8 @@ CollectionRef = {
 }
 
 CatalogEntry = {
-  id: text,
-  name: text,
+  identifier: text,
+  displayName: text,
   mediaType: text,
   (url: text // inline: any),
   ? version: text,
@@ -1016,8 +1016,8 @@ artifact types including a nested catalog acting as a plugin bundle:
   },
   "entries": [
     {
-      "id": "urn:acme:agent:finance-a2a",
-      "name": "Acme Finance A2A Agent",
+      "identifier": "urn:acme:agent:finance-a2a",
+      "displayName": "Acme Finance A2A Agent",
       "version": "2.1.0",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance.json",
@@ -1049,8 +1049,8 @@ artifact types including a nested catalog acting as a plugin bundle:
       "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      "id": "urn:acme:server:finance-mcp",
-      "name": "Acme Finance MCP Server",
+      "identifier": "urn:acme:server:finance-mcp",
+      "displayName": "Acme Finance MCP Server",
       "version": "1.4.0",
       "mediaType": "application/mcp-server+json",
       "url": "https://api.acme-corp.com/mcp/finance.json",
@@ -1059,8 +1059,8 @@ artifact types including a nested catalog acting as a plugin bundle:
       "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      "id": "urn:acme:plugin:finance-suite",
-      "name": "Acme Finance Suite",
+      "identifier": "urn:acme:plugin:finance-suite",
+      "displayName": "Acme Finance Suite",
       "mediaType": "application/ai-catalog+json",
       "description": "Plugin bundle: A2A agent + MCP server + dataset.",
       "tags": ["finance", "plugin", "bundle"],
@@ -1068,20 +1068,20 @@ artifact types including a nested catalog acting as a plugin bundle:
               "specVersion": "1.0",
         "entries": [
           {
-            "id": "urn:acme:agent:finance-a2a",
-            "name": "Finance A2A Agent",
+            "identifier": "urn:acme:agent:finance-a2a",
+            "displayName": "Finance A2A Agent",
             "mediaType": "application/a2a-agent-card+json",
             "url": "https://api.acme-corp.com/agents/finance.json"
           },
           {
-            "id": "urn:acme:server:finance-mcp",
-            "name": "Finance MCP Server",
+            "identifier": "urn:acme:server:finance-mcp",
+            "displayName": "Finance MCP Server",
             "mediaType": "application/mcp-server+json",
             "url": "https://api.acme-corp.com/mcp/finance.json"
           },
           {
-            "id": "urn:acme:data:market-2026q1",
-            "name": "Market Dataset Q1 2026",
+            "identifier": "urn:acme:data:market-2026q1",
+            "displayName": "Market Dataset Q1 2026",
             "mediaType": "application/parquet",
             "url": "https://data.acme-corp.com/market-2026q1.parquet",
             "trustManifest": {
@@ -1122,8 +1122,8 @@ collection points to a separate AI Catalog document:
   },
   "entries": [
     {
-      "id": "urn:acme:agent:assistant",
-      "name": "Acme Corporate Assistant",
+      "identifier": "urn:acme:agent:assistant",
+      "displayName": "Acme Corporate Assistant",
       "version": "3.0.0",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/assistant.json",
@@ -1164,8 +1164,8 @@ An AI Catalog entry for a Claude Code plugin (per the
 
 ```json
 {
-  "id": "urn:claude-plugin:endorlabs:ai-plugins",
-  "name": "ai-plugins",
+  "identifier": "urn:claude-plugin:endorlabs:ai-plugins",
+  "displayName": "ai-plugins",
   "mediaType": "application/vnd.anthropic.claude-plugin+json",
   "url": "https://github.com/endorlabs/ai-plugins.git",
   "description": "Set up endorctl and use Endor Labs to scan, prioritize, and fix security risks across your software supply chain",
@@ -1208,7 +1208,7 @@ and replication using existing container infrastructure.
 ## Logical Format vs. Physical Distribution
 
 The AI Catalog specification defines a **logical format**: a JSON
-document with `entries`, `name`, `mediaType`, and `trustManifest`
+document with `entries`, `displayName`, `mediaType`, and `trustManifest`
 fields that are immediately meaningful to anyone working with AI
 artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
 consume simple JSON.
@@ -1329,8 +1329,8 @@ authored by hand:
       "size": 1024,
       "artifactType": "application/a2a-agent-card+json",
       "annotations": {
-        "ai-catalog.id": "urn:acme:agent:finance-a2a",
-        "ai-catalog.name": "Acme Finance A2A Agent"
+        "ai-catalog.identifier": "urn:acme:agent:finance-a2a",
+        "ai-catalog.displayName": "Acme Finance A2A Agent"
       }
     },
     {
@@ -1339,8 +1339,8 @@ authored by hand:
       "size": 512,
       "artifactType": "application/mcp-server+json",
       "annotations": {
-        "ai-catalog.id": "urn:acme:server:finance-mcp",
-        "ai-catalog.name": "Acme Finance MCP Server"
+        "ai-catalog.identifier": "urn:acme:server:finance-mcp",
+        "ai-catalog.displayName": "Acme Finance MCP Server"
       }
     }
   ],
@@ -1386,7 +1386,7 @@ tradeoffs are:
 | Concern | Logical-first (this spec) | OCI-native |
 |:---|:---|:---|
 | Authoring | Write simple JSON with domain vocabulary | Write JSON conforming to OCI Manifest schema |
-| Vocabulary | `entries`, `name`, `mediaType`, `trustManifest` | `manifests`, `layers`, `config`, `annotations` |
+| Vocabulary | `entries`, `displayName`, `mediaType`, `trustManifest` | `manifests`, `layers`, `config`, `annotations` |
 | Minimum viable serving | Static JSON file at any URL (optionally well-known) | OCI registry or static OCI layout |
 | Signing | Detached JWS in logical format; Cosign/Notation in OCI | Cosign/Notation only |
 | Content integrity | Optional digests in Trust Manifest | Guaranteed by OCI content-addressing |
@@ -1423,8 +1423,8 @@ Instead, it provides the discovery envelope and trust layer that
 | MCP `server.json` | AI Catalog Equivalent |
 |:---|:---|
 | `server.json` document (whole file) | Artifact content via entry `url` or `inline` |
-| `name` (reverse-DNS identifier) | Entry `id` (mapped to URI form) |
-| `title` | Entry `name` |
+| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
+| `title` | Entry `displayName` |
 | `description` | Entry `description` |
 | `version` | Entry `version` |
 | `repository` | Entry `metadata.repository` |
@@ -1460,8 +1460,8 @@ with `mediaType` set to `application/mcp-server+json`:
 
 ```json
 {
-  "id": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-  "name": "Brave Search",
+  "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+  "displayName": "Brave Search",
   "version": "1.0.2",
   "mediaType": "application/mcp-server+json",
   "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
@@ -1517,8 +1517,8 @@ agents, skills, and other artifacts:
   },
   "entries": [
     {
-      "id": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-      "name": "Brave Search",
+      "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+      "displayName": "Brave Search",
       "version": "1.0.2",
       "mediaType": "application/mcp-server+json",
       "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
@@ -1526,8 +1526,8 @@ agents, skills, and other artifacts:
       "tags": ["search", "brave"]
     },
     {
-      "id": "urn:mcp:io.github.modelcontextprotocol/filesystem",
-      "name": "Filesystem",
+      "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
+      "displayName": "Filesystem",
       "version": "1.0.2",
       "mediaType": "application/mcp-server+json",
       "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
@@ -1535,8 +1535,8 @@ agents, skills, and other artifacts:
       "tags": ["filesystem", "files"]
     },
     {
-      "id": "urn:mcp:io.github.example/weather-mcp",
-      "name": "Weather",
+      "identifier": "urn:mcp:io.github.example/weather-mcp",
+      "displayName": "Weather",
       "version": "0.5.0",
       "mediaType": "application/mcp-server+json",
       "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
@@ -1620,8 +1620,8 @@ server can reference the Server Card as its artifact content:
 
 ```json
 {
-  "id": "urn:mcp:example.com:finance-server",
-  "name": "Acme Finance MCP Server",
+  "identifier": "urn:mcp:example.com:finance-server",
+  "displayName": "Acme Finance MCP Server",
   "mediaType": "application/mcp-server-card+json",
   "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
   "description": "MCP server for financial data and trading tools",
@@ -1705,7 +1705,7 @@ plugins/
 | Marketplace `description` | Catalog `metadata.description` |
 | Marketplace `owner` | Catalog `host` (with `id` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
-| Plugin `name` | Entry `name` and `id` (derived as URN) |
+| Plugin `name` | Entry `displayName` and `identifier` (derived as URN) |
 | Plugin `description` | Entry `description` |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
@@ -1752,8 +1752,8 @@ maps to an AI Catalog where each plugin is an entry:
   },
   "entries": [
     {
-      "id": "urn:claude-plugin:anthropic:agent-sdk-dev",
-      "name": "agent-sdk-dev",
+      "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
+      "displayName": "agent-sdk-dev",
       "mediaType": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
       "description": "Development kit for working with the Claude Agent SDK",
@@ -1767,8 +1767,8 @@ maps to an AI Catalog where each plugin is an entry:
       }
     },
     {
-      "id": "urn:claude-plugin:adspirer:ads-agent",
-      "name": "adspirer-ads-agent",
+      "identifier": "urn:claude-plugin:adspirer:ads-agent",
+      "displayName": "adspirer-ads-agent",
       "mediaType": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
       "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
@@ -1788,8 +1788,8 @@ maps to an AI Catalog where each plugin is an entry:
       }
     },
     {
-      "id": "urn:claude-plugin:aikido:security",
-      "name": "aikido",
+      "identifier": "urn:claude-plugin:aikido:security",
+      "displayName": "aikido",
       "mediaType": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
       "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
@@ -1822,8 +1822,8 @@ contains multiple artifact types:
 
 ```json
 {
-  "id": "urn:claude-plugin:anthropic:example-plugin",
-  "name": "example-plugin",
+  "identifier": "urn:claude-plugin:anthropic:example-plugin",
+  "displayName": "example-plugin",
   "mediaType": "application/ai-catalog+json",
   "description": "Comprehensive plugin with commands, agents, skills, and MCP servers",
   "tags": ["development", "bundle"],
@@ -1835,14 +1835,14 @@ contains multiple artifact types:
       "specVersion": "1.0",
     "entries": [
       {
-        "id": "urn:claude-plugin:anthropic:example-plugin:mcp",
-        "name": "Example Plugin MCP Server",
+        "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
+        "displayName": "Example Plugin MCP Server",
         "mediaType": "application/mcp-server+json",
         "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/.mcp.json"
       },
       {
-        "id": "urn:claude-plugin:anthropic:example-plugin:skills",
-        "name": "Example Plugin Skills",
+        "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
+        "displayName": "Example Plugin Skills",
         "mediaType": "application/vnd.agentskills.skill+md",
         "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills"
       }
