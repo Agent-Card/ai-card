@@ -5,3 +5,9 @@ type/*.md
 specification/json/
 package-lock.json
 package.json
+.copilot/skills/publish-spec/SKILL.md
+tracker.log
+specification/ai-catalog.html
+respec-config.json
+__pycache__/
+dist/

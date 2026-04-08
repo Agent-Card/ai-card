@@ -8,6 +8,30 @@ Members from various AI Protocols (MCP, A2A) are collaborating on a common AI ca
 
 Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-card/issues), and [Pull Requests](https://github.com/Agent-Card/ai-card/pulls).
 
+## Specification Site
+
+The AI Catalog specification is built from `specification/ai-catalog.md` and published to GitHub Pages by the workflow in `.github/workflows/publish-spec.yml`.
+
+Pushes to the `ai-catalog-spec` branch trigger the GitHub Pages publication workflow.
+
+GitHub Pages for the repository should be configured to use **GitHub Actions** as the deployment source.
+
+To build the published HTML locally:
+
+```bash
+./build-spec.sh
+```
+
+This uses `uv` to resolve the Markdown dependency and writes the generated page to `dist/index.html`.
+
+If you want to run the builder directly, use:
+
+```bash
+uv run --with-requirements requirements-spec.txt python tools/build_spec.py
+```
+
+The generated site entry point is `dist/index.html`.
+
 ## What problem are we solving?
 
 There are multiple evolving standards for communication protocols between AI clients and servers. While these protocols differ in capabilities and technical architecture, there are common ecosystem needs for producers and consumers of services built on top of them. This includes discovery, verifiable metadata, and trusted identity standards.
