@@ -1,0 +1,21 @@
+{
+  "protocolVersion": "2025-03-26",
+  "serverInfo": {
+    "name": "Acme MCP Server",
+    "version": "1.0.0"
+  },
+  "capabilities": {
+    "logging": {},
+    "prompts": {
+      "listChanged": true
+    },
+    "resources": {
+      "subscribe": true,
+      "listChanged": true
+    },
+    "tools": {
+      "listChanged": true
+    }
+  },
+  "instructions": "Use tools for finance workflows and resources for market context."
+}
