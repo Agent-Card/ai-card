@@ -67,8 +67,8 @@ Artifact
    filter, and route entries without parsing artifact content.
 
 3. **Composability**: The catalog format supports nesting — a catalog
-   entry can reference another AI Catalog. This enables plugin-style
-   packaging where a single catalog bundles multiple related artifacts.
+   entry can reference another AI Catalog, enabling hierarchical
+   organization and multi-artifact packaging.
 
 4. **Progressive Complexity**: The simplest catalog is just entries
    with names and URLs. Trust, identity, and provenance metadata are
@@ -77,9 +77,9 @@ Artifact
 
 5. **Scalable Federation**: The catalog format enables partitioning
    into sub-catalogs to manage size, and supports delegation to
-   sub-catalogs managed by independent publishers. Collections and
-   nested catalogs support a federated model where each segment of
-   the hierarchy may be authored, hosted, and updated independently.
+   sub-catalogs managed by independent publishers. Nested catalog
+   entries support a federated model where each segment of the
+   hierarchy may be authored, hosted, and updated independently.
 
 6. **Location Independence**: An AI Catalog MAY be served from any URL.
    The standard defines a well-known URL convention to enable
@@ -116,13 +116,13 @@ For example, a minimal catalog listing three AI artifacts:
     {
       "identifier": "urn:example:skill:code-review",
       "displayName": "Code Review Assistant",
-      "mediaType": "application/ai-skill",
+      "mediaType": "application/agentskill+zip",
       "url": "https://skills.example.com/code-review/skill.zip"
     },
     {
       "identifier": "urn:example:mcp:weather",
       "displayName": "Weather Service",
-      "mediaType": "application/mcp-server+json",
+      "mediaType": "application/mcp-server-card+json",
       "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
@@ -140,10 +140,6 @@ The following members are OPTIONAL:
 `host`
 : A Host Info object as defined in [Host Info](#host-info) identifying the
   operator of this catalog.
-
-`collections`
-: An array of Collection Reference objects as defined in
-  [Organizing Catalogs](#organizing-catalogs).
 
 `metadata`
 : An open map of string keys to arbitrary values for custom or
@@ -196,9 +192,9 @@ It MUST contain the following members:
 
   - `application/ai-catalog+json` — a nested AI Catalog
   - `application/a2a-agent-card+json` — an A2A Agent Card
-  - `application/mcp-server+json` — an MCP Server manifest
+  - `application/mcp-server-card+json` — an MCP Server Card
   - Any other media type defined by a protocol specification (e.g.,
-    `application/ai-skill` for skill definitions)
+    `application/agentskill+zip` for skill definitions)
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
@@ -208,7 +204,7 @@ provide the artifact content:
   retrieved. The document served at this URL SHOULD be served with
   the media type declared in the `mediaType` field.
 
-`inline`
+`data`
 : A JSON value containing the complete artifact document inline. The
   structure of this value is determined by the `mediaType` field and
   is opaque to this specification.
@@ -532,102 +528,83 @@ For each attestation in the `attestations` array:
 
 # Organizing Catalogs
 
-As catalogs grow, a flat list of entries becomes unwieldy. This
-specification provides two complementary mechanisms for structuring
-catalogs at scale: **bundles** and **collections**. They serve
-fundamentally different purposes and appear in different parts of
-the document.
+As catalogs grow, a flat list of entries becomes unwieldy. Because any
+catalog entry can have a `mediaType` of `application/ai-catalog+json`,
+catalogs are naturally composable — an entry can reference or inline
+another AI Catalog, creating a hierarchy of any depth.
 
-## Bundles (Nested Catalog Entries)
+## Nested Catalog Entries
 
-A bundle is a catalog entry whose `mediaType` is
-`application/ai-catalog+json`. The entry's content (via `url` or
-`inline`) is itself an AI Catalog document containing the bundled
-artifacts. Bundles express **dependency**: the artifacts inside
-are related and intended to be acquired or deployed together.
+A catalog entry whose `mediaType` is `application/ai-catalog+json`
+references (via `url`) or embeds (via `data`) another AI Catalog
+document. This mechanism supports two complementary use cases:
 
-Use bundles when:
+**Organizational hierarchy.** An enterprise with thousands of artifacts
+can partition its catalog into sub-catalogs by department, product line,
+or region. Each sub-catalog is an independent AI Catalog document with
+its own `host` and entries:
 
-- A skill requires a companion MCP server to function
-- A plugin ships with a dataset it depends on
-- A vendor distributes a suite of agents as a single installable package
-
-```
-Vendor Catalog
-  └── Entry: "Finance Plugin" (mediaType: application/ai-catalog+json)
-        ├── Entry: Finance A2A Agent
-        ├── Entry: Finance MCP Server
-        └── Entry: Market Dataset
-```
-
-A bundle is a regular catalog entry — it has an `identifier`, may carry a
-`trustManifest`, and may include a `publisher`. An entry inside a
-bundle MAY reuse the same `identifier` as an entry elsewhere; this
-indicates the same logical artifact.
-
-Clients processing bundles SHOULD impose a maximum nesting depth to
-prevent circular references. A depth limit of 8 is RECOMMENDED.
-
-## Collections (Catalog Hierarchy) {#collection-reference}
-
-Collections are an OPTIONAL top-level array on the AI Catalog. Each
-element is a Collection Reference that points to a child AI Catalog
-at a different URL. Collections express **organization**: they
-partition a large catalog into browsable subcategories without
-implying any dependency between the referenced catalogs.
-
-Use collections when:
-
-- An enterprise has thousands of artifacts spread across departments
-- A registry wants to offer a top-level directory of vendor catalogs
-- A catalog needs to be partitioned for performance or governance
-
-A Collection Reference object MUST contain:
-
-`displayName`
-: A string containing a human-readable name for this collection
-  (e.g., "Finance Services", "ML Models").
-
-`url`
-: A string containing a URL where the child AI Catalog document can
-  be retrieved. The document at this URL MUST be a valid AI Catalog.
-
-The following members are OPTIONAL:
-
-`description`
-: A string describing what this collection contains.
-
-`tags`
-: An array of strings serving as keywords for filtering and navigation.
-
-```
-Enterprise Catalog
-  ├── Collection: "Finance Services" → https://acme.com/catalogs/finance.json
-  ├── Collection: "ML Models"        → https://acme.com/catalogs/ml.json
-  └── Collection: "DevOps Tools"     → https://acme.com/catalogs/devops.json
-        ├── Collection: "CI/CD"      → https://acme.com/catalogs/devops/cicd.json
-        └── Collection: "Monitoring" → https://acme.com/catalogs/devops/monitoring.json
+```json
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme Enterprise AI",
+    "identifier": "did:web:acme-corp.com"
+  },
+  "entries": [
+    {
+      "identifier": "urn:acme:catalog:finance",
+      "displayName": "Finance Services",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/finance.json"
+    },
+    {
+      "identifier": "urn:acme:catalog:ml",
+      "displayName": "ML Models",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/ml.json"
+    },
+    {
+      "identifier": "urn:acme:catalog:devops",
+      "displayName": "DevOps Tools",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/devops.json"
+    }
+  ]
+}
 ```
 
-Collections are recursive — a child catalog MAY itself contain
-`collections`, enabling multi-level organizational hierarchies.
-Clients SHOULD impose a maximum traversal depth.
+**Multi-artifact packaging.** An entry with a `publisher` that contains
+a nested catalog may be interpreted as a set of items that could be
+acquired as a unit. For example, a finance plugin that ships an A2A
+agent, an MCP server, and a dataset together:
 
-## Bundles vs. Collections
+```json
+{
+  "identifier": "urn:acme:plugin:finance-suite",
+  "displayName": "Finance Plugin",
+  "mediaType": "application/ai-catalog+json",
+  "url": "https://acme.com/plugins/finance-suite.json",
+  "publisher": {
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
+  }
+}
+```
 
-| | Bundle | Collection |
-|---|---|---|
-| **Where** | An entry in `entries[]` | An element in `collections[]` |
-| **Content** | Inline or referenced AI Catalog | URL to a separate AI Catalog |
-| **Semantics** | Dependency — artifacts are consumed together | Organization — catalogs are browsed independently |
-| **Identity** | Has an `identifier`, may carry `trustManifest` | Named pointer, no artifact identity |
-| **Example** | "Finance Plugin" shipping agent + server + data | "Finance Department" grouping 50 artifacts |
-| **Trust** | Bundle entry may have its own publisher and trust | Child catalog has its own host and publisher(s) |
+The document at that URL would itself be an AI Catalog containing
+the A2A agent, MCP server, and dataset entries.
 
-A single catalog MAY use both mechanisms. For example, an enterprise
-catalog could use collections to partition by department, while
-individual department catalogs contain bundle entries that package
-related artifacts together.
+A nested catalog entry is a regular catalog entry — it has an
+`identifier`, may carry a `trustManifest`, and may include a
+`publisher`. An entry inside a nested catalog MAY reuse the same
+`identifier` as an entry elsewhere; this indicates the same logical
+artifact.
+
+Clients processing nested catalogs SHOULD impose a maximum nesting
+depth to prevent circular references. A depth limit of 4 is
+RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
+document their limit.
 
 # Discovery
 
@@ -721,10 +698,10 @@ A conformant Minimal Catalog is a JSON document with media type
 - `specVersion` — the specification version string
 - `entries` — an array of Catalog Entry objects, each containing at
   minimum `identifier`, `displayName`, `mediaType`, and exactly one of `url` or
-  `inline`
+  `data`
 
-All other fields (`host`, `collections`, `publisher`, `trustManifest`,
-`metadata`) are OPTIONAL. This level is sufficient for use cases that
+All other fields (`host`, `publisher`, `trustManifest`,
+`metadata`) are OPTIONAL.This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents.
 
@@ -735,7 +712,6 @@ In addition to Level 1 requirements, a Discoverable Catalog:
 - Includes a `host` object identifying the catalog operator
 - MAY be served at the well-known URI `/.well-known/ai-catalog.json`
   to enable automated domain-level discovery
-- MAY include `collections` for organizational hierarchy
 
 ## Level 3: Trusted Catalog
 
@@ -762,7 +738,7 @@ AI Catalogs, artifacts, and Trust Manifests MUST be served over HTTPS
 
 Clients processing nested catalogs MUST enforce a maximum recursion
 depth to prevent denial-of-service attacks via deeply nested or
-circular catalog references. A maximum depth of 8 is RECOMMENDED.
+circular catalog references. A maximum depth of 4 is RECOMMENDED.
 
 ## Privacy Considerations
 
@@ -781,7 +757,6 @@ classDiagram
         specVersion string
         entries CatalogEntry[]
         host HostInfo
-        collections CollectionRef[]
     }
     class HostInfo {
         displayName string
@@ -792,16 +767,10 @@ classDiagram
         identifier string
         displayName string
         mediaType string
-        url | inline
+        url | data
         version string
         publisher Publisher
         trustManifest TrustManifest
-    }
-    class CollectionRef {
-        displayName string
-        url string
-        description string
-        tags string[]
     }
     class Publisher {
         identifier string
@@ -832,15 +801,13 @@ classDiagram
     }
     AICatalog --> "*" CatalogEntry : entries
     AICatalog --> "0..1" HostInfo : host
-    AICatalog --> "*" CollectionRef : collections
     CatalogEntry --> "0..1" Publisher : publisher
     CatalogEntry --> "0..1" TrustManifest : trustManifest
     HostInfo --> "0..1" TrustManifest : trustManifest
     TrustManifest --> "0..1" TrustSchema : trustSchema
     TrustManifest --> "*" Attestation : attestations
     TrustManifest --> "*" ProvenanceLink : provenance
-    CatalogEntry --> "0..1" AICatalog : bundle
-    CollectionRef ..> AICatalog : references
+    CatalogEntry --> "0..1" AICatalog : nested
 </pre>
 
 # IANA Considerations
@@ -920,7 +887,6 @@ AICatalog = {
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? collections: [* CollectionRef],
   ? metadata: { * text => any }
 }
 
@@ -932,18 +898,11 @@ HostInfo = {
   ? trustManifest: TrustManifest
 }
 
-CollectionRef = {
-  displayName: text,
-  url: text,
-  ? description: text,
-  ? tags: [* text]
-}
-
 CatalogEntry = {
   identifier: text,
   displayName: text,
   mediaType: text,
-  (url: text // inline: any),
+  (url: text // data: any),
   ? version: text,
   ? description: text,
   ? tags: [* text],
@@ -1001,10 +960,10 @@ ProvenanceLink = {
 }
 ```
 
-# Example: Multi-Artifact Catalog with Nested Plugin
+# Example: Multi-Artifact Catalog with Nested Catalog
 
 The following example shows an AI Catalog that contains a mix of
-artifact types including a nested catalog acting as a plugin bundle:
+artifact types including a nested catalog packaging related artifacts:
 
 ```json
 {
@@ -1052,8 +1011,8 @@ artifact types including a nested catalog acting as a plugin bundle:
       "identifier": "urn:acme:server:finance-mcp",
       "displayName": "Acme Finance MCP Server",
       "version": "1.4.0",
-      "mediaType": "application/mcp-server+json",
-      "url": "https://api.acme-corp.com/mcp/finance.json",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
       "description": "MCP server with finance tools.",
       "tags": ["finance", "mcp"],
       "updatedAt": "2026-03-15T10:00:00Z"
@@ -1062,9 +1021,9 @@ artifact types including a nested catalog acting as a plugin bundle:
       "identifier": "urn:acme:plugin:finance-suite",
       "displayName": "Acme Finance Suite",
       "mediaType": "application/ai-catalog+json",
-      "description": "Plugin bundle: A2A agent + MCP server + dataset.",
-      "tags": ["finance", "plugin", "bundle"],
-      "inline": {
+      "description": "A2A agent + MCP server + dataset for finance workflows.",
+      "tags": ["finance", "suite"],
+      "data": {
               "specVersion": "1.0",
         "entries": [
           {
@@ -1076,8 +1035,8 @@ artifact types including a nested catalog acting as a plugin bundle:
           {
             "identifier": "urn:acme:server:finance-mcp",
             "displayName": "Finance MCP Server",
-            "mediaType": "application/mcp-server+json",
-            "url": "https://api.acme-corp.com/mcp/finance.json"
+            "mediaType": "application/mcp-server-card+json",
+            "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
           {
             "identifier": "urn:acme:data:market-2026q1",
@@ -1107,11 +1066,12 @@ artifact types including a nested catalog acting as a plugin bundle:
 }
 ```
 
-# Example: Catalog with Collections
+# Example: Hierarchical Catalog
 
-The following example shows how an enterprise uses `collections` to
-organize a large number of artifacts into browsable categories. Each
-collection points to a separate AI Catalog document:
+The following example shows how an enterprise uses nested catalog
+entries to organize a large number of artifacts into browsable
+categories. Each sub-catalog entry points to a separate AI Catalog
+document:
 
 ```json
 {
@@ -1128,23 +1088,27 @@ collection points to a separate AI Catalog document:
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/assistant.json",
       "description": "General-purpose corporate assistant agent."
-    }
-  ],
-  "collections": [
+    },
     {
+      "identifier": "urn:acme:catalog:finance",
       "displayName": "Finance Services",
+      "mediaType": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/finance.json",
       "description": "Financial agents, MCP servers, and datasets.",
       "tags": ["finance", "trading", "compliance"]
     },
     {
+      "identifier": "urn:acme:catalog:engineering",
       "displayName": "Engineering Tools",
+      "mediaType": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/engineering.json",
       "description": "CI/CD agents, code review tools, and DevOps servers.",
       "tags": ["engineering", "devops", "ci-cd"]
     },
     {
+      "identifier": "urn:acme:catalog:ml-models",
       "displayName": "ML Models",
+      "mediaType": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/ml-models.json",
       "description": "Model cards and inference endpoints.",
       "tags": ["ml", "models", "inference"]
@@ -1153,51 +1117,63 @@ collection points to a separate AI Catalog document:
 }
 ```
 
-A catalog MAY contain both `entries` and `collections`. In this
-example, the corporate assistant agent is listed directly while
-department-specific artifacts are organized into child catalogs.
+A catalog MAY contain both direct artifact entries and nested catalog
+entries. In this example, the corporate assistant agent is listed
+directly while department-specific artifacts are organized into child
+catalogs.
 
-# Example: Claude Code Plugin Entry
+# Example: Dual-Protocol Agent (MCP + A2A)
 
-An AI Catalog entry for a Claude Code plugin (per the
-[Claude Plugins marketplace](https://github.com/anthropics/claude-plugins-official)):
+A single agent that supports both MCP and A2A protocols can be
+represented as one catalog entry whose content is a nested catalog
+containing both protocol-specific entries:
 
 ```json
 {
-  "identifier": "urn:claude-plugin:endorlabs:ai-plugins",
-  "displayName": "ai-plugins",
-  "mediaType": "application/vnd.anthropic.claude-plugin+json",
-  "url": "https://github.com/endorlabs/ai-plugins.git",
-  "description": "Set up endorctl and use Endor Labs to scan, prioritize, and fix security risks across your software supply chain",
-  "tags": ["security", "supply-chain"],
+  "identifier": "urn:acme:agent:finance",
+  "displayName": "Acme Finance Agent",
+  "mediaType": "application/ai-catalog+json",
+  "description": "Finance agent accessible via both MCP and A2A protocols.",
+  "tags": ["finance", "dual-protocol"],
   "publisher": {
-    "identifier": "did:web:endorlabs.com",
-    "displayName": "Endor Labs"
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
   },
-  "trustManifest": {
-    "identity": "urn:claude-plugin:endorlabs:ai-plugins",
-    "identityType": "did",
-    "attestations": [
+  "data": {
+    "specVersion": "1.0",
+    "entries": [
       {
-        "type": "publisher-identity",
-        "uri": "https://trust.endorlabs.com/certs/publisher.jwt",
-        "mediaType": "application/jwt",
-        "description": "Verifies did:web:endorlabs.com as publisher"
-      }
-    ],
-    "provenance": [
+        "identifier": "urn:acme:agent:finance:mcp",
+        "displayName": "Acme Finance MCP Server",
+        "mediaType": "application/mcp-server-card+json",
+        "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+      },
       {
-        "relation": "publishedFrom",
-        "sourceId": "https://github.com/endorlabs/ai-plugins",
-        "sourceDigest": "sha1:a0f1d5632b6f9e6c26eaa9806f5d8d454ca5b06f"
+        "identifier": "urn:acme:agent:finance:a2a",
+        "displayName": "Acme Finance A2A Agent",
+        "mediaType": "application/a2a-agent-card+json",
+        "url": "https://api.acme-corp.com/agents/finance"
       }
     ]
   },
-  "metadata": {
-    "homepage": "https://www.endorlabs.com"
+  "trustManifest": {
+    "identity": "urn:acme:agent:finance",
+    "attestations": [
+      {
+        "type": "SOC2-Type2",
+        "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+        "mediaType": "application/pdf",
+        "digest": "sha256:a1b2c3d4e5f6"
+      }
+    ]
   }
 }
 ```
+
+The outer entry represents the logical agent as a single discoverable
+artifact with its own trust metadata. The `data` field inlines a
+catalog with protocol-specific entries, allowing clients to choose
+MCP or A2A based on their capabilities.
 
 # Mapping to OCI Distribution
 
@@ -1257,7 +1233,7 @@ concepts to their OCI physical equivalents:
 | Entry `mediaType` | Manifest `artifactType` field |
 | Entry artifact content | Manifest `layers[0]` blob (the protocol-specific document) |
 | Entry metadata (name, tags, publisher) | Manifest `config` blob and/or `annotations` |
-| Nested Catalog | Nested OCI Image Index referenced from the parent index |
+| Nested Catalog Entry | Nested OCI Image Index referenced from the parent index |
 | Trust Manifest | OCI Referrer artifact with `subject` pointing to the entry manifest |
 | Trust Manifest attestations | Individual OCI Referrer artifacts per attestation |
 | Signing | Cosign / Notation signatures as OCI Referrers |
@@ -1278,7 +1254,7 @@ Tooling converts an AI Catalog JSON document into OCI artifacts:
    entry manifests via the `subject` field. Attestation documents
    (JWTs, PDFs, SLSA provenance) become individual referrer layers.
 
-4. **Nested catalogs** become nested OCI Image Indexes.
+4. **Nested catalog entries** become nested OCI Image Indexes.
 
 ```
 oci://registry.acme.com/ai-catalog:latest          (Image Index)
@@ -1337,7 +1313,7 @@ authored by hand:
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:bbb222...",
       "size": 512,
-      "artifactType": "application/mcp-server+json",
+      "artifactType": "application/mcp-server-card+json",
       "annotations": {
         "ai-catalog.identifier": "urn:acme:server:finance-mcp",
         "ai-catalog.displayName": "Acme Finance MCP Server"
@@ -1422,7 +1398,7 @@ Instead, it provides the discovery envelope and trust layer that
 
 | MCP `server.json` | AI Catalog Equivalent |
 |:---|:---|
-| `server.json` document (whole file) | Artifact content via entry `url` or `inline` |
+| `server.json` document (whole file) | Artifact content via entry `url` or `data` |
 | `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
 | `title` | Entry `displayName` |
 | `description` | Entry `description` |
@@ -1456,15 +1432,15 @@ identity, trust verification, and cross-ecosystem discoverability.
 ## MCP Server as Catalog Entry
 
 An MCP server described by a `server.json` maps to a Catalog Entry
-with `mediaType` set to `application/mcp-server+json`:
+with `mediaType` set to `application/mcp-server-card+json`:
 
 ```json
 {
   "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
   "displayName": "Brave Search",
   "version": "1.0.2",
-  "mediaType": "application/mcp-server+json",
-  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+  "mediaType": "application/mcp-server-card+json",
+  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server-card.json",
   "description": "MCP server for Brave Search API integration",
   "tags": ["search", "brave", "web"],
   "publisher": {
@@ -1520,8 +1496,8 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
       "displayName": "Brave Search",
       "version": "1.0.2",
-      "mediaType": "application/mcp-server+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server-card.json",
       "description": "MCP server for Brave Search API integration",
       "tags": ["search", "brave"]
     },
@@ -1529,8 +1505,8 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
       "displayName": "Filesystem",
       "version": "1.0.2",
-      "mediaType": "application/mcp-server+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server-card.json",
       "description": "MCP server for filesystem operations",
       "tags": ["filesystem", "files"]
     },
@@ -1538,8 +1514,8 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.example/weather-mcp",
       "displayName": "Weather",
       "version": "0.5.0",
-      "mediaType": "application/mcp-server+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://registry.modelcontextprotocol.io/servers/weather/server-card.json",
       "description": "Python MCP server for weather data access",
       "tags": ["weather", "python"],
       "publisher": {
@@ -1565,7 +1541,7 @@ https://api.acme-corp.com/.well-known/ai-catalog.json
 ```
 
 Clients and crawlers discover the catalog via the well-known URL,
-find entries with `mediaType: "application/mcp-server+json"`, and
+find entries with `mediaType: "application/mcp-server-card+json"`, and
 fetch the `server.json` documents for operational details.
 
 The centralized MCP Registry and decentralized AI Catalogs are
@@ -1589,7 +1565,7 @@ fills this gap:
 5. **Cross-ecosystem discovery**: MCP servers become discoverable
    alongside A2A agents, plugins, and datasets through a single
    catalog format.
-6. **Composability**: MCP servers can be bundled with related
+6. **Composability**: MCP servers can be packaged with related
    artifacts (A2A agents, datasets) in nested catalogs.
 
 ## Relationship to MCP Server Cards (SEP-1649)
@@ -1813,9 +1789,9 @@ maps to an AI Catalog where each plugin is an entry:
 }
 ```
 
-## Plugin Bundles as Nested Catalogs
+## Plugin Packages as Nested Catalogs
 
-A plugin that bundles multiple components (MCP servers, skills,
+A plugin that contains multiple components (MCP servers, skills,
 commands, agents) naturally maps to a nested AI Catalog. This
 mirrors the plugin directory structure where a single plugin
 contains multiple artifact types:
@@ -1826,25 +1802,25 @@ contains multiple artifact types:
   "displayName": "example-plugin",
   "mediaType": "application/ai-catalog+json",
   "description": "Comprehensive plugin with commands, agents, skills, and MCP servers",
-  "tags": ["development", "bundle"],
+  "tags": ["development"],
   "publisher": {
     "identifier": "did:web:anthropic.com",
     "displayName": "Anthropic"
   },
-  "inline": {
+  "data": {
       "specVersion": "1.0",
     "entries": [
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
         "displayName": "Example Plugin MCP Server",
-        "mediaType": "application/mcp-server+json",
-        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/.mcp.json"
+        "mediaType": "application/mcp-server-card+json",
+        "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
       },
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
         "displayName": "Example Plugin Skills",
-        "mediaType": "application/vnd.agentskills.skill+md",
-        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills"
+        "mediaType": "application/agentskill+zip",
+        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip"
       }
     ]
   }
@@ -1873,7 +1849,7 @@ listing available plugins. AI Catalog extends this with:
    plugins. AI Catalog assigns `application/vnd.anthropic.claude-plugin+json`
    enabling clients to filter and route by artifact type.
 
-5. **Composability**: Plugin bundles that combine skills, MCP servers,
+5. **Composability**: Plugin packages that combine skills, MCP servers,
    and commands can be represented as nested catalogs, making the
    internal structure of a plugin package explicit and independently
    addressable.
