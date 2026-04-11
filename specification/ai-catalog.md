@@ -11,7 +11,7 @@ and reducing interoperability.
 This document defines the **AI Catalog**: a typed, nestable JSON
 container for discovering heterogeneous AI artifacts. Each entry
 declares its artifact type via a media type and may reference or
-embed the native artifact metadata.A minimal catalog is simply a
+embed the native artifact metadata. A minimal catalog is simply a
 list of entries — names, types, and URLs — requiring no additional
 infrastructure.
 
@@ -102,6 +102,7 @@ members:
 `specVersion`
 : A string indicating the version of this specification that the
   catalog conforms to, in "Major.Minor" format (e.g., "1.0").
+  See [Version Handling](#version-handling) for compatibility rules.
 
 `entries`
 : An array of Catalog Entry objects as defined in [Catalog Entry](#catalog-entry).
@@ -143,7 +144,8 @@ The following members are OPTIONAL:
 
 `metadata`
 : An open map of string keys to arbitrary values for custom or
-  non-standard metadata.
+  non-standard metadata. See [Metadata Extensibility](#metadata-extensibility)
+  for key naming conventions.
 
 ## Host Info
 
@@ -724,6 +726,84 @@ depth to prevent circular references. A depth limit of 4 is
 RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.
 
+# Metadata Extensibility {#metadata-extensibility}
+
+The `metadata` property appears on the AI Catalog top-level object,
+on Catalog Entry objects, and on Trust Manifest objects. It provides
+a single, well-defined extension point for custom or vendor-specific
+properties.
+
+## Key Naming
+
+Metadata keys MUST be non-empty strings. To avoid collisions between
+independent publishers, the following conventions are RECOMMENDED:
+
+- **Reverse-DNS prefix** for vendor-specific keys:
+  `com.example.confidenceScore`, `io.acme.deploymentRegion`.
+- **Short, unqualified names** for keys the publisher considers
+  broadly useful and unlikely to conflict: `repository`, `homepage`,
+  `license`.
+- **Avoid keys that duplicate** defined catalog fields (`displayName`,
+  `description`, `tags`, `version`). Consumers MAY ignore metadata
+  entries that shadow standard fields.
+
+## Reserved Keys
+
+No metadata keys are reserved by this specification. Future
+specification versions MAY promote commonly used metadata keys into
+standard fields. When this occurs, the metadata key SHOULD be
+retained for backward compatibility and the standard field takes
+precedence.
+
+## Value Types
+
+Metadata values MAY be any valid JSON type (string, number, boolean,
+array, object, null). Consumers that do not recognize a metadata key
+SHOULD ignore it.
+
+# Version Handling {#version-handling}
+
+The `specVersion` field identifies which version of this specification
+a catalog conforms to. This section defines how producers and consumers
+handle version differences.
+
+## Version Format
+
+The `specVersion` value is a "Major.Minor" string (e.g., "1.0",
+"1.1", "2.0"). Major and minor components are non-negative integers.
+
+## Compatibility Rules
+
+Minor version increments (e.g., 1.0 → 1.1)
+: The specification adds new OPTIONAL fields or features. Documents
+  conforming to a higher minor version are backward-compatible with
+  consumers that understand the same major version. Consumers MUST
+  ignore unrecognized fields.
+
+Major version increments (e.g., 1.x → 2.0)
+: The specification introduces breaking changes (removed fields,
+  changed semantics, new required fields). Consumers that do not
+  support the major version SHOULD reject the document with an
+  informative error rather than silently misinterpreting it.
+
+## Consumer Behavior
+
+Consumers SHOULD:
+
+- Parse the `specVersion` field before processing the document.
+- Accept documents whose major version matches their supported major
+  version, regardless of minor version differences.
+- Ignore unrecognized fields (forward compatibility within a major
+  version).
+- Reject documents whose major version is higher than the highest
+  major version they support, with an informative error message.
+
+## Producer Behavior
+
+Producers MUST set `specVersion` to the version of this specification
+they implement. Producers SHOULD NOT set `specVersion` to a version
+higher than they actually conform to.
+
 # Discovery
 
 ## Location Independence
@@ -852,11 +932,95 @@ conformance levels and SHOULD gracefully handle their absence.
 AI Catalogs, artifacts, and Trust Manifests MUST be served over HTTPS
 (TLS 1.2 or later) to prevent tampering and eavesdropping.
 
-## Nested Catalog Depth
+## Nested Catalog Depth and Circular References
 
 Clients processing nested catalogs MUST enforce a maximum recursion
 depth to prevent denial-of-service attacks via deeply nested or
 circular catalog references. A maximum depth of 4 is RECOMMENDED.
+
+Depth limits alone do not prevent circular references at shallow
+depths (e.g., Catalog A → Catalog B → Catalog A). Clients SHOULD
+track the set of catalog URLs visited during recursive resolution and
+reject any catalog URL that has already been fetched in the current
+traversal path.
+
+## Trust Manifest Substitution
+
+Because the Trust Manifest is a peer element alongside the artifact
+reference (not embedded within the artifact itself), an attacker who
+controls the catalog document can substitute a different Trust Manifest
+for any entry. This is a real and significant threat.
+
+Mitigations include:
+
+- **Content-addressed references**: When distributing catalogs through
+  OCI registries, Trust Manifests are bound to entry manifests by
+  digest. Substitution is detectable because the digest changes.
+- **Signed Trust Manifests**: The `signature` field on a Trust Manifest
+  provides integrity verification independent of the transport. Consumers
+  SHOULD verify signatures when present and reject Trust Manifests whose
+  signature does not validate.
+- **Identity binding**: The requirement that Trust Manifest `identity`
+  MUST match the entry's `identifier` prevents transplanting a Trust
+  Manifest from one entry to another.
+
+Consumers that rely on trust metadata for security decisions SHOULD
+NOT trust unsigned Trust Manifests served over plain HTTPS without
+additional verification (e.g., fetching the attestation documents
+independently and verifying their signatures).
+
+## Catalog Poisoning
+
+An attacker who can modify a catalog document (e.g., through a
+compromised hosting account or DNS hijack) can redirect consumers to
+malicious artifacts by changing `url` values or injecting new entries.
+
+Mitigations include:
+
+- Serving catalogs over HTTPS with proper certificate management.
+- Using content-addressed digests in Trust Manifest provenance links
+  so consumers can verify artifact integrity after fetch.
+- Deploying catalogs through OCI registries where all content is
+  digest-addressed and signed.
+
+## Identifier Typosquatting
+
+Catalog entries are identified by URIs/URNs. An attacker can register
+identifiers similar to legitimate ones (e.g., `urn:acme:agent:financ`
+vs. `urn:acme:agent:finance`) to trick consumers into using a
+malicious artifact.
+
+Registries and consumers SHOULD implement similarity checks on
+identifiers. Publishers SHOULD use identifiers anchored to domains
+they control (e.g., DIDs or domain-scoped URNs).
+
+## Stale Attestations
+
+Attestation documents referenced in Trust Manifests have no built-in
+expiry mechanism in this specification. A SOC2 report from a previous
+year may no longer reflect current practices.
+
+Consumers SHOULD:
+
+- Check the `updatedAt` field on catalog entries to assess freshness.
+- Independently verify attestation documents are current when making
+  trust decisions.
+- Treat attestations as evidence, not guarantees — the attestation
+  indicates a claim was made, not that it remains valid indefinitely.
+
+Future versions of this specification MAY add `validFrom` and
+`expiresAt` fields to the Attestation object.
+
+## Embedded Content Safety
+
+When the `data` field contains embedded artifact content, consumers
+MUST treat it as untrusted input. In particular:
+
+- Content with HTML or script-capable media types MUST be sandboxed
+  and MUST NOT be executed in the consumer's security context.
+- Consumers SHOULD validate that the `data` content is well-formed
+  JSON (or the expected format for the declared `mediaType`) before
+  processing.
 
 ## Privacy Considerations
 
@@ -1498,6 +1662,16 @@ This appendix describes how the MCP Registry `server.json` format
 relates to AI Catalog, enabling MCP servers to be discovered alongside
 other AI artifacts through a unified catalog.
 
+> **Note:** The MCP ecosystem defines two distinct metadata documents
+> for servers. The **Registry `server.json`** is an installable package
+> descriptor (package coordinates, transports, environment variables).
+> The **MCP Server Card** ([SEP-1649](#relationship-to-mcp-server-cards-sep-1649))
+> is a runtime discovery document at `/.well-known/mcp/server-card.json`
+> describing capabilities, tools, and authentication. An AI Catalog
+> entry can reference either artifact depending on the use case — use
+> `server.json` for installable packages and Server Cards for
+> connectable HTTP endpoints.
+
 ## Overview
 
 The MCP Registry defines a `server.json` format for describing MCP
@@ -1509,8 +1683,8 @@ SSE), transport configuration, environment variables, and CLI arguments.
 In AI Catalog terms, a `server.json` document is the **artifact
 content** — the native metadata that a Catalog Entry references. The
 AI Catalog does not duplicate or redefine `server.json` fields.
-Instead, it provides the discovery envelope and trust layer that
-`server.json` does not address.
+Instead, it provides the discovery and trust layer that `server.json`
+does not address.
 
 ## Conceptual Mapping
 
@@ -1549,16 +1723,17 @@ identity, trust verification, and cross-ecosystem discoverability.
 
 ## MCP Server as Catalog Entry
 
-An MCP server described by a `server.json` maps to a Catalog Entry
-with `mediaType` set to `application/mcp-server-card+json`:
+An MCP server listed in the Registry maps to a Catalog Entry whose
+`url` points to the `server.json` document and whose `mediaType`
+reflects the Registry format:
 
 ```json
 {
   "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
   "displayName": "Brave Search",
   "version": "1.0.2",
-  "mediaType": "application/mcp-server-card+json",
-  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server-card.json",
+  "mediaType": "application/json",
+  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
   "description": "MCP server for Brave Search API integration",
   "tags": ["search", "brave", "web"],
   "publisher": {
@@ -1594,6 +1769,12 @@ The `url` points to the complete `server.json`. A client fetches the
 catalog entry for discovery and trust evaluation, then retrieves the
 `server.json` for operational details (packages, transports, env vars).
 
+> **Note:** This example uses `application/json` because the MCP
+> Registry has not registered a dedicated media type for `server.json`.
+> When referencing an MCP Server Card (SEP-1649) instead, use
+> `application/mcp-server-card+json` — see
+> [Relationship to MCP Server Cards](#relationship-to-mcp-server-cards-sep-1649).
+
 ## MCP Registry as AI Catalog
 
 The MCP Registry — a centralized index of MCP servers — can be
@@ -1614,8 +1795,8 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
       "displayName": "Brave Search",
       "version": "1.0.2",
-      "mediaType": "application/mcp-server-card+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server-card.json",
+      "mediaType": "application/json",
+      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
       "description": "MCP server for Brave Search API integration",
       "tags": ["search", "brave"]
     },
@@ -1623,8 +1804,8 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
       "displayName": "Filesystem",
       "version": "1.0.2",
-      "mediaType": "application/mcp-server-card+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server-card.json",
+      "mediaType": "application/json",
+      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
       "description": "MCP server for filesystem operations",
       "tags": ["filesystem", "files"]
     },
@@ -1632,8 +1813,8 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.example/weather-mcp",
       "displayName": "Weather",
       "version": "0.5.0",
-      "mediaType": "application/mcp-server-card+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/weather/server-card.json",
+      "mediaType": "application/json",
+      "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
       "description": "Python MCP server for weather data access",
       "tags": ["weather", "python"],
       "publisher": {
@@ -1659,8 +1840,9 @@ https://api.acme-corp.com/.well-known/ai-catalog.json
 ```
 
 Clients and crawlers discover the catalog via the well-known URL,
-find entries with `mediaType: "application/mcp-server-card+json"`, and
-fetch the `server.json` documents for operational details.
+find entries by `mediaType`, and fetch the referenced artifacts for
+operational details — whether those are MCP Server Cards, Registry
+`server.json` documents, or other AI artifact formats.
 
 The centralized MCP Registry and decentralized AI Catalogs are
 complementary. The registry can serve an AI Catalog as its response

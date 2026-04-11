@@ -1,116 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>AI Catalog</title>
-  <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
-  <script class="remove">
-    var respecConfig = {
-      "specStatus": "unofficial",
-      "shortName": "ai-catalog",
-      "editors": [],
-      "latestVersion": null,
-      "noRecTrack": true,
-      "localBiblio": {
-            "RFC2119": {
-                  "title": "Key words for use in RFCs to Indicate Requirement Levels",
-                  "href": "https://www.rfc-editor.org/rfc/rfc2119",
-                  "status": "BCP 14",
-                  "publisher": "IETF"
-            },
-            "RFC8174": {
-                  "title": "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8174",
-                  "status": "BCP 14",
-                  "publisher": "IETF"
-            },
-            "RFC3986": {
-                  "title": "Uniform Resource Identifier (URI): Generic Syntax",
-                  "href": "https://www.rfc-editor.org/rfc/rfc3986",
-                  "status": "STD 66",
-                  "publisher": "IETF"
-            },
-            "RFC8141": {
-                  "title": "Uniform Resource Names (URNs)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8141",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC3339": {
-                  "title": "Date and Time on the Internet: Timestamps",
-                  "href": "https://www.rfc-editor.org/rfc/rfc3339",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC2397": {
-                  "title": "The data URL scheme",
-                  "href": "https://www.rfc-editor.org/rfc/rfc2397",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC7515": {
-                  "title": "JSON Web Signature (JWS)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc7515",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC8615": {
-                  "title": "Well-Known Uniform Resource Identifiers (URIs)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8615",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC6838": {
-                  "title": "Media Type Specifications and Registration Procedures",
-                  "href": "https://www.rfc-editor.org/rfc/rfc6838",
-                  "status": "BCP 13",
-                  "publisher": "IETF"
-            },
-            "RFC8610": {
-                  "title": "Concise Data Definition Language (CDDL)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8610",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC8259": {
-                  "title": "The JavaScript Object Notation (JSON) Data Interchange Format",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8259",
-                  "status": "STD 90",
-                  "publisher": "IETF"
-            },
-            "RFC8785": {
-                  "title": "JSON Canonicalization Scheme (JCS)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8785",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC7517": {
-                  "title": "JSON Web Key (JWK)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc7517",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC6234": {
-                  "title": "US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)",
-                  "href": "https://www.rfc-editor.org/rfc/rfc6234",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            },
-            "RFC8288": {
-                  "title": "Web Linking",
-                  "href": "https://www.rfc-editor.org/rfc/rfc8288",
-                  "status": "RFC",
-                  "publisher": "IETF"
-            }
-      },
-      "edDraftURI": "https://github.com/Agent-Card/ai-card/pull/27"
-};
-  </script>
-  <style>
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="generator" content="ReSpec 35.9.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<style>
+dfn{cursor:pointer}
+.dfn-panel{position:absolute;z-index:35;min-width:300px;max-width:500px;padding:.5em .75em;margin-top:.6em;font-family:"Helvetica Neue",sans-serif;font-size:small;background:#fff;background:var(--indextable-hover-bg,#fff);color:#000;color:var(--text,#000);box-shadow:0 1em 3em -.4em rgba(0,0,0,.3),0 0 1px 1px rgba(0,0,0,.05);box-shadow:0 1em 3em -.4em var(--tocsidebar-shadow,rgba(0,0,0,.3)),0 0 1px 1px var(--tocsidebar-shadow,rgba(0,0,0,.05));border-radius:2px}
+.dfn-panel:not(.docked)>.caret{position:absolute;top:-9px}
+.dfn-panel:not(.docked)>.caret::after,.dfn-panel:not(.docked)>.caret::before{content:"";position:absolute;border:10px solid transparent;border-top:0;border-bottom:10px solid #fff;border-bottom-color:var(--indextable-hover-bg,#fff);top:0}
+.dfn-panel:not(.docked)>.caret::before{border-bottom:9px solid #a2a9b1;border-bottom-color:var(--indextable-hover-bg,#a2a9b1)}
+.dfn-panel *{margin:0}
+.dfn-panel b{display:block;color:#000;color:var(--text,#000);margin-top:.25em}
+.dfn-panel ul a[href]{color:#333;color:var(--text,#333)}
+.dfn-panel>div{display:flex}
+.dfn-panel a.self-link{font-weight:700;margin-right:auto}
+.dfn-panel .marker{padding:.1em;margin-left:.5em;border-radius:.2em;text-align:center;white-space:nowrap;font-size:90%;color:#040b1c}
+.dfn-panel .marker.dfn-exported{background:#d1edfd;box-shadow:0 0 0 .125em #1ca5f940}
+.dfn-panel .marker.idl-block{background:#8ccbf2;box-shadow:0 0 0 .125em #0670b161}
+.dfn-panel a:not(:hover){text-decoration:none!important;border-bottom:none!important}
+.dfn-panel a[href]:hover{border-bottom-width:1px}
+.dfn-panel ul{padding:0}
+.dfn-panel li{margin-left:1em}
+.dfn-panel.docked{position:fixed;left:.5em;top:unset;bottom:2em;margin:0 auto;max-width:calc(100vw - .75em * 2 - .5em - .2em * 2);max-height:30vh;overflow:auto}
+</style>
+  
+  
+<title>AI Catalog</title>
+  
+  
+  
+<style>
+
     pre { background: #f8f8f8; padding: 1em; overflow-x: auto; }
     pre.mermaid { background: white; border: 1px solid #e0e0e0; text-align: center; }
-  </style>
-  <script type="module">
+  
+</style>
+  
+<script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
     mermaid.initialize({ startOnLoad: false, theme: 'default' });
     if (document.respec) {
@@ -118,31 +43,284 @@
     }
     await mermaid.run({ querySelector: 'pre.mermaid' });
   </script>
-</head>
-<body>
 
-<section id="abstract">
-  <h2>Abstract</h2>
+<style id="respec-mainstyle">
+@keyframes pop{
+0%{transform:scale(1,1)}
+25%{transform:scale(1.25,1.25);opacity:.75}
+100%{transform:scale(1,1)}
+}
+a.internalDFN{color:inherit;border-bottom:1px solid #99c;text-decoration:none}
+a.externalDFN{color:inherit;border-bottom:1px dotted #ccc;text-decoration:none}
+a.bibref{text-decoration:none}
+.respec-offending-element:target{animation:pop .25s ease-in-out 0s 1}
+.respec-offending-element,a[href].respec-offending-element{text-decoration:red wavy underline}
+@supports not (text-decoration:red wavy underline){
+.respec-offending-element:not(pre){display:inline-block}
+.respec-offending-element{background:url(data:image/gif;base64,R0lGODdhBAADAPEAANv///8AAP///wAAACwAAAAABAADAEACBZQjmIAFADs=) bottom repeat-x}
+}
+#references :target{background:#eaf3ff;animation:pop .4s ease-in-out 0s 1}
+cite .bibref{font-style:italic}
+a[href].orcid{padding-left:4px;padding-right:4px}
+a[href].orcid>svg{margin-bottom:-2px}
+ol.tof,ul.tof{list-style:none outside none}
+.caption{margin-top:.5em;font-style:italic}
+#issue-summary>ul{column-count:2}
+#issue-summary li{list-style:none;display:inline-block}
+details.respec-tests-details{margin-left:1em;display:inline-block;vertical-align:top}
+details.respec-tests-details>*{padding-right:2em}
+details.respec-tests-details[open]{z-index:999999;position:absolute;border:thin solid #cad3e2;border-radius:.3em;background-color:#fff;padding-bottom:.5em}
+details.respec-tests-details[open]>summary{border-bottom:thin solid #cad3e2;padding-left:1em;margin-bottom:1em;line-height:2em}
+details.respec-tests-details>ul{width:100%;margin-top:-.3em}
+details.respec-tests-details>li{padding-left:1em}
+.self-link:hover{opacity:1;text-decoration:none;background-color:transparent}
+aside.example .marker>a.self-link{color:inherit}
+.header-wrapper{display:flex;align-items:baseline}
+:is(h2,h3,h4,h5,h6):not(#toc>h2,#abstract>h2,#sotd>h2,.head>h2){position:relative;left:-.5em}
+:is(h2,h3,h4,h5,h6):not(#toch2)+a.self-link{color:inherit;order:-1;position:relative;left:-1.1em;font-size:1rem;opacity:.5}
+:is(h2,h3,h4,h5,h6)+a.self-link::before{content:"§";text-decoration:none;color:var(--heading-text)}
+:is(h2,h3)+a.self-link{top:-.2em}
+:is(h4,h5,h6)+a.self-link::before{color:#000}
+@media (max-width:767px){
+dd{margin-left:0}
+}
+@media print{
+.removeOnSave{display:none}
+}
+</style>
+<meta name="color-scheme" content="light">
+<meta name="description" content="This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.">
+<style>
+.hljs{--base:#fafafa;--mono-1:#383a42;--mono-2:#686b77;--mono-3:#717277;--hue-1:#0b76c5;--hue-2:#336ae3;--hue-3:#a626a4;--hue-4:#42803c;--hue-5:#ca4706;--hue-5-2:#c91243;--hue-6:#986801;--hue-6-2:#9a6a01}
+@media (prefers-color-scheme:dark){
+.hljs{--base:#282c34;--mono-1:#abb2bf;--mono-2:#818896;--mono-3:#5c6370;--hue-1:#56b6c2;--hue-2:#61aeee;--hue-3:#c678dd;--hue-4:#98c379;--hue-5:#e06c75;--hue-5-2:#be5046;--hue-6:#d19a66;--hue-6-2:#e6c07b}
+}
+.hljs{display:block;overflow-x:auto;padding:.5em;color:#383a42;color:var(--mono-1,#383a42);background:#fafafa;background:var(--base,#fafafa)}
+.hljs-comment,.hljs-quote{color:#717277;color:var(--mono-3,#717277);font-style:italic}
+.hljs-doctag,.hljs-formula,.hljs-keyword{color:#a626a4;color:var(--hue-3,#a626a4)}
+.hljs-deletion,.hljs-name,.hljs-section,.hljs-selector-tag,.hljs-subst{color:#ca4706;color:var(--hue-5,#ca4706);font-weight:700}
+.hljs-literal{color:#0b76c5;color:var(--hue-1,#0b76c5)}
+.hljs-addition,.hljs-attribute,.hljs-meta-string,.hljs-regexp,.hljs-string{color:#42803c;color:var(--hue-4,#42803c)}
+.hljs-built_in,.hljs-class .hljs-title{color:#9a6a01;color:var(--hue-6-2,#9a6a01)}
+.hljs-attr,.hljs-number,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-pseudo,.hljs-template-variable,.hljs-type,.hljs-variable{color:#986801;color:var(--hue-6,#986801)}
+.hljs-bullet,.hljs-link,.hljs-meta,.hljs-selector-id,.hljs-symbol,.hljs-title{color:#336ae3;color:var(--hue-2,#336ae3)}
+.hljs-emphasis{font-style:italic}
+.hljs-strong{font-weight:700}
+.hljs-link{text-decoration:underline}
+</style>
+<style>
+var:hover{text-decoration:underline;cursor:pointer}
+var.respec-hl{color:var(--color,#000);background-color:var(--bg-color);box-shadow:0 0 0 2px var(--bg-color)}
+@media (prefers-color-scheme:dark){
+var.respec-hl{filter:saturate(.9) brightness(.9)}
+}
+var.respec-hl-c1{--bg-color:#f4d200}
+var.respec-hl-c2{--bg-color:#ff87a2}
+var.respec-hl-c3{--bg-color:#96e885}
+var.respec-hl-c4{--bg-color:#3eeed2}
+var.respec-hl-c5{--bg-color:#eacfb6}
+var.respec-hl-c6{--bg-color:#82ddff}
+var.respec-hl-c7{--bg-color:#ffbcf2}
+@media print{
+var.respec-hl{background:0 0;color:#000;box-shadow:unset}
+}
+</style>
+<style>
+var{position:relative;cursor:pointer}
+var[data-type]::after,var[data-type]::before{position:absolute;left:50%;top:-6px;opacity:0;transition:opacity .4s;pointer-events:none}
+var[data-type]::before{content:"";transform:translateX(-50%);border-width:4px 6px 0 6px;border-style:solid;border-color:transparent;border-top-color:#222}
+var[data-type]::after{content:attr(data-type);transform:translateX(-50%) translateY(-100%);background:#222;text-align:center;font-family:"Dank Mono","Fira Code",monospace;font-style:normal;padding:6px;border-radius:3px;color:#daca88;text-indent:0;font-weight:400}
+var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
+</style>
+<script id="initialUserConfig" type="application/json">{
+  "specStatus": "unofficial",
+  "shortName": "ai-catalog",
+  "editors": [],
+  "latestVersion": null,
+  "noRecTrack": true,
+  "localBiblio": {
+    "RFC2119": {
+      "title": "Key words for use in RFCs to Indicate Requirement Levels",
+      "href": "https://www.rfc-editor.org/rfc/rfc2119",
+      "status": "BCP 14",
+      "publisher": "IETF",
+      "id": "rfc2119"
+    },
+    "RFC8174": {
+      "title": "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words",
+      "href": "https://www.rfc-editor.org/rfc/rfc8174",
+      "status": "BCP 14",
+      "publisher": "IETF",
+      "id": "rfc8174"
+    },
+    "RFC3986": {
+      "title": "Uniform Resource Identifier (URI): Generic Syntax",
+      "href": "https://www.rfc-editor.org/rfc/rfc3986",
+      "status": "STD 66",
+      "publisher": "IETF",
+      "id": "rfc3986"
+    },
+    "RFC8141": {
+      "title": "Uniform Resource Names (URNs)",
+      "href": "https://www.rfc-editor.org/rfc/rfc8141",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc8141"
+    },
+    "RFC3339": {
+      "title": "Date and Time on the Internet: Timestamps",
+      "href": "https://www.rfc-editor.org/rfc/rfc3339",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc3339"
+    },
+    "RFC2397": {
+      "title": "The data URL scheme",
+      "href": "https://www.rfc-editor.org/rfc/rfc2397",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc2397"
+    },
+    "RFC7515": {
+      "title": "JSON Web Signature (JWS)",
+      "href": "https://www.rfc-editor.org/rfc/rfc7515",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc7515"
+    },
+    "RFC8615": {
+      "title": "Well-Known Uniform Resource Identifiers (URIs)",
+      "href": "https://www.rfc-editor.org/rfc/rfc8615",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc8615"
+    },
+    "RFC6838": {
+      "title": "Media Type Specifications and Registration Procedures",
+      "href": "https://www.rfc-editor.org/rfc/rfc6838",
+      "status": "BCP 13",
+      "publisher": "IETF",
+      "id": "rfc6838"
+    },
+    "RFC8610": {
+      "title": "Concise Data Definition Language (CDDL)",
+      "href": "https://www.rfc-editor.org/rfc/rfc8610",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc8610"
+    },
+    "RFC8259": {
+      "title": "The JavaScript Object Notation (JSON) Data Interchange Format",
+      "href": "https://www.rfc-editor.org/rfc/rfc8259",
+      "status": "STD 90",
+      "publisher": "IETF",
+      "id": "rfc8259"
+    },
+    "RFC8785": {
+      "title": "JSON Canonicalization Scheme (JCS)",
+      "href": "https://www.rfc-editor.org/rfc/rfc8785",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc8785"
+    },
+    "RFC7517": {
+      "title": "JSON Web Key (JWK)",
+      "href": "https://www.rfc-editor.org/rfc/rfc7517",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc7517"
+    },
+    "RFC6234": {
+      "title": "US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)",
+      "href": "https://www.rfc-editor.org/rfc/rfc6234",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc6234"
+    },
+    "RFC8288": {
+      "title": "Web Linking",
+      "href": "https://www.rfc-editor.org/rfc/rfc8288",
+      "status": "RFC",
+      "publisher": "IETF",
+      "id": "rfc8288"
+    }
+  },
+  "edDraftURI": "https://github.com/Agent-Card/ai-card/pull/27",
+  "publishISODate": "2026-04-11T00:00:00.000Z",
+  "generatedSubtitle": "Unofficial Draft 11 April 2026"
+}</script>
+<link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-UD"></head>
+<body class="h-entry"><div class="head">
+    
+    <h1 id="title" class="title">AI Catalog</h1> 
+    <p id="w3c-state">Unofficial Draft <time class="dt-published" datetime="2026-04-11">11 April 2026</time></p>
+    <details open="">
+      <summary>More details about this document</summary>
+      <dl>
+        
+        <dt>Latest published version:</dt><dd>
+                none
+              </dd>
+        <dt>Latest editor's draft:</dt><dd><a href="https://github.com/Agent-Card/ai-card/pull/27">https://github.com/Agent-Card/ai-card/pull/27</a></dd>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      </dl>
+    </details>
+    
+    
+    <p class="copyright">
+      Copyright ©
+      2026
+      the document editors/authors.
+      Text is available under the
+            <a rel="license" href="https://creativecommons.org/licenses/by/4.0/legalcode">Creative Commons Attribution 4.0 International Public License</a>; additional terms may apply.
+    </p>
+    <hr title="Separator for header">
+  </div>
+
+<section id="abstract" class="introductory"><h2>Abstract</h2>
+  
   <p>This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.</p>
 </section>
 
-<section id="sotd">
-  <h2>Status of This Document</h2>
+<section id="sotd" class="introductory"><h2>Status of This Document</h2><p>
+      This document is a draft of a potential specification. It has no official
+      standing of any kind and does not represent the support or consensus of
+      any standards organization.
+    </p>
+  <section id="status-of-this-document"><div class="header-wrapper"><h3 id="status-of-this-document-0">Status of This Document</h3><a class="self-link" href="#status-of-this-document" aria-label="Permalink for this Section"></a></div>
   <p>This is a draft document and may be updated at any time.</p>
-</section>
+</section></section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#abstract">Abstract</a></li><li class="tocline"><a class="tocxref" href="#sotd">Status of This Document</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#status-of-this-document">Status of This Document</a></li></ol></li><li class="tocline"><a class="tocxref" href="#conformance"><bdi class="secno">1. </bdi>Conformance</a></li><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">2. </bdi>Introduction</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#terminology"><bdi class="secno">2.1 </bdi>Terminology</a></li></ol></li><li class="tocline"><a class="tocxref" href="#design-goals"><bdi class="secno">3. </bdi>Design Goals</a></li><li class="tocline"><a class="tocxref" href="#ai-catalog"><bdi class="secno">4. </bdi>AI Catalog</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#media-type"><bdi class="secno">4.1 </bdi>Media Type</a></li><li class="tocline"><a class="tocxref" href="#top-level-structure"><bdi class="secno">4.2 </bdi>Top-Level Structure</a></li><li class="tocline"><a class="tocxref" href="#host-info"><bdi class="secno">4.3 </bdi>Host Info</a></li><li class="tocline"><a class="tocxref" href="#catalog-entry"><bdi class="secno">4.4 </bdi>Catalog Entry</a></li><li class="tocline"><a class="tocxref" href="#multi-version-entries"><bdi class="secno">4.5 </bdi>Multi-Version Entries</a></li><li class="tocline"><a class="tocxref" href="#publisher-object"><bdi class="secno">4.6 </bdi>Publisher Object</a></li></ol></li><li class="tocline"><a class="tocxref" href="#trust-manifest"><bdi class="secno">5. </bdi>Trust Manifest</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#identity"><bdi class="secno">5.1 </bdi>Identity</a></li><li class="tocline"><a class="tocxref" href="#optional-members"><bdi class="secno">5.2 </bdi>Optional Members</a></li><li class="tocline"><a class="tocxref" href="#trust-schema-object"><bdi class="secno">5.3 </bdi>Trust Schema Object</a></li><li class="tocline"><a class="tocxref" href="#attestation-object"><bdi class="secno">5.4 </bdi>Attestation Object</a></li><li class="tocline"><a class="tocxref" href="#provenance-link-object"><bdi class="secno">5.5 </bdi>Provenance Link Object</a></li><li class="tocline"><a class="tocxref" href="#verification-procedures"><bdi class="secno">5.6 </bdi>Verification Procedures</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#digest-format"><bdi class="secno">5.6.1 </bdi>Digest Format</a></li><li class="tocline"><a class="tocxref" href="#trust-manifest-signatures"><bdi class="secno">5.6.2 </bdi>Trust Manifest Signatures</a></li><li class="tocline"><a class="tocxref" href="#key-resolution"><bdi class="secno">5.6.3 </bdi>Key Resolution</a></li><li class="tocline"><a class="tocxref" href="#verifying-host-identity"><bdi class="secno">5.6.4 </bdi>Verifying Host Identity</a></li><li class="tocline"><a class="tocxref" href="#verifying-publisher-identity"><bdi class="secno">5.6.5 </bdi>Verifying Publisher Identity</a></li><li class="tocline"><a class="tocxref" href="#verifying-artifact-integrity"><bdi class="secno">5.6.6 </bdi>Verifying Artifact Integrity</a></li><li class="tocline"><a class="tocxref" href="#verifying-attestations"><bdi class="secno">5.6.7 </bdi>Verifying Attestations</a></li></ol></li></ol></li><li class="tocline"><a class="tocxref" href="#organizing-catalogs"><bdi class="secno">6. </bdi>Organizing Catalogs</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#nested-catalog-entries"><bdi class="secno">6.1 </bdi>Nested Catalog Entries</a></li></ol></li><li class="tocline"><a class="tocxref" href="#metadata-extensibility"><bdi class="secno">7. </bdi>Metadata Extensibility</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#key-naming"><bdi class="secno">7.1 </bdi>Key Naming</a></li><li class="tocline"><a class="tocxref" href="#reserved-keys"><bdi class="secno">7.2 </bdi>Reserved Keys</a></li><li class="tocline"><a class="tocxref" href="#value-types"><bdi class="secno">7.3 </bdi>Value Types</a></li></ol></li><li class="tocline"><a class="tocxref" href="#version-handling"><bdi class="secno">8. </bdi>Version Handling</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#version-format"><bdi class="secno">8.1 </bdi>Version Format</a></li><li class="tocline"><a class="tocxref" href="#compatibility-rules"><bdi class="secno">8.2 </bdi>Compatibility Rules</a></li><li class="tocline"><a class="tocxref" href="#consumer-behavior"><bdi class="secno">8.3 </bdi>Consumer Behavior</a></li><li class="tocline"><a class="tocxref" href="#producer-behavior"><bdi class="secno">8.4 </bdi>Producer Behavior</a></li></ol></li><li class="tocline"><a class="tocxref" href="#discovery"><bdi class="secno">9. </bdi>Discovery</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#location-independence"><bdi class="secno">9.1 </bdi>Location Independence</a></li><li class="tocline"><a class="tocxref" href="#well-known-uri"><bdi class="secno">9.2 </bdi>Well-Known URI</a></li><li class="tocline"><a class="tocxref" href="#dynamic-discovery"><bdi class="secno">9.3 </bdi>Dynamic Discovery</a></li><li class="tocline"><a class="tocxref" href="#link-relation-discovery"><bdi class="secno">9.4 </bdi>Link Relation Discovery</a></li></ol></li><li class="tocline"><a class="tocxref" href="#conformance-levels"><bdi class="secno">10. </bdi>Conformance Levels</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#level-1-minimal-catalog"><bdi class="secno">10.1 </bdi>Level 1: Minimal Catalog</a></li><li class="tocline"><a class="tocxref" href="#level-2-discoverable-catalog"><bdi class="secno">10.2 </bdi>Level 2: Discoverable Catalog</a></li><li class="tocline"><a class="tocxref" href="#level-3-trusted-catalog"><bdi class="secno">10.3 </bdi>Level 3: Trusted Catalog</a></li></ol></li><li class="tocline"><a class="tocxref" href="#security-considerations"><bdi class="secno">11. </bdi>Security Considerations</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#transport-security"><bdi class="secno">11.1 </bdi>Transport Security</a></li><li class="tocline"><a class="tocxref" href="#nested-catalog-depth-and-circular-references"><bdi class="secno">11.2 </bdi>Nested Catalog Depth and Circular References</a></li><li class="tocline"><a class="tocxref" href="#trust-manifest-substitution"><bdi class="secno">11.3 </bdi>Trust Manifest Substitution</a></li><li class="tocline"><a class="tocxref" href="#catalog-poisoning"><bdi class="secno">11.4 </bdi>Catalog Poisoning</a></li><li class="tocline"><a class="tocxref" href="#identifier-typosquatting"><bdi class="secno">11.5 </bdi>Identifier Typosquatting</a></li><li class="tocline"><a class="tocxref" href="#stale-attestations"><bdi class="secno">11.6 </bdi>Stale Attestations</a></li><li class="tocline"><a class="tocxref" href="#embedded-content-safety"><bdi class="secno">11.7 </bdi>Embedded Content Safety</a></li><li class="tocline"><a class="tocxref" href="#privacy-considerations"><bdi class="secno">11.8 </bdi>Privacy Considerations</a></li></ol></li><li class="tocline"><a class="tocxref" href="#data-model-overview"><bdi class="secno">A. </bdi>Data Model Overview</a></li><li class="tocline"><a class="tocxref" href="#iana-considerations"><bdi class="secno">B. </bdi>IANA Considerations</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#media-type-registration-applicationai-catalogjson"><bdi class="secno">B.1 </bdi>Media Type Registration: application/ai-catalog+json</a></li><li class="tocline"><a class="tocxref" href="#link-relation-registration-ai-catalog"><bdi class="secno">B.2 </bdi>Link Relation Registration: ai-catalog</a></li></ol></li><li class="tocline"><a class="tocxref" href="#cddl-schema"><bdi class="secno">C. </bdi>CDDL Schema</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#ai-catalog"><bdi class="secno">C.1 </bdi>AI Catalog</a></li><li class="tocline"><a class="tocxref" href="#trust-manifest"><bdi class="secno">C.2 </bdi>Trust Manifest</a></li></ol></li><li class="tocline"><a class="tocxref" href="#example-multi-artifact-catalog-with-nested-catalog"><bdi class="secno">D. </bdi>Example: Multi-Artifact Catalog with Nested Catalog</a></li><li class="tocline"><a class="tocxref" href="#example-hierarchical-catalog"><bdi class="secno">E. </bdi>Example: Hierarchical Catalog</a></li><li class="tocline"><a class="tocxref" href="#example-dual-protocol-agent-mcp-a2a"><bdi class="secno">F. </bdi>Example: Dual-Protocol Agent (MCP + A2A)</a></li><li class="tocline"><a class="tocxref" href="#mapping-to-oci-distribution"><bdi class="secno">G. </bdi>Mapping to OCI Distribution</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#logical-format-vs-physical-distribution"><bdi class="secno">G.1 </bdi>Logical Format vs. Physical Distribution</a></li><li class="tocline"><a class="tocxref" href="#conceptual-mapping"><bdi class="secno">G.2 </bdi>Conceptual Mapping</a></li><li class="tocline"><a class="tocxref" href="#packing-ai-catalog-to-oci"><bdi class="secno">G.3 </bdi>Packing: AI Catalog to OCI</a></li><li class="tocline"><a class="tocxref" href="#unpacking-oci-to-ai-catalog"><bdi class="secno">G.4 </bdi>Unpacking: OCI to AI Catalog</a></li><li class="tocline"><a class="tocxref" href="#oci-image-index-example"><bdi class="secno">G.5 </bdi>OCI Image Index Example</a></li><li class="tocline"><a class="tocxref" href="#signing-and-verification"><bdi class="secno">G.6 </bdi>Signing and Verification</a></li><li class="tocline"><a class="tocxref" href="#relationship-to-oci-native-proposals"><bdi class="secno">G.7 </bdi>Relationship to OCI-Native Proposals</a></li></ol></li><li class="tocline"><a class="tocxref" href="#mapping-to-mcp-registry-serverjson"><bdi class="secno">H. </bdi>Mapping to MCP Registry server.json</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#overview"><bdi class="secno">H.1 </bdi>Overview</a></li><li class="tocline"><a class="tocxref" href="#conceptual-mapping"><bdi class="secno">H.2 </bdi>Conceptual Mapping</a></li><li class="tocline"><a class="tocxref" href="#separation-of-concerns"><bdi class="secno">H.3 </bdi>Separation of Concerns</a></li><li class="tocline"><a class="tocxref" href="#mcp-server-as-catalog-entry"><bdi class="secno">H.4 </bdi>MCP Server as Catalog Entry</a></li><li class="tocline"><a class="tocxref" href="#mcp-registry-as-ai-catalog"><bdi class="secno">H.5 </bdi>MCP Registry as AI Catalog</a></li><li class="tocline"><a class="tocxref" href="#decentralized-discovery"><bdi class="secno">H.6 </bdi>Decentralized Discovery</a></li><li class="tocline"><a class="tocxref" href="#what-ai-catalog-adds-to-serverjson"><bdi class="secno">H.7 </bdi>What AI Catalog Adds to server.json</a></li><li class="tocline"><a class="tocxref" href="#relationship-to-mcp-server-cards-sep-1649"><bdi class="secno">H.8 </bdi>Relationship to MCP Server Cards (SEP-1649)</a></li></ol></li><li class="tocline"><a class="tocxref" href="#mapping-to-claude-code-plugins-marketplace"><bdi class="secno">I. </bdi>Mapping to Claude Code Plugins Marketplace</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#overview"><bdi class="secno">I.1 </bdi>Overview</a></li><li class="tocline"><a class="tocxref" href="#conceptual-mapping"><bdi class="secno">I.2 </bdi>Conceptual Mapping</a></li><li class="tocline"><a class="tocxref" href="#source-types"><bdi class="secno">I.3 </bdi>Source Types</a></li><li class="tocline"><a class="tocxref" href="#marketplace-as-ai-catalog"><bdi class="secno">I.4 </bdi>Marketplace as AI Catalog</a></li><li class="tocline"><a class="tocxref" href="#plugin-packages-as-nested-catalogs"><bdi class="secno">I.5 </bdi>Plugin Packages as Nested Catalogs</a></li><li class="tocline"><a class="tocxref" href="#what-ai-catalog-adds-to-the-marketplace"><bdi class="secno">I.6 </bdi>What AI Catalog Adds to the Marketplace</a></li></ol></li><li class="tocline"><a class="tocxref" href="#acknowledgments"><bdi class="secno">J. </bdi>Acknowledgments</a></li><li class="tocline"><a class="tocxref" href="#references"><bdi class="secno">K. </bdi>References</a><ol class="toc"><li class="tocline"><a class="tocxref" href="#normative-references"><bdi class="secno">K.1 </bdi>Normative references</a></li></ol></li></ol></nav>
 
-<section id="conformance">
+<section id="conformance"><div class="header-wrapper"><h2 id="x1-conformance"><bdi class="secno">1. </bdi>Conformance</h2><a class="self-link" href="#conformance" aria-label="Permalink for Section 1."></a></div><p>As well as sections marked as non-normative, all authoring guidelines, diagrams, examples, and notes in this specification are non-normative. Everything else in this specification is normative.</p><p>
+        The key words <em class="rfc2119">MAY</em>, <em class="rfc2119">MUST</em>, <em class="rfc2119">MUST NOT</em>, <em class="rfc2119">NOT RECOMMENDED</em>, <em class="rfc2119">OPTIONAL</em>, <em class="rfc2119">RECOMMENDED</em>, <em class="rfc2119">REQUIRED</em>, <em class="rfc2119">SHALL</em>, <em class="rfc2119">SHALL NOT</em>, <em class="rfc2119">SHOULD</em>, and <em class="rfc2119">SHOULD NOT</em> in this document
+        are to be interpreted as described in
+        <a href="https://www.rfc-editor.org/info/bcp14">BCP 14</a>
+        [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">RFC2119</a></cite>] [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8174" title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">RFC8174</a></cite>]
+        when, and only when, they appear in all
+        capitals, as shown here.
+      </p>
   <p>
-    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-    "OPTIONAL" in this document are to be interpreted as described in BCP 14
-    [[RFC2119]] [[RFC8174]] when, and only when, they appear in all capitals,
+    The key words "<em class="rfc2119">MUST</em>", "<em class="rfc2119">MUST NOT</em>", "<em class="rfc2119">REQUIRED</em>", "<em class="rfc2119">SHALL</em>", "<em class="rfc2119">SHALL NOT</em>",
+    "<em class="rfc2119">SHOULD</em>", "<em class="rfc2119">SHOULD NOT</em>", "<em class="rfc2119">RECOMMENDED</em>", "<em class="rfc2119">NOT RECOMMENDED</em>", "<em class="rfc2119">MAY</em>", and
+    "<em class="rfc2119">OPTIONAL</em>" in this document are to be interpreted as described in BCP 14
+    [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">RFC2119</a></cite>] [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8174" title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">RFC8174</a></cite>] when, and only when, they appear in all capitals,
     as shown here.
   </p>
 </section>
 
-<section id="introduction">
-<h1>Introduction</h1>
+<section id="introduction"><div class="header-wrapper"><h2 id="x2-introduction"><bdi class="secno">2. </bdi>Introduction</h2><a class="self-link" href="#introduction" aria-label="Permalink for Section 2."></a></div>
+
 <p>The AI ecosystem comprises a growing number of protocols, artifact
 formats, and service types. Model Context Protocol (MCP) servers,
 Agent-to-Agent (A2A) agents, Claude Code plugins, datasets, model cards,
@@ -153,7 +331,7 @@ and reducing interoperability.</p>
 <p>This document defines the <strong>AI Catalog</strong>: a typed, nestable JSON
 container for discovering heterogeneous AI artifacts. Each entry
 declares its artifact type via a media type and may reference or
-embed the native artifact metadata.A minimal catalog is simply a
+embed the native artifact metadata. A minimal catalog is simply a
 list of entries — names, types, and URLs — requiring no additional
 infrastructure.</p>
 <p>For environments that need verifiable identity, compliance evidence,
@@ -168,12 +346,12 @@ manifests, A2A agent cards, or any other artifact format. Instead, it
 relies on media types to identify what each entry is, and delegates
 the definition of artifact-specific metadata to the respective protocol
 specifications.</p>
-<section id="terminology">
-<h2>Terminology</h2>
-<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-"OPTIONAL" in this document are to be interpreted as described in
-BCP 14 [[RFC2119]] [[RFC8174]] when, and only when, they appear in all
+<section id="terminology"><div class="header-wrapper"><h3 id="x2-1-terminology"><bdi class="secno">2.1 </bdi>Terminology</h3><a class="self-link" href="#terminology" aria-label="Permalink for Section 2.1"></a></div>
+
+<p>The key words "<em class="rfc2119">MUST</em>", "<em class="rfc2119">MUST NOT</em>", "<em class="rfc2119">REQUIRED</em>", "<em class="rfc2119">SHALL</em>", "<em class="rfc2119">SHALL NOT</em>",
+"<em class="rfc2119">SHOULD</em>", "<em class="rfc2119">SHOULD NOT</em>", "<em class="rfc2119">RECOMMENDED</em>", "<em class="rfc2119">NOT RECOMMENDED</em>", "<em class="rfc2119">MAY</em>", and
+"<em class="rfc2119">OPTIONAL</em>" in this document are to be interpreted as described in
+BCP 14 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">RFC2119</a></cite>] [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8174" title="Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words">RFC8174</a></cite>] when, and only when, they appear in all
 capitals, as shown here.</p>
 <p>The following terms are used throughout this document:</p>
 <dl>
@@ -193,16 +371,16 @@ capitals, as shown here.</p>
 </dl>
 </section>
 </section>
-<section id="design-goals">
-<h1>Design Goals</h1>
+<section id="design-goals"><div class="header-wrapper"><h2 id="x3-design-goals"><bdi class="secno">3. </bdi>Design Goals</h2><a class="self-link" href="#design-goals" aria-label="Permalink for Section 3."></a></div>
+
 <ol>
 <li>
-<p><strong>Artifact Agnosticism</strong>: The catalog MUST be capable of indexing
+<p><strong>Artifact Agnosticism</strong>: The catalog <em class="rfc2119">MUST</em> be capable of indexing
    any type of AI artifact without requiring knowledge of the
    artifact's internal schema.</p>
 </li>
 <li>
-<p><strong>Media Type Identification</strong>: Each catalog entry MUST declare its
+<p><strong>Media Type Identification</strong>: Each catalog entry <em class="rfc2119">MUST</em> declare its
    artifact type using a media type, enabling clients to select,
    filter, and route entries without parsing artifact content.</p>
 </li>
@@ -225,78 +403,80 @@ capitals, as shown here.</p>
    hierarchy may be authored, hosted, and updated independently.</p>
 </li>
 <li>
-<p><strong>Location Independence</strong>: An AI Catalog MAY be served from any URL.
+<p><strong>Location Independence</strong>: An AI Catalog <em class="rfc2119">MAY</em> be served from any URL.
    The standard defines a well-known URL convention to enable
    automated discovery, but catalogs are equally valid when hosted at
    arbitrary paths, embedded in registries, or distributed as files.</p>
 </li>
 </ol>
 </section>
-<section id="ai-catalog">
-<h1>AI Catalog</h1>
-<section id="media-type">
-<h2>Media Type</h2>
+<section id="ai-catalog"><div class="header-wrapper"><h2 id="x4-ai-catalog"><bdi class="secno">4. </bdi>AI Catalog</h2><a class="self-link" href="#ai-catalog" aria-label="Permalink for Section 4."></a></div>
+
+<section id="media-type"><div class="header-wrapper"><h3 id="x4-1-media-type"><bdi class="secno">4.1 </bdi>Media Type</h3><a class="self-link" href="#media-type" aria-label="Permalink for Section 4.1"></a></div>
+
 <p>An AI Catalog document is identified by the media type:</p>
-<pre><code>application/ai-catalog+json
+<pre><code aria-busy="false" class="hljs">application/ai-catalog+json
 </code></pre>
 </section>
-<section id="top-level-structure">
-<h2>Top-Level Structure</h2>
-<p>An AI Catalog document is a JSON object that MUST contain the following
+<section id="top-level-structure"><div class="header-wrapper"><h3 id="x4-2-top-level-structure"><bdi class="secno">4.2 </bdi>Top-Level Structure</h3><a class="self-link" href="#top-level-structure" aria-label="Permalink for Section 4.2"></a></div>
+
+<p>An AI Catalog document is a JSON object that <em class="rfc2119">MUST</em> contain the following
 members:</p>
 <dl>
 <dt><code>specVersion</code></dt>
 <dd>A string indicating the version of this specification that the
-  catalog conforms to, in "Major.Minor" format (e.g., "1.0").</dd>
+  catalog conforms to, in "Major.Minor" format (e.g., "1.0").
+  See <a href="#version-handling">Version Handling</a> for compatibility rules.</dd>
 <dt><code>entries</code></dt>
 <dd>An array of Catalog Entry objects as defined in <a href="#catalog-entry">Catalog Entry</a>.
-  This array MAY be empty.</dd>
+  This array <em class="rfc2119">MAY</em> be empty.</dd>
 </dl>
 <p>For example, a minimal catalog listing three AI artifacts:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;entries&quot;: [
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:example:skill:code-review&quot;,
-      &quot;displayName&quot;: &quot;Code Review Assistant&quot;,
-      &quot;mediaType&quot;: &quot;application/agentskill+zip&quot;,
-      &quot;url&quot;: &quot;https://skills.example.com/code-review/skill.zip&quot;
+      "identifier": "urn:example:skill:code-review",
+      "displayName": "Code Review Assistant",
+      "mediaType": "application/agentskill+zip",
+      "url": "https://skills.example.com/code-review/skill.zip"
     },
     {
-      &quot;identifier&quot;: &quot;urn:example:mcp:weather&quot;,
-      &quot;displayName&quot;: &quot;Weather Service&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-      &quot;url&quot;: &quot;https://api.example.com/.well-known/mcp/server-card.json&quot;
+      "identifier": "urn:example:mcp:weather",
+      "displayName": "Weather Service",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
-      &quot;identifier&quot;: &quot;urn:example:a2a:research&quot;,
-      &quot;displayName&quot;: &quot;Research Assistant&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;url&quot;: &quot;https://agents.example.com/researchAssistant&quot;
+      "identifier": "urn:example:a2a:research",
+      "displayName": "Research Assistant",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://agents.example.com/researchAssistant"
     }
   ]
 }
 </code></pre>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>host</code></dt>
 <dd>A Host Info object as defined in <a href="#host-info">Host Info</a> identifying the
   operator of this catalog.</dd>
 <dt><code>metadata</code></dt>
 <dd>An open map of string keys to arbitrary values for custom or
-  non-standard metadata.</dd>
+  non-standard metadata. See <a href="#metadata-extensibility">Metadata Extensibility</a>
+  for key naming conventions.</dd>
 </dl>
 </section>
-<section id="host-info">
-<h2>Host Info</h2>
-<p>The Host Info object identifies the operator of the catalog. It MUST
+<section id="host-info"><div class="header-wrapper"><h3 id="x4-3-host-info"><bdi class="secno">4.3 </bdi>Host Info</h3><a class="self-link" href="#host-info" aria-label="Permalink for Section 4.3"></a></div>
+
+<p>The Host Info object identifies the operator of the catalog. It <em class="rfc2119">MUST</em>
 contain:</p>
 <dl>
 <dt><code>displayName</code></dt>
 <dd>A string containing the human-readable name of the host (e.g., the
   organization name).</dd>
 </dl>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>identifier</code></dt>
 <dd>A string containing a verifiable identifier for the host (e.g., a
@@ -310,22 +490,22 @@ contain:</p>
   verifiable identity and trust metadata for the host itself.</dd>
 </dl>
 <p>For example:</p>
-<pre><code class="language-json">{
-  &quot;displayName&quot;: &quot;Acme Enterprise AI&quot;,
-  &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-  &quot;documentationUrl&quot;: &quot;https://docs.acme-corp.com/ai&quot;,
-  &quot;logoUrl&quot;: &quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0c...&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "displayName": "Acme Enterprise AI",
+  "identifier": "did:web:acme-corp.com",
+  "documentationUrl": "https://docs.acme-corp.com/ai",
+  "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0c..."
 }
 </code></pre>
 </section>
-<section id="catalog-entry">
-<h2>Catalog Entry</h2>
+<section id="catalog-entry"><div class="header-wrapper"><h3 id="x4-4-catalog-entry"><bdi class="secno">4.4 </bdi>Catalog Entry</h3><a class="self-link" href="#catalog-entry" aria-label="Permalink for Section 4.4"></a></div>
+
 <p>A Catalog Entry object describes a single AI artifact in the catalog.
-It MUST contain the following members:</p>
+It <em class="rfc2119">MUST</em> contain the following members:</p>
 <dl>
 <dt><code>identifier</code></dt>
-<dd>A string identifying this artifact. This SHOULD be a URN
-  [[RFC8141]] or URI [[RFC3986]] (e.g., <code>urn:example:agent:name</code>).
+<dd>A string identifying this artifact. This <em class="rfc2119">SHOULD</em> be a URN
+  [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8141" title="Uniform Resource Names (URNs)">RFC8141</a></cite>] or URI [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc3986" title="Uniform Resource Identifier (URI): Generic Syntax">RFC3986</a></cite>] (e.g., <code>urn:example:agent:name</code>).
   See <a href="#multi-version-entries">Multi-Version Entries</a> for uniqueness
   rules when multiple versions are present.</dd>
 <dt><code>displayName</code></dt>
@@ -343,19 +523,19 @@ It MUST contain the following members:</p>
 <li>Any other media type defined by a protocol specification (e.g.,
     <code>application/agentskill+zip</code> for skill definitions)</li>
 </ul>
-<p>A Catalog Entry MUST contain exactly one of the following members to
+<p>A Catalog Entry <em class="rfc2119">MUST</em> contain exactly one of the following members to
 provide the artifact content:</p>
 <dl>
 <dt><code>url</code></dt>
 <dd>A string containing a URL where the full artifact document can be
-  retrieved. The document served at this URL SHOULD be served with
+  retrieved. The document served at this URL <em class="rfc2119">SHOULD</em> be served with
   the media type declared in the <code>mediaType</code> field.</dd>
 <dt><code>data</code></dt>
 <dd>A JSON value containing the complete artifact document inline. The
   structure of this value is determined by the <code>mediaType</code> field and
   is opaque to this specification.</dd>
 </dl>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>description</code></dt>
 <dd>A string containing a short description of the artifact.</dd>
@@ -363,11 +543,11 @@ provide the artifact content:</p>
 <dd>An array of strings serving as keywords for filtering and discovery.</dd>
 <dt><code>version</code></dt>
 <dd>A string containing the version of this artifact.
-  <a href="https://semver.org/">Semantic Versioning</a> is RECOMMENDED but not
+  <a href="https://semver.org/">Semantic Versioning</a> is <em class="rfc2119">RECOMMENDED</em> but not
   required. See <a href="#multi-version-entries">Multi-Version Entries</a> for
   how versions interact with <code>identifier</code>.</dd>
 <dt><code>updatedAt</code></dt>
-<dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
+<dd>A string containing an ISO 8601 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc3339" title="Date and Time on the Internet: Timestamps">RFC3339</a></cite>] timestamp indicating
   when this entry was last modified.</dd>
 <dt><code>metadata</code></dt>
 <dd>An open map of string keys to arbitrary values for custom data.</dd>
@@ -382,39 +562,39 @@ provide the artifact content:</p>
   See <a href="#trust-manifest">Trust Manifest</a> for details.</dd>
 </dl>
 </section>
-<section id="multi-version-entries">
-<h2>Multi-Version Entries</h2>
-<p>A catalog MAY contain multiple entries with the same <code>identifier</code> and
+<section id="multi-version-entries"><div class="header-wrapper"><h3 id="x4-5-multi-version-entries"><bdi class="secno">4.5 </bdi>Multi-Version Entries</h3><a class="self-link" href="#multi-version-entries" aria-label="Permalink for Section 4.5"></a></div>
+
+<p>A catalog <em class="rfc2119">MAY</em> contain multiple entries with the same <code>identifier</code> and
 different <code>version</code> values, representing a version history for a
 single artifact — similar to a package registry.</p>
 <p>When <code>version</code> is present, the combination of <code>identifier</code> and <code>version</code>
-MUST be unique within the catalog. When <code>version</code> is absent, <code>identifier</code>
-alone MUST be unique. The <code>identifier</code> SHOULD be stable across versions
+<em class="rfc2119">MUST</em> be unique within the catalog. When <code>version</code> is absent, <code>identifier</code>
+alone <em class="rfc2119">MUST</em> be unique. The <code>identifier</code> <em class="rfc2119">SHOULD</em> be stable across versions
 and catalog locations so that the same logical artifact can be
 recognized wherever it appears.</p>
-<p>Clients that need only the latest version SHOULD sort entries
+<p>Clients that need only the latest version <em class="rfc2119">SHOULD</em> sort entries
 sharing the same <code>identifier</code> by <code>version</code> (when parseable as a semantic
 version) or by <code>updatedAt</code>, and select the most recent. Clients
-that need a specific version SHOULD match on both <code>identifier</code> and <code>version</code>.</p>
+that need a specific version <em class="rfc2119">SHOULD</em> match on both <code>identifier</code> and <code>version</code>.</p>
 <p>For example, a catalog listing two versions of the same agent:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;entries&quot;: [
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
-      &quot;version&quot;: &quot;2.1.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
-      &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+      "identifier": "urn:acme:agent:finance",
+      "displayName": "Acme Finance Agent",
+      "version": "2.1.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
-      &quot;version&quot;: &quot;2.0.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.0.json&quot;,
-      &quot;updatedAt&quot;: &quot;2026-01-20T08:00:00Z&quot;
+      "identifier": "urn:acme:agent:finance",
+      "displayName": "Acme Finance Agent",
+      "version": "2.0.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
+      "updatedAt": "2026-01-20T08:00:00Z"
     }
   ]
 }
@@ -422,11 +602,11 @@ that need a specific version SHOULD match on both <code>identifier</code> and <c
 <p>Both entries share the same <code>identifier</code> but have distinct <code>version</code>
 values, so the combination is unique.</p>
 </section>
-<section id="publisher-object">
-<h2>Publisher Object</h2>
+<section id="publisher-object"><div class="header-wrapper"><h3 id="x4-6-publisher-object"><bdi class="secno">4.6 </bdi>Publisher Object</h3><a class="self-link" href="#publisher-object" aria-label="Permalink for Section 4.6"></a></div>
+
 <p>The Publisher object identifies the entity responsible for an artifact.
 It appears on the Catalog Entry and is the canonical location for
-publisher information. It MUST contain:</p>
+publisher information. It <em class="rfc2119">MUST</em> contain:</p>
 <dl>
 <dt><code>identifier</code></dt>
 <dd>A string containing a verifiable identifier for the publisher
@@ -434,7 +614,7 @@ publisher information. It MUST contain:</p>
 <dt><code>displayName</code></dt>
 <dd>A string containing the human-readable name of the publisher.</dd>
 </dl>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>identityType</code></dt>
 <dd>A string providing a type hint for the publisher identifier (e.g.,
@@ -442,12 +622,12 @@ publisher information. It MUST contain:</p>
 </dl>
 </section>
 </section>
-<section id="trust-manifest">
-<h1>Trust Manifest</h1>
-<p>The Trust Manifest is an OPTIONAL companion to catalog entries and
+<section id="trust-manifest"><div class="header-wrapper"><h2 id="x5-trust-manifest"><bdi class="secno">5. </bdi>Trust Manifest</h2><a class="self-link" href="#trust-manifest" aria-label="Permalink for Section 5."></a></div>
+
+<p>The Trust Manifest is an <em class="rfc2119">OPTIONAL</em> companion to catalog entries and
 host objects. It is a JSON object that provides verifiable identity,
 attestation, and provenance metadata for AI artifacts.
-Implementations that do not require trust metadata MAY ignore this
+Implementations that do not require trust metadata <em class="rfc2119">MAY</em> ignore this
 section entirely — a conformant AI Catalog does not require Trust
 Manifests.</p>
 <p>The Trust Manifest does NOT wrap the artifact. It sits alongside the
@@ -455,34 +635,34 @@ artifact as a peer element within a Catalog Entry, keeping the native
 artifact format unmodified. Publisher information is NOT duplicated
 in the Trust Manifest — the informational publisher identity is
 carried on the Catalog Entry (see <a href="#publisher-object">Publisher Object</a>).</p>
-<section id="identity">
-<h2>Identity</h2>
-<p>A Trust Manifest MUST contain:</p>
+<section id="identity"><div class="header-wrapper"><h3 id="x5-1-identity"><bdi class="secno">5.1 </bdi>Identity</h3><a class="self-link" href="#identity" aria-label="Permalink for Section 5.1"></a></div>
+
+<p>A Trust Manifest <em class="rfc2119">MUST</em> contain:</p>
 <dl>
 <dt><code>identity</code></dt>
-<dd>A string containing a globally unique URI [[RFC3986]] that serves as
-  the primary subject identifier for this artifact. This SHOULD be a
+<dd>A string containing a globally unique URI [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc3986" title="Uniform Resource Identifier (URI): Generic Syntax">RFC3986</a></cite>] that serves as
+  the primary subject identifier for this artifact. This <em class="rfc2119">SHOULD</em> be a
   DID, SPIFFE ID, or URL.</dd>
 </dl>
 <p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
-field MUST match the entry's <code>identifier</code> field. This binding ensures trust
+field <em class="rfc2119">MUST</em> match the entry's <code>identifier</code> field. This binding ensures trust
 claims are unambiguously associated with the catalog artifact.
-Consumers MUST reject a Trust Manifest whose <code>identity</code> does not
+Consumers <em class="rfc2119">MUST</em> reject a Trust Manifest whose <code>identity</code> does not
 match the containing entry's <code>identifier</code>.</p>
 <p>When a Trust Manifest appears on a Host Info object, <code>identity</code>
-SHOULD match the host's <code>identifier</code> field when present.</p>
+<em class="rfc2119">SHOULD</em> match the host's <code>identifier</code> field when present.</p>
 <p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
-values), each entry MAY carry its own Trust Manifest. There is no
+values), each entry <em class="rfc2119">MAY</em> carry its own Trust Manifest. There is no
 requirement that all versions carry identical trust metadata — trust
 properties may evolve across versions.</p>
 </section>
-<section id="optional-members">
-<h2>Optional Members</h2>
-<p>The following members are OPTIONAL:</p>
+<section id="optional-members"><div class="header-wrapper"><h3 id="x5-2-optional-members"><bdi class="secno">5.2 </bdi>Optional Members</h3><a class="self-link" href="#optional-members" aria-label="Permalink for Section 5.2"></a></div>
+
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>identityType</code></dt>
 <dd>A string providing a type hint for the identity URI (e.g., "did",
-  "spiffe", "dns"). This field is OPTIONAL when the type is evident
+  "spiffe", "dns"). This field is <em class="rfc2119">OPTIONAL</em> when the type is evident
   from the URI scheme.</dd>
 <dt><code>trustSchema</code></dt>
 <dd>A Trust Schema object as defined in <a href="#trust-schema-object">Trust Schema</a>.</dd>
@@ -500,7 +680,7 @@ properties may evolve across versions.</p>
 <dt><code>termsOfServiceUrl</code></dt>
 <dd>A string containing a URL to the terms of service.</dd>
 <dt><code>signature</code></dt>
-<dd>A string containing a detached JWS [[RFC7515]] signature computed
+<dd>A string containing a detached JWS [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc7515" title="JSON Web Signature (JWS)">RFC7515</a></cite>] signature computed
   over the Trust Manifest content. This enables integrity verification
   of the trust metadata independent of the artifact.</dd>
 <dt><code>metadata</code></dt>
@@ -509,53 +689,53 @@ properties may evolve across versions.</p>
 </dl>
 <p>For example, a Trust Manifest with identity, attestations, and
 provenance:</p>
-<pre><code class="language-json">{
-  &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
-  &quot;identityType&quot;: &quot;did&quot;,
-  &quot;trustSchema&quot;: {
-    &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
-    &quot;version&quot;: &quot;1.0&quot;,
-    &quot;governanceUri&quot;: &quot;https://acme-corp.com/trust/governance.pdf&quot;,
-    &quot;verificationMethods&quot;: [&quot;did&quot;, &quot;x509&quot;]
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identity": "urn:acme:agent:finance",
+  "identityType": "did",
+  "trustSchema": {
+    "identifier": "urn:trust:acme-enterprise-v1",
+    "version": "1.0",
+    "governanceUri": "https://acme-corp.com/trust/governance.pdf",
+    "verificationMethods": ["did", "x509"]
   },
-  &quot;attestations&quot;: [
+  "attestations": [
     {
-      &quot;type&quot;: &quot;publisher-identity&quot;,
-      &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
-      &quot;mediaType&quot;: &quot;application/jwt&quot;,
-      &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
+      "type": "publisher-identity",
+      "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
+      "mediaType": "application/jwt",
+      "description": "Verifies did:web:acme-corp.com as publisher"
     },
     {
-      &quot;type&quot;: &quot;SOC2-Type2&quot;,
-      &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-      &quot;mediaType&quot;: &quot;application/pdf&quot;,
-      &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
+      "type": "SOC2-Type2",
+      "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+      "mediaType": "application/pdf",
+      "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
     }
   ],
-  &quot;provenance&quot;: [
+  "provenance": [
     {
-      &quot;relation&quot;: &quot;publishedFrom&quot;,
-      &quot;sourceId&quot;: &quot;https://github.com/acme-corp/finance-agent&quot;,
-      &quot;sourceDigest&quot;: &quot;sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321&quot;
+      "relation": "publishedFrom",
+      "sourceId": "https://github.com/acme-corp/finance-agent",
+      "sourceDigest": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
     }
   ],
-  &quot;privacyPolicyUrl&quot;: &quot;https://acme-corp.com/legal/privacy&quot;,
-  &quot;termsOfServiceUrl&quot;: &quot;https://acme-corp.com/legal/terms&quot;,
-  &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached-jws-signature&quot;
+  "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
+  "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
+  "signature": "eyJhbGciOiJFUzI1NiJ9..detached-jws-signature"
 }
 </code></pre>
 </section>
-<section id="trust-schema-object">
-<h2>Trust Schema Object</h2>
+<section id="trust-schema-object"><div class="header-wrapper"><h3 id="x5-3-trust-schema-object"><bdi class="secno">5.3 </bdi>Trust Schema Object</h3><a class="self-link" href="#trust-schema-object" aria-label="Permalink for Section 5.3"></a></div>
+
 <p>A Trust Schema object describes the trust framework applied to the
-artifact. It MUST contain:</p>
+artifact. It <em class="rfc2119">MUST</em> contain:</p>
 <dl>
 <dt><code>identifier</code></dt>
 <dd>A string identifying the trust schema.</dd>
 <dt><code>version</code></dt>
 <dd>A string indicating the schema version.</dd>
 </dl>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>governanceUri</code></dt>
 <dd>A string containing a URI to the governance policy document.</dd>
@@ -564,17 +744,17 @@ artifact. It MUST contain:</p>
   (e.g., "did", "x509", "dns-01").</dd>
 </dl>
 <p>For example:</p>
-<pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
-  &quot;version&quot;: &quot;1.0&quot;,
-  &quot;governanceUri&quot;: &quot;https://acme-corp.com/trust/governance.pdf&quot;,
-  &quot;verificationMethods&quot;: [&quot;did&quot;, &quot;x509&quot;]
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identifier": "urn:trust:acme-enterprise-v1",
+  "version": "1.0",
+  "governanceUri": "https://acme-corp.com/trust/governance.pdf",
+  "verificationMethods": ["did", "x509"]
 }
 </code></pre>
 </section>
-<section id="attestation-object">
-<h2>Attestation Object</h2>
-<p>An Attestation object provides verifiable proof of a claim. It MUST
+<section id="attestation-object"><div class="header-wrapper"><h3 id="x5-4-attestation-object"><bdi class="secno">5.4 </bdi>Attestation Object</h3><a class="self-link" href="#attestation-object" aria-label="Permalink for Section 5.4"></a></div>
+
+<p>An Attestation object provides verifiable proof of a claim. It <em class="rfc2119">MUST</em>
 contain:</p>
 <dl>
 <dt><code>type</code></dt>
@@ -582,12 +762,12 @@ contain:</p>
   "HIPAA-Audit", "ISO27001").</dd>
 <dt><code>uri</code></dt>
 <dd>A string containing the location of the attestation document.
-  This may be an HTTPS URL or an inline Data URI [[RFC2397]].</dd>
+  This may be an HTTPS URL or an inline Data URI [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc2397" title="The data URL scheme">RFC2397</a></cite>].</dd>
 <dt><code>mediaType</code></dt>
 <dd>A string indicating the format (e.g., "application/pdf",
   "application/jwt").</dd>
 </dl>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>digest</code></dt>
 <dd>A string containing a cryptographic hash for integrity verification
@@ -598,19 +778,19 @@ contain:</p>
 <dd>A string containing a human-readable label.</dd>
 </dl>
 <p>For example, a compliance attestation with integrity verification:</p>
-<pre><code class="language-json">{
-  &quot;type&quot;: &quot;SOC2-Type2&quot;,
-  &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2-2026.pdf&quot;,
-  &quot;mediaType&quot;: &quot;application/pdf&quot;,
-  &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;,
-  &quot;size&quot;: 245760,
-  &quot;description&quot;: &quot;SOC2 Type 2 audit report for Acme Finance Agent (2026)&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "type": "SOC2-Type2",
+  "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
+  "mediaType": "application/pdf",
+  "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "size": 245760,
+  "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
 }
 </code></pre>
 </section>
-<section id="provenance-link-object">
-<h2>Provenance Link Object</h2>
-<p>A Provenance Link records lineage information. It MUST contain:</p>
+<section id="provenance-link-object"><div class="header-wrapper"><h3 id="x5-5-provenance-link-object"><bdi class="secno">5.5 </bdi>Provenance Link Object</h3><a class="self-link" href="#provenance-link-object" aria-label="Permalink for Section 5.5"></a></div>
+
+<p>A Provenance Link records lineage information. It <em class="rfc2119">MUST</em> contain:</p>
 <dl>
 <dt><code>relation</code></dt>
 <dd>A string describing the relationship (e.g., "materializedFrom",
@@ -618,7 +798,7 @@ contain:</p>
 <dt><code>sourceId</code></dt>
 <dd>A string identifying the source artifact or data.</dd>
 </dl>
-<p>The following members are OPTIONAL:</p>
+<p>The following members are <em class="rfc2119">OPTIONAL</em>:</p>
 <dl>
 <dt><code>sourceDigest</code></dt>
 <dd>A string containing the digest of the source.</dd>
@@ -631,38 +811,38 @@ contain:</p>
 </dl>
 <p>For example, a provenance link recording that an artifact was built
 from a specific source commit and published through an OCI registry:</p>
-<pre><code class="language-json">{
-  &quot;relation&quot;: &quot;publishedFrom&quot;,
-  &quot;sourceId&quot;: &quot;https://github.com/acme-corp/finance-agent&quot;,
-  &quot;sourceDigest&quot;: &quot;sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321&quot;,
-  &quot;registryUri&quot;: &quot;oci://registry.acme-corp.com/agents/finance&quot;,
-  &quot;statementUri&quot;: &quot;https://trust.acme-corp.com/provenance/finance-agent-v2.1.json&quot;,
-  &quot;signatureRef&quot;: &quot;did:web:acme-corp.com#key-1&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "relation": "publishedFrom",
+  "sourceId": "https://github.com/acme-corp/finance-agent",
+  "sourceDigest": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+  "registryUri": "oci://registry.acme-corp.com/agents/finance",
+  "statementUri": "https://trust.acme-corp.com/provenance/finance-agent-v2.1.json",
+  "signatureRef": "did:web:acme-corp.com#key-1"
 }
 </code></pre>
 </section>
-<section id="verification-procedures">
-<h2>Verification Procedures</h2>
+<section id="verification-procedures"><div class="header-wrapper"><h3 id="x5-6-verification-procedures"><bdi class="secno">5.6 </bdi>Verification Procedures</h3><a class="self-link" href="#verification-procedures" aria-label="Permalink for Section 5.6"></a></div>
+
 <p>This section describes how consumers verify the trust metadata
-carried by a Trust Manifest. Verification is OPTIONAL — consumers
+carried by a Trust Manifest. Verification is <em class="rfc2119">OPTIONAL</em> — consumers
 that do not need trust assurance can skip this entirely.</p>
-<section id="digest-format">
-<h3>Digest Format</h3>
+<section id="digest-format"><div class="header-wrapper"><h4 id="x5-6-1-digest-format"><bdi class="secno">5.6.1 </bdi>Digest Format</h4><a class="self-link" href="#digest-format" aria-label="Permalink for Section 5.6.1"></a></div>
+
 <p>Digests in this specification use the format <code>algorithm:hex-value</code>,
 where <code>algorithm</code> is a hash algorithm identifier and <code>hex-value</code> is
 the lowercase hexadecimal encoding of the hash output. For example:</p>
-<pre><code>sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+<pre><code aria-busy="false" class="hljs">sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
 </code></pre>
-<p>Producers SHOULD use SHA-256 [[RFC6234]] or stronger. Consumers
-MUST reject digest values using algorithms shorter than SHA-256.</p>
+<p>Producers <em class="rfc2119">SHOULD</em> use SHA-256 [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc6234" title="US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)">RFC6234</a></cite>] or stronger. Consumers
+<em class="rfc2119">MUST</em> reject digest values using algorithms shorter than SHA-256.</p>
 </section>
-<section id="trust-manifest-signatures">
-<h3>Trust Manifest Signatures</h3>
-<p>The <code>signature</code> field carries a detached JWS [[RFC7515]] computed
+<section id="trust-manifest-signatures"><div class="header-wrapper"><h4 id="x5-6-2-trust-manifest-signatures"><bdi class="secno">5.6.2 </bdi>Trust Manifest Signatures</h4><a class="self-link" href="#trust-manifest-signatures" aria-label="Permalink for Section 5.6.2"></a></div>
+
+<p>The <code>signature</code> field carries a detached JWS [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc7515" title="JSON Web Signature (JWS)">RFC7515</a></cite>] computed
 over the Trust Manifest content. To create or verify a signature:</p>
 <ol>
 <li><strong>Canonicalize</strong> the Trust Manifest JSON using JCS (JSON
-   Canonicalization Scheme) [[RFC8785]]. Remove the <code>signature</code>
+   Canonicalization Scheme) [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8785" title="JSON Canonicalization Scheme (JCS)">RFC8785</a></cite>]. Remove the <code>signature</code>
    field itself before canonicalization.</li>
 <li><strong>Sign</strong> (or verify) the canonical bytes as a detached JWS
    payload using the publisher's private (or public) key.</li>
@@ -673,8 +853,8 @@ over the Trust Manifest content. To create or verify a signature:</p>
 key ordering or whitespace, and can be verified independently of the
 artifact content.</p>
 </section>
-<section id="key-resolution">
-<h3>Key Resolution</h3>
+<section id="key-resolution"><div class="header-wrapper"><h4 id="x5-6-3-key-resolution"><bdi class="secno">5.6.3 </bdi>Key Resolution</h4><a class="self-link" href="#key-resolution" aria-label="Permalink for Section 5.6.3"></a></div>
+
 <p>Consumers resolve the signer's public key based on the <code>identity</code>
 URI scheme:</p>
 <dl>
@@ -683,7 +863,7 @@ URI scheme:</p>
   and extract the verification key from the <code>verificationMethod</code>
   array.</dd>
 <dt>HTTPS URL (e.g., <code>https://example.com/.well-known/jwks.json</code>)</dt>
-<dd>Fetch the JWK Set [[RFC7517]] at the specified URL and select the
+<dd>Fetch the JWK Set [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc7517" title="JSON Web Key (JWK)">RFC7517</a></cite>] at the specified URL and select the
   key matching the JWS <code>kid</code> header.</dd>
 <dt>SPIFFE ID (e.g., <code>spiffe://example.com/service</code>)</dt>
 <dd>Obtain the X.509 SVID from the SPIFFE Workload API and extract
@@ -693,8 +873,8 @@ URI scheme:</p>
   or look up a DNSKEY/TXT record containing the JWK thumbprint.</dd>
 </dl>
 </section>
-<section id="verifying-host-identity">
-<h3>Verifying Host Identity</h3>
+<section id="verifying-host-identity"><div class="header-wrapper"><h4 id="x5-6-4-verifying-host-identity"><bdi class="secno">5.6.4 </bdi>Verifying Host Identity</h4><a class="self-link" href="#verifying-host-identity" aria-label="Permalink for Section 5.6.4"></a></div>
+
 <p>To verify the host of a catalog:</p>
 <ol>
 <li>Confirm the catalog was retrieved over HTTPS from the expected
@@ -705,8 +885,8 @@ URI scheme:</p>
    signature as described above.</li>
 </ol>
 </section>
-<section id="verifying-publisher-identity">
-<h3>Verifying Publisher Identity</h3>
+<section id="verifying-publisher-identity"><div class="header-wrapper"><h4 id="x5-6-5-verifying-publisher-identity"><bdi class="secno">5.6.5 </bdi>Verifying Publisher Identity</h4><a class="self-link" href="#verifying-publisher-identity" aria-label="Permalink for Section 5.6.5"></a></div>
+
 <p>To verify the publisher of an artifact:</p>
 <ol>
 <li>Locate the <code>publisher-identity</code> attestation in the Trust
@@ -718,8 +898,8 @@ URI scheme:</p>
    Manifest's <code>identity</code>.</li>
 </ol>
 </section>
-<section id="verifying-artifact-integrity">
-<h3>Verifying Artifact Integrity</h3>
+<section id="verifying-artifact-integrity"><div class="header-wrapper"><h4 id="x5-6-6-verifying-artifact-integrity"><bdi class="secno">5.6.6 </bdi>Verifying Artifact Integrity</h4><a class="self-link" href="#verifying-artifact-integrity" aria-label="Permalink for Section 5.6.6"></a></div>
+
 <p>When a Trust Manifest includes <code>provenance</code> entries with <code>sourceDigest</code>:</p>
 <ol>
 <li>Fetch the artifact content from the entry's <code>url</code>.</li>
@@ -729,8 +909,8 @@ URI scheme:</p>
    artifact if they differ.</li>
 </ol>
 </section>
-<section id="verifying-attestations">
-<h3>Verifying Attestations</h3>
+<section id="verifying-attestations"><div class="header-wrapper"><h4 id="x5-6-7-verifying-attestations"><bdi class="secno">5.6.7 </bdi>Verifying Attestations</h4><a class="self-link" href="#verifying-attestations" aria-label="Permalink for Section 5.6.7"></a></div>
+
 <p>For each attestation in the <code>attestations</code> array:</p>
 <ol>
 <li>Fetch the attestation document from <code>uri</code>.</li>
@@ -742,14 +922,14 @@ URI scheme:</p>
 </section>
 </section>
 </section>
-<section id="organizing-catalogs">
-<h1>Organizing Catalogs</h1>
+<section id="organizing-catalogs"><div class="header-wrapper"><h2 id="x6-organizing-catalogs"><bdi class="secno">6. </bdi>Organizing Catalogs</h2><a class="self-link" href="#organizing-catalogs" aria-label="Permalink for Section 6."></a></div>
+
 <p>As catalogs grow, a flat list of entries becomes unwieldy. Because any
 catalog entry can have a <code>mediaType</code> of <code>application/ai-catalog+json</code>,
 catalogs are naturally composable — an entry can reference or inline
 another AI Catalog, creating a hierarchy of any depth.</p>
-<section id="nested-catalog-entries">
-<h2>Nested Catalog Entries</h2>
+<section id="nested-catalog-entries"><div class="header-wrapper"><h3 id="x6-1-nested-catalog-entries"><bdi class="secno">6.1 </bdi>Nested Catalog Entries</h3><a class="self-link" href="#nested-catalog-entries" aria-label="Permalink for Section 6.1"></a></div>
+
 <p>A catalog entry whose <code>mediaType</code> is <code>application/ai-catalog+json</code>
 references (via <code>url</code>) or embeds (via <code>data</code>) another AI Catalog
 document. This mechanism supports two complementary use cases:</p>
@@ -757,30 +937,30 @@ document. This mechanism supports two complementary use cases:</p>
 can partition its catalog into sub-catalogs by department, product line,
 or region. Each sub-catalog is an independent AI Catalog document with
 its own <code>host</code> and entries:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;host&quot;: {
-    &quot;displayName&quot;: &quot;Acme Enterprise AI&quot;,
-    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme Enterprise AI",
+    "identifier": "did:web:acme-corp.com"
   },
-  &quot;entries&quot;: [
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:finance&quot;,
-      &quot;displayName&quot;: &quot;Finance Services&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;url&quot;: &quot;https://acme.com/catalogs/finance.json&quot;
+      "identifier": "urn:acme:catalog:finance",
+      "displayName": "Finance Services",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/finance.json"
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:ml&quot;,
-      &quot;displayName&quot;: &quot;ML Models&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;url&quot;: &quot;https://acme.com/catalogs/ml.json&quot;
+      "identifier": "urn:acme:catalog:ml",
+      "displayName": "ML Models",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/ml.json"
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:devops&quot;,
-      &quot;displayName&quot;: &quot;DevOps Tools&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;url&quot;: &quot;https://acme.com/catalogs/devops.json&quot;
+      "identifier": "urn:acme:catalog:devops",
+      "displayName": "DevOps Tools",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/devops.json"
     }
   ]
 }
@@ -789,14 +969,14 @@ its own <code>host</code> and entries:</p>
 a nested catalog may be interpreted as a set of items that could be
 acquired as a unit. For example, a finance plugin that ships an A2A
 agent, an MCP server, and a dataset together:</p>
-<pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
-  &quot;displayName&quot;: &quot;Finance Plugin&quot;,
-  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-  &quot;url&quot;: &quot;https://acme.com/plugins/finance-suite.json&quot;,
-  &quot;publisher&quot;: {
-    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-    &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identifier": "urn:acme:plugin:finance-suite",
+  "displayName": "Finance Plugin",
+  "mediaType": "application/ai-catalog+json",
+  "url": "https://acme.com/plugins/finance-suite.json",
+  "publisher": {
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
   }
 }
 </code></pre>
@@ -804,66 +984,147 @@ agent, an MCP server, and a dataset together:</p>
 the A2A agent, MCP server, and dataset entries.</p>
 <p>A nested catalog entry is a regular catalog entry — it has an
 <code>identifier</code>, may carry a <code>trustManifest</code>, and may include a
-<code>publisher</code>. An entry inside a nested catalog MAY reuse the same
+<code>publisher</code>. An entry inside a nested catalog <em class="rfc2119">MAY</em> reuse the same
 <code>identifier</code> as an entry elsewhere; this indicates the same logical
 artifact.</p>
-<p>Clients processing nested catalogs SHOULD impose a maximum nesting
+<p>Clients processing nested catalogs <em class="rfc2119">SHOULD</em> impose a maximum nesting
 depth to prevent circular references. A depth limit of 4 is
-RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
+<em class="rfc2119">RECOMMENDED</em>. Implementations <em class="rfc2119">MAY</em> support deeper nesting but <em class="rfc2119">SHOULD</em>
 document their limit.</p>
 </section>
 </section>
-<section id="discovery">
-<h1>Discovery</h1>
-<section id="location-independence">
-<h2>Location Independence</h2>
-<p>An AI Catalog document MAY be served from any URL. It is identified
+<section id="metadata-extensibility"><div class="header-wrapper"><h2 id="x7-metadata-extensibility"><bdi class="secno">7. </bdi>Metadata Extensibility</h2><a class="self-link" href="#metadata-extensibility" aria-label="Permalink for Section 7."></a></div>
+
+<p>The <code>metadata</code> property appears on the AI Catalog top-level object,
+on Catalog Entry objects, and on Trust Manifest objects. It provides
+a single, well-defined extension point for custom or vendor-specific
+properties.</p>
+<section id="key-naming"><div class="header-wrapper"><h3 id="x7-1-key-naming"><bdi class="secno">7.1 </bdi>Key Naming</h3><a class="self-link" href="#key-naming" aria-label="Permalink for Section 7.1"></a></div>
+
+<p>Metadata keys <em class="rfc2119">MUST</em> be non-empty strings. To avoid collisions between
+independent publishers, the following conventions are <em class="rfc2119">RECOMMENDED</em>:</p>
+<ul>
+<li><strong>Reverse-DNS prefix</strong> for vendor-specific keys:
+  <code>com.example.confidenceScore</code>, <code>io.acme.deploymentRegion</code>.</li>
+<li><strong>Short, unqualified names</strong> for keys the publisher considers
+  broadly useful and unlikely to conflict: <code>repository</code>, <code>homepage</code>,
+  <code>license</code>.</li>
+<li><strong>Avoid keys that duplicate</strong> defined catalog fields (<code>displayName</code>,
+  <code>description</code>, <code>tags</code>, <code>version</code>). Consumers <em class="rfc2119">MAY</em> ignore metadata
+  entries that shadow standard fields.</li>
+</ul>
+</section>
+<section id="reserved-keys"><div class="header-wrapper"><h3 id="x7-2-reserved-keys"><bdi class="secno">7.2 </bdi>Reserved Keys</h3><a class="self-link" href="#reserved-keys" aria-label="Permalink for Section 7.2"></a></div>
+
+<p>No metadata keys are reserved by this specification. Future
+specification versions <em class="rfc2119">MAY</em> promote commonly used metadata keys into
+standard fields. When this occurs, the metadata key <em class="rfc2119">SHOULD</em> be
+retained for backward compatibility and the standard field takes
+precedence.</p>
+</section>
+<section id="value-types"><div class="header-wrapper"><h3 id="x7-3-value-types"><bdi class="secno">7.3 </bdi>Value Types</h3><a class="self-link" href="#value-types" aria-label="Permalink for Section 7.3"></a></div>
+
+<p>Metadata values <em class="rfc2119">MAY</em> be any valid JSON type (string, number, boolean,
+array, object, null). Consumers that do not recognize a metadata key
+<em class="rfc2119">SHOULD</em> ignore it.</p>
+</section>
+</section>
+<section id="version-handling"><div class="header-wrapper"><h2 id="x8-version-handling"><bdi class="secno">8. </bdi>Version Handling</h2><a class="self-link" href="#version-handling" aria-label="Permalink for Section 8."></a></div>
+
+<p>The <code>specVersion</code> field identifies which version of this specification
+a catalog conforms to. This section defines how producers and consumers
+handle version differences.</p>
+<section id="version-format"><div class="header-wrapper"><h3 id="x8-1-version-format"><bdi class="secno">8.1 </bdi>Version Format</h3><a class="self-link" href="#version-format" aria-label="Permalink for Section 8.1"></a></div>
+
+<p>The <code>specVersion</code> value is a "Major.Minor" string (e.g., "1.0",
+"1.1", "2.0"). Major and minor components are non-negative integers.</p>
+</section>
+<section id="compatibility-rules"><div class="header-wrapper"><h3 id="x8-2-compatibility-rules"><bdi class="secno">8.2 </bdi>Compatibility Rules</h3><a class="self-link" href="#compatibility-rules" aria-label="Permalink for Section 8.2"></a></div>
+
+<dl>
+<dt>Minor version increments (e.g., 1.0 → 1.1)</dt>
+<dd>The specification adds new <em class="rfc2119">OPTIONAL</em> fields or features. Documents
+  conforming to a higher minor version are backward-compatible with
+  consumers that understand the same major version. Consumers <em class="rfc2119">MUST</em>
+  ignore unrecognized fields.</dd>
+<dt>Major version increments (e.g., 1.x → 2.0)</dt>
+<dd>The specification introduces breaking changes (removed fields,
+  changed semantics, new required fields). Consumers that do not
+  support the major version <em class="rfc2119">SHOULD</em> reject the document with an
+  informative error rather than silently misinterpreting it.</dd>
+</dl>
+</section>
+<section id="consumer-behavior"><div class="header-wrapper"><h3 id="x8-3-consumer-behavior"><bdi class="secno">8.3 </bdi>Consumer Behavior</h3><a class="self-link" href="#consumer-behavior" aria-label="Permalink for Section 8.3"></a></div>
+
+<p>Consumers <em class="rfc2119">SHOULD</em>:</p>
+<ul>
+<li>Parse the <code>specVersion</code> field before processing the document.</li>
+<li>Accept documents whose major version matches their supported major
+  version, regardless of minor version differences.</li>
+<li>Ignore unrecognized fields (forward compatibility within a major
+  version).</li>
+<li>Reject documents whose major version is higher than the highest
+  major version they support, with an informative error message.</li>
+</ul>
+</section>
+<section id="producer-behavior"><div class="header-wrapper"><h3 id="x8-4-producer-behavior"><bdi class="secno">8.4 </bdi>Producer Behavior</h3><a class="self-link" href="#producer-behavior" aria-label="Permalink for Section 8.4"></a></div>
+
+<p>Producers <em class="rfc2119">MUST</em> set <code>specVersion</code> to the version of this specification
+they implement. Producers <em class="rfc2119">SHOULD NOT</em> set <code>specVersion</code> to a version
+higher than they actually conform to.</p>
+</section>
+</section>
+<section id="discovery"><div class="header-wrapper"><h2 id="x9-discovery"><bdi class="secno">9. </bdi>Discovery</h2><a class="self-link" href="#discovery" aria-label="Permalink for Section 9."></a></div>
+
+<section id="location-independence"><div class="header-wrapper"><h3 id="x9-1-location-independence"><bdi class="secno">9.1 </bdi>Location Independence</h3><a class="self-link" href="#location-independence" aria-label="Permalink for Section 9.1"></a></div>
+
+<p>An AI Catalog document <em class="rfc2119">MAY</em> be served from any URL. It is identified
 by its media type (<code>application/ai-catalog+json</code>) and its <code>specVersion</code>
 field, not by its URL path. Catalogs are equally valid when hosted at
 an arbitrary path, embedded in a registry response, packaged in an
 archive, or distributed as a local file.</p>
-<p>When served over HTTP, the document SHOULD be served with the media
+<p>When served over HTTP, the document <em class="rfc2119">SHOULD</em> be served with the media
 type <code>application/ai-catalog+json</code>.</p>
 </section>
-<section id="well-known-uri">
-<h2>Well-Known URI</h2>
-<p>To support automated discovery, hosts MAY serve an AI Catalog at the
-following well-known URI [[RFC8615]]:</p>
-<pre><code>/.well-known/ai-catalog.json
+<section id="well-known-uri"><div class="header-wrapper"><h3 id="x9-2-well-known-uri"><bdi class="secno">9.2 </bdi>Well-Known URI</h3><a class="self-link" href="#well-known-uri" aria-label="Permalink for Section 9.2"></a></div>
+
+<p>To support automated discovery, hosts <em class="rfc2119">MAY</em> serve an AI Catalog at the
+following well-known URI [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8615" title="Well-Known Uniform Resource Identifiers (URIs)">RFC8615</a></cite>]:</p>
+<pre><code aria-busy="false" class="hljs">/.well-known/ai-catalog.json
 </code></pre>
-<p>Clients performing domain-level discovery SHOULD attempt to retrieve
+<p>Clients performing domain-level discovery <em class="rfc2119">SHOULD</em> attempt to retrieve
 this well-known URL. If a valid AI Catalog document is returned, the
-client SHOULD use the <code>url</code> entries to retrieve individual artifacts
+client <em class="rfc2119">SHOULD</em> use the <code>url</code> entries to retrieve individual artifacts
 and their associated Trust Manifests.</p>
-<p>Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
+<p>Use of the well-known URI is <em class="rfc2119">OPTIONAL</em>. Hosts that publish catalogs at
 other locations (e.g., as part of an API response or a package
 registry) are fully conformant.</p>
 </section>
-<section id="dynamic-discovery">
-<h2>Dynamic Discovery</h2>
-<p>Implementing protocols MAY support dynamic catalog generation through
+<section id="dynamic-discovery"><div class="header-wrapper"><h3 id="x9-3-dynamic-discovery"><bdi class="secno">9.3 </bdi>Dynamic Discovery</h3><a class="self-link" href="#dynamic-discovery" aria-label="Permalink for Section 9.3"></a></div>
+
+<p>Implementing protocols <em class="rfc2119">MAY</em> support dynamic catalog generation through
 their own mechanisms, such as providing different catalog content based
 on a caller's identity or query parameters. Defining dynamic discovery
 behavior is out of scope for this specification.</p>
 </section>
-<section id="link-relation-discovery">
-<h2>Link Relation Discovery</h2>
-<p>Websites MAY advertise their AI Catalog by including an <code>ai-catalog</code>
+<section id="link-relation-discovery"><div class="header-wrapper"><h3 id="x9-4-link-relation-discovery"><bdi class="secno">9.4 </bdi>Link Relation Discovery</h3><a class="self-link" href="#link-relation-discovery" aria-label="Permalink for Section 9.4"></a></div>
+
+<p>Websites <em class="rfc2119">MAY</em> advertise their AI Catalog by including an <code>ai-catalog</code>
 link relation in HTTP responses or HTML documents. This enables AI
 agents, crawlers, and other automated clients to discover the catalog
 associated with any website without prior knowledge of its location.</p>
-<p><strong>HTTP Link header.</strong> A server MAY include a <code>Link</code> header [[RFC8288]]
+<p><strong>HTTP Link header.</strong> A server <em class="rfc2119">MAY</em> include a <code>Link</code> header [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8288" title="Web Linking">RFC8288</a></cite>]
 in HTTP responses:</p>
-<pre><code>Link: &lt;https://example.com/catalog/ai.json&gt;; rel="ai-catalog"
+<pre><code aria-busy="false" class="hljs http"><span class="hljs-attribute">Link</span><span class="hljs-punctuation">: </span>&lt;https://example.com/catalog/ai.json&gt;; rel="ai-catalog"
 </code></pre>
-<p><strong>HTML <code>&lt;link&gt;</code> element.</strong> An HTML page MAY include a link element in
+<p><strong>HTML <code>&lt;link&gt;</code> element.</strong> An HTML page <em class="rfc2119">MAY</em> include a link element in
 the document head:</p>
-<pre><code class="language-html">&lt;link rel=&quot;ai-catalog&quot; href=&quot;/catalog/ai.json&quot;
-      type=&quot;application/ai-catalog+json&quot;&gt;
+<pre><code class="language-html hljs" aria-busy="false">&lt;link rel="ai-catalog" href="/catalog/ai.json"
+      type="application/ai-catalog+json"&gt;
 </code></pre>
 <p><strong>Agent-driven discovery.</strong> AI agents that interact with websites
 (for example, agents following user instructions to "find tools on
-this site" or browsing on behalf of a user) SHOULD check for the
+this site" or browsing on behalf of a user) <em class="rfc2119">SHOULD</em> check for the
 <code>ai-catalog</code> link relation on the target website. The discovery
 procedure is:</p>
 <ol>
@@ -884,13 +1145,13 @@ and services to visiting agents through a standard, machine-readable
 pointer — without requiring changes to the site's visible content.</p>
 </section>
 </section>
-<section id="conformance-levels">
-<h1>Conformance Levels</h1>
+<section id="conformance-levels"><div class="header-wrapper"><h2 id="x10-conformance-levels"><bdi class="secno">10. </bdi>Conformance Levels</h2><a class="self-link" href="#conformance-levels" aria-label="Permalink for Section 10."></a></div>
+
 <p>This specification defines three conformance levels. Each level builds
-on the previous one. Implementations MUST satisfy all requirements of
+on the previous one. Implementations <em class="rfc2119">MUST</em> satisfy all requirements of
 their declared level.</p>
-<section id="level-1-minimal-catalog">
-<h2>Level 1: Minimal Catalog</h2>
+<section id="level-1-minimal-catalog"><div class="header-wrapper"><h3 id="x10-1-level-1-minimal-catalog"><bdi class="secno">10.1 </bdi>Level 1: Minimal Catalog</h3><a class="self-link" href="#level-1-minimal-catalog" aria-label="Permalink for Section 10.1"></a></div>
+
 <p>A conformant Minimal Catalog is a JSON document with media type
 <code>application/ai-catalog+json</code> that contains:</p>
 <ul>
@@ -900,125 +1161,148 @@ their declared level.</p>
   <code>data</code></li>
 </ul>
 <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
-<code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
+<code>metadata</code>) are <em class="rfc2119">OPTIONAL</em>. This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents.</p>
 </section>
-<section id="level-2-discoverable-catalog">
-<h2>Level 2: Discoverable Catalog</h2>
+<section id="level-2-discoverable-catalog"><div class="header-wrapper"><h3 id="x10-2-level-2-discoverable-catalog"><bdi class="secno">10.2 </bdi>Level 2: Discoverable Catalog</h3><a class="self-link" href="#level-2-discoverable-catalog" aria-label="Permalink for Section 10.2"></a></div>
+
 <p>In addition to Level 1 requirements, a Discoverable Catalog:</p>
 <ul>
 <li>Includes a <code>host</code> object identifying the catalog operator</li>
-<li>MAY be served at the well-known URI <code>/.well-known/ai-catalog.json</code>
+<li><em class="rfc2119">MAY</em> be served at the well-known URI <code>/.well-known/ai-catalog.json</code>
   to enable automated domain-level discovery</li>
 </ul>
 </section>
-<section id="level-3-trusted-catalog">
-<h2>Level 3: Trusted Catalog</h2>
+<section id="level-3-trusted-catalog"><div class="header-wrapper"><h3 id="x10-3-level-3-trusted-catalog"><bdi class="secno">10.3 </bdi>Level 3: Trusted Catalog</h3><a class="self-link" href="#level-3-trusted-catalog" aria-label="Permalink for Section 10.3"></a></div>
+
 <p>In addition to Level 2 requirements, a Trusted Catalog:</p>
 <ul>
 <li>Includes <code>trustManifest</code> objects on entries and/or the host, as
   defined in <a href="#trust-manifest">Trust Manifest</a></li>
-<li>MAY include <code>publisher</code> objects on entries with verifiable identifiers</li>
+<li><em class="rfc2119">MAY</em> include <code>publisher</code> objects on entries with verifiable identifiers</li>
 <li>Enables verifiable identity, compliance attestations, and provenance
   tracking</li>
 </ul>
 <p>Implementations at any level are fully conformant with this
-specification. Consumers MAY ignore fields defined at higher
-conformance levels and SHOULD gracefully handle their absence.</p>
+specification. Consumers <em class="rfc2119">MAY</em> ignore fields defined at higher
+conformance levels and <em class="rfc2119">SHOULD</em> gracefully handle their absence.</p>
 </section>
 </section>
-<section id="security-considerations">
-<h1>Security Considerations</h1>
-<section id="transport-security">
-<h2>Transport Security</h2>
-<p>AI Catalogs, artifacts, and Trust Manifests MUST be served over HTTPS
+<section id="security-considerations"><div class="header-wrapper"><h2 id="x11-security-considerations"><bdi class="secno">11. </bdi>Security Considerations</h2><a class="self-link" href="#security-considerations" aria-label="Permalink for Section 11."></a></div>
+
+<section id="transport-security"><div class="header-wrapper"><h3 id="x11-1-transport-security"><bdi class="secno">11.1 </bdi>Transport Security</h3><a class="self-link" href="#transport-security" aria-label="Permalink for Section 11.1"></a></div>
+
+<p>AI Catalogs, artifacts, and Trust Manifests <em class="rfc2119">MUST</em> be served over HTTPS
 (TLS 1.2 or later) to prevent tampering and eavesdropping.</p>
 </section>
-<section id="nested-catalog-depth">
-<h2>Nested Catalog Depth</h2>
-<p>Clients processing nested catalogs MUST enforce a maximum recursion
+<section id="nested-catalog-depth-and-circular-references"><div class="header-wrapper"><h3 id="x11-2-nested-catalog-depth-and-circular-references"><bdi class="secno">11.2 </bdi>Nested Catalog Depth and Circular References</h3><a class="self-link" href="#nested-catalog-depth-and-circular-references" aria-label="Permalink for Section 11.2"></a></div>
+
+<p>Clients processing nested catalogs <em class="rfc2119">MUST</em> enforce a maximum recursion
 depth to prevent denial-of-service attacks via deeply nested or
-circular catalog references. A maximum depth of 4 is RECOMMENDED.</p>
+circular catalog references. A maximum depth of 4 is <em class="rfc2119">RECOMMENDED</em>.</p>
+<p>Depth limits alone do not prevent circular references at shallow
+depths (e.g., Catalog A → Catalog B → Catalog A). Clients <em class="rfc2119">SHOULD</em>
+track the set of catalog URLs visited during recursive resolution and
+reject any catalog URL that has already been fetched in the current
+traversal path.</p>
 </section>
-<section id="privacy-considerations">
-<h2>Privacy Considerations</h2>
-<p>Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
-information through image fetch requests. Publishers SHOULD carefully
+<section id="trust-manifest-substitution"><div class="header-wrapper"><h3 id="x11-3-trust-manifest-substitution"><bdi class="secno">11.3 </bdi>Trust Manifest Substitution</h3><a class="self-link" href="#trust-manifest-substitution" aria-label="Permalink for Section 11.3"></a></div>
+
+<p>Because the Trust Manifest is a peer element alongside the artifact
+reference (not embedded within the artifact itself), an attacker who
+controls the catalog document can substitute a different Trust Manifest
+for any entry. This is a real and significant threat.</p>
+<p>Mitigations include:</p>
+<ul>
+<li><strong>Content-addressed references</strong>: When distributing catalogs through
+  OCI registries, Trust Manifests are bound to entry manifests by
+  digest. Substitution is detectable because the digest changes.</li>
+<li><strong>Signed Trust Manifests</strong>: The <code>signature</code> field on a Trust Manifest
+  provides integrity verification independent of the transport. Consumers
+  <em class="rfc2119">SHOULD</em> verify signatures when present and reject Trust Manifests whose
+  signature does not validate.</li>
+<li><strong>Identity binding</strong>: The requirement that Trust Manifest <code>identity</code>
+  <em class="rfc2119">MUST</em> match the entry's <code>identifier</code> prevents transplanting a Trust
+  Manifest from one entry to another.</li>
+</ul>
+<p>Consumers that rely on trust metadata for security decisions <em class="rfc2119">SHOULD NOT</em> trust unsigned Trust Manifests served over plain HTTPS without
+additional verification (e.g., fetching the attestation documents
+independently and verifying their signatures).</p>
+</section>
+<section id="catalog-poisoning"><div class="header-wrapper"><h3 id="x11-4-catalog-poisoning"><bdi class="secno">11.4 </bdi>Catalog Poisoning</h3><a class="self-link" href="#catalog-poisoning" aria-label="Permalink for Section 11.4"></a></div>
+
+<p>An attacker who can modify a catalog document (e.g., through a
+compromised hosting account or DNS hijack) can redirect consumers to
+malicious artifacts by changing <code>url</code> values or injecting new entries.</p>
+<p>Mitigations include:</p>
+<ul>
+<li>Serving catalogs over HTTPS with proper certificate management.</li>
+<li>Using content-addressed digests in Trust Manifest provenance links
+  so consumers can verify artifact integrity after fetch.</li>
+<li>Deploying catalogs through OCI registries where all content is
+  digest-addressed and signed.</li>
+</ul>
+</section>
+<section id="identifier-typosquatting"><div class="header-wrapper"><h3 id="x11-5-identifier-typosquatting"><bdi class="secno">11.5 </bdi>Identifier Typosquatting</h3><a class="self-link" href="#identifier-typosquatting" aria-label="Permalink for Section 11.5"></a></div>
+
+<p>Catalog entries are identified by URIs/URNs. An attacker can register
+identifiers similar to legitimate ones (e.g., <code>urn:acme:agent:financ</code>
+vs. <code>urn:acme:agent:finance</code>) to trick consumers into using a
+malicious artifact.</p>
+<p>Registries and consumers <em class="rfc2119">SHOULD</em> implement similarity checks on
+identifiers. Publishers <em class="rfc2119">SHOULD</em> use identifiers anchored to domains
+they control (e.g., DIDs or domain-scoped URNs).</p>
+</section>
+<section id="stale-attestations"><div class="header-wrapper"><h3 id="x11-6-stale-attestations"><bdi class="secno">11.6 </bdi>Stale Attestations</h3><a class="self-link" href="#stale-attestations" aria-label="Permalink for Section 11.6"></a></div>
+
+<p>Attestation documents referenced in Trust Manifests have no built-in
+expiry mechanism in this specification. A SOC2 report from a previous
+year may no longer reflect current practices.</p>
+<p>Consumers <em class="rfc2119">SHOULD</em>:</p>
+<ul>
+<li>Check the <code>updatedAt</code> field on catalog entries to assess freshness.</li>
+<li>Independently verify attestation documents are current when making
+  trust decisions.</li>
+<li>Treat attestations as evidence, not guarantees — the attestation
+  indicates a claim was made, not that it remains valid indefinitely.</li>
+</ul>
+<p>Future versions of this specification <em class="rfc2119">MAY</em> add <code>validFrom</code> and
+<code>expiresAt</code> fields to the Attestation object.</p>
+</section>
+<section id="embedded-content-safety"><div class="header-wrapper"><h3 id="x11-7-embedded-content-safety"><bdi class="secno">11.7 </bdi>Embedded Content Safety</h3><a class="self-link" href="#embedded-content-safety" aria-label="Permalink for Section 11.7"></a></div>
+
+<p>When the <code>data</code> field contains embedded artifact content, consumers
+<em class="rfc2119">MUST</em> treat it as untrusted input. In particular:</p>
+<ul>
+<li>Content with HTML or script-capable media types <em class="rfc2119">MUST</em> be sandboxed
+  and <em class="rfc2119">MUST NOT</em> be executed in the consumer's security context.</li>
+<li>Consumers <em class="rfc2119">SHOULD</em> validate that the <code>data</code> content is well-formed
+  JSON (or the expected format for the declared <code>mediaType</code>) before
+  processing.</li>
+</ul>
+</section>
+<section id="privacy-considerations"><div class="header-wrapper"><h3 id="x11-8-privacy-considerations"><bdi class="secno">11.8 </bdi>Privacy Considerations</h3><a class="self-link" href="#privacy-considerations" aria-label="Permalink for Section 11.8"></a></div>
+
+<p>Logo URLs <em class="rfc2119">SHOULD</em> use Data URIs [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc2397" title="The data URL scheme">RFC2397</a></cite>] to avoid leaking client
+information through image fetch requests. Publishers <em class="rfc2119">SHOULD</em> carefully
 consider what information is included in <code>metadata</code> extension fields.</p>
 </section>
 </section>
 
-<section class="appendix" id="data-model-overview">
-<h1>Data Model Overview</h1>
+<section class="appendix" id="data-model-overview"><div class="header-wrapper"><h2 id="a-data-model-overview"><bdi class="secno">A. </bdi>Data Model Overview</h2><a class="self-link" href="#data-model-overview" aria-label="Permalink for Appendix A."></a></div>
+
 <p>The following diagram illustrates the relationships between the
 core objects defined in this specification:</p>
-<pre class="mermaid nohighlight">
-classDiagram
-    class AICatalog {
-        specVersion string
-        entries CatalogEntry[]
-        host HostInfo
-    }
-    class HostInfo {
-        displayName string
-        identifier string
-        trustManifest TrustManifest
-    }
-    class CatalogEntry {
-        identifier string
-        displayName string
-        mediaType string
-        url | data
-        version string
-        publisher Publisher
-        trustManifest TrustManifest
-    }
-    class Publisher {
-        identifier string
-        displayName string
-    }
-    class TrustManifest {
-        identity string
-        trustSchema TrustSchema
-        attestations Attestation[]
-        provenance ProvenanceLink[]
-        signature string
-    }
-    class TrustSchema {
-        identifier string
-        version string
-        verificationMethods string[]
-    }
-    class Attestation {
-        type string
-        uri string
-        mediaType string
-        digest string
-    }
-    class ProvenanceLink {
-        relation string
-        sourceId string
-        sourceDigest string
-    }
-    AICatalog --> "*" CatalogEntry : entries
-    AICatalog --> "0..1" HostInfo : host
-    CatalogEntry --> "0..1" Publisher : publisher
-    CatalogEntry --> "0..1" TrustManifest : trustManifest
-    HostInfo --> "0..1" TrustManifest : trustManifest
-    TrustManifest --> "0..1" TrustSchema : trustSchema
-    TrustManifest --> "*" Attestation : attestations
-    TrustManifest --> "*" ProvenanceLink : provenance
-    CatalogEntry --> "0..1" AICatalog : nested
-</pre>
+<pre class="mermaid nohighlight" data-processed="true"><div id="dmermaid-1775939656162" style="font-family: &quot;trebuchet ms&quot;, verdana, arial, sans-serif;"><svg id="mermaid-1775939656162" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g></g></svg></div></pre>
 
 </section>
-<section class="appendix" id="iana-considerations">
-<h1>IANA Considerations</h1>
-<section id="media-type-registration-applicationai-catalogjson">
-<h2>Media Type Registration: application/ai-catalog+json</h2>
+<section class="appendix" id="iana-considerations"><div class="header-wrapper"><h2 id="b-iana-considerations"><bdi class="secno">B. </bdi>IANA Considerations</h2><a class="self-link" href="#iana-considerations" aria-label="Permalink for Appendix B."></a></div>
+
+<section id="media-type-registration-applicationai-catalogjson"><div class="header-wrapper"><h3 id="b-1-media-type-registration-application-ai-catalog-json"><bdi class="secno">B.1 </bdi>Media Type Registration: application/ai-catalog+json</h3><a class="self-link" href="#media-type-registration-applicationai-catalogjson" aria-label="Permalink for Appendix B.1"></a></div>
+
 <p>This section registers the <code>application/ai-catalog+json</code> media type
-[[RFC6838]] in the "Application" registry.</p>
+[<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc6838" title="Media Type Specifications and Registration Procedures">RFC6838</a></cite>] in the "Application" registry.</p>
 <dl>
 <dt>Type name:</dt>
 <dd>application</dd>
@@ -1029,12 +1313,12 @@ classDiagram
 <dt>Optional parameters:</dt>
 <dd>N/A</dd>
 <dt>Encoding considerations:</dt>
-<dd>binary (UTF-8 encoded JSON [[RFC8259]])</dd>
+<dd>binary (UTF-8 encoded JSON [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8259" title="The JavaScript Object Notation (JSON) Data Interchange Format">RFC8259</a></cite>])</dd>
 <dt>Security considerations:</dt>
 <dd>See <a href="#security-considerations">Security Considerations</a> of this document.</dd>
 <dt>Interoperability considerations:</dt>
 <dd>This media type identifies a JSON document conforming to the AI
-  Catalog schema defined in this specification. The document MUST
+  Catalog schema defined in this specification. The document <em class="rfc2119">MUST</em>
   contain <code>specVersion</code> and <code>entries</code> fields.</dd>
 <dt>Published specification:</dt>
 <dd>This document</dd>
@@ -1051,10 +1335,10 @@ classDiagram
 <dd>N/A</dd>
 </dl>
 </section>
-<section id="link-relation-registration-ai-catalog">
-<h2>Link Relation Registration: ai-catalog</h2>
+<section id="link-relation-registration-ai-catalog"><div class="header-wrapper"><h3 id="b-2-link-relation-registration-ai-catalog"><bdi class="secno">B.2 </bdi>Link Relation Registration: ai-catalog</h3><a class="self-link" href="#link-relation-registration-ai-catalog" aria-label="Permalink for Appendix B.2"></a></div>
+
 <p>This section registers the <code>ai-catalog</code> link relation type in the
-IANA "Link Relations" registry [[RFC8288]].</p>
+IANA "Link Relations" registry [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8288" title="Web Linking">RFC8288</a></cite>].</p>
 <dl>
 <dt>Relation Name:</dt>
 <dd>ai-catalog</dd>
@@ -1067,286 +1351,286 @@ IANA "Link Relations" registry [[RFC8288]].</p>
 </dl>
 </section>
 </section>
-<section class="appendix" id="cddl-schema">
-<h1>CDDL Schema</h1>
-<p>The following CDDL [[RFC8610]] defines the normative schema for AI
+<section class="appendix" id="cddl-schema"><div class="header-wrapper"><h2 id="c-cddl-schema"><bdi class="secno">C. </bdi>CDDL Schema</h2><a class="self-link" href="#cddl-schema" aria-label="Permalink for Appendix C."></a></div>
+
+<p>The following CDDL [<cite><a class="bibref" data-link-type="biblio" href="#bib-rfc8610" title="Concise Data Definition Language (CDDL)">RFC8610</a></cite>] defines the normative schema for AI
 Catalog and Trust Manifest documents.</p>
-<section id="ai-catalog">
-<h2>AI Catalog</h2>
-<pre><code>AICatalog = {
-  specVersion: text,
-  ? host: HostInfo,
-  entries: [* CatalogEntry],
-  ? metadata: { * text =&gt; any }
+<section id="ai-catalog"><div class="header-wrapper"><h3 id="c-1-ai-catalog"><bdi class="secno">C.1 </bdi>AI Catalog</h3><a class="self-link" href="#ai-catalog" aria-label="Permalink for Appendix C.1"></a></div>
+
+<pre><code aria-busy="false" class="hljs yaml"><span class="hljs-string">AICatalog</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">specVersion:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">host:</span> <span class="hljs-string">HostInfo</span>,
+  <span class="hljs-attr">entries:</span> [<span class="hljs-string">*</span> <span class="hljs-string">CatalogEntry</span>],
+  <span class="hljs-string">?</span> <span class="hljs-attr">metadata:</span> { <span class="hljs-string">*</span> <span class="hljs-string">text</span> <span class="hljs-string">=&gt;</span> <span class="hljs-string">any</span> }
 }
 
-HostInfo = {
-  displayName: text,
-  ? identifier: text,
-  ? documentationUrl: text,
-  ? logoUrl: text,
-  ? trustManifest: TrustManifest
+<span class="hljs-string">HostInfo</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">displayName:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">identifier:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">documentationUrl:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">logoUrl:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">trustManifest:</span> <span class="hljs-string">TrustManifest</span>
 }
 
-CatalogEntry = {
-  identifier: text,
-  displayName: text,
-  mediaType: text,
-  (url: text // data: any),
-  ? version: text,
-  ? description: text,
-  ? tags: [* text],
-  ? publisher: Publisher,
-  ? trustManifest: TrustManifest,
-  ? updatedAt: tdate,
-  ? metadata: { * text =&gt; any }
+<span class="hljs-string">CatalogEntry</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">identifier:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">displayName:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">mediaType:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">(url:</span> <span class="hljs-attr">text // data:</span> <span class="hljs-string">any)</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">version:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">description:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">tags:</span> [<span class="hljs-string">*</span> <span class="hljs-string">text</span>],
+  <span class="hljs-string">?</span> <span class="hljs-attr">publisher:</span> <span class="hljs-string">Publisher</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">trustManifest:</span> <span class="hljs-string">TrustManifest</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">updatedAt:</span> <span class="hljs-string">tdate</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">metadata:</span> { <span class="hljs-string">*</span> <span class="hljs-string">text</span> <span class="hljs-string">=&gt;</span> <span class="hljs-string">any</span> }
 }
 
-Publisher = {
-  identifier: text,
-  displayName: text,
-  ? identityType: text
+<span class="hljs-string">Publisher</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">identifier:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">displayName:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">identityType:</span> <span class="hljs-string">text</span>
 }
 </code></pre>
 </section>
-<section id="trust-manifest">
-<h2>Trust Manifest</h2>
-<pre><code>TrustManifest = {
-  identity: text,
-  ? identityType: text,
-  ? trustSchema: TrustSchema,
-  ? attestations: [* Attestation],
-  ? provenance: [* ProvenanceLink],
-  ? privacyPolicyUrl: text,
-  ? termsOfServiceUrl: text,
-  ? signature: text,
-  ? metadata: { * text =&gt; any }
+<section id="trust-manifest"><div class="header-wrapper"><h3 id="c-2-trust-manifest"><bdi class="secno">C.2 </bdi>Trust Manifest</h3><a class="self-link" href="#trust-manifest" aria-label="Permalink for Appendix C.2"></a></div>
+
+<pre><code aria-busy="false" class="hljs yaml"><span class="hljs-string">TrustManifest</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">identity:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">identityType:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">trustSchema:</span> <span class="hljs-string">TrustSchema</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">attestations:</span> [<span class="hljs-string">*</span> <span class="hljs-string">Attestation</span>],
+  <span class="hljs-string">?</span> <span class="hljs-attr">provenance:</span> [<span class="hljs-string">*</span> <span class="hljs-string">ProvenanceLink</span>],
+  <span class="hljs-string">?</span> <span class="hljs-attr">privacyPolicyUrl:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">termsOfServiceUrl:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">signature:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">metadata:</span> { <span class="hljs-string">*</span> <span class="hljs-string">text</span> <span class="hljs-string">=&gt;</span> <span class="hljs-string">any</span> }
 }
 
-TrustSchema = {
-  identifier: text,
-  version: text,
-  ? governanceUri: text,
-  ? verificationMethods: [* text]
+<span class="hljs-string">TrustSchema</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">identifier:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">version:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">governanceUri:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">verificationMethods:</span> [<span class="hljs-string">*</span> <span class="hljs-string">text</span>]
 }
 
-Attestation = {
-  type: text,
-  uri: text,
-  mediaType: text,
-  ? digest: text,
-  ? size: uint,
-  ? description: text
+<span class="hljs-string">Attestation</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">type:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">uri:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">mediaType:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">digest:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">size:</span> <span class="hljs-string">uint</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">description:</span> <span class="hljs-string">text</span>
 }
 
-ProvenanceLink = {
-  relation: text,
-  sourceId: text,
-  ? sourceDigest: text,
-  ? registryUri: text,
-  ? statementUri: text,
-  ? signatureRef: text
+<span class="hljs-string">ProvenanceLink</span> <span class="hljs-string">=</span> {
+  <span class="hljs-attr">relation:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-attr">sourceId:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">sourceDigest:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">registryUri:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">statementUri:</span> <span class="hljs-string">text</span>,
+  <span class="hljs-string">?</span> <span class="hljs-attr">signatureRef:</span> <span class="hljs-string">text</span>
 }
 </code></pre>
 </section>
 </section>
-<section class="appendix" id="example-multi-artifact-catalog-with-nested-catalog">
-<h1>Example: Multi-Artifact Catalog with Nested Catalog</h1>
+<section class="appendix" id="example-multi-artifact-catalog-with-nested-catalog"><div class="header-wrapper"><h2 id="d-example-multi-artifact-catalog-with-nested-catalog"><bdi class="secno">D. </bdi>Example: Multi-Artifact Catalog with Nested Catalog</h2><a class="self-link" href="#example-multi-artifact-catalog-with-nested-catalog" aria-label="Permalink for Appendix D."></a></div>
+
 <p>The following example shows an AI Catalog that contains a mix of
 artifact types including a nested catalog packaging related artifacts:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;host&quot;: {
-    &quot;displayName&quot;: &quot;Acme Services Inc.&quot;,
-    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-    &quot;documentationUrl&quot;: &quot;https://docs.acme-corp.com/ai&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme Services Inc.",
+    "identifier": "did:web:acme-corp.com",
+    "documentationUrl": "https://docs.acme-corp.com/ai"
   },
-  &quot;entries&quot;: [
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
-      &quot;version&quot;: &quot;2.1.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;,
-      &quot;description&quot;: &quot;A2A agent for financial workflows.&quot;,
-      &quot;tags&quot;: [&quot;finance&quot;, &quot;a2a&quot;],
-      &quot;publisher&quot;: {
-        &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-        &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+      "identifier": "urn:acme:agent:finance-a2a",
+      "displayName": "Acme Finance A2A Agent",
+      "version": "2.1.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance.json",
+      "description": "A2A agent for financial workflows.",
+      "tags": ["finance", "a2a"],
+      "publisher": {
+        "identifier": "did:web:acme-corp.com",
+        "displayName": "Acme Financial Corp"
       },
-      &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
-        &quot;attestations&quot;: [
+      "trustManifest": {
+        "identity": "urn:acme:agent:finance-a2a",
+        "attestations": [
           {
-            &quot;type&quot;: &quot;publisher-identity&quot;,
-            &quot;uri&quot;: &quot;https://trust.acme.com/certs/publisher.jwt&quot;,
-            &quot;mediaType&quot;: &quot;application/jwt&quot;,
-            &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
+            "type": "publisher-identity",
+            "uri": "https://trust.acme.com/certs/publisher.jwt",
+            "mediaType": "application/jwt",
+            "description": "Verifies did:web:acme-corp.com as publisher"
           },
           {
-            &quot;type&quot;: &quot;SOC2-Type2&quot;,
-            &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
-            &quot;mediaType&quot;: &quot;application/pdf&quot;,
-            &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+            "type": "SOC2-Type2",
+            "uri": "https://trust.acme.com/reports/soc2.pdf",
+            "mediaType": "application/pdf",
+            "digest": "sha256:a1b2c3d4e5f6"
           }
         ],
-        &quot;privacyPolicyUrl&quot;: &quot;https://acme.com/legal/privacy&quot;,
-        &quot;termsOfServiceUrl&quot;: &quot;https://acme.com/legal/terms&quot;
+        "privacyPolicyUrl": "https://acme.com/legal/privacy",
+        "termsOfServiceUrl": "https://acme.com/legal/terms"
       },
-      &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-      &quot;version&quot;: &quot;1.4.0&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-      &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
-      &quot;description&quot;: &quot;MCP server with finance tools.&quot;,
-      &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
-      &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+      "identifier": "urn:acme:server:finance-mcp",
+      "displayName": "Acme Finance MCP Server",
+      "version": "1.4.0",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+      "description": "MCP server with finance tools.",
+      "tags": ["finance", "mcp"],
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance Suite&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;description&quot;: &quot;A2A agent + MCP server + dataset for finance workflows.&quot;,
-      &quot;tags&quot;: [&quot;finance&quot;, &quot;suite&quot;],
-      &quot;data&quot;: {
-        &quot;specVersion&quot;: &quot;1.0&quot;,
-        &quot;entries&quot;: [
+      "identifier": "urn:acme:plugin:finance-suite",
+      "displayName": "Acme Finance Suite",
+      "mediaType": "application/ai-catalog+json",
+      "description": "A2A agent + MCP server + dataset for finance workflows.",
+      "tags": ["finance", "suite"],
+      "data": {
+        "specVersion": "1.0",
+        "entries": [
           {
-            &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
-            &quot;displayName&quot;: &quot;Finance A2A Agent&quot;,
-            &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-            &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;
+            "identifier": "urn:acme:agent:finance-a2a",
+            "displayName": "Finance A2A Agent",
+            "mediaType": "application/a2a-agent-card+json",
+            "url": "https://api.acme-corp.com/agents/finance.json"
           },
           {
-            &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
-            &quot;displayName&quot;: &quot;Finance MCP Server&quot;,
-            &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-            &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
+            "identifier": "urn:acme:server:finance-mcp",
+            "displayName": "Finance MCP Server",
+            "mediaType": "application/mcp-server-card+json",
+            "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
           {
-            &quot;identifier&quot;: &quot;urn:acme:data:market-2026q1&quot;,
-            &quot;displayName&quot;: &quot;Market Dataset Q1 2026&quot;,
-            &quot;mediaType&quot;: &quot;application/parquet&quot;,
-            &quot;url&quot;: &quot;https://data.acme-corp.com/market-2026q1.parquet&quot;,
-            &quot;trustManifest&quot;: {
-              &quot;identity&quot;: &quot;urn:acme:data:market-2026q1&quot;,
-              &quot;provenance&quot;: [
+            "identifier": "urn:acme:data:market-2026q1",
+            "displayName": "Market Dataset Q1 2026",
+            "mediaType": "application/parquet",
+            "url": "https://data.acme-corp.com/market-2026q1.parquet",
+            "trustManifest": {
+              "identity": "urn:acme:data:market-2026q1",
+              "provenance": [
                 {
-                  &quot;relation&quot;: &quot;publishedFrom&quot;,
-                  &quot;sourceId&quot;: &quot;oci://registry.acme.com/data/market:2026q1&quot;,
-                  &quot;sourceDigest&quot;: &quot;sha256:99998888...&quot;
+                  "relation": "publishedFrom",
+                  "sourceId": "oci://registry.acme.com/data/market:2026q1",
+                  "sourceDigest": "sha256:99998888..."
                 }
               ]
             }
           }
         ]
       },
-      &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
-        &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached&quot;
+      "trustManifest": {
+        "identity": "urn:acme:plugin:finance-suite",
+        "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
       },
-      &quot;updatedAt&quot;: &quot;2026-03-20T14:00:00Z&quot;
+      "updatedAt": "2026-03-20T14:00:00Z"
     }
   ]
 }
 </code></pre>
 </section>
-<section class="appendix" id="example-hierarchical-catalog">
-<h1>Example: Hierarchical Catalog</h1>
+<section class="appendix" id="example-hierarchical-catalog"><div class="header-wrapper"><h2 id="e-example-hierarchical-catalog"><bdi class="secno">E. </bdi>Example: Hierarchical Catalog</h2><a class="self-link" href="#example-hierarchical-catalog" aria-label="Permalink for Appendix E."></a></div>
+
 <p>The following example shows how an enterprise uses nested catalog
 entries to organize a large number of artifacts into browsable
 categories. Each sub-catalog entry points to a separate AI Catalog
 document:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;host&quot;: {
-    &quot;displayName&quot;: &quot;Acme Enterprise AI&quot;,
-    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme Enterprise AI",
+    "identifier": "did:web:acme-corp.com"
   },
-  &quot;entries&quot;: [
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:assistant&quot;,
-      &quot;displayName&quot;: &quot;Acme Corporate Assistant&quot;,
-      &quot;version&quot;: &quot;3.0.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/assistant.json&quot;,
-      &quot;description&quot;: &quot;General-purpose corporate assistant agent.&quot;
+      "identifier": "urn:acme:agent:assistant",
+      "displayName": "Acme Corporate Assistant",
+      "version": "3.0.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/assistant.json",
+      "description": "General-purpose corporate assistant agent."
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:finance&quot;,
-      &quot;displayName&quot;: &quot;Finance Services&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;url&quot;: &quot;https://acme-corp.com/catalogs/finance.json&quot;,
-      &quot;description&quot;: &quot;Financial agents, MCP servers, and datasets.&quot;,
-      &quot;tags&quot;: [&quot;finance&quot;, &quot;trading&quot;, &quot;compliance&quot;]
+      "identifier": "urn:acme:catalog:finance",
+      "displayName": "Finance Services",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme-corp.com/catalogs/finance.json",
+      "description": "Financial agents, MCP servers, and datasets.",
+      "tags": ["finance", "trading", "compliance"]
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:engineering&quot;,
-      &quot;displayName&quot;: &quot;Engineering Tools&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;url&quot;: &quot;https://acme-corp.com/catalogs/engineering.json&quot;,
-      &quot;description&quot;: &quot;CI/CD agents, code review tools, and DevOps servers.&quot;,
-      &quot;tags&quot;: [&quot;engineering&quot;, &quot;devops&quot;, &quot;ci-cd&quot;]
+      "identifier": "urn:acme:catalog:engineering",
+      "displayName": "Engineering Tools",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme-corp.com/catalogs/engineering.json",
+      "description": "CI/CD agents, code review tools, and DevOps servers.",
+      "tags": ["engineering", "devops", "ci-cd"]
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:ml-models&quot;,
-      &quot;displayName&quot;: &quot;ML Models&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-      &quot;url&quot;: &quot;https://acme-corp.com/catalogs/ml-models.json&quot;,
-      &quot;description&quot;: &quot;Model cards and inference endpoints.&quot;,
-      &quot;tags&quot;: [&quot;ml&quot;, &quot;models&quot;, &quot;inference&quot;]
+      "identifier": "urn:acme:catalog:ml-models",
+      "displayName": "ML Models",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme-corp.com/catalogs/ml-models.json",
+      "description": "Model cards and inference endpoints.",
+      "tags": ["ml", "models", "inference"]
     }
   ]
 }
 </code></pre>
-<p>A catalog MAY contain both direct artifact entries and nested catalog
+<p>A catalog <em class="rfc2119">MAY</em> contain both direct artifact entries and nested catalog
 entries. In this example, the corporate assistant agent is listed
 directly while department-specific artifacts are organized into child
 catalogs.</p>
 </section>
-<section class="appendix" id="example-dual-protocol-agent-mcp-a2a">
-<h1>Example: Dual-Protocol Agent (MCP + A2A)</h1>
+<section class="appendix" id="example-dual-protocol-agent-mcp-a2a"><div class="header-wrapper"><h2 id="f-example-dual-protocol-agent-mcp-a2a"><bdi class="secno">F. </bdi>Example: Dual-Protocol Agent (MCP + A2A)</h2><a class="self-link" href="#example-dual-protocol-agent-mcp-a2a" aria-label="Permalink for Appendix F."></a></div>
+
 <p>A single agent that supports both MCP and A2A protocols can be
 represented as one catalog entry whose content is a nested catalog
 containing both protocol-specific entries:</p>
-<pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
-  &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
-  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-  &quot;description&quot;: &quot;Finance agent accessible via both MCP and A2A protocols.&quot;,
-  &quot;tags&quot;: [&quot;finance&quot;, &quot;dual-protocol&quot;],
-  &quot;publisher&quot;: {
-    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-    &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identifier": "urn:acme:agent:finance",
+  "displayName": "Acme Finance Agent",
+  "mediaType": "application/ai-catalog+json",
+  "description": "Finance agent accessible via both MCP and A2A protocols.",
+  "tags": ["finance", "dual-protocol"],
+  "publisher": {
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
   },
-  &quot;data&quot;: {
-    &quot;specVersion&quot;: &quot;1.0&quot;,
-    &quot;entries&quot;: [
+  "data": {
+    "specVersion": "1.0",
+    "entries": [
       {
-        &quot;identifier&quot;: &quot;urn:acme:agent:finance:mcp&quot;,
-        &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-        &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-        &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
+        "identifier": "urn:acme:agent:finance:mcp",
+        "displayName": "Acme Finance MCP Server",
+        "mediaType": "application/mcp-server-card+json",
+        "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
       },
       {
-        &quot;identifier&quot;: &quot;urn:acme:agent:finance:a2a&quot;,
-        &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
-        &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-        &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance&quot;
+        "identifier": "urn:acme:agent:finance:a2a",
+        "displayName": "Acme Finance A2A Agent",
+        "mediaType": "application/a2a-agent-card+json",
+        "url": "https://api.acme-corp.com/agents/finance"
       }
     ]
   },
-  &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
-    &quot;attestations&quot;: [
+  "trustManifest": {
+    "identity": "urn:acme:agent:finance",
+    "attestations": [
       {
-        &quot;type&quot;: &quot;SOC2-Type2&quot;,
-        &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;mediaType&quot;: &quot;application/pdf&quot;,
-        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+        "type": "SOC2-Type2",
+        "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+        "mediaType": "application/pdf",
+        "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
   }
@@ -1357,13 +1641,13 @@ artifact with its own trust metadata. The <code>data</code> field inlines a
 catalog with protocol-specific entries, allowing clients to choose
 MCP or A2A based on their capabilities.</p>
 </section>
-<section class="appendix" id="mapping-to-oci-distribution">
-<h1>Mapping to OCI Distribution</h1>
+<section class="appendix" id="mapping-to-oci-distribution"><div class="header-wrapper"><h2 id="g-mapping-to-oci-distribution"><bdi class="secno">G. </bdi>Mapping to OCI Distribution</h2><a class="self-link" href="#mapping-to-oci-distribution" aria-label="Permalink for Appendix G."></a></div>
+
 <p>This appendix describes how AI Catalog documents can be distributed
 through OCI registries, enabling content-addressed storage, signing,
 and replication using existing container infrastructure.</p>
-<section id="logical-format-vs-physical-distribution">
-<h2>Logical Format vs. Physical Distribution</h2>
+<section id="logical-format-vs-physical-distribution"><div class="header-wrapper"><h3 id="g-1-logical-format-vs-physical-distribution"><bdi class="secno">G.1 </bdi>Logical Format vs. Physical Distribution</h3><a class="self-link" href="#logical-format-vs-physical-distribution" aria-label="Permalink for Appendix G.1"></a></div>
+
 <p>The AI Catalog specification defines a <strong>logical format</strong>: a JSON
 document with <code>entries</code>, <code>displayName</code>, <code>mediaType</code>, and <code>trustManifest</code>
 fields that are immediately meaningful to anyone working with AI
@@ -1378,10 +1662,10 @@ container-oriented vocabulary (<code>manifests</code>, <code>layers</code>, <cod
 <p>This specification treats OCI as one distribution option, not as the
 canonical data model. The logical AI Catalog format remains the
 authoring and consumption interface. Tooling bridges the two:</p>
-<pre><code>Authoring                         Distribution                    Consumption
+<pre><code aria-busy="false" class="hljs css">Authoring                         Distribution                    Consumption
 ─────────                         ────────────                    ───────────
-ai-catalog.json    ──pack──►    OCI Registry     ──unpack──►   ai-catalog.json
-  entries[]                       Index/Manifests                  entries[]
+ai-catalog<span class="hljs-selector-class">.json</span>    ──pack──►    OCI Registry     ──unpack──►   ai-catalog<span class="hljs-selector-class">.json</span>
+  entries<span class="hljs-selector-attr">[]</span>                       Index/Manifests                  entries<span class="hljs-selector-attr">[]</span>
   trustManifest                   Referrers                        trustManifest
 </code></pre>
 <p>This separation means:</p>
@@ -1397,8 +1681,8 @@ ai-catalog.json    ──pack──►    OCI Registry     ──unpack──►
   artifacts using the mapping defined below.</li>
 </ul>
 </section>
-<section id="conceptual-mapping">
-<h2>Conceptual Mapping</h2>
+<section id="conceptual-mapping"><div class="header-wrapper"><h3 id="g-2-conceptual-mapping"><bdi class="secno">G.2 </bdi>Conceptual Mapping</h3><a class="self-link" href="#conceptual-mapping" aria-label="Permalink for Appendix G.2"></a></div>
+
 <p>The OCI image specification (v1.1+) supports arbitrary artifact types
 through the <code>artifactType</code> field. The following table maps AI Catalog
 concepts to their OCI physical equivalents:</p>
@@ -1449,8 +1733,8 @@ concepts to their OCI physical equivalents:</p>
 </tbody>
 </table>
 </section>
-<section id="packing-ai-catalog-to-oci">
-<h2>Packing: AI Catalog to OCI</h2>
+<section id="packing-ai-catalog-to-oci"><div class="header-wrapper"><h3 id="g-3-packing-ai-catalog-to-oci"><bdi class="secno">G.3 </bdi>Packing: AI Catalog to OCI</h3><a class="self-link" href="#packing-ai-catalog-to-oci" aria-label="Permalink for Appendix G.3"></a></div>
+
 <p>Tooling converts an AI Catalog JSON document into OCI artifacts:</p>
 <ol>
 <li>
@@ -1472,23 +1756,23 @@ concepts to their OCI physical equivalents:</p>
 <p><strong>Nested catalog entries</strong> become nested OCI Image Indexes.</p>
 </li>
 </ol>
-<pre><code>oci://registry.acme.com/ai-catalog:latest          (Image Index)
-  ├── manifest: finance-a2a-agent                   (Manifest)
-  │     ├── config: { name, description, publisher }
-  │     ├── layers[0]: a2a-card.json
-  │     └── referrer: trust-manifest                (Referrer)
-  │           ├── config: trust-manifest.json
-  │           └── layers: [publisher.jwt, soc2.pdf]
-  ├── manifest: finance-mcp-server                  (Manifest)
-  │     ├── config: { name, description }
-  │     └── layers[0]: mcp-server.json
-  └── index: finance-suite                          (Nested Index)
-        ├── manifest: suite-a2a-agent
-        └── manifest: suite-mcp-server
+<pre><code aria-busy="false" class="hljs yaml"><span class="hljs-string">oci://registry.acme.com/ai-catalog:latest</span>          <span class="hljs-string">(Image</span> <span class="hljs-string">Index)</span>
+  <span class="hljs-string">├──</span> <span class="hljs-attr">manifest:</span> <span class="hljs-string">finance-a2a-agent</span>                   <span class="hljs-string">(Manifest)</span>
+  <span class="hljs-string">│</span>     <span class="hljs-string">├──</span> <span class="hljs-attr">config:</span> { <span class="hljs-string">name</span>, <span class="hljs-string">description</span>, <span class="hljs-string">publisher</span> }
+  <span class="hljs-string">│</span>     <span class="hljs-string">├──</span> <span class="hljs-string">layers[0]:</span> <span class="hljs-string">a2a-card.json</span>
+  <span class="hljs-string">│</span>     <span class="hljs-string">└──</span> <span class="hljs-attr">referrer:</span> <span class="hljs-string">trust-manifest</span>                <span class="hljs-string">(Referrer)</span>
+  <span class="hljs-string">│</span>           <span class="hljs-string">├──</span> <span class="hljs-attr">config:</span> <span class="hljs-string">trust-manifest.json</span>
+  <span class="hljs-string">│</span>           <span class="hljs-string">└──</span> <span class="hljs-attr">layers:</span> [<span class="hljs-string">publisher.jwt</span>, <span class="hljs-string">soc2.pdf</span>]
+  <span class="hljs-string">├──</span> <span class="hljs-attr">manifest:</span> <span class="hljs-string">finance-mcp-server</span>                  <span class="hljs-string">(Manifest)</span>
+  <span class="hljs-string">│</span>     <span class="hljs-string">├──</span> <span class="hljs-attr">config:</span> { <span class="hljs-string">name</span>, <span class="hljs-string">description</span> }
+  <span class="hljs-string">│</span>     <span class="hljs-string">└──</span> <span class="hljs-string">layers[0]:</span> <span class="hljs-string">mcp-server.json</span>
+  <span class="hljs-string">└──</span> <span class="hljs-attr">index:</span> <span class="hljs-string">finance-suite</span>                          <span class="hljs-string">(Nested</span> <span class="hljs-string">Index)</span>
+        <span class="hljs-string">├──</span> <span class="hljs-attr">manifest:</span> <span class="hljs-string">suite-a2a-agent</span>
+        <span class="hljs-string">└──</span> <span class="hljs-attr">manifest:</span> <span class="hljs-string">suite-mcp-server</span>
 </code></pre>
 </section>
-<section id="unpacking-oci-to-ai-catalog">
-<h2>Unpacking: OCI to AI Catalog</h2>
+<section id="unpacking-oci-to-ai-catalog"><div class="header-wrapper"><h3 id="g-4-unpacking-oci-to-ai-catalog"><bdi class="secno">G.4 </bdi>Unpacking: OCI to AI Catalog</h3><a class="self-link" href="#unpacking-oci-to-ai-catalog" aria-label="Permalink for Appendix G.4"></a></div>
+
 <p>Tooling converts OCI artifacts back to an AI Catalog JSON document:</p>
 <ol>
 <li>Fetch the OCI Image Index for the catalog.</li>
@@ -1502,64 +1786,64 @@ concepts to their OCI physical equivalents:</p>
 <p>The result is a standard <code>application/ai-catalog+json</code> document
 indistinguishable from one authored by hand.</p>
 </section>
-<section id="oci-image-index-example">
-<h2>OCI Image Index Example</h2>
+<section id="oci-image-index-example"><div class="header-wrapper"><h3 id="g-5-oci-image-index-example"><bdi class="secno">G.5 </bdi>OCI Image Index Example</h3><a class="self-link" href="#oci-image-index-example" aria-label="Permalink for Appendix G.5"></a></div>
+
 <p>The following shows the OCI physical representation of an AI Catalog
 containing two entries. Note that this is generated by tooling, not
 authored by hand:</p>
-<pre><code class="language-json">{
-  &quot;schemaVersion&quot;: 2,
-  &quot;mediaType&quot;: &quot;application/vnd.oci.image.index.v1+json&quot;,
-  &quot;artifactType&quot;: &quot;application/ai-catalog+json&quot;,
-  &quot;manifests&quot;: [
+<pre><code class="language-json hljs" aria-busy="false">{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "artifactType": "application/ai-catalog+json",
+  "manifests": [
     {
-      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
-      &quot;digest&quot;: &quot;sha256:aaa111...&quot;,
-      &quot;size&quot;: 1024,
-      &quot;artifactType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;annotations&quot;: {
-        &quot;ai-catalog.identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
-        &quot;ai-catalog.displayName&quot;: &quot;Acme Finance A2A Agent&quot;
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:aaa111...",
+      "size": 1024,
+      "artifactType": "application/a2a-agent-card+json",
+      "annotations": {
+        "ai-catalog.identifier": "urn:acme:agent:finance-a2a",
+        "ai-catalog.displayName": "Acme Finance A2A Agent"
       }
     },
     {
-      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
-      &quot;digest&quot;: &quot;sha256:bbb222...&quot;,
-      &quot;size&quot;: 512,
-      &quot;artifactType&quot;: &quot;application/mcp-server-card+json&quot;,
-      &quot;annotations&quot;: {
-        &quot;ai-catalog.identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
-        &quot;ai-catalog.displayName&quot;: &quot;Acme Finance MCP Server&quot;
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:bbb222...",
+      "size": 512,
+      "artifactType": "application/mcp-server-card+json",
+      "annotations": {
+        "ai-catalog.identifier": "urn:acme:server:finance-mcp",
+        "ai-catalog.displayName": "Acme Finance MCP Server"
       }
     }
   ],
-  &quot;annotations&quot;: {
-    &quot;ai-catalog.specVersion&quot;: &quot;1.0&quot;,
-    &quot;ai-catalog.host.displayName&quot;: &quot;Acme Services Inc.&quot;
+  "annotations": {
+    "ai-catalog.specVersion": "1.0",
+    "ai-catalog.host.displayName": "Acme Services Inc."
   }
 }
 </code></pre>
 </section>
-<section id="signing-and-verification">
-<h2>Signing and Verification</h2>
+<section id="signing-and-verification"><div class="header-wrapper"><h3 id="g-6-signing-and-verification"><bdi class="secno">G.6 </bdi>Signing and Verification</h3><a class="self-link" href="#signing-and-verification" aria-label="Permalink for Appendix G.6"></a></div>
+
 <p>Because OCI distribution uses content-addressed digests, signing is
 handled by existing OCI tooling rather than embedded signature fields:</p>
-<pre><code># Sign an entry manifest
-cosign sign registry.example.com/ai/finance-a2a@sha256:aaa111...
+<pre><code aria-busy="false" class="hljs yaml"><span class="hljs-comment"># Sign an entry manifest</span>
+<span class="hljs-string">cosign</span> <span class="hljs-string">sign</span> <span class="hljs-string">registry.example.com/ai/finance-a2a@sha256:aaa111...</span>
 
-# Verify
-cosign verify registry.example.com/ai/finance-a2a@sha256:aaa111...
+<span class="hljs-comment"># Verify</span>
+<span class="hljs-string">cosign</span> <span class="hljs-string">verify</span> <span class="hljs-string">registry.example.com/ai/finance-a2a@sha256:aaa111...</span>
 
-# Attach SLSA provenance
-cosign attest --predicate provenance.json --type slsaprovenance \
-  registry.example.com/ai/finance-a2a@sha256:aaa111...
+<span class="hljs-comment"># Attach SLSA provenance</span>
+<span class="hljs-string">cosign</span> <span class="hljs-string">attest</span> <span class="hljs-string">--predicate</span> <span class="hljs-string">provenance.json</span> <span class="hljs-string">--type</span> <span class="hljs-string">slsaprovenance</span> <span class="hljs-string">\</span>
+  <span class="hljs-string">registry.example.com/ai/finance-a2a@sha256:aaa111...</span>
 </code></pre>
 <p>These signatures and attestations are discoverable via the OCI
 Referrers API and can be mapped back to Trust Manifest attestation
 objects during unpacking.</p>
 </section>
-<section id="relationship-to-oci-native-proposals">
-<h2>Relationship to OCI-Native Proposals</h2>
+<section id="relationship-to-oci-native-proposals"><div class="header-wrapper"><h3 id="g-7-relationship-to-oci-native-proposals"><bdi class="secno">G.7 </bdi>Relationship to OCI-Native Proposals</h3><a class="self-link" href="#relationship-to-oci-native-proposals" aria-label="Permalink for Appendix G.7"></a></div>
+
 <p>Some proposals (such as the AAIF AI Card OCI schema) take an
 OCI-native approach where the OCI Image Manifest <em>is</em> the data model.
 In that model, the AI Card is an OCI Manifest, protocol cards are
@@ -1618,14 +1902,25 @@ losslessly, allowing simple consumers to work with the logical format
 while infrastructure-oriented deployments leverage OCI distribution.</p>
 </section>
 </section>
-<section class="appendix" id="mapping-to-mcp-registry-serverjson">
-<h1>Mapping to MCP Registry server.json</h1>
+<section class="appendix" id="mapping-to-mcp-registry-serverjson"><div class="header-wrapper"><h2 id="h-mapping-to-mcp-registry-server-json"><bdi class="secno">H. </bdi>Mapping to MCP Registry server.json</h2><a class="self-link" href="#mapping-to-mcp-registry-serverjson" aria-label="Permalink for Appendix H."></a></div>
+
 <p>This appendix describes how the MCP Registry <code>server.json</code> format
 (see <a href="https://github.com/modelcontextprotocol/registry">modelcontextprotocol/registry</a>)
 relates to AI Catalog, enabling MCP servers to be discovered alongside
 other AI artifacts through a unified catalog.</p>
-<section id="overview">
-<h2>Overview</h2>
+<blockquote>
+<p><strong>Note:</strong> The MCP ecosystem defines two distinct metadata documents
+for servers. The <strong>Registry <code>server.json</code></strong> is an installable package
+descriptor (package coordinates, transports, environment variables).
+The <strong>MCP Server Card</strong> (<a href="#relationship-to-mcp-server-cards-sep-1649">SEP-1649</a>)
+is a runtime discovery document at <code>/.well-known/mcp/server-card.json</code>
+describing capabilities, tools, and authentication. An AI Catalog
+entry can reference either artifact depending on the use case — use
+<code>server.json</code> for installable packages and Server Cards for
+connectable HTTP endpoints.</p>
+</blockquote>
+<section id="overview"><div class="header-wrapper"><h3 id="h-1-overview"><bdi class="secno">H.1 </bdi>Overview</h3><a class="self-link" href="#overview" aria-label="Permalink for Appendix H.1"></a></div>
+
 <p>The MCP Registry defines a <code>server.json</code> format for describing MCP
 servers. Each <code>server.json</code> document captures everything needed to
 install, configure, and connect to a single MCP server: package
@@ -1634,11 +1929,11 @@ SSE), transport configuration, environment variables, and CLI arguments.</p>
 <p>In AI Catalog terms, a <code>server.json</code> document is the <strong>artifact
 content</strong> — the native metadata that a Catalog Entry references. The
 AI Catalog does not duplicate or redefine <code>server.json</code> fields.
-Instead, it provides the discovery envelope and trust layer that
-<code>server.json</code> does not address.</p>
+Instead, it provides the discovery and trust layer that <code>server.json</code>
+does not address.</p>
 </section>
-<section id="conceptual-mapping">
-<h2>Conceptual Mapping</h2>
+<section id="conceptual-mapping"><div class="header-wrapper"><h3 id="h-2-conceptual-mapping"><bdi class="secno">H.2 </bdi>Conceptual Mapping</h3><a class="self-link" href="#conceptual-mapping" aria-label="Permalink for Appendix H.2"></a></div>
+
 <table>
 <thead>
 <tr>
@@ -1706,8 +2001,8 @@ Instead, it provides the discovery envelope and trust layer that
 </tbody>
 </table>
 </section>
-<section id="separation-of-concerns">
-<h2>Separation of Concerns</h2>
+<section id="separation-of-concerns"><div class="header-wrapper"><h3 id="h-3-separation-of-concerns"><bdi class="secno">H.3 </bdi>Separation of Concerns</h3><a class="self-link" href="#separation-of-concerns" aria-label="Permalink for Appendix H.3"></a></div>
+
 <p>The <code>server.json</code> format and AI Catalog address different concerns:</p>
 <dl>
 <dt>server.json (Operational)</dt>
@@ -1721,118 +2016,127 @@ Instead, it provides the discovery envelope and trust layer that
 <code>server.json</code> and adds only what <code>server.json</code> lacks: publisher
 identity, trust verification, and cross-ecosystem discoverability.</p>
 </section>
-<section id="mcp-server-as-catalog-entry">
-<h2>MCP Server as Catalog Entry</h2>
-<p>An MCP server described by a <code>server.json</code> maps to a Catalog Entry
-with <code>mediaType</code> set to <code>application/mcp-server-card+json</code>:</p>
-<pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
-  &quot;displayName&quot;: &quot;Brave Search&quot;,
-  &quot;version&quot;: &quot;1.0.2&quot;,
-  &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-  &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server-card.json&quot;,
-  &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
-  &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
-  &quot;publisher&quot;: {
-    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
-    &quot;displayName&quot;: &quot;Model Context Protocol&quot;
+<section id="mcp-server-as-catalog-entry"><div class="header-wrapper"><h3 id="h-4-mcp-server-as-catalog-entry"><bdi class="secno">H.4 </bdi>MCP Server as Catalog Entry</h3><a class="self-link" href="#mcp-server-as-catalog-entry" aria-label="Permalink for Appendix H.4"></a></div>
+
+<p>An MCP server listed in the Registry maps to a Catalog Entry whose
+<code>url</code> points to the <code>server.json</code> document and whose <code>mediaType</code>
+reflects the Registry format:</p>
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+  "displayName": "Brave Search",
+  "version": "1.0.2",
+  "mediaType": "application/json",
+  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+  "description": "MCP server for Brave Search API integration",
+  "tags": ["search", "brave", "web"],
+  "publisher": {
+    "identifier": "did:web:modelcontextprotocol.io",
+    "displayName": "Model Context Protocol"
   },
-  &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
-    &quot;attestations&quot;: [
+  "trustManifest": {
+    "identity": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+    "attestations": [
       {
-        &quot;type&quot;: &quot;publisher-identity&quot;,
-        &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;,
-        &quot;mediaType&quot;: &quot;application/jwt&quot;,
-        &quot;description&quot;: &quot;Verifies did:web:modelcontextprotocol.io as publisher&quot;
+        "type": "publisher-identity",
+        "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
+        "mediaType": "application/jwt",
+        "description": "Verifies did:web:modelcontextprotocol.io as publisher"
       }
     ],
-    &quot;provenance&quot;: [
+    "provenance": [
       {
-        &quot;relation&quot;: &quot;publishedFrom&quot;,
-        &quot;sourceId&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;,
-        &quot;registryUri&quot;: &quot;https://registry.npmjs.org&quot;
+        "relation": "publishedFrom",
+        "sourceId": "https://github.com/modelcontextprotocol/servers",
+        "registryUri": "https://registry.npmjs.org"
       }
     ]
   },
-  &quot;metadata&quot;: {
-    &quot;repository&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;
+  "metadata": {
+    "repository": "https://github.com/modelcontextprotocol/servers"
   },
-  &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+  "updatedAt": "2026-03-15T10:00:00Z"
 }
 </code></pre>
 <p>The <code>url</code> points to the complete <code>server.json</code>. A client fetches the
 catalog entry for discovery and trust evaluation, then retrieves the
 <code>server.json</code> for operational details (packages, transports, env vars).</p>
+<blockquote>
+<p><strong>Note:</strong> This example uses <code>application/json</code> because the MCP
+Registry has not registered a dedicated media type for <code>server.json</code>.
+When referencing an MCP Server Card (SEP-1649) instead, use
+<code>application/mcp-server-card+json</code> — see
+<a href="#relationship-to-mcp-server-cards-sep-1649">Relationship to MCP Server Cards</a>.</p>
+</blockquote>
 </section>
-<section id="mcp-registry-as-ai-catalog">
-<h2>MCP Registry as AI Catalog</h2>
+<section id="mcp-registry-as-ai-catalog"><div class="header-wrapper"><h3 id="h-5-mcp-registry-as-ai-catalog"><bdi class="secno">H.5 </bdi>MCP Registry as AI Catalog</h3><a class="self-link" href="#mcp-registry-as-ai-catalog" aria-label="Permalink for Appendix H.5"></a></div>
+
 <p>The MCP Registry — a centralized index of MCP servers — can be
 represented as an AI Catalog. This enables clients that understand
 <code>application/ai-catalog+json</code> to discover MCP servers alongside A2A
 agents, skills, and other artifacts:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;host&quot;: {
-    &quot;displayName&quot;: &quot;MCP Server Registry&quot;,
-    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
-    &quot;documentationUrl&quot;: &quot;https://modelcontextprotocol.io/docs&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "MCP Server Registry",
+    "identifier": "did:web:modelcontextprotocol.io",
+    "documentationUrl": "https://modelcontextprotocol.io/docs"
   },
-  &quot;entries&quot;: [
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
-      &quot;displayName&quot;: &quot;Brave Search&quot;,
-      &quot;version&quot;: &quot;1.0.2&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server-card.json&quot;,
-      &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
-      &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
+      "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+      "displayName": "Brave Search",
+      "version": "1.0.2",
+      "mediaType": "application/json",
+      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+      "description": "MCP server for Brave Search API integration",
+      "tags": ["search", "brave"]
     },
     {
-      &quot;identifier&quot;: &quot;urn:mcp:io.github.modelcontextprotocol/filesystem&quot;,
-      &quot;displayName&quot;: &quot;Filesystem&quot;,
-      &quot;version&quot;: &quot;1.0.2&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server-card.json&quot;,
-      &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
-      &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
+      "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
+      "displayName": "Filesystem",
+      "version": "1.0.2",
+      "mediaType": "application/json",
+      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
+      "description": "MCP server for filesystem operations",
+      "tags": ["filesystem", "files"]
     },
     {
-      &quot;identifier&quot;: &quot;urn:mcp:io.github.example/weather-mcp&quot;,
-      &quot;displayName&quot;: &quot;Weather&quot;,
-      &quot;version&quot;: &quot;0.5.0&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server-card.json&quot;,
-      &quot;description&quot;: &quot;Python MCP server for weather data access&quot;,
-      &quot;tags&quot;: [&quot;weather&quot;, &quot;python&quot;],
-      &quot;publisher&quot;: {
-        &quot;identifier&quot;: &quot;did:web:example.github.io&quot;,
-        &quot;displayName&quot;: &quot;Example Corp&quot;
+      "identifier": "urn:mcp:io.github.example/weather-mcp",
+      "displayName": "Weather",
+      "version": "0.5.0",
+      "mediaType": "application/json",
+      "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
+      "description": "Python MCP server for weather data access",
+      "tags": ["weather", "python"],
+      "publisher": {
+        "identifier": "did:web:example.github.io",
+        "displayName": "Example Corp"
       }
     }
   ]
 }
 </code></pre>
 </section>
-<section id="decentralized-discovery">
-<h2>Decentralized Discovery</h2>
+<section id="decentralized-discovery"><div class="header-wrapper"><h3 id="h-6-decentralized-discovery"><bdi class="secno">H.6 </bdi>Decentralized Discovery</h3><a class="self-link" href="#decentralized-discovery" aria-label="Permalink for Appendix H.6"></a></div>
+
 <p>The MCP Registry is a centralized service. AI Catalog enables
 decentralized discovery: any domain can publish its MCP servers at
 <code>/.well-known/ai-catalog.json</code> without registering with a central
 authority.</p>
 <p>A vendor hosting its own MCP servers can publish:</p>
-<pre><code>https://api.acme-corp.com/.well-known/ai-catalog.json
+<pre><code aria-busy="false" class="hljs javascript"><span class="hljs-attr">https</span>:<span class="hljs-comment">//api.acme-corp.com/.well-known/ai-catalog.json</span>
 </code></pre>
 <p>Clients and crawlers discover the catalog via the well-known URL,
-find entries with <code>mediaType: "application/mcp-server-card+json"</code>, and
-fetch the <code>server.json</code> documents for operational details.</p>
+find entries by <code>mediaType</code>, and fetch the referenced artifacts for
+operational details — whether those are MCP Server Cards, Registry
+<code>server.json</code> documents, or other AI artifact formats.</p>
 <p>The centralized MCP Registry and decentralized AI Catalogs are
 complementary. The registry can serve an AI Catalog as its response
 format, while individual domains publish their own catalogs for
 direct discovery.</p>
 </section>
-<section id="what-ai-catalog-adds-to-serverjson">
-<h2>What AI Catalog Adds to server.json</h2>
+<section id="what-ai-catalog-adds-to-serverjson"><div class="header-wrapper"><h3 id="h-7-what-ai-catalog-adds-to-server-json"><bdi class="secno">H.7 </bdi>What AI Catalog Adds to server.json</h3><a class="self-link" href="#what-ai-catalog-adds-to-serverjson" aria-label="Permalink for Appendix H.7"></a></div>
+
 <p>The <code>server.json</code> format has no trust or identity layer. AI Catalog
 fills this gap:</p>
 <ol>
@@ -1851,8 +2155,8 @@ fills this gap:</p>
    artifacts (A2A agents, datasets) in nested catalogs.</li>
 </ol>
 </section>
-<section id="relationship-to-mcp-server-cards-sep-1649">
-<h2>Relationship to MCP Server Cards (SEP-1649)</h2>
+<section id="relationship-to-mcp-server-cards-sep-1649"><div class="header-wrapper"><h3 id="h-8-relationship-to-mcp-server-cards-sep-1649"><bdi class="secno">H.8 </bdi>Relationship to MCP Server Cards (SEP-1649)</h3><a class="self-link" href="#relationship-to-mcp-server-cards-sep-1649" aria-label="Permalink for Appendix H.8"></a></div>
+
 <p>MCP Server Cards
 (<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649">SEP-1649</a>)
 define a static discovery document for individual HTTP-based MCP
@@ -1874,30 +2178,30 @@ prompts.</p>
 </dl>
 <p>The two mechanisms layer naturally. An AI Catalog entry for an MCP
 server can reference the Server Card as its artifact content:</p>
-<pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
-  &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-  &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-  &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
-  &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
-  &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
-  &quot;publisher&quot;: {
-    &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-    &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identifier": "urn:mcp:example.com:finance-server",
+  "displayName": "Acme Finance MCP Server",
+  "mediaType": "application/mcp-server-card+json",
+  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+  "description": "MCP server for financial data and trading tools",
+  "tags": ["finance", "mcp"],
+  "publisher": {
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
   },
-  &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
-    &quot;attestations&quot;: [
+  "trustManifest": {
+    "identity": "urn:mcp:example.com:finance-server",
+    "attestations": [
       {
-        &quot;type&quot;: &quot;publisher-identity&quot;,
-        &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
-        &quot;mediaType&quot;: &quot;application/jwt&quot;
+        "type": "publisher-identity",
+        "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
+        "mediaType": "application/jwt"
       },
       {
-        &quot;type&quot;: &quot;SOC2-Type2&quot;,
-        &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;mediaType&quot;: &quot;application/pdf&quot;,
-        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+        "type": "SOC2-Type2",
+        "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+        "mediaType": "application/pdf",
+        "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
   }
@@ -1921,35 +2225,35 @@ servers publishes one AI Catalog listing all of them, with each entry
 pointing to its respective Server Card.</p>
 </section>
 </section>
-<section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
-<h1>Mapping to Claude Code Plugins Marketplace</h1>
+<section class="appendix" id="mapping-to-claude-code-plugins-marketplace"><div class="header-wrapper"><h2 id="i-mapping-to-claude-code-plugins-marketplace"><bdi class="secno">I. </bdi>Mapping to Claude Code Plugins Marketplace</h2><a class="self-link" href="#mapping-to-claude-code-plugins-marketplace" aria-label="Permalink for Appendix I."></a></div>
+
 <p>This appendix describes how the Anthropic Claude Code Plugins
 marketplace format (see
 <a href="https://github.com/anthropics/claude-plugins-official">claude-plugins-official</a>)
 maps to AI Catalog, enabling Claude Code plugins to be discovered,
 indexed, and distributed through a unified catalog alongside other AI
 artifacts.</p>
-<section id="overview">
-<h2>Overview</h2>
+<section id="overview"><div class="header-wrapper"><h3 id="i-1-overview"><bdi class="secno">I.1 </bdi>Overview</h3><a class="self-link" href="#overview" aria-label="Permalink for Appendix I.1"></a></div>
+
 <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
 file that lists available plugins. Each plugin is a directory containing
 a <code>.claude-plugin/plugin.json</code> metadata file and optional components:
 MCP server configurations (<code>.mcp.json</code>), slash commands (<code>commands/</code>),
 agent definitions (<code>agents/</code>), and skill definitions (<code>skills/</code>).</p>
-<pre><code>marketplace.json                    # Top-level plugin directory
-plugins/
-  example-plugin/
-    .claude-plugin/
-      plugin.json                   # Plugin metadata (name, description, author)
-    .mcp.json                       # MCP server config (optional)
-    commands/                       # Slash commands (optional)
-    agents/                         # Agent definitions (optional)
-    skills/                         # Skill definitions (optional)
-    README.md
+<pre><code aria-busy="false" class="hljs yaml"><span class="hljs-string">marketplace.json</span>                    <span class="hljs-comment"># Top-level plugin directory</span>
+<span class="hljs-string">plugins/</span>
+  <span class="hljs-string">example-plugin/</span>
+    <span class="hljs-string">.claude-plugin/</span>
+      <span class="hljs-string">plugin.json</span>                   <span class="hljs-comment"># Plugin metadata (name, description, author)</span>
+    <span class="hljs-string">.mcp.json</span>                       <span class="hljs-comment"># MCP server config (optional)</span>
+    <span class="hljs-string">commands/</span>                       <span class="hljs-comment"># Slash commands (optional)</span>
+    <span class="hljs-string">agents/</span>                         <span class="hljs-comment"># Agent definitions (optional)</span>
+    <span class="hljs-string">skills/</span>                         <span class="hljs-comment"># Skill definitions (optional)</span>
+    <span class="hljs-string">README.md</span>
 </code></pre>
 </section>
-<section id="conceptual-mapping">
-<h2>Conceptual Mapping</h2>
+<section id="conceptual-mapping"><div class="header-wrapper"><h3 id="i-2-conceptual-mapping"><bdi class="secno">I.2 </bdi>Conceptual Mapping</h3><a class="self-link" href="#conceptual-mapping" aria-label="Permalink for Appendix I.2"></a></div>
+
 <table>
 <thead>
 <tr>
@@ -2029,8 +2333,8 @@ plugins/
 </tbody>
 </table>
 </section>
-<section id="source-types">
-<h2>Source Types</h2>
+<section id="source-types"><div class="header-wrapper"><h3 id="i-3-source-types"><bdi class="secno">I.3 </bdi>Source Types</h3><a class="self-link" href="#source-types" aria-label="Permalink for Appendix I.3"></a></div>
+
 <p>The marketplace supports three source types for plugins. Each maps
 differently to AI Catalog entry fields:</p>
 <dl>
@@ -2046,73 +2350,73 @@ differently to AI Catalog entry fields:</p>
   pointing at the known repository location for the plugin directory.</dd>
 </dl>
 </section>
-<section id="marketplace-as-ai-catalog">
-<h2>Marketplace as AI Catalog</h2>
+<section id="marketplace-as-ai-catalog"><div class="header-wrapper"><h3 id="i-4-marketplace-as-ai-catalog"><bdi class="secno">I.4 </bdi>Marketplace as AI Catalog</h3><a class="self-link" href="#marketplace-as-ai-catalog" aria-label="Permalink for Appendix I.4"></a></div>
+
 <p>The <code>marketplace.json</code> from
 <a href="https://github.com/anthropics/claude-plugins-official">claude-plugins-official</a>
 maps to an AI Catalog where each plugin is an entry:</p>
-<pre><code class="language-json">{
-  &quot;specVersion&quot;: &quot;1.0&quot;,
-  &quot;host&quot;: {
-    &quot;displayName&quot;: &quot;Claude Code Plugins Directory&quot;,
-    &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
-    &quot;documentationUrl&quot;: &quot;https://code.claude.com/docs/en/plugins&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Claude Code Plugins Directory",
+    "identifier": "did:web:anthropic.com",
+    "documentationUrl": "https://code.claude.com/docs/en/plugins"
   },
-  &quot;entries&quot;: [
+  "entries": [
     {
-      &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
-      &quot;displayName&quot;: &quot;agent-sdk-dev&quot;,
-      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
-      &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
-      &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
-      &quot;tags&quot;: [&quot;development&quot;],
-      &quot;publisher&quot;: {
-        &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
-        &quot;displayName&quot;: &quot;Anthropic&quot;
+      "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
+      "displayName": "agent-sdk-dev",
+      "mediaType": "application/vnd.anthropic.claude-plugin+json",
+      "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
+      "description": "Development kit for working with the Claude Agent SDK",
+      "tags": ["development"],
+      "publisher": {
+        "identifier": "did:web:anthropic.com",
+        "displayName": "Anthropic"
       },
-      &quot;metadata&quot;: {
-        &quot;homepage&quot;: &quot;https://github.com/anthropics/claude-plugins-public/tree/main/plugins/agent-sdk-dev&quot;
+      "metadata": {
+        "homepage": "https://github.com/anthropics/claude-plugins-public/tree/main/plugins/agent-sdk-dev"
       }
     },
     {
-      &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
-      &quot;displayName&quot;: &quot;adspirer-ads-agent&quot;,
-      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
-      &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
-      &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
-      &quot;tags&quot;: [&quot;productivity&quot;, &quot;ads&quot;],
-      &quot;metadata&quot;: {
-        &quot;homepage&quot;: &quot;https://www.adspirer.com&quot;
+      "identifier": "urn:claude-plugin:adspirer:ads-agent",
+      "displayName": "adspirer-ads-agent",
+      "mediaType": "application/vnd.anthropic.claude-plugin+json",
+      "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
+      "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
+      "tags": ["productivity", "ads"],
+      "metadata": {
+        "homepage": "https://www.adspirer.com"
       },
-      &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
-        &quot;provenance&quot;: [
+      "trustManifest": {
+        "identity": "urn:claude-plugin:adspirer:ads-agent",
+        "provenance": [
           {
-            &quot;relation&quot;: &quot;publishedFrom&quot;,
-            &quot;sourceId&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin&quot;,
-            &quot;sourceDigest&quot;: &quot;sha1:aa70dbdbbbb843e94a794c10c2b13f5dd66b5e40&quot;
+            "relation": "publishedFrom",
+            "sourceId": "https://github.com/amekala/adspirer-mcp-plugin",
+            "sourceDigest": "sha1:aa70dbdbbbb843e94a794c10c2b13f5dd66b5e40"
           }
         ]
       }
     },
     {
-      &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
-      &quot;displayName&quot;: &quot;aikido&quot;,
-      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
-      &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
-      &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
-      &quot;tags&quot;: [&quot;security&quot;],
-      &quot;publisher&quot;: {
-        &quot;identifier&quot;: &quot;did:web:aikido.dev&quot;,
-        &quot;displayName&quot;: &quot;Aikido Security&quot;
+      "identifier": "urn:claude-plugin:aikido:security",
+      "displayName": "aikido",
+      "mediaType": "application/vnd.anthropic.claude-plugin+json",
+      "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
+      "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
+      "tags": ["security"],
+      "publisher": {
+        "identifier": "did:web:aikido.dev",
+        "displayName": "Aikido Security"
       },
-      &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
-        &quot;provenance&quot;: [
+      "trustManifest": {
+        "identity": "urn:claude-plugin:aikido:security",
+        "provenance": [
           {
-            &quot;relation&quot;: &quot;publishedFrom&quot;,
-            &quot;sourceId&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin&quot;,
-            &quot;sourceDigest&quot;: &quot;sha1:d7fa8b8e192680d9a26c1a5dcaead7cf5cdb7139&quot;
+            "relation": "publishedFrom",
+            "sourceId": "https://github.com/AikidoSec/aikido-claude-plugin",
+            "sourceDigest": "sha1:d7fa8b8e192680d9a26c1a5dcaead7cf5cdb7139"
           }
         ]
       }
@@ -2121,44 +2425,44 @@ maps to an AI Catalog where each plugin is an entry:</p>
 }
 </code></pre>
 </section>
-<section id="plugin-packages-as-nested-catalogs">
-<h2>Plugin Packages as Nested Catalogs</h2>
+<section id="plugin-packages-as-nested-catalogs"><div class="header-wrapper"><h3 id="i-5-plugin-packages-as-nested-catalogs"><bdi class="secno">I.5 </bdi>Plugin Packages as Nested Catalogs</h3><a class="self-link" href="#plugin-packages-as-nested-catalogs" aria-label="Permalink for Appendix I.5"></a></div>
+
 <p>A plugin that contains multiple components (MCP servers, skills,
 commands, agents) naturally maps to a nested AI Catalog. This
 mirrors the plugin directory structure where a single plugin
 contains multiple artifact types:</p>
-<pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin&quot;,
-  &quot;displayName&quot;: &quot;example-plugin&quot;,
-  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
-  &quot;description&quot;: &quot;Comprehensive plugin with commands, agents, skills, and MCP servers&quot;,
-  &quot;tags&quot;: [&quot;development&quot;],
-  &quot;publisher&quot;: {
-    &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
-    &quot;displayName&quot;: &quot;Anthropic&quot;
+<pre><code class="language-json hljs" aria-busy="false">{
+  "identifier": "urn:claude-plugin:anthropic:example-plugin",
+  "displayName": "example-plugin",
+  "mediaType": "application/ai-catalog+json",
+  "description": "Comprehensive plugin with commands, agents, skills, and MCP servers",
+  "tags": ["development"],
+  "publisher": {
+    "identifier": "did:web:anthropic.com",
+    "displayName": "Anthropic"
   },
-  &quot;data&quot;: {
-      &quot;specVersion&quot;: &quot;1.0&quot;,
-    &quot;entries&quot;: [
+  "data": {
+      "specVersion": "1.0",
+    "entries": [
       {
-        &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;,
-        &quot;displayName&quot;: &quot;Example Plugin MCP Server&quot;,
-        &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
-        &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json&quot;
+        "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
+        "displayName": "Example Plugin MCP Server",
+        "mediaType": "application/mcp-server-card+json",
+        "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
       },
       {
-        &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:skills&quot;,
-        &quot;displayName&quot;: &quot;Example Plugin Skills&quot;,
-        &quot;mediaType&quot;: &quot;application/agentskill+zip&quot;,
-        &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip&quot;
+        "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
+        "displayName": "Example Plugin Skills",
+        "mediaType": "application/agentskill+zip",
+        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip"
       }
     ]
   }
 }
 </code></pre>
 </section>
-<section id="what-ai-catalog-adds-to-the-marketplace">
-<h2>What AI Catalog Adds to the Marketplace</h2>
+<section id="what-ai-catalog-adds-to-the-marketplace"><div class="header-wrapper"><h3 id="i-6-what-ai-catalog-adds-to-the-marketplace"><bdi class="secno">I.6 </bdi>What AI Catalog Adds to the Marketplace</h3><a class="self-link" href="#what-ai-catalog-adds-to-the-marketplace" aria-label="Permalink for Appendix I.6"></a></div>
+
 <p>The <code>marketplace.json</code> format is a lightweight directory focused on
 listing available plugins. AI Catalog extends this with:</p>
 <ol>
@@ -2197,12 +2501,367 @@ listing available plugins. AI Catalog extends this with:</p>
 </ol>
 </section>
 </section>
-<section class="appendix" id="acknowledgments">
-<h1>Acknowledgments</h1>
+<section class="appendix" id="acknowledgments"><div class="header-wrapper"><h2 id="j-acknowledgments"><bdi class="secno">J. </bdi>Acknowledgments</h2><a class="self-link" href="#acknowledgments" aria-label="Permalink for Appendix J."></a></div>
+
 <p>This specification was developed through collaboration among members of
 the A2A and MCP protocol communities under the governance of the Linux
 Foundation.</p>
 </section>
 
-</body>
-</html>
+
+
+<section id="references" class="appendix"><div class="header-wrapper"><h2 id="k-references"><bdi class="secno">K. </bdi>References</h2><a class="self-link" href="#references" aria-label="Permalink for Appendix K."></a></div><section id="normative-references"><div class="header-wrapper"><h3 id="k-1-normative-references"><bdi class="secno">K.1 </bdi>Normative references</h3><a class="self-link" href="#normative-references" aria-label="Permalink for Appendix K.1"></a></div>
+    
+    <dl class="bibliography"><dt id="bib-rfc2119">[RFC2119]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>.  IETF. BCP 14. URL: <a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>
+    </dd><dt id="bib-rfc2397">[RFC2397]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc2397"><cite>The data URL scheme</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc2397">https://www.rfc-editor.org/rfc/rfc2397</a>
+    </dd><dt id="bib-rfc3339">[RFC3339]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc3339"><cite>Date and Time on the Internet: Timestamps</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc3339">https://www.rfc-editor.org/rfc/rfc3339</a>
+    </dd><dt id="bib-rfc3986">[RFC3986]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc3986"><cite>Uniform Resource Identifier (URI): Generic Syntax</cite></a>.  IETF. STD 66. URL: <a href="https://www.rfc-editor.org/rfc/rfc3986">https://www.rfc-editor.org/rfc/rfc3986</a>
+    </dd><dt id="bib-rfc6234">[RFC6234]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc6234"><cite>US Secure Hash Algorithms (SHA and SHA-based HMAC and HKDF)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc6234">https://www.rfc-editor.org/rfc/rfc6234</a>
+    </dd><dt id="bib-rfc6838">[RFC6838]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc6838"><cite>Media Type Specifications and Registration Procedures</cite></a>.  IETF. BCP 13. URL: <a href="https://www.rfc-editor.org/rfc/rfc6838">https://www.rfc-editor.org/rfc/rfc6838</a>
+    </dd><dt id="bib-rfc7515">[RFC7515]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc7515"><cite>JSON Web Signature (JWS)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc7515">https://www.rfc-editor.org/rfc/rfc7515</a>
+    </dd><dt id="bib-rfc7517">[RFC7517]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc7517"><cite>JSON Web Key (JWK)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc7517">https://www.rfc-editor.org/rfc/rfc7517</a>
+    </dd><dt id="bib-rfc8141">[RFC8141]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8141"><cite>Uniform Resource Names (URNs)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc8141">https://www.rfc-editor.org/rfc/rfc8141</a>
+    </dd><dt id="bib-rfc8174">[RFC8174]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8174"><cite>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</cite></a>.  IETF. BCP 14. URL: <a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>
+    </dd><dt id="bib-rfc8259">[RFC8259]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8259"><cite>The JavaScript Object Notation (JSON) Data Interchange Format</cite></a>.  IETF. STD 90. URL: <a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>
+    </dd><dt id="bib-rfc8288">[RFC8288]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8288"><cite>Web Linking</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc8288">https://www.rfc-editor.org/rfc/rfc8288</a>
+    </dd><dt id="bib-rfc8610">[RFC8610]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8610"><cite>Concise Data Definition Language (CDDL)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc8610">https://www.rfc-editor.org/rfc/rfc8610</a>
+    </dd><dt id="bib-rfc8615">[RFC8615]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8615"><cite>Well-Known Uniform Resource Identifiers (URIs)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc8615">https://www.rfc-editor.org/rfc/rfc8615</a>
+    </dd><dt id="bib-rfc8785">[RFC8785]</dt><dd>
+      <a href="https://www.rfc-editor.org/rfc/rfc8785"><cite>JSON Canonicalization Scheme (JCS)</cite></a>.  IETF. RFC. URL: <a href="https://www.rfc-editor.org/rfc/rfc8785">https://www.rfc-editor.org/rfc/rfc8785</a>
+    </dd></dl>
+  </section></section><p role="navigation" id="back-to-top">
+    <a href="#title"><abbr title="Back to Top">↑</abbr></a>
+  </p><script id="respec-highlight-vars">(() => {
+// @ts-check
+
+if (document.respec) {
+  document.respec.ready.then(setupVarHighlighter);
+} else {
+  setupVarHighlighter();
+}
+
+function setupVarHighlighter() {
+  document
+    .querySelectorAll("var")
+    .forEach(varElem => varElem.addEventListener("click", highlightListener));
+}
+
+function highlightListener(ev) {
+  ev.stopPropagation();
+  const { target: varElem } = ev;
+  const hightligtedElems = highlightVars(varElem);
+  const resetListener = () => {
+    const hlColor = getHighlightColor(varElem);
+    hightligtedElems.forEach(el => removeHighlight(el, hlColor));
+    [...HL_COLORS.keys()].forEach(key => HL_COLORS.set(key, true));
+  };
+  if (hightligtedElems.length) {
+    document.body.addEventListener("click", resetListener, { once: true });
+  }
+}
+
+// availability of highlight colors. colors from var.css
+const HL_COLORS = new Map([
+  ["respec-hl-c1", true],
+  ["respec-hl-c2", true],
+  ["respec-hl-c3", true],
+  ["respec-hl-c4", true],
+  ["respec-hl-c5", true],
+  ["respec-hl-c6", true],
+  ["respec-hl-c7", true],
+]);
+
+function getHighlightColor(target) {
+  // return current colors if applicable
+  const { value } = target.classList;
+  const re = /respec-hl-\w+/;
+  const activeClass = re.test(value) && value.match(re);
+  if (activeClass) return activeClass[0];
+
+  // first color preference
+  if (HL_COLORS.get("respec-hl-c1") === true) return "respec-hl-c1";
+
+  // otherwise get some other available color
+  return [...HL_COLORS.keys()].find(c => HL_COLORS.get(c)) || "respec-hl-c1";
+}
+
+function highlightVars(varElem) {
+  const textContent = norm(varElem.textContent);
+  const parent = varElem.closest(".algorithm, section");
+  const highlightColor = getHighlightColor(varElem);
+
+  const varsToHighlight = [...parent.querySelectorAll("var")].filter(
+    el =>
+      norm(el.textContent) === textContent &&
+      el.closest(".algorithm, section") === parent
+  );
+
+  // update availability of highlight color
+  const colorStatus = varsToHighlight[0].classList.contains("respec-hl");
+  HL_COLORS.set(highlightColor, colorStatus);
+
+  // highlight vars
+  if (colorStatus) {
+    varsToHighlight.forEach(el => removeHighlight(el, highlightColor));
+    return [];
+  } else {
+    varsToHighlight.forEach(el => addHighlight(el, highlightColor));
+  }
+  return varsToHighlight;
+}
+
+function removeHighlight(el, highlightColor) {
+  el.classList.remove("respec-hl", highlightColor);
+  // clean up empty class attributes so they don't come in export
+  if (!el.classList.length) el.removeAttribute("class");
+}
+
+function addHighlight(elem, highlightColor) {
+  elem.classList.add("respec-hl", highlightColor);
+}
+
+/**
+ * Same as `norm` from src/core/utils, but our build process doesn't allow
+ * imports in runtime scripts, so duplicated here.
+ * @param {string} str
+ */
+function norm(str) {
+  return str.trim().replace(/\s+/g, " ");
+}
+})()</script><script id="respec-dfn-panel">(() => {
+// @ts-check
+if (document.respec) {
+  document.respec.ready.then(setupPanel);
+} else {
+  setupPanel();
+}
+
+function setupPanel() {
+  const listener = panelListener();
+  document.body.addEventListener("keydown", listener);
+  document.body.addEventListener("click", listener);
+}
+
+function panelListener() {
+  /** @type {HTMLElement} */
+  let panel = null;
+  return event => {
+    const { target, type } = event;
+
+    if (!(target instanceof HTMLElement)) return;
+
+    // For keys, we only care about Enter key to activate the panel
+    // otherwise it's activated via a click.
+    if (type === "keydown" && event.key !== "Enter") return;
+
+    const action = deriveAction(event);
+
+    switch (action) {
+      case "show": {
+        hidePanel(panel);
+        /** @type {HTMLElement} */
+        const dfn = target.closest("dfn, .index-term");
+        panel = document.getElementById(`dfn-panel-for-${dfn.id}`);
+        const coords = deriveCoordinates(event);
+        displayPanel(dfn, panel, coords);
+        break;
+      }
+      case "dock": {
+        panel.style.left = null;
+        panel.style.top = null;
+        panel.classList.add("docked");
+        break;
+      }
+      case "hide": {
+        hidePanel(panel);
+        panel = null;
+        break;
+      }
+    }
+  };
+}
+
+/**
+ * @param {MouseEvent|KeyboardEvent} event
+ */
+function deriveCoordinates(event) {
+  const target = /** @type HTMLElement */ (event.target);
+
+  // We prevent synthetic AT clicks from putting
+  // the dialog in a weird place. The AT events sometimes
+  // lack coordinates, so they have clientX/Y = 0
+  const rect = target.getBoundingClientRect();
+  if (
+    event instanceof MouseEvent &&
+    event.clientX >= rect.left &&
+    event.clientY >= rect.top
+  ) {
+    // The event probably happened inside the bounding rect...
+    return { x: event.clientX, y: event.clientY };
+  }
+
+  // Offset to the middle of the element
+  const x = rect.x + rect.width / 2;
+  // Placed at the bottom of the element
+  const y = rect.y + rect.height;
+  return { x, y };
+}
+
+/**
+ * @param {Event} event
+ */
+function deriveAction(event) {
+  const target = /** @type {HTMLElement} */ (event.target);
+  const hitALink = !!target.closest("a");
+  if (target.closest("dfn:not([data-cite]), .index-term")) {
+    return hitALink ? "none" : "show";
+  }
+  if (target.closest(".dfn-panel")) {
+    if (hitALink) {
+      return target.classList.contains("self-link") ? "hide" : "dock";
+    }
+    const panel = target.closest(".dfn-panel");
+    return panel.classList.contains("docked") ? "hide" : "none";
+  }
+  if (document.querySelector(".dfn-panel:not([hidden])")) {
+    return "hide";
+  }
+  return "none";
+}
+
+/**
+ * @param {HTMLElement} dfn
+ * @param {HTMLElement} panel
+ * @param {{ x: number, y: number }} clickPosition
+ */
+function displayPanel(dfn, panel, { x, y }) {
+  panel.hidden = false;
+  // distance (px) between edge of panel and the pointing triangle (caret)
+  const MARGIN = 20;
+
+  const dfnRects = dfn.getClientRects();
+  // Find the `top` offset when the `dfn` can be spread across multiple lines
+  let closestTop = 0;
+  let minDiff = Infinity;
+  for (const rect of dfnRects) {
+    const { top, bottom } = rect;
+    const diffFromClickY = Math.abs((top + bottom) / 2 - y);
+    if (diffFromClickY < minDiff) {
+      minDiff = diffFromClickY;
+      closestTop = top;
+    }
+  }
+
+  const top = window.scrollY + closestTop + dfnRects[0].height;
+  const left = x - MARGIN;
+  panel.style.left = `${left}px`;
+  panel.style.top = `${top}px`;
+
+  // Find if the panel is flowing out of the window
+  const panelRect = panel.getBoundingClientRect();
+  const SCREEN_WIDTH = Math.min(window.innerWidth, window.screen.width);
+  if (panelRect.right > SCREEN_WIDTH) {
+    const newLeft = Math.max(MARGIN, x + MARGIN - panelRect.width);
+    const newCaretOffset = left - newLeft;
+    panel.style.left = `${newLeft}px`;
+    /** @type {HTMLElement} */
+    const caret = panel.querySelector(".caret");
+    caret.style.left = `${newCaretOffset}px`;
+  }
+
+  // As it's a dialog, we trap focus.
+  // TODO: when <dialog> becomes a implemented, we should really
+  // use that.
+  trapFocus(panel, dfn);
+}
+
+/**
+ * @param {HTMLElement} panel
+ * @param {HTMLElement} dfn
+ * @returns
+ */
+function trapFocus(panel, dfn) {
+  /** @type NodeListOf<HTMLAnchorElement> elements */
+  const anchors = panel.querySelectorAll("a[href]");
+  // No need to trap focus
+  if (!anchors.length) return;
+
+  // Move focus to first anchor element
+  const first = anchors.item(0);
+  first.focus();
+
+  const trapListener = createTrapListener(anchors, panel, dfn);
+  panel.addEventListener("keydown", trapListener);
+
+  // Hiding the panel releases the trap
+  const mo = new MutationObserver(records => {
+    const [record] = records;
+    const target = /** @type HTMLElement */ (record.target);
+    if (target.hidden) {
+      panel.removeEventListener("keydown", trapListener);
+      mo.disconnect();
+    }
+  });
+  mo.observe(panel, { attributes: true, attributeFilter: ["hidden"] });
+}
+
+/**
+ *
+ * @param {NodeListOf<HTMLAnchorElement>} anchors
+ * @param {HTMLElement} panel
+ * @param {HTMLElement} dfn
+ * @returns
+ */
+function createTrapListener(anchors, panel, dfn) {
+  const lastIndex = anchors.length - 1;
+  let currentIndex = 0;
+  return event => {
+    switch (event.key) {
+      // Hitting "Tab" traps us in a nice loop around elements.
+      case "Tab": {
+        event.preventDefault();
+        currentIndex += event.shiftKey ? -1 : +1;
+        if (currentIndex < 0) {
+          currentIndex = lastIndex;
+        } else if (currentIndex > lastIndex) {
+          currentIndex = 0;
+        }
+        anchors.item(currentIndex).focus();
+        break;
+      }
+
+      // Hitting "Enter" on an anchor releases the trap.
+      case "Enter":
+        hidePanel(panel);
+        break;
+
+      // Hitting "Escape" returns focus to dfn.
+      case "Escape":
+        hidePanel(panel);
+        dfn.focus();
+        return;
+    }
+  };
+}
+
+/** @param {HTMLElement} panel */
+function hidePanel(panel) {
+  if (!panel) return;
+  panel.hidden = true;
+  panel.classList.remove("docked");
+}
+})()</script><script src="https://www.w3.org/scripts/TR/2021/fixup.js"></script></body></html>
