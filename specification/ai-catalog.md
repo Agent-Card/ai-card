@@ -11,7 +11,7 @@ and reducing interoperability.
 This document defines the **AI Catalog**: a typed, nestable JSON
 container for discovering heterogeneous AI artifacts. Each entry
 declares its artifact type via a media type and may reference or
-inline the native artifact metadata. A minimal catalog is simply a
+embed the native artifact metadata.A minimal catalog is simply a
 list of entries — names, types, and URLs — requiring no additional
 infrastructure.
 
@@ -45,7 +45,7 @@ AI Catalog
 
 Catalog Entry
 : A single item in an AI Catalog, identified by a media type and
-  referencing or inlining an AI artifact.
+  referencing or embedding an AI artifact.
 
 Trust Manifest
 : A JSON object providing verifiable identity, attestation, and
@@ -129,7 +129,7 @@ For example, a minimal catalog listing three AI artifacts:
       "identifier": "urn:example:a2a:research",
       "displayName": "Research Assistant",
       "mediaType": "application/a2a-agent-card+json",
-      "url": "https://agents.example.com/researchAssitant"
+      "url": "https://agents.example.com/researchAssistant"
     }
   ]
 }
@@ -169,6 +169,17 @@ The following members are OPTIONAL:
 `trustManifest`
 : A Trust Manifest object as defined in [Trust Manifest](#trust-manifest) providing
   verifiable identity and trust metadata for the host itself.
+
+For example:
+
+```json
+{
+  "displayName": "Acme Enterprise AI",
+  "identifier": "did:web:acme-corp.com",
+  "documentationUrl": "https://docs.acme-corp.com/ai",
+  "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0c..."
+}
+```
 
 ## Catalog Entry
 
@@ -257,6 +268,35 @@ Clients that need only the latest version SHOULD sort entries
 sharing the same `identifier` by `version` (when parseable as a semantic
 version) or by `updatedAt`, and select the most recent. Clients
 that need a specific version SHOULD match on both `identifier` and `version`.
+
+For example, a catalog listing two versions of the same agent:
+
+```json
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:acme:agent:finance",
+      "displayName": "Acme Finance Agent",
+      "version": "2.1.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
+      "updatedAt": "2026-03-15T10:00:00Z"
+    },
+    {
+      "identifier": "urn:acme:agent:finance",
+      "displayName": "Acme Finance Agent",
+      "version": "2.0.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
+      "updatedAt": "2026-01-20T08:00:00Z"
+    }
+  ]
+}
+```
+
+Both entries share the same `identifier` but have distinct `version`
+values, so the combination is unique.
 
 ## Publisher Object
 
@@ -353,6 +393,46 @@ The following members are OPTIONAL:
 : An open map of string keys to arbitrary values for extending trust
   metadata.
 
+For example, a Trust Manifest with identity, attestations, and
+provenance:
+
+```json
+{
+  "identity": "urn:acme:agent:finance",
+  "identityType": "did",
+  "trustSchema": {
+    "identifier": "urn:trust:acme-enterprise-v1",
+    "version": "1.0",
+    "governanceUri": "https://acme-corp.com/trust/governance.pdf",
+    "verificationMethods": ["did", "x509"]
+  },
+  "attestations": [
+    {
+      "type": "publisher-identity",
+      "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
+      "mediaType": "application/jwt",
+      "description": "Verifies did:web:acme-corp.com as publisher"
+    },
+    {
+      "type": "SOC2-Type2",
+      "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+      "mediaType": "application/pdf",
+      "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+    }
+  ],
+  "provenance": [
+    {
+      "relation": "publishedFrom",
+      "sourceId": "https://github.com/acme-corp/finance-agent",
+      "sourceDigest": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
+    }
+  ],
+  "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
+  "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
+  "signature": "eyJhbGciOiJFUzI1NiJ9..detached-jws-signature"
+}
+```
+
 ## Trust Schema Object
 
 A Trust Schema object describes the trust framework applied to the
@@ -372,6 +452,17 @@ The following members are OPTIONAL:
 `verificationMethods`
 : An array of strings identifying the verification methods supported
   (e.g., "did", "x509", "dns-01").
+
+For example:
+
+```json
+{
+  "identifier": "urn:trust:acme-enterprise-v1",
+  "version": "1.0",
+  "governanceUri": "https://acme-corp.com/trust/governance.pdf",
+  "verificationMethods": ["did", "x509"]
+}
+```
 
 ## Attestation Object
 
@@ -402,6 +493,19 @@ The following members are OPTIONAL:
 `description`
 : A string containing a human-readable label.
 
+For example, a compliance attestation with integrity verification:
+
+```json
+{
+  "type": "SOC2-Type2",
+  "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
+  "mediaType": "application/pdf",
+  "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "size": 245760,
+  "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
+}
+```
+
 ## Provenance Link Object
 
 A Provenance Link records lineage information. It MUST contain:
@@ -426,6 +530,20 @@ The following members are OPTIONAL:
 
 `signatureRef`
 : A string referencing the key used to sign the provenance statement.
+
+For example, a provenance link recording that an artifact was built
+from a specific source commit and published through an OCI registry:
+
+```json
+{
+  "relation": "publishedFrom",
+  "sourceId": "https://github.com/acme-corp/finance-agent",
+  "sourceDigest": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+  "registryUri": "oci://registry.acme-corp.com/agents/finance",
+  "statementUri": "https://trust.acme-corp.com/provenance/finance-agent-v2.1.json",
+  "signatureRef": "did:web:acme-corp.com#key-1"
+}
+```
 
 ## Verification Procedures
 
@@ -613,8 +731,8 @@ document their limit.
 An AI Catalog document MAY be served from any URL. It is identified
 by its media type (`application/ai-catalog+json`) and its `specVersion`
 field, not by its URL path. Catalogs are equally valid when hosted at
-an arbitrary path, embedded in a registry response, bundled in a
-package, or distributed as a local file.
+an arbitrary path, embedded in a registry response, packaged in an
+archive, or distributed as a local file.
 
 When served over HTTP, the document SHOULD be served with the media
 type `application/ai-catalog+json`.
@@ -701,7 +819,7 @@ A conformant Minimal Catalog is a JSON document with media type
   `data`
 
 All other fields (`host`, `publisher`, `trustManifest`,
-`metadata`) are OPTIONAL.This level is sufficient for use cases that
+`metadata`) are OPTIONAL. This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents.
 
@@ -1024,7 +1142,7 @@ artifact types including a nested catalog packaging related artifacts:
       "description": "A2A agent + MCP server + dataset for finance workflows.",
       "tags": ["finance", "suite"],
       "data": {
-              "specVersion": "1.0",
+        "specVersion": "1.0",
         "entries": [
           {
             "identifier": "urn:acme:agent:finance-a2a",
@@ -1243,7 +1361,7 @@ concepts to their OCI physical equivalents:
 Tooling converts an AI Catalog JSON document into OCI artifacts:
 
 1. **Each catalog entry** becomes an OCI Image Manifest. The entry's
-   artifact content (A2A card, MCP manifest, skill definition) is
+   artifact content (A2A card, MCP Server Card, skill definition) is
    stored as a `layers[0]` blob. Common metadata (name, description,
    publisher) is stored as the `config` blob or as `annotations`.
 

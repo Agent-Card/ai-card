@@ -153,7 +153,7 @@ and reducing interoperability.</p>
 <p>This document defines the <strong>AI Catalog</strong>: a typed, nestable JSON
 container for discovering heterogeneous AI artifacts. Each entry
 declares its artifact type via a media type and may reference or
-inline the native artifact metadata. A minimal catalog is simply a
+embed the native artifact metadata.A minimal catalog is simply a
 list of entries — names, types, and URLs — requiring no additional
 infrastructure.</p>
 <p>For environments that need verifiable identity, compliance evidence,
@@ -182,7 +182,7 @@ capitals, as shown here.</p>
   media type that contains an ordered list of catalog entries.</dd>
 <dt>Catalog Entry</dt>
 <dd>A single item in an AI Catalog, identified by a media type and
-  referencing or inlining an AI artifact.</dd>
+  referencing or embedding an AI artifact.</dd>
 <dt>Trust Manifest</dt>
 <dd>A JSON object providing verifiable identity, attestation, and
   provenance metadata for an AI artifact.</dd>
@@ -272,7 +272,7 @@ members:</p>
       &quot;identifier&quot;: &quot;urn:example:a2a:research&quot;,
       &quot;displayName&quot;: &quot;Research Assistant&quot;,
       &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
-      &quot;url&quot;: &quot;https://agents.example.com/researchAssitant&quot;
+      &quot;url&quot;: &quot;https://agents.example.com/researchAssistant&quot;
     }
   ]
 }
@@ -309,6 +309,14 @@ contain:</p>
 <dd>A Trust Manifest object as defined in <a href="#trust-manifest">Trust Manifest</a> providing
   verifiable identity and trust metadata for the host itself.</dd>
 </dl>
+<p>For example:</p>
+<pre><code class="language-json">{
+  &quot;displayName&quot;: &quot;Acme Enterprise AI&quot;,
+  &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
+  &quot;documentationUrl&quot;: &quot;https://docs.acme-corp.com/ai&quot;,
+  &quot;logoUrl&quot;: &quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0c...&quot;
+}
+</code></pre>
 </section>
 <section id="catalog-entry">
 <h2>Catalog Entry</h2>
@@ -388,6 +396,31 @@ recognized wherever it appears.</p>
 sharing the same <code>identifier</code> by <code>version</code> (when parseable as a semantic
 version) or by <code>updatedAt</code>, and select the most recent. Clients
 that need a specific version SHOULD match on both <code>identifier</code> and <code>version</code>.</p>
+<p>For example, a catalog listing two versions of the same agent:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
+      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
+      &quot;version&quot;: &quot;2.1.0&quot;,
+      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
+      &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+    },
+    {
+      &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
+      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
+      &quot;version&quot;: &quot;2.0.0&quot;,
+      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.0.json&quot;,
+      &quot;updatedAt&quot;: &quot;2026-01-20T08:00:00Z&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Both entries share the same <code>identifier</code> but have distinct <code>version</code>
+values, so the combination is unique.</p>
 </section>
 <section id="publisher-object">
 <h2>Publisher Object</h2>
@@ -474,6 +507,43 @@ properties may evolve across versions.</p>
 <dd>An open map of string keys to arbitrary values for extending trust
   metadata.</dd>
 </dl>
+<p>For example, a Trust Manifest with identity, attestations, and
+provenance:</p>
+<pre><code class="language-json">{
+  &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
+  &quot;identityType&quot;: &quot;did&quot;,
+  &quot;trustSchema&quot;: {
+    &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
+    &quot;version&quot;: &quot;1.0&quot;,
+    &quot;governanceUri&quot;: &quot;https://acme-corp.com/trust/governance.pdf&quot;,
+    &quot;verificationMethods&quot;: [&quot;did&quot;, &quot;x509&quot;]
+  },
+  &quot;attestations&quot;: [
+    {
+      &quot;type&quot;: &quot;publisher-identity&quot;,
+      &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
+      &quot;mediaType&quot;: &quot;application/jwt&quot;,
+      &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
+    },
+    {
+      &quot;type&quot;: &quot;SOC2-Type2&quot;,
+      &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
+      &quot;mediaType&quot;: &quot;application/pdf&quot;,
+      &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
+    }
+  ],
+  &quot;provenance&quot;: [
+    {
+      &quot;relation&quot;: &quot;publishedFrom&quot;,
+      &quot;sourceId&quot;: &quot;https://github.com/acme-corp/finance-agent&quot;,
+      &quot;sourceDigest&quot;: &quot;sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321&quot;
+    }
+  ],
+  &quot;privacyPolicyUrl&quot;: &quot;https://acme-corp.com/legal/privacy&quot;,
+  &quot;termsOfServiceUrl&quot;: &quot;https://acme-corp.com/legal/terms&quot;,
+  &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached-jws-signature&quot;
+}
+</code></pre>
 </section>
 <section id="trust-schema-object">
 <h2>Trust Schema Object</h2>
@@ -493,6 +563,14 @@ artifact. It MUST contain:</p>
 <dd>An array of strings identifying the verification methods supported
   (e.g., "did", "x509", "dns-01").</dd>
 </dl>
+<p>For example:</p>
+<pre><code class="language-json">{
+  &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
+  &quot;version&quot;: &quot;1.0&quot;,
+  &quot;governanceUri&quot;: &quot;https://acme-corp.com/trust/governance.pdf&quot;,
+  &quot;verificationMethods&quot;: [&quot;did&quot;, &quot;x509&quot;]
+}
+</code></pre>
 </section>
 <section id="attestation-object">
 <h2>Attestation Object</h2>
@@ -519,6 +597,16 @@ contain:</p>
 <dt><code>description</code></dt>
 <dd>A string containing a human-readable label.</dd>
 </dl>
+<p>For example, a compliance attestation with integrity verification:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;SOC2-Type2&quot;,
+  &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2-2026.pdf&quot;,
+  &quot;mediaType&quot;: &quot;application/pdf&quot;,
+  &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;,
+  &quot;size&quot;: 245760,
+  &quot;description&quot;: &quot;SOC2 Type 2 audit report for Acme Finance Agent (2026)&quot;
+}
+</code></pre>
 </section>
 <section id="provenance-link-object">
 <h2>Provenance Link Object</h2>
@@ -541,6 +629,17 @@ contain:</p>
 <dt><code>signatureRef</code></dt>
 <dd>A string referencing the key used to sign the provenance statement.</dd>
 </dl>
+<p>For example, a provenance link recording that an artifact was built
+from a specific source commit and published through an OCI registry:</p>
+<pre><code class="language-json">{
+  &quot;relation&quot;: &quot;publishedFrom&quot;,
+  &quot;sourceId&quot;: &quot;https://github.com/acme-corp/finance-agent&quot;,
+  &quot;sourceDigest&quot;: &quot;sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321&quot;,
+  &quot;registryUri&quot;: &quot;oci://registry.acme-corp.com/agents/finance&quot;,
+  &quot;statementUri&quot;: &quot;https://trust.acme-corp.com/provenance/finance-agent-v2.1.json&quot;,
+  &quot;signatureRef&quot;: &quot;did:web:acme-corp.com#key-1&quot;
+}
+</code></pre>
 </section>
 <section id="verification-procedures">
 <h2>Verification Procedures</h2>
@@ -721,8 +820,8 @@ document their limit.</p>
 <p>An AI Catalog document MAY be served from any URL. It is identified
 by its media type (<code>application/ai-catalog+json</code>) and its <code>specVersion</code>
 field, not by its URL path. Catalogs are equally valid when hosted at
-an arbitrary path, embedded in a registry response, bundled in a
-package, or distributed as a local file.</p>
+an arbitrary path, embedded in a registry response, packaged in an
+archive, or distributed as a local file.</p>
 <p>When served over HTTP, the document SHOULD be served with the media
 type <code>application/ai-catalog+json</code>.</p>
 </section>
@@ -801,7 +900,7 @@ their declared level.</p>
   <code>data</code></li>
 </ul>
 <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
-<code>metadata</code>) are OPTIONAL.This level is sufficient for use cases that
+<code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents.</p>
 </section>
@@ -1113,7 +1212,7 @@ artifact types including a nested catalog packaging related artifacts:</p>
       &quot;description&quot;: &quot;A2A agent + MCP server + dataset for finance workflows.&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;suite&quot;],
       &quot;data&quot;: {
-              &quot;specVersion&quot;: &quot;1.0&quot;,
+        &quot;specVersion&quot;: &quot;1.0&quot;,
         &quot;entries&quot;: [
           {
             &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
@@ -1356,7 +1455,7 @@ concepts to their OCI physical equivalents:</p>
 <ol>
 <li>
 <p><strong>Each catalog entry</strong> becomes an OCI Image Manifest. The entry's
-   artifact content (A2A card, MCP manifest, skill definition) is
+   artifact content (A2A card, MCP Server Card, skill definition) is
    stored as a <code>layers[0]</code> blob. Common metadata (name, description,
    publisher) is stored as the <code>config</code> blob or as <code>annotations</code>.</p>
 </li>
