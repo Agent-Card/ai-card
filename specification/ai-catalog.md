@@ -927,10 +927,53 @@ conformance levels and SHOULD gracefully handle their absence.
 
 # Security Considerations
 
-## Transport Security
+## Trust Layers
 
-AI Catalogs, artifacts, and Trust Manifests MUST be served over HTTPS
-(TLS 1.2 or later) to prevent tampering and eavesdropping.
+This specification supports a progressive trust model. Each layer
+builds on the previous one, adding confidence without requiring all
+consumers to implement every layer. Consumers choose the level
+appropriate to their threat model.
+
+**Layer 0 — Transport Security**
+: The catalog and artifacts are served over HTTPS (TLS 1.2 or later).
+  The consumer trusts the TLS certificate chain and DNS resolution.
+  This prevents passive eavesdropping and casual tampering but does
+  not protect against compromised hosting or DNS hijack.
+
+**Layer 1 — Trust Manifest with Provenance**
+: The catalog entry includes a Trust Manifest containing provenance
+  links with `sourceDigest` values. After fetching an artifact, the
+  consumer can hash the content and compare it to the digest recorded
+  in the provenance link. This detects artifact tampering in transit.
+  However, because the Trust Manifest is a peer element in the catalog
+  (not embedded in the artifact), an attacker who controls the catalog
+  document can substitute both the artifact URL and the Trust Manifest
+  with matching values. **Digest verification without signature
+  verification guards against transport-level tampering but not
+  catalog-level substitution.**
+
+**Layer 2 — Signed Trust Manifest**
+: The Trust Manifest includes a `signature` field (detached JWS).
+  The consumer verifies the signature against the publisher's public
+  key before trusting any claims in the Trust Manifest — including
+  provenance digests, attestations, and identity bindings. This closes
+  the substitution gap from Layer 1: an attacker cannot forge a
+  signed Trust Manifest without the publisher's private key.
+  Consumers SHOULD verify signatures when present and SHOULD reject
+  Trust Manifests whose signature does not validate.
+
+**Layer 3 — Content-Addressed Distribution (OCI)**
+: The catalog is distributed through an OCI registry where all content
+  — entries, artifacts, and Trust Manifests — is addressed by
+  cryptographic digest. The registry enforces integrity: substitution
+  is impossible because any change produces a different digest.
+  Cosign or Notation signatures on OCI manifests provide an additional
+  layer of publisher authentication.
+
+Consumers that rely on trust metadata for security decisions SHOULD
+implement at least Layer 2 (signature verification). Consumers that
+only implement Layer 0 or Layer 1 SHOULD treat Trust Manifest content
+as advisory, not authoritative.
 
 ## Nested Catalog Depth and Circular References
 
@@ -944,44 +987,23 @@ track the set of catalog URLs visited during recursive resolution and
 reject any catalog URL that has already been fetched in the current
 traversal path.
 
-## Trust Manifest Substitution
-
-Because the Trust Manifest is a peer element alongside the artifact
-reference (not embedded within the artifact itself), an attacker who
-controls the catalog document can substitute a different Trust Manifest
-for any entry. This is a real and significant threat.
-
-Mitigations include:
-
-- **Content-addressed references**: When distributing catalogs through
-  OCI registries, Trust Manifests are bound to entry manifests by
-  digest. Substitution is detectable because the digest changes.
-- **Signed Trust Manifests**: The `signature` field on a Trust Manifest
-  provides integrity verification independent of the transport. Consumers
-  SHOULD verify signatures when present and reject Trust Manifests whose
-  signature does not validate.
-- **Identity binding**: The requirement that Trust Manifest `identity`
-  MUST match the entry's `identifier` prevents transplanting a Trust
-  Manifest from one entry to another.
-
-Consumers that rely on trust metadata for security decisions SHOULD
-NOT trust unsigned Trust Manifests served over plain HTTPS without
-additional verification (e.g., fetching the attestation documents
-independently and verifying their signatures).
-
 ## Catalog Poisoning
 
 An attacker who can modify a catalog document (e.g., through a
 compromised hosting account or DNS hijack) can redirect consumers to
 malicious artifacts by changing `url` values or injecting new entries.
 
-Mitigations include:
+The trust layers described above provide progressive defense against
+this threat:
 
-- Serving catalogs over HTTPS with proper certificate management.
-- Using content-addressed digests in Trust Manifest provenance links
-  so consumers can verify artifact integrity after fetch.
-- Deploying catalogs through OCI registries where all content is
-  digest-addressed and signed.
+- **Layer 0** relies on HTTPS certificate management to prevent
+  unauthorized modification.
+- **Layer 1** enables post-fetch integrity checks but does not prevent
+  whole-entry substitution.
+- **Layer 2** prevents Trust Manifest forgery, ensuring provenance
+  digests and attestations are authentic.
+- **Layer 3** makes modification structurally impossible through
+  content-addressing.
 
 ## Identifier Typosquatting
 
