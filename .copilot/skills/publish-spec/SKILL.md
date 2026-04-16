@@ -2,7 +2,7 @@
 name: publish-spec
 description: >
   Build and publish the AI Catalog specification. Converts the Markdown source
-  to a styled ReSpec HTML document and deploys it to Azure Static Website.
+  to a styled ReSpec HTML document and publishes it via GitHub Pages.
   Trigger phrases include "publish the spec", "deploy the spec", "build the spec",
   "update the website", "rebuild the HTML".
 compatibility: Copilot CLI
@@ -15,7 +15,7 @@ metadata:
 # Publish Spec Skill
 
 Build the AI Catalog & Trust Manifest specification from Markdown source and
-deploy it as a static website on Azure.
+publish it as a static website via GitHub Pages.
 
 ## Source Files
 
@@ -23,53 +23,37 @@ deploy it as a static website on Azure.
 |------|---------|
 | `specification/ai-catalog.md` | Markdown source of truth |
 | `specification/respec-config.json` | ReSpec configuration (title, abstract, appendix headers) |
-| `specification/ai-catalog-respec.html` | ReSpec HTML (generated) |
+| `dist/index.html` | Generated site artifact |
+| `.github/workflows/publish-spec.yml` | GitHub Pages build and deploy workflow |
 
 ## Build Pipeline
 
-### Step 1: Generate ReSpec HTML from Markdown
+### Step 1: Generate the site locally
 
-```powershell
-python "C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py" `
-  "D:\github\agentcard\ai-card\specification\ai-catalog.md" `
-  "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" `
-  --config "D:\github\agentcard\ai-card\specification\respec-config.json"
+```bash
+uv run --locked python tools/build_spec.py specification/ai-catalog.md dist/index.html --config specification/respec-config.json
 ```
 
-This converts the Markdown into a ReSpec-compatible HTML document using the
-config for title, abstract, and appendix header detection.
+This converts the Markdown into the generated HTML site at `dist/index.html`
+using the repo's `uv`-managed dependencies.
 
-### Step 2: Deploy to Azure
+### Step 2: Publish via GitHub Pages
 
-```powershell
-az storage blob upload `
-  --account-name aicatalogspec `
-  --container-name '$web' `
-  --name index.html `
-  --file "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" `
-  --content-type "text/html" `
-  --overwrite
-```
-
-## Azure Details
-
-| Property | Value |
-|----------|-------|
-| Storage Account | `aicatalogspec` |
-| Resource Group | `rg-ai-catalog` |
-| Region | Canada East |
-| Static Website URL | https://aicatalogspec.z27.web.core.windows.net/ |
-| Container | `$web` |
-| Index Document | `index.html` |
+Push changes to the `main` branch to trigger
+`.github/workflows/publish-spec.yml`, which rebuilds the canonical site and
+updates the `gh-pages` branch served at `https://agent-card.github.io/ai-card/`.
+Same-repo pull requests also publish rendered preview pages under
+`https://agent-card.github.io/ai-card/pr/<number>/`.
 
 ## One-Liner (Build + Deploy)
 
-```powershell
-python "C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py" "D:\github\agentcard\ai-card\specification\ai-catalog.md" "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" --config "D:\github\agentcard\ai-card\specification\respec-config.json" && az storage blob upload --account-name aicatalogspec --container-name '$web' --name index.html --file "D:\github\agentcard\ai-card\specification\ai-catalog-respec.html" --content-type "text/html" --overwrite
+```bash
+uv run --locked python tools/build_spec.py specification/ai-catalog.md dist/index.html --config specification/respec-config.json
 ```
 
 ## Prerequisites
 
-- Python 3 (for build_respec.py)
-- Azure CLI (`az`) logged in to the Visual Studio Enterprise subscription
-- The ReSpec skill's build script at `C:\Users\darrmi\.claude\skills\respec\scripts\build_respec.py`
+- `uv`
+- Python 3.12+
+- GitHub Pages configured to serve from the `gh-pages` branch root
+- Push or merge access to `main` for canonical site publication
