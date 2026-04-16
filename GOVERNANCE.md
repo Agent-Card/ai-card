@@ -23,7 +23,7 @@ The AI Catalog project is governed by the Technical Steering Committee. The init
 1. The Technical Steering Committee (the "TSC") will be responsible for all technical oversight of the open source Project.
 2. **TSC Composition**
 
-    a. **"Startup Phase."** At the inception of the Project, four TSC members will be nominated. Two will be nominated by MCP Maintainers (https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) and two will be nominated by the the Linux Foundation A2A Technical Steering Committee (https://github.com/a2aproject/A2A/blob/main/GOVERNANCE.md).
+    a. **"Startup Phase."** At the inception of the Project, four TSC members will be nominated. Two will be nominated by MCP Core Maintainers (https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/MAINTAINERS.md) and two will be nominated by the the Linux Foundation A2A Technical Steering Committee (https://github.com/a2aproject/A2A/blob/main/GOVERNANCE.md).
 
     b. **"Steady State."** The TSC will decide upon a "steady state" composition of the TSC (whether by election, subproject technical leads, or other method as determined by the TSC).
 
