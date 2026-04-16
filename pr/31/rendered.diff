@@ -1,0 +1,20 @@
+--- a/base/index.html
++++ b/head/index.html
+@@ -11,7 +11,7 @@
+       "latestVersion": null,
+       "noRecTrack": true,
+       "shortName": "ai-catalog",
+-      "edDraftURI": "https://github.com/Agent-Card/ai-card/pull/27",
++      "edDraftURI": "https://agent-card.github.io/ai-card/",
+       "localBiblio": {
+             "RFC8785": {
+                   "title": "JSON Canonicalization Scheme (JCS)",
+@@ -1766,7 +1766,7 @@
+ <pre><code class="language-json">{
+   &quot;identifier&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
+   &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
+-  &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
++  &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+   &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
+   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
+   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
