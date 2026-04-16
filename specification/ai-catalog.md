@@ -1179,6 +1179,25 @@ Description:
 Reference:
 : This document
 
+## Well-Known URI Registration: ai-catalog.json
+
+This section registers the `ai-catalog.json` well-known URI in the
+IANA "Well-Known URIs" registry [[RFC8615]].
+
+URI Suffix:
+: ai-catalog.json
+
+Change Controller:
+: Agent Card Working Group
+
+Specification Document:
+: This document, [Well-Known URI](#well-known-uri)
+
+Related Information:
+: The well-known URI returns a JSON document with media type
+  `application/ai-catalog+json` conforming to the AI Catalog schema
+  defined in this specification.
+
 # CDDL Schema
 
 The following CDDL [[RFC8610]] defines the normative schema for AI
