@@ -39,9 +39,11 @@ using the repo's `uv`-managed dependencies.
 
 ### Step 2: Publish via GitHub Pages
 
-Push changes to the `ai-catalog-spec` branch to trigger
-`.github/workflows/publish-spec.yml`, which rebuilds `dist/index.html` and
-deploys it to GitHub Pages at `https://agent-card.github.io/ai-card/`.
+Push changes to the `main` branch to trigger
+`.github/workflows/publish-spec.yml`, which rebuilds the canonical site and
+updates the `gh-pages` branch served at `https://agent-card.github.io/ai-card/`.
+Same-repo pull requests also publish rendered preview pages under
+`https://agent-card.github.io/ai-card/pr/<number>/`.
 
 ## One-Liner (Build + Deploy)
 
@@ -53,4 +55,5 @@ uv run --locked python tools/build_spec.py specification/ai-catalog.md dist/inde
 
 - `uv`
 - Python 3.12+
-- Push access to the `ai-catalog-spec` branch for GitHub Pages publication
+- GitHub Pages configured to serve from the `gh-pages` branch root
+- Push or merge access to `main` for canonical site publication

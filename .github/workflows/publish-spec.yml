@@ -2,6 +2,12 @@ name: Publish Specification
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - closed
     paths:
       - .github/workflows/publish-spec.yml
       - pyproject.toml
@@ -9,9 +15,11 @@ on:
       - specification/ai-catalog.md
       - specification/respec-config.json
       - tools/build_spec.py
+      - tools/build_spec_preview.py
+      - tools/update_gh_pages.py
   push:
     branches:
-      - ai-catalog-spec
+      - main
     paths:
       - .github/workflows/publish-spec.yml
       - pyproject.toml
@@ -19,6 +27,8 @@ on:
       - specification/ai-catalog.md
       - specification/respec-config.json
       - tools/build_spec.py
+      - tools/build_spec_preview.py
+      - tools/update_gh_pages.py
   workflow_dispatch:
 
 permissions:
@@ -30,6 +40,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,25 +59,105 @@ jobs:
         run: |
           uv run --python 3.12 --locked python tools/build_spec.py specification/ai-catalog.md dist/index.html --config specification/respec-config.json
 
-      - name: Add GitHub Pages marker
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/ai-catalog-spec'
-        run: touch dist/.nojekyll
-
-      - name: Upload Pages artifact
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/ai-catalog-spec'
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
-        with:
-          path: dist
-
-  deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/ai-catalog-spec'
+  publish-root:
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     needs: build
     runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
     permissions:
-      pages: write
-      id-token: write
+      contents: write
 
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Build canonical specification site
+        run: |
+          uv run --python 3.12 --locked python tools/build_spec.py specification/ai-catalog.md .site/root/index.html --config specification/respec-config.json
+
+      - name: Publish canonical site to gh-pages
+        run: |
+          python3 tools/update_gh_pages.py root \
+            --source-dir .site/root \
+            --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            --commit-message "Publish specification site from main"
+
+  publish-pr-preview:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out pull request head
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Fetch base branch history
+        run: |
+          git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+
+      - name: Build rendered PR preview site
+        run: |
+          uv run --python 3.12 --locked python tools/build_spec_preview.py \
+            --base-sha "${{ github.event.pull_request.base.sha }}" \
+            --head-sha "${{ github.event.pull_request.head.sha }}" \
+            --base-branch "${{ github.event.pull_request.base.ref }}" \
+            --head-branch "${{ github.event.pull_request.head.ref }}" \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --output-dir ".site/pr/${{ github.event.pull_request.number }}"
+
+      - name: Publish PR preview to gh-pages
+        run: |
+          python3 tools/update_gh_pages.py preview \
+            --source-dir ".site/pr/${{ github.event.pull_request.number }}" \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            --commit-message "Publish specification preview for PR #${{ github.event.pull_request.number }}"
+
+  cleanup-pr-preview:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Remove PR preview from gh-pages
+        run: |
+          python3 tools/update_gh_pages.py cleanup \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            --commit-message "Remove specification preview for PR #${{ github.event.pull_request.number }}"
