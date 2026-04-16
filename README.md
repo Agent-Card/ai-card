@@ -1,5 +1,7 @@
 # Common AI Card and Registry Standard
 
+[![Specification](https://img.shields.io/badge/GitHub%20Pages-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://agent-card.github.io/ai-card/) [![Build](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml/badge.svg?branch=ai-catalog-spec)](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml)
+
 Co-Authors: [ToddSegal](https://github.com/ToddSegal), [David Soria Parra](https://github.com/dsp-ant)
 
 ## tl;dr
@@ -19,15 +21,23 @@ GitHub Pages for the repository should be configured to use **GitHub Actions** a
 To build the published HTML locally:
 
 ```bash
-./build-spec.sh
+uv run --locked python tools/build_spec.py specification/ai-catalog.md dist/index.html --config specification/respec-config.json
 ```
 
 This uses `uv` to resolve the Markdown dependency and writes the generated page to `dist/index.html`.
 
-If you want to run the builder directly, use:
+The build dependencies live in `pyproject.toml` and are pinned in `uv.lock`.
+
+If you want to omit the explicit paths, the builder defaults to the spec source and `dist/index.html` output:
 
 ```bash
-uv run --with-requirements requirements-spec.txt python tools/build_spec.py
+uv run --locked python tools/build_spec.py
+```
+
+If you change the spec build dependencies, refresh the lockfile with:
+
+```bash
+uv lock
 ```
 
 The generated site entry point is `dist/index.html`.
