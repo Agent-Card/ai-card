@@ -67,10 +67,6 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_CONFIG,
         help="ReSpec configuration JSON file",
     )
-    parser.add_argument(
-        "--ed-draft-uri",
-        help="Override the ReSpec editor's draft URI",
-    )
     return parser.parse_args()
 
 
@@ -167,12 +163,8 @@ def render_sections(converter: markdown.Markdown, sections: list[Section]) -> st
     return "\n".join(rendered_sections)
 
 
-def load_config(
-    path: Path, ed_draft_uri_override: str | None = None
-) -> tuple[dict[str, object], str, str, list[str]]:
+def load_config(path: Path) -> tuple[dict[str, object], str, str, list[str]]:
     config = json.loads(path.read_text(encoding="utf-8"))
-    if ed_draft_uri_override:
-        config["edDraftURI"] = ed_draft_uri_override
     title = str(config.pop("title"))
     abstract = str(config.pop("abstract"))
     appendix_headers = list(config.pop("appendixHeaders", []))
@@ -180,12 +172,8 @@ def load_config(
     return final_config, title, abstract, appendix_headers
 
 
-def build_document(
-    source: Path, output: Path, config_path: Path, ed_draft_uri_override: str | None = None
-) -> None:
-    respec_config, title, abstract, appendix_headers = load_config(
-        config_path, ed_draft_uri_override
-    )
+def build_document(source: Path, output: Path, config_path: Path) -> None:
+    respec_config, title, abstract, appendix_headers = load_config(config_path)
     sections = build_section_tree(source.read_text(encoding="utf-8"), appendix_headers)
 
     converter = markdown.Markdown(
@@ -253,7 +241,7 @@ def build_document(
 
 def main() -> None:
     args = parse_args()
-    build_document(args.source, args.output, args.config, args.ed_draft_uri)
+    build_document(args.source, args.output, args.config)
 
 
 if __name__ == "__main__":

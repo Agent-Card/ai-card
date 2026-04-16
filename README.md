@@ -1,5 +1,7 @@
 # Common AI Card and Registry Standard
 
+[![Specification](https://img.shields.io/badge/GitHub%20Pages-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://agent-card.github.io/ai-card/) [![Build](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml/badge.svg?branch=main)](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml)
+
 Co-Authors: [ToddSegal](https://github.com/ToddSegal), [David Soria Parra](https://github.com/dsp-ant)
 
 ## tl;dr
@@ -12,22 +14,30 @@ Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-car
 
 The AI Catalog specification is built from `specification/ai-catalog.md` and published to GitHub Pages by the workflow in `.github/workflows/publish-spec.yml`.
 
-Pushes to the `ai-catalog-spec` branch trigger the GitHub Pages publication workflow.
+Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://agent-card.github.io/ai-card/pr/<number>/`, including a diff2html view against the PR base branch.
 
-GitHub Pages for the repository should be configured to use **GitHub Actions** as the deployment source.
+GitHub Pages for the repository should be configured to serve from the `gh-pages` branch at the repository root.
 
 To build the published HTML locally:
 
 ```bash
-./build-spec.sh
+uv run --locked python tools/build_spec.py specification/ai-catalog.md dist/index.html --config specification/respec-config.json
 ```
 
 This uses `uv` to resolve the Markdown dependency and writes the generated page to `dist/index.html`.
 
-If you want to run the builder directly, use:
+The build dependencies live in `pyproject.toml` and are pinned in `uv.lock`.
+
+If you want to omit the explicit paths, the builder defaults to the spec source and `dist/index.html` output:
 
 ```bash
-uv run --with-requirements requirements-spec.txt python tools/build_spec.py
+uv run --locked python tools/build_spec.py
+```
+
+If you change the spec build dependencies, refresh the lockfile with:
+
+```bash
+uv lock
 ```
 
 The generated site entry point is `dist/index.html`.

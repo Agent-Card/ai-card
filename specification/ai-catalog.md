@@ -1939,7 +1939,7 @@ server can reference the Server Card as its artifact content:
 {
   "identifier": "urn:mcp:example.com:finance-server",
   "displayName": "Acme Finance MCP Server",
-  "mediaType": "application/mcp-server-card+json",
+  "mediaType": "application/mcp-server+json",
   "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
   "description": "MCP server for financial data and trading tools",
   "tags": ["finance", "mcp"],
