@@ -2,8 +2,6 @@
 
 [![Specification](https://img.shields.io/badge/GitHub%20Pages-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://agent-card.github.io/ai-card/) [![Build](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml/badge.svg?branch=main)](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml)
 
-Co-Authors: [ToddSegal](https://github.com/ToddSegal), [David Soria Parra](https://github.com/dsp-ant)
-
 ## tl;dr
 
 Members from various AI Protocols (MCP, A2A) are collaborating on a common AI card standard to benefit the AI Service Ecosystem.
