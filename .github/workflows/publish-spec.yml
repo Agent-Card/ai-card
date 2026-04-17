@@ -108,10 +108,8 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Check out pull request head
+      - name: Check out pull request merge ref
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up uv
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
@@ -119,15 +117,31 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Fetch base branch history
+      - name: Fetch base and head history
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          git fetch --no-tags origin "${{ github.event.pull_request.base.ref }}"
+          git fetch --no-tags origin "$BASE_REF" "$HEAD_REF"
+
+      - name: Resolve preview revisions
+        id: preview-revisions
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          base_sha=$(git rev-parse "origin/${BASE_REF}")
+          if ! git cat-file -e "${HEAD_SHA}^{commit}"; then
+            git fetch --no-tags origin "${HEAD_SHA}"
+          fi
+          echo "base_sha=${base_sha}" >> "$GITHUB_OUTPUT"
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Build rendered PR preview site
         run: |
           uv run --python 3.12 --locked python tools/build_spec_preview.py \
-            --base-sha "${{ github.event.pull_request.base.sha }}" \
-            --head-sha "${{ github.event.pull_request.head.sha }}" \
+            --base-sha "${{ steps.preview-revisions.outputs.base_sha }}" \
+            --head-sha "${{ steps.preview-revisions.outputs.head_sha }}" \
             --base-branch "${{ github.event.pull_request.base.ref }}" \
             --head-branch "${{ github.event.pull_request.head.ref }}" \
             --pr-number "${{ github.event.pull_request.number }}" \
