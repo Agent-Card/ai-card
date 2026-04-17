@@ -129,7 +129,7 @@ For example, a minimal catalog listing three AI artifacts:
       "identifier": "urn:example:a2a:research",
       "displayName": "Research Assistant",
       "mediaType": "application/a2a-agent-card+json",
-      "url": "https://agents.example.com/researchAssitant"
+      "url": "https://agents.example.com/researchAssistant"
     }
   ]
 }
