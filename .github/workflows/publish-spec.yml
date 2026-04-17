@@ -105,6 +105,7 @@ jobs:
     permissions:
       contents: write
       issues: write
+      pull-requests: write
 
     steps:
       - name: Check out pull request head
@@ -153,13 +154,11 @@ jobs:
           This comment is updated automatically while the pull request preview is available.
           EOF
           )
-          comments=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments?per_page=100")
-          comment_id=$(printf '%s' "$comments" | jq -r --arg marker "$marker" 'map(select(.body | contains($marker))) | first | .id // empty')
-          if [[ -n "$comment_id" ]]; then
-            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/${comment_id}" -f body="$body" >/dev/null
-          else
-            gh api --method POST "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" -f body="$body" >/dev/null
-          fi
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last \
+            --create-if-none \
+            --body "$body"
 
   cleanup-pr-preview:
     if: |
@@ -173,6 +172,7 @@ jobs:
     permissions:
       contents: write
       issues: write
+      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -197,8 +197,8 @@ jobs:
           The pull request preview was removed because this pull request is closed.
           EOF
           )
-          comments=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments?per_page=100")
-          comment_id=$(printf '%s' "$comments" | jq -r --arg marker "$marker" 'map(select(.body | contains($marker))) | first | .id // empty')
-          if [[ -n "$comment_id" ]]; then
-            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/${comment_id}" -f body="$body" >/dev/null
-          fi
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last \
+            --create-if-none \
+            --body "$body"
