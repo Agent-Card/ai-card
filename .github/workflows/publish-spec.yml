@@ -104,6 +104,8 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Check out pull request head
@@ -139,6 +141,25 @@ jobs:
             --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
             --commit-message "Publish specification preview for PR #${{ github.event.pull_request.number }}"
 
+      - name: Comment preview URL on pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_URL: https://agent-card.github.io/ai-catalog/pr/${{ github.event.pull_request.number }}/
+        run: |
+          marker='<!-- ai-catalog-preview-url -->'
+          body=$(cat <<EOF
+          ${marker}
+          Preview: ${PREVIEW_URL}
+
+          This comment is updated automatically while the pull request preview is available.
+          EOF
+          )
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last \
+            --create-if-none \
+            --body "$body"
+
   cleanup-pr-preview:
     if: |
       github.event_name == 'pull_request' &&
@@ -150,6 +171,8 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -161,3 +184,21 @@ jobs:
             --pr-number "${{ github.event.pull_request.number }}" \
             --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
             --commit-message "Remove specification preview for PR #${{ github.event.pull_request.number }}"
+
+      - name: Update preview comment on pull request close
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          marker='<!-- ai-catalog-preview-url -->'
+          body=$(cat <<EOF
+          ${marker}
+          Preview unavailable.
+
+          The pull request preview was removed because this pull request is closed.
+          EOF
+          )
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last \
+            --create-if-none \
+            --body "$body"

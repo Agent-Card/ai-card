@@ -1,18 +1,20 @@
-# Common AI Card and Registry Standard
+# Common AI Catalog and Registry Standard
 
-[![Specification](https://img.shields.io/badge/GitHub%20Pages-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://agent-card.github.io/ai-card/) [![Build](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml/badge.svg?branch=main)](https://github.com/Agent-Card/ai-card/actions/workflows/publish-spec.yml)
+[![Specification](https://img.shields.io/badge/GitHub%20Pages-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://agent-card.github.io/ai-catalog/) [![Build](https://github.com/Agent-Card/ai-catalog/actions/workflows/publish-spec.yml/badge.svg?branch=main)](https://github.com/Agent-Card/ai-catalog/actions/workflows/publish-spec.yml)
 
 ## tl;dr
 
-Members from various AI Protocols (MCP, A2A) are collaborating on a common AI card standard to benefit the AI Service Ecosystem.
+Members from various AI protocols (MCP, A2A, and others) are collaborating on a common AI Catalog standard for discovering heterogeneous AI artifacts across the ecosystem.
 
-Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-card/issues), and [Pull Requests](https://github.com/Agent-Card/ai-card/pulls).
+Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-catalog/issues), and [Pull Requests](https://github.com/Agent-Card/ai-catalog/pulls).
 
 ## Specification Site
 
 The AI Catalog specification is built from `specification/ai-catalog.md` and published to GitHub Pages by the workflow in `.github/workflows/publish-spec.yml`.
 
-Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://agent-card.github.io/ai-card/pr/<number>/`, including a diff2html view against the PR base branch.
+Published site: [agent-card.github.io/ai-catalog](https://agent-card.github.io/ai-catalog/)
+
+Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://agent-card.github.io/ai-catalog/pr/<number>/`, including a rendered diff preview against the PR base branch. The workflow also keeps a pull request comment updated with the live preview URL while the PR remains open.
 
 GitHub Pages for the repository should be configured to serve from the `gh-pages` branch at the repository root.
 
@@ -48,42 +50,42 @@ Without a common discovery standard, we see duplicative and incompatible efforts
 
 ## What are we doing?
 
-In this repo, we will establish a new open standard for creating, discovering, securing, and serving AI service metadata called an **AI Card**. This standard will be proposed to be adopted by A2A and MCP following their standard governance processes. Other protocols are encouraged to adopt this standard as well.
+In this repo, we are defining the **AI Catalog**: a typed, nestable JSON container for discovering heterogeneous AI artifacts. Each catalog entry identifies an artifact by media type and may either reference the native artifact metadata by URL or inline it directly. The specification also defines an optional Trust Manifest extension for identity, attestations, and provenance metadata.
 
-*Important Note:* The **AI Card** standard does not change the underlying protocol architecture.
+*Important Note:* The **AI Catalog** standard does not replace or redefine protocol-specific artifact formats. It provides a common discovery and trust layer around them.
 
 ### Guiding Requirements
 
-#### Core AI Card Features
+#### Core AI Catalog Features
 
-The project will define a schema for a secure, tamper-resistant AI Card. This may include items (potential examples):
+The project defines a schema for a secure, extensible AI Catalog. This may include items such as:
 
-* **Common server metadata**, such as publishing company, links to documentation, description, icon, and server version.
-* **Verifiable metadata**, such as accreditations, certifications, reputational scores, and badges.
+* **Common catalog metadata**, such as publisher, documentation links, descriptions, icons, and versioning.
+* **Verifiable metadata**, such as attestations, certifications, provenance, and trust signals.
 * **Identity metadata**, such as Decentralized Identifiers (DID) or Secure Production Identity Framework For Everyone (SPIFFE).
-* **Custom data** defined by individual producers or consumers for their own needs.
+* **Custom metadata** defined by individual producers or consumers for their own needs.
 
 Actual properties for inclusion will be debated in PRs.
 
-#### AI Protocol Services
+#### AI Artifact Coverage
 
-AI Card will include `services` information indicating which AI protocols the server supports, their network addresses, and protocol-specific extension metadata such as capabilities.
+AI Catalog entries can reference or inline a wide range of AI artifacts, including MCP servers, A2A agent cards, Claude Code plugins, datasets, model cards, and nested catalogs.
 
-For example, an AI Card that supports MCP, A2A, and a custom “Foo” protocol, would have entries for each of MCP, A2A, and Foo. Each entry would contain their own specific metadata (such as “MCP tools” or “A2A skills”).
+Protocol-specific metadata remains defined by the underlying artifact specifications. The catalog does not duplicate or constrain those schemas; it uses media types to identify what each entry contains.
 
-This protocol-specific metadata would NOT be part of the AI Card spec. As noted earlier, the card standard will also allow for arbitrary custom data to be defined by a producer.
+Nested AI Catalog entries allow publishers to organize large catalogs, delegate sub-catalogs, or package related artifacts together.
 
 #### Static Discovery
 
-As part of the specification, this project would define a standard for how a server can make an individual card, and a catalog of cards, available at a well-known URL for a given domain (e.g. at `./well-known/ai-card.json`).
+As part of the specification, this project defines a standard way to publish a catalog at a well-known URL for a given domain, for example at `./well-known/ai-catalog.json`.
 
 Implementing protocols may support dynamic card creation and discovery through their own methods for scenarios such as providing different card content based on a caller's identity.
 
-Defining this behavior is NOT in scope for the AI Card specification.
+Defining those protocol-specific dynamic behaviors is NOT in scope for the AI Catalog specification.
 
 #### Common Registry Standard
 
-The AI Card project should also define a common **AI Card Registry** standard that provides a universal interface for clients to interact (query, search, CRUDL) with AI card collections.
+The AI Catalog project should also define a common **AI Catalog Registry** standard that provides a universal interface for clients to interact with catalog collections.
 
 ### Proposed Mechanics
 
@@ -95,9 +97,9 @@ This project will be moved to a permanent location a later date with a permanent
 
 #### Adoption
 
-When the specification is finalized, A2A and MCP steering committees will vote on adoption of the AI Card standard, potentially replacing existing protocol-specific standards or proposals.
+When the specification is finalized, A2A and MCP steering committees will vote on adoption of the AI Catalog standard, potentially replacing existing protocol-specific standards or proposals.
 
-Protocol-specific cards would be standardized as a common AI Card structure, with protocol-specific properties available in services as noted earlier.
+Protocol-specific artifacts would remain in their native formats and become discoverable through common AI Catalog entries.
 
 #### Ecosystem
 
