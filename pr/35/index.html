@@ -128,7 +128,7 @@
         </div>
         <div>
           <dt>Head revision</dt>
-          <dd>343d1b1ded94f33233e4bc1e0e17c6250ab05a5d</dd>
+          <dd>febb47392e47829ba8ef48d9fcc52f324f71e366</dd>
         </div>
       </dl>
     </section>
@@ -138,10 +138,10 @@
         The viewer below uses diff2html to show the unified diff between the
         generated base and head HTML pages.
       </p>
-      <p class="empty">No rendered HTML differences were detected between these revisions.</p>
+      <div id="diff"></div>
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/diff2html@3.4.45/bundles/js/diff2html.min.js"></script>
-  
+  <script>document.addEventListener("DOMContentLoaded", function () { const diffString = "--- a/base/index.html\n+++ b/head/index.html\n@@ -206,7 +206,7 @@\n       &quot;identifier&quot;: &quot;urn:example:a2a:research&quot;,\n       &quot;displayName&quot;: &quot;Research Assistant&quot;,\n       &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,\n-      &quot;url&quot;: &quot;https://agents.example.com/researchAssitant&quot;\n+      &quot;url&quot;: &quot;https://agents.example.com/researchAssistant&quot;\n     }\n   ]\n }\n"; const diffHtml = Diff2Html.html(diffString, { drawFileList: false, matching: "lines", outputFormat: "side-by-side", renderNothingWhenEmpty: false }); document.getElementById("diff").innerHTML = diffHtml; });</script>
 </body>
 </html>
