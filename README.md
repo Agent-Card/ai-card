@@ -8,6 +8,8 @@ Members from various AI Protocols (MCP, A2A) are collaborating on a common AI ca
 
 Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-card/issues), and [Pull Requests](https://github.com/Agent-Card/ai-card/pulls).
 
+Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+
 ## What problem are we solving?
 
 There are multiple evolving standards for communication protocols between AI clients and servers. While these protocols differ in capabilities and technical architecture, there are common ecosystem needs for producers and consumers of services built on top of them. This includes discovery, verifiable metadata, and trusted identity standards.
