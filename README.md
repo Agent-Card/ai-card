@@ -14,7 +14,7 @@ The AI Catalog specification is built from `specification/ai-catalog.md` and pub
 
 Published site: [agent-card.github.io/ai-catalog](https://agent-card.github.io/ai-catalog/)
 
-Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://agent-card.github.io/ai-catalog/pr/<number>/`, including a rendered diff preview against the PR base branch.
+Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://agent-card.github.io/ai-catalog/pr/<number>/`, including a rendered diff preview against the PR base branch. The workflow also keeps a pull request comment updated with the live preview URL while the PR remains open.
 
 GitHub Pages for the repository should be configured to serve from the `gh-pages` branch at the repository root.
 
