@@ -11,7 +11,7 @@ and reducing interoperability.
 This document defines the **AI Catalog**: a typed, nestable JSON
 container for discovering heterogeneous AI artifacts. Each entry
 declares its artifact type via a media type and may reference or
-inline the native artifact metadata. A minimal catalog is simply a
+embed the native artifact metadata. A minimal catalog is simply a
 list of entries — names, types, and URLs — requiring no additional
 infrastructure.
 
@@ -45,7 +45,7 @@ AI Catalog
 
 Catalog Entry
 : A single item in an AI Catalog, identified by a media type and
-  referencing or inlining an AI artifact.
+  referencing or embedding an AI artifact.
 
 Trust Manifest
 : A JSON object providing verifiable identity, attestation, and
@@ -67,8 +67,8 @@ Artifact
    filter, and route entries without parsing artifact content.
 
 3. **Composability**: The catalog format supports nesting — a catalog
-   entry can reference another AI Catalog. This enables plugin-style
-   packaging where a single catalog bundles multiple related artifacts.
+   entry can reference another AI Catalog, enabling hierarchical
+   organization and multi-artifact packaging.
 
 4. **Progressive Complexity**: The simplest catalog is just entries
    with names and URLs. Trust, identity, and provenance metadata are
@@ -77,9 +77,9 @@ Artifact
 
 5. **Scalable Federation**: The catalog format enables partitioning
    into sub-catalogs to manage size, and supports delegation to
-   sub-catalogs managed by independent publishers. Collections and
-   nested catalogs support a federated model where each segment of
-   the hierarchy may be authored, hosted, and updated independently.
+   sub-catalogs managed by independent publishers. Nested catalog
+   entries support a federated model where each segment of the
+   hierarchy may be authored, hosted, and updated independently.
 
 6. **Location Independence**: An AI Catalog MAY be served from any URL.
    The standard defines a well-known URL convention to enable
@@ -102,6 +102,7 @@ members:
 `specVersion`
 : A string indicating the version of this specification that the
   catalog conforms to, in "Major.Minor" format (e.g., "1.0").
+  See [Version Handling](#version-handling) for compatibility rules.
 
 `entries`
 : An array of Catalog Entry objects as defined in [Catalog Entry](#catalog-entry).
@@ -116,13 +117,13 @@ For example, a minimal catalog listing three AI artifacts:
     {
       "identifier": "urn:example:skill:code-review",
       "displayName": "Code Review Assistant",
-      "mediaType": "application/ai-skill",
+      "mediaType": "application/agentskill+zip",
       "url": "https://skills.example.com/code-review/skill.zip"
     },
     {
       "identifier": "urn:example:mcp:weather",
       "displayName": "Weather Service",
-      "mediaType": "application/mcp-server+json",
+      "mediaType": "application/mcp-server-card+json",
       "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
@@ -141,13 +142,10 @@ The following members are OPTIONAL:
 : A Host Info object as defined in [Host Info](#host-info) identifying the
   operator of this catalog.
 
-`collections`
-: An array of Collection Reference objects as defined in
-  [Organizing Catalogs](#organizing-catalogs).
-
 `metadata`
 : An open map of string keys to arbitrary values for custom or
-  non-standard metadata.
+  non-standard metadata. See [Metadata Extensibility](#metadata-extensibility)
+  for key naming conventions.
 
 ## Host Info
 
@@ -174,6 +172,17 @@ The following members are OPTIONAL:
 : A Trust Manifest object as defined in [Trust Manifest](#trust-manifest) providing
   verifiable identity and trust metadata for the host itself.
 
+For example:
+
+```json
+{
+  "displayName": "Acme Enterprise AI",
+  "identifier": "did:web:acme-corp.com",
+  "documentationUrl": "https://docs.acme-corp.com/ai",
+  "logoUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0c..."
+}
+```
+
 ## Catalog Entry
 
 A Catalog Entry object describes a single AI artifact in the catalog.
@@ -196,9 +205,9 @@ It MUST contain the following members:
 
   - `application/ai-catalog+json` — a nested AI Catalog
   - `application/a2a-agent-card+json` — an A2A Agent Card
-  - `application/mcp-server+json` — an MCP Server manifest
+  - `application/mcp-server-card+json` — an MCP Server Card
   - Any other media type defined by a protocol specification (e.g.,
-    `application/ai-skill` for skill definitions)
+    `application/agentskill+zip` for skill definitions)
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
@@ -208,7 +217,7 @@ provide the artifact content:
   retrieved. The document served at this URL SHOULD be served with
   the media type declared in the `mediaType` field.
 
-`inline`
+`data`
 : A JSON value containing the complete artifact document inline. The
   structure of this value is determined by the `mediaType` field and
   is opaque to this specification.
@@ -261,6 +270,35 @@ Clients that need only the latest version SHOULD sort entries
 sharing the same `identifier` by `version` (when parseable as a semantic
 version) or by `updatedAt`, and select the most recent. Clients
 that need a specific version SHOULD match on both `identifier` and `version`.
+
+For example, a catalog listing two versions of the same agent:
+
+```json
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:acme:agent:finance",
+      "displayName": "Acme Finance Agent",
+      "version": "2.1.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
+      "updatedAt": "2026-03-15T10:00:00Z"
+    },
+    {
+      "identifier": "urn:acme:agent:finance",
+      "displayName": "Acme Finance Agent",
+      "version": "2.0.0",
+      "mediaType": "application/a2a-agent-card+json",
+      "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
+      "updatedAt": "2026-01-20T08:00:00Z"
+    }
+  ]
+}
+```
+
+Both entries share the same `identifier` but have distinct `version`
+values, so the combination is unique.
 
 ## Publisher Object
 
@@ -357,6 +395,46 @@ The following members are OPTIONAL:
 : An open map of string keys to arbitrary values for extending trust
   metadata.
 
+For example, a Trust Manifest with identity, attestations, and
+provenance:
+
+```json
+{
+  "identity": "urn:acme:agent:finance",
+  "identityType": "did",
+  "trustSchema": {
+    "identifier": "urn:trust:acme-enterprise-v1",
+    "version": "1.0",
+    "governanceUri": "https://acme-corp.com/trust/governance.pdf",
+    "verificationMethods": ["did", "x509"]
+  },
+  "attestations": [
+    {
+      "type": "publisher-identity",
+      "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
+      "mediaType": "application/jwt",
+      "description": "Verifies did:web:acme-corp.com as publisher"
+    },
+    {
+      "type": "SOC2-Type2",
+      "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+      "mediaType": "application/pdf",
+      "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+    }
+  ],
+  "provenance": [
+    {
+      "relation": "publishedFrom",
+      "sourceId": "https://github.com/acme-corp/finance-agent",
+      "sourceDigest": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
+    }
+  ],
+  "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
+  "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
+  "signature": "eyJhbGciOiJFUzI1NiJ9..detached-jws-signature"
+}
+```
+
 ## Trust Schema Object
 
 A Trust Schema object describes the trust framework applied to the
@@ -376,6 +454,17 @@ The following members are OPTIONAL:
 `verificationMethods`
 : An array of strings identifying the verification methods supported
   (e.g., "did", "x509", "dns-01").
+
+For example:
+
+```json
+{
+  "identifier": "urn:trust:acme-enterprise-v1",
+  "version": "1.0",
+  "governanceUri": "https://acme-corp.com/trust/governance.pdf",
+  "verificationMethods": ["did", "x509"]
+}
+```
 
 ## Attestation Object
 
@@ -406,6 +495,19 @@ The following members are OPTIONAL:
 `description`
 : A string containing a human-readable label.
 
+For example, a compliance attestation with integrity verification:
+
+```json
+{
+  "type": "SOC2-Type2",
+  "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
+  "mediaType": "application/pdf",
+  "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
+  "size": 245760,
+  "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
+}
+```
+
 ## Provenance Link Object
 
 A Provenance Link records lineage information. It MUST contain:
@@ -430,6 +532,20 @@ The following members are OPTIONAL:
 
 `signatureRef`
 : A string referencing the key used to sign the provenance statement.
+
+For example, a provenance link recording that an artifact was built
+from a specific source commit and published through an OCI registry:
+
+```json
+{
+  "relation": "publishedFrom",
+  "sourceId": "https://github.com/acme-corp/finance-agent",
+  "sourceDigest": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+  "registryUri": "oci://registry.acme-corp.com/agents/finance",
+  "statementUri": "https://trust.acme-corp.com/provenance/finance-agent-v2.1.json",
+  "signatureRef": "did:web:acme-corp.com#key-1"
+}
+```
 
 ## Verification Procedures
 
@@ -532,102 +648,161 @@ For each attestation in the `attestations` array:
 
 # Organizing Catalogs
 
-As catalogs grow, a flat list of entries becomes unwieldy. This
-specification provides two complementary mechanisms for structuring
-catalogs at scale: **bundles** and **collections**. They serve
-fundamentally different purposes and appear in different parts of
-the document.
+As catalogs grow, a flat list of entries becomes unwieldy. Because any
+catalog entry can have a `mediaType` of `application/ai-catalog+json`,
+catalogs are naturally composable — an entry can reference or inline
+another AI Catalog, creating a hierarchy of any depth.
 
-## Bundles (Nested Catalog Entries)
+## Nested Catalog Entries
 
-A bundle is a catalog entry whose `mediaType` is
-`application/ai-catalog+json`. The entry's content (via `url` or
-`inline`) is itself an AI Catalog document containing the bundled
-artifacts. Bundles express **dependency**: the artifacts inside
-are related and intended to be acquired or deployed together.
+A catalog entry whose `mediaType` is `application/ai-catalog+json`
+references (via `url`) or embeds (via `data`) another AI Catalog
+document. This mechanism supports two complementary use cases:
 
-Use bundles when:
+**Organizational hierarchy.** An enterprise with thousands of artifacts
+can partition its catalog into sub-catalogs by department, product line,
+or region. Each sub-catalog is an independent AI Catalog document with
+its own `host` and entries:
 
-- A skill requires a companion MCP server to function
-- A plugin ships with a dataset it depends on
-- A vendor distributes a suite of agents as a single installable package
-
-```
-Vendor Catalog
-  └── Entry: "Finance Plugin" (mediaType: application/ai-catalog+json)
-        ├── Entry: Finance A2A Agent
-        ├── Entry: Finance MCP Server
-        └── Entry: Market Dataset
-```
-
-A bundle is a regular catalog entry — it has an `identifier`, may carry a
-`trustManifest`, and may include a `publisher`. An entry inside a
-bundle MAY reuse the same `identifier` as an entry elsewhere; this
-indicates the same logical artifact.
-
-Clients processing bundles SHOULD impose a maximum nesting depth to
-prevent circular references. A depth limit of 8 is RECOMMENDED.
-
-## Collections (Catalog Hierarchy) {#collection-reference}
-
-Collections are an OPTIONAL top-level array on the AI Catalog. Each
-element is a Collection Reference that points to a child AI Catalog
-at a different URL. Collections express **organization**: they
-partition a large catalog into browsable subcategories without
-implying any dependency between the referenced catalogs.
-
-Use collections when:
-
-- An enterprise has thousands of artifacts spread across departments
-- A registry wants to offer a top-level directory of vendor catalogs
-- A catalog needs to be partitioned for performance or governance
-
-A Collection Reference object MUST contain:
-
-`displayName`
-: A string containing a human-readable name for this collection
-  (e.g., "Finance Services", "ML Models").
-
-`url`
-: A string containing a URL where the child AI Catalog document can
-  be retrieved. The document at this URL MUST be a valid AI Catalog.
-
-The following members are OPTIONAL:
-
-`description`
-: A string describing what this collection contains.
-
-`tags`
-: An array of strings serving as keywords for filtering and navigation.
-
-```
-Enterprise Catalog
-  ├── Collection: "Finance Services" → https://acme.com/catalogs/finance.json
-  ├── Collection: "ML Models"        → https://acme.com/catalogs/ml.json
-  └── Collection: "DevOps Tools"     → https://acme.com/catalogs/devops.json
-        ├── Collection: "CI/CD"      → https://acme.com/catalogs/devops/cicd.json
-        └── Collection: "Monitoring" → https://acme.com/catalogs/devops/monitoring.json
+```json
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme Enterprise AI",
+    "identifier": "did:web:acme-corp.com"
+  },
+  "entries": [
+    {
+      "identifier": "urn:acme:catalog:finance",
+      "displayName": "Finance Services",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/finance.json"
+    },
+    {
+      "identifier": "urn:acme:catalog:ml",
+      "displayName": "ML Models",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/ml.json"
+    },
+    {
+      "identifier": "urn:acme:catalog:devops",
+      "displayName": "DevOps Tools",
+      "mediaType": "application/ai-catalog+json",
+      "url": "https://acme.com/catalogs/devops.json"
+    }
+  ]
+}
 ```
 
-Collections are recursive — a child catalog MAY itself contain
-`collections`, enabling multi-level organizational hierarchies.
-Clients SHOULD impose a maximum traversal depth.
+**Multi-artifact packaging.** An entry with a `publisher` that contains
+a nested catalog may be interpreted as a set of items that could be
+acquired as a unit. For example, a finance plugin that ships an A2A
+agent, an MCP server, and a dataset together:
 
-## Bundles vs. Collections
+```json
+{
+  "identifier": "urn:acme:plugin:finance-suite",
+  "displayName": "Finance Plugin",
+  "mediaType": "application/ai-catalog+json",
+  "url": "https://acme.com/plugins/finance-suite.json",
+  "publisher": {
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
+  }
+}
+```
 
-| | Bundle | Collection |
-|---|---|---|
-| **Where** | An entry in `entries[]` | An element in `collections[]` |
-| **Content** | Inline or referenced AI Catalog | URL to a separate AI Catalog |
-| **Semantics** | Dependency — artifacts are consumed together | Organization — catalogs are browsed independently |
-| **Identity** | Has an `identifier`, may carry `trustManifest` | Named pointer, no artifact identity |
-| **Example** | "Finance Plugin" shipping agent + server + data | "Finance Department" grouping 50 artifacts |
-| **Trust** | Bundle entry may have its own publisher and trust | Child catalog has its own host and publisher(s) |
+The document at that URL would itself be an AI Catalog containing
+the A2A agent, MCP server, and dataset entries.
 
-A single catalog MAY use both mechanisms. For example, an enterprise
-catalog could use collections to partition by department, while
-individual department catalogs contain bundle entries that package
-related artifacts together.
+A nested catalog entry is a regular catalog entry — it has an
+`identifier`, may carry a `trustManifest`, and may include a
+`publisher`. An entry inside a nested catalog MAY reuse the same
+`identifier` as an entry elsewhere; this indicates the same logical
+artifact.
+
+Clients processing nested catalogs SHOULD impose a maximum nesting
+depth to prevent circular references. A depth limit of 4 is
+RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
+document their limit.
+
+# Metadata Extensibility {#metadata-extensibility}
+
+The `metadata` property appears on the AI Catalog top-level object,
+on Catalog Entry objects, and on Trust Manifest objects. It provides
+a single, well-defined extension point for custom or vendor-specific
+properties.
+
+## Key Naming
+
+Metadata keys MUST be non-empty strings. To avoid collisions between
+independent publishers, the following conventions are RECOMMENDED:
+
+- **Reverse-DNS prefix** for vendor-specific keys:
+  `com.example.confidenceScore`, `io.acme.deploymentRegion`.
+- **Short, unqualified names** for keys the publisher considers
+  broadly useful and unlikely to conflict: `repository`, `homepage`,
+  `license`.
+- **Avoid keys that duplicate** defined catalog fields (`displayName`,
+  `description`, `tags`, `version`). Consumers MAY ignore metadata
+  entries that shadow standard fields.
+
+## Reserved Keys
+
+No metadata keys are reserved by this specification. Future
+specification versions MAY promote commonly used metadata keys into
+standard fields. When this occurs, the metadata key SHOULD be
+retained for backward compatibility and the standard field takes
+precedence.
+
+## Value Types
+
+Metadata values MAY be any valid JSON type (string, number, boolean,
+array, object, null). Consumers that do not recognize a metadata key
+SHOULD ignore it.
+
+# Version Handling {#version-handling}
+
+The `specVersion` field identifies which version of this specification
+a catalog conforms to. This section defines how producers and consumers
+handle version differences.
+
+## Version Format
+
+The `specVersion` value is a "Major.Minor" string (e.g., "1.0",
+"1.1", "2.0"). Major and minor components are non-negative integers.
+
+## Compatibility Rules
+
+Minor version increments (e.g., 1.0 → 1.1)
+: The specification adds new OPTIONAL fields or features. Documents
+  conforming to a higher minor version are backward-compatible with
+  consumers that understand the same major version. Consumers MUST
+  ignore unrecognized fields.
+
+Major version increments (e.g., 1.x → 2.0)
+: The specification introduces breaking changes (removed fields,
+  changed semantics, new required fields). Consumers that do not
+  support the major version SHOULD reject the document with an
+  informative error rather than silently misinterpreting it.
+
+## Consumer Behavior
+
+Consumers SHOULD:
+
+- Parse the `specVersion` field before processing the document.
+- Accept documents whose major version matches their supported major
+  version, regardless of minor version differences.
+- Ignore unrecognized fields (forward compatibility within a major
+  version).
+- Reject documents whose major version is higher than the highest
+  major version they support, with an informative error message.
+
+## Producer Behavior
+
+Producers MUST set `specVersion` to the version of this specification
+they implement. Producers SHOULD NOT set `specVersion` to a version
+higher than they actually conform to.
 
 # Discovery
 
@@ -636,8 +811,8 @@ related artifacts together.
 An AI Catalog document MAY be served from any URL. It is identified
 by its media type (`application/ai-catalog+json`) and its `specVersion`
 field, not by its URL path. Catalogs are equally valid when hosted at
-an arbitrary path, embedded in a registry response, bundled in a
-package, or distributed as a local file.
+an arbitrary path, embedded in a registry response, packaged in an
+archive, or distributed as a local file.
 
 When served over HTTP, the document SHOULD be served with the media
 type `application/ai-catalog+json`.
@@ -721,9 +896,9 @@ A conformant Minimal Catalog is a JSON document with media type
 - `specVersion` — the specification version string
 - `entries` — an array of Catalog Entry objects, each containing at
   minimum `identifier`, `displayName`, `mediaType`, and exactly one of `url` or
-  `inline`
+  `data`
 
-All other fields (`host`, `collections`, `publisher`, `trustManifest`,
+All other fields (`host`, `publisher`, `trustManifest`,
 `metadata`) are OPTIONAL. This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents.
@@ -735,7 +910,6 @@ In addition to Level 1 requirements, a Discoverable Catalog:
 - Includes a `host` object identifying the catalog operator
 - MAY be served at the well-known URI `/.well-known/ai-catalog.json`
   to enable automated domain-level discovery
-- MAY include `collections` for organizational hierarchy
 
 ## Level 3: Trusted Catalog
 
@@ -753,16 +927,122 @@ conformance levels and SHOULD gracefully handle their absence.
 
 # Security Considerations
 
-## Transport Security
+## Trust Layers
 
-AI Catalogs, artifacts, and Trust Manifests MUST be served over HTTPS
-(TLS 1.2 or later) to prevent tampering and eavesdropping.
+This specification supports a progressive trust model. Each layer
+builds on the previous one, adding confidence without requiring all
+consumers to implement every layer. Consumers choose the level
+appropriate to their threat model.
 
-## Nested Catalog Depth
+**Layer 0 — Transport Security**
+: The catalog and artifacts are served over HTTPS (TLS 1.2 or later).
+  The consumer trusts the TLS certificate chain and DNS resolution.
+  This prevents passive eavesdropping and casual tampering but does
+  not protect against compromised hosting or DNS hijack.
+
+**Layer 1 — Trust Manifest with Provenance**
+: The catalog entry includes a Trust Manifest containing provenance
+  links with `sourceDigest` values. After fetching an artifact, the
+  consumer can hash the content and compare it to the digest recorded
+  in the provenance link. This detects artifact tampering in transit.
+  However, because the Trust Manifest is a peer element in the catalog
+  (not embedded in the artifact), an attacker who controls the catalog
+  document can substitute both the artifact URL and the Trust Manifest
+  with matching values. **Digest verification without signature
+  verification guards against transport-level tampering but not
+  catalog-level substitution.**
+
+**Layer 2 — Signed Trust Manifest**
+: The Trust Manifest includes a `signature` field (detached JWS).
+  The consumer verifies the signature against the publisher's public
+  key before trusting any claims in the Trust Manifest — including
+  provenance digests, attestations, and identity bindings. This closes
+  the substitution gap from Layer 1: an attacker cannot forge a
+  signed Trust Manifest without the publisher's private key.
+  Consumers SHOULD verify signatures when present and SHOULD reject
+  Trust Manifests whose signature does not validate.
+
+**Layer 3 — Content-Addressed Distribution (OCI)**
+: The catalog is distributed through an OCI registry where all content
+  — entries, artifacts, and Trust Manifests — is addressed by
+  cryptographic digest. The registry enforces integrity: substitution
+  is impossible because any change produces a different digest.
+  Cosign or Notation signatures on OCI manifests provide an additional
+  layer of publisher authentication.
+
+Consumers that rely on trust metadata for security decisions SHOULD
+implement at least Layer 2 (signature verification). Consumers that
+only implement Layer 0 or Layer 1 SHOULD treat Trust Manifest content
+as advisory, not authoritative.
+
+## Nested Catalog Depth and Circular References
 
 Clients processing nested catalogs MUST enforce a maximum recursion
 depth to prevent denial-of-service attacks via deeply nested or
-circular catalog references. A maximum depth of 8 is RECOMMENDED.
+circular catalog references. A maximum depth of 4 is RECOMMENDED.
+
+Depth limits alone do not prevent circular references at shallow
+depths (e.g., Catalog A → Catalog B → Catalog A). Clients SHOULD
+track the set of catalog URLs visited during recursive resolution and
+reject any catalog URL that has already been fetched in the current
+traversal path.
+
+## Catalog Poisoning
+
+An attacker who can modify a catalog document (e.g., through a
+compromised hosting account or DNS hijack) can redirect consumers to
+malicious artifacts by changing `url` values or injecting new entries.
+
+The trust layers described above provide progressive defense against
+this threat:
+
+- **Layer 0** relies on HTTPS certificate management to prevent
+  unauthorized modification.
+- **Layer 1** enables post-fetch integrity checks but does not prevent
+  whole-entry substitution.
+- **Layer 2** prevents Trust Manifest forgery, ensuring provenance
+  digests and attestations are authentic.
+- **Layer 3** makes modification structurally impossible through
+  content-addressing.
+
+## Identifier Typosquatting
+
+Catalog entries are identified by URIs/URNs. An attacker can register
+identifiers similar to legitimate ones (e.g., `urn:acme:agent:financ`
+vs. `urn:acme:agent:finance`) to trick consumers into using a
+malicious artifact.
+
+Registries and consumers SHOULD implement similarity checks on
+identifiers. Publishers SHOULD use identifiers anchored to domains
+they control (e.g., DIDs or domain-scoped URNs).
+
+## Stale Attestations
+
+Attestation documents referenced in Trust Manifests have no built-in
+expiry mechanism in this specification. A SOC2 report from a previous
+year may no longer reflect current practices.
+
+Consumers SHOULD:
+
+- Check the `updatedAt` field on catalog entries to assess freshness.
+- Independently verify attestation documents are current when making
+  trust decisions.
+- Treat attestations as evidence, not guarantees — the attestation
+  indicates a claim was made, not that it remains valid indefinitely.
+
+Future versions of this specification MAY add `validFrom` and
+`expiresAt` fields to the Attestation object.
+
+## Embedded Content Safety
+
+When the `data` field contains embedded artifact content, consumers
+MUST treat it as untrusted input. In particular:
+
+- Content with HTML or script-capable media types MUST be sandboxed
+  and MUST NOT be executed in the consumer's security context.
+- Consumers SHOULD validate that the `data` content is well-formed
+  JSON (or the expected format for the declared `mediaType`) before
+  processing.
 
 ## Privacy Considerations
 
@@ -781,7 +1061,6 @@ classDiagram
         specVersion string
         entries CatalogEntry[]
         host HostInfo
-        collections CollectionRef[]
     }
     class HostInfo {
         displayName string
@@ -792,16 +1071,10 @@ classDiagram
         identifier string
         displayName string
         mediaType string
-        url | inline
+        url | data
         version string
         publisher Publisher
         trustManifest TrustManifest
-    }
-    class CollectionRef {
-        displayName string
-        url string
-        description string
-        tags string[]
     }
     class Publisher {
         identifier string
@@ -832,15 +1105,13 @@ classDiagram
     }
     AICatalog --> "*" CatalogEntry : entries
     AICatalog --> "0..1" HostInfo : host
-    AICatalog --> "*" CollectionRef : collections
     CatalogEntry --> "0..1" Publisher : publisher
     CatalogEntry --> "0..1" TrustManifest : trustManifest
     HostInfo --> "0..1" TrustManifest : trustManifest
     TrustManifest --> "0..1" TrustSchema : trustSchema
     TrustManifest --> "*" Attestation : attestations
     TrustManifest --> "*" ProvenanceLink : provenance
-    CatalogEntry --> "0..1" AICatalog : bundle
-    CollectionRef ..> AICatalog : references
+    CatalogEntry --> "0..1" AICatalog : nested
 </pre>
 
 # IANA Considerations
@@ -908,6 +1179,25 @@ Description:
 Reference:
 : This document
 
+## Well-Known URI Registration: ai-catalog.json
+
+This section registers the `ai-catalog.json` well-known URI in the
+IANA "Well-Known URIs" registry [[RFC8615]].
+
+URI Suffix:
+: ai-catalog.json
+
+Change Controller:
+: Agent Card Working Group
+
+Specification Document:
+: This document, [Well-Known URI](#well-known-uri)
+
+Related Information:
+: The well-known URI returns a JSON document with media type
+  `application/ai-catalog+json` conforming to the AI Catalog schema
+  defined in this specification.
+
 # CDDL Schema
 
 The following CDDL [[RFC8610]] defines the normative schema for AI
@@ -920,7 +1210,6 @@ AICatalog = {
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? collections: [* CollectionRef],
   ? metadata: { * text => any }
 }
 
@@ -932,18 +1221,11 @@ HostInfo = {
   ? trustManifest: TrustManifest
 }
 
-CollectionRef = {
-  displayName: text,
-  url: text,
-  ? description: text,
-  ? tags: [* text]
-}
-
 CatalogEntry = {
   identifier: text,
   displayName: text,
   mediaType: text,
-  (url: text // inline: any),
+  (url: text // data: any),
   ? version: text,
   ? description: text,
   ? tags: [* text],
@@ -1001,10 +1283,10 @@ ProvenanceLink = {
 }
 ```
 
-# Example: Multi-Artifact Catalog with Nested Plugin
+# Example: Multi-Artifact Catalog with Nested Catalog
 
 The following example shows an AI Catalog that contains a mix of
-artifact types including a nested catalog acting as a plugin bundle:
+artifact types including a nested catalog packaging related artifacts:
 
 ```json
 {
@@ -1052,8 +1334,8 @@ artifact types including a nested catalog acting as a plugin bundle:
       "identifier": "urn:acme:server:finance-mcp",
       "displayName": "Acme Finance MCP Server",
       "version": "1.4.0",
-      "mediaType": "application/mcp-server+json",
-      "url": "https://api.acme-corp.com/mcp/finance.json",
+      "mediaType": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
       "description": "MCP server with finance tools.",
       "tags": ["finance", "mcp"],
       "updatedAt": "2026-03-15T10:00:00Z"
@@ -1062,10 +1344,10 @@ artifact types including a nested catalog acting as a plugin bundle:
       "identifier": "urn:acme:plugin:finance-suite",
       "displayName": "Acme Finance Suite",
       "mediaType": "application/ai-catalog+json",
-      "description": "Plugin bundle: A2A agent + MCP server + dataset.",
-      "tags": ["finance", "plugin", "bundle"],
-      "inline": {
-              "specVersion": "1.0",
+      "description": "A2A agent + MCP server + dataset for finance workflows.",
+      "tags": ["finance", "suite"],
+      "data": {
+        "specVersion": "1.0",
         "entries": [
           {
             "identifier": "urn:acme:agent:finance-a2a",
@@ -1076,8 +1358,8 @@ artifact types including a nested catalog acting as a plugin bundle:
           {
             "identifier": "urn:acme:server:finance-mcp",
             "displayName": "Finance MCP Server",
-            "mediaType": "application/mcp-server+json",
-            "url": "https://api.acme-corp.com/mcp/finance.json"
+            "mediaType": "application/mcp-server-card+json",
+            "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
           {
             "identifier": "urn:acme:data:market-2026q1",
@@ -1107,11 +1389,12 @@ artifact types including a nested catalog acting as a plugin bundle:
 }
 ```
 
-# Example: Catalog with Collections
+# Example: Hierarchical Catalog
 
-The following example shows how an enterprise uses `collections` to
-organize a large number of artifacts into browsable categories. Each
-collection points to a separate AI Catalog document:
+The following example shows how an enterprise uses nested catalog
+entries to organize a large number of artifacts into browsable
+categories. Each sub-catalog entry points to a separate AI Catalog
+document:
 
 ```json
 {
@@ -1128,23 +1411,27 @@ collection points to a separate AI Catalog document:
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/assistant.json",
       "description": "General-purpose corporate assistant agent."
-    }
-  ],
-  "collections": [
+    },
     {
+      "identifier": "urn:acme:catalog:finance",
       "displayName": "Finance Services",
+      "mediaType": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/finance.json",
       "description": "Financial agents, MCP servers, and datasets.",
       "tags": ["finance", "trading", "compliance"]
     },
     {
+      "identifier": "urn:acme:catalog:engineering",
       "displayName": "Engineering Tools",
+      "mediaType": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/engineering.json",
       "description": "CI/CD agents, code review tools, and DevOps servers.",
       "tags": ["engineering", "devops", "ci-cd"]
     },
     {
+      "identifier": "urn:acme:catalog:ml-models",
       "displayName": "ML Models",
+      "mediaType": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/ml-models.json",
       "description": "Model cards and inference endpoints.",
       "tags": ["ml", "models", "inference"]
@@ -1153,51 +1440,63 @@ collection points to a separate AI Catalog document:
 }
 ```
 
-A catalog MAY contain both `entries` and `collections`. In this
-example, the corporate assistant agent is listed directly while
-department-specific artifacts are organized into child catalogs.
+A catalog MAY contain both direct artifact entries and nested catalog
+entries. In this example, the corporate assistant agent is listed
+directly while department-specific artifacts are organized into child
+catalogs.
 
-# Example: Claude Code Plugin Entry
+# Example: Dual-Protocol Agent (MCP + A2A)
 
-An AI Catalog entry for a Claude Code plugin (per the
-[Claude Plugins marketplace](https://github.com/anthropics/claude-plugins-official)):
+A single agent that supports both MCP and A2A protocols can be
+represented as one catalog entry whose content is a nested catalog
+containing both protocol-specific entries:
 
 ```json
 {
-  "identifier": "urn:claude-plugin:endorlabs:ai-plugins",
-  "displayName": "ai-plugins",
-  "mediaType": "application/vnd.anthropic.claude-plugin+json",
-  "url": "https://github.com/endorlabs/ai-plugins.git",
-  "description": "Set up endorctl and use Endor Labs to scan, prioritize, and fix security risks across your software supply chain",
-  "tags": ["security", "supply-chain"],
+  "identifier": "urn:acme:agent:finance",
+  "displayName": "Acme Finance Agent",
+  "mediaType": "application/ai-catalog+json",
+  "description": "Finance agent accessible via both MCP and A2A protocols.",
+  "tags": ["finance", "dual-protocol"],
   "publisher": {
-    "identifier": "did:web:endorlabs.com",
-    "displayName": "Endor Labs"
+    "identifier": "did:web:acme-corp.com",
+    "displayName": "Acme Financial Corp"
   },
-  "trustManifest": {
-    "identity": "urn:claude-plugin:endorlabs:ai-plugins",
-    "identityType": "did",
-    "attestations": [
+  "data": {
+    "specVersion": "1.0",
+    "entries": [
       {
-        "type": "publisher-identity",
-        "uri": "https://trust.endorlabs.com/certs/publisher.jwt",
-        "mediaType": "application/jwt",
-        "description": "Verifies did:web:endorlabs.com as publisher"
-      }
-    ],
-    "provenance": [
+        "identifier": "urn:acme:agent:finance:mcp",
+        "displayName": "Acme Finance MCP Server",
+        "mediaType": "application/mcp-server-card+json",
+        "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+      },
       {
-        "relation": "publishedFrom",
-        "sourceId": "https://github.com/endorlabs/ai-plugins",
-        "sourceDigest": "sha1:a0f1d5632b6f9e6c26eaa9806f5d8d454ca5b06f"
+        "identifier": "urn:acme:agent:finance:a2a",
+        "displayName": "Acme Finance A2A Agent",
+        "mediaType": "application/a2a-agent-card+json",
+        "url": "https://api.acme-corp.com/agents/finance"
       }
     ]
   },
-  "metadata": {
-    "homepage": "https://www.endorlabs.com"
+  "trustManifest": {
+    "identity": "urn:acme:agent:finance",
+    "attestations": [
+      {
+        "type": "SOC2-Type2",
+        "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+        "mediaType": "application/pdf",
+        "digest": "sha256:a1b2c3d4e5f6"
+      }
+    ]
   }
 }
 ```
+
+The outer entry represents the logical agent as a single discoverable
+artifact with its own trust metadata. The `data` field inlines a
+catalog with protocol-specific entries, allowing clients to choose
+MCP or A2A based on their capabilities.
 
 # Mapping to OCI Distribution
 
@@ -1257,7 +1556,7 @@ concepts to their OCI physical equivalents:
 | Entry `mediaType` | Manifest `artifactType` field |
 | Entry artifact content | Manifest `layers[0]` blob (the protocol-specific document) |
 | Entry metadata (name, tags, publisher) | Manifest `config` blob and/or `annotations` |
-| Nested Catalog | Nested OCI Image Index referenced from the parent index |
+| Nested Catalog Entry | Nested OCI Image Index referenced from the parent index |
 | Trust Manifest | OCI Referrer artifact with `subject` pointing to the entry manifest |
 | Trust Manifest attestations | Individual OCI Referrer artifacts per attestation |
 | Signing | Cosign / Notation signatures as OCI Referrers |
@@ -1267,7 +1566,7 @@ concepts to their OCI physical equivalents:
 Tooling converts an AI Catalog JSON document into OCI artifacts:
 
 1. **Each catalog entry** becomes an OCI Image Manifest. The entry's
-   artifact content (A2A card, MCP manifest, skill definition) is
+   artifact content (A2A card, MCP Server Card, skill definition) is
    stored as a `layers[0]` blob. Common metadata (name, description,
    publisher) is stored as the `config` blob or as `annotations`.
 
@@ -1278,7 +1577,7 @@ Tooling converts an AI Catalog JSON document into OCI artifacts:
    entry manifests via the `subject` field. Attestation documents
    (JWTs, PDFs, SLSA provenance) become individual referrer layers.
 
-4. **Nested catalogs** become nested OCI Image Indexes.
+4. **Nested catalog entries** become nested OCI Image Indexes.
 
 ```
 oci://registry.acme.com/ai-catalog:latest          (Image Index)
@@ -1337,7 +1636,7 @@ authored by hand:
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:bbb222...",
       "size": 512,
-      "artifactType": "application/mcp-server+json",
+      "artifactType": "application/mcp-server-card+json",
       "annotations": {
         "ai-catalog.identifier": "urn:acme:server:finance-mcp",
         "ai-catalog.displayName": "Acme Finance MCP Server"
@@ -1404,6 +1703,16 @@ This appendix describes how the MCP Registry `server.json` format
 relates to AI Catalog, enabling MCP servers to be discovered alongside
 other AI artifacts through a unified catalog.
 
+> **Note:** The MCP ecosystem defines two distinct metadata documents
+> for servers. The **Registry `server.json`** is an installable package
+> descriptor (package coordinates, transports, environment variables).
+> The **MCP Server Card** ([SEP-1649](#relationship-to-mcp-server-cards-sep-1649))
+> is a runtime discovery document at `/.well-known/mcp/server-card.json`
+> describing capabilities, tools, and authentication. An AI Catalog
+> entry can reference either artifact depending on the use case — use
+> `server.json` for installable packages and Server Cards for
+> connectable HTTP endpoints.
+
 ## Overview
 
 The MCP Registry defines a `server.json` format for describing MCP
@@ -1415,14 +1724,14 @@ SSE), transport configuration, environment variables, and CLI arguments.
 In AI Catalog terms, a `server.json` document is the **artifact
 content** — the native metadata that a Catalog Entry references. The
 AI Catalog does not duplicate or redefine `server.json` fields.
-Instead, it provides the discovery envelope and trust layer that
-`server.json` does not address.
+Instead, it provides the discovery and trust layer that `server.json`
+does not address.
 
 ## Conceptual Mapping
 
 | MCP `server.json` | AI Catalog Equivalent |
 |:---|:---|
-| `server.json` document (whole file) | Artifact content via entry `url` or `inline` |
+| `server.json` document (whole file) | Artifact content via entry `url` or `data` |
 | `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
 | `title` | Entry `displayName` |
 | `description` | Entry `description` |
@@ -1455,15 +1764,16 @@ identity, trust verification, and cross-ecosystem discoverability.
 
 ## MCP Server as Catalog Entry
 
-An MCP server described by a `server.json` maps to a Catalog Entry
-with `mediaType` set to `application/mcp-server+json`:
+An MCP server listed in the Registry maps to a Catalog Entry whose
+`url` points to the `server.json` document and whose `mediaType`
+reflects the Registry format:
 
 ```json
 {
   "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
   "displayName": "Brave Search",
   "version": "1.0.2",
-  "mediaType": "application/mcp-server+json",
+  "mediaType": "application/json",
   "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
   "description": "MCP server for Brave Search API integration",
   "tags": ["search", "brave", "web"],
@@ -1500,6 +1810,12 @@ The `url` points to the complete `server.json`. A client fetches the
 catalog entry for discovery and trust evaluation, then retrieves the
 `server.json` for operational details (packages, transports, env vars).
 
+> **Note:** This example uses `application/json` because the MCP
+> Registry has not registered a dedicated media type for `server.json`.
+> When referencing an MCP Server Card (SEP-1649) instead, use
+> `application/mcp-server-card+json` — see
+> [Relationship to MCP Server Cards](#relationship-to-mcp-server-cards-sep-1649).
+
 ## MCP Registry as AI Catalog
 
 The MCP Registry — a centralized index of MCP servers — can be
@@ -1520,7 +1836,7 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
       "displayName": "Brave Search",
       "version": "1.0.2",
-      "mediaType": "application/mcp-server+json",
+      "mediaType": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
       "description": "MCP server for Brave Search API integration",
       "tags": ["search", "brave"]
@@ -1529,7 +1845,7 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
       "displayName": "Filesystem",
       "version": "1.0.2",
-      "mediaType": "application/mcp-server+json",
+      "mediaType": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
       "description": "MCP server for filesystem operations",
       "tags": ["filesystem", "files"]
@@ -1538,7 +1854,7 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.example/weather-mcp",
       "displayName": "Weather",
       "version": "0.5.0",
-      "mediaType": "application/mcp-server+json",
+      "mediaType": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
       "description": "Python MCP server for weather data access",
       "tags": ["weather", "python"],
@@ -1565,8 +1881,9 @@ https://api.acme-corp.com/.well-known/ai-catalog.json
 ```
 
 Clients and crawlers discover the catalog via the well-known URL,
-find entries with `mediaType: "application/mcp-server+json"`, and
-fetch the `server.json` documents for operational details.
+find entries by `mediaType`, and fetch the referenced artifacts for
+operational details — whether those are MCP Server Cards, Registry
+`server.json` documents, or other AI artifact formats.
 
 The centralized MCP Registry and decentralized AI Catalogs are
 complementary. The registry can serve an AI Catalog as its response
@@ -1589,7 +1906,7 @@ fills this gap:
 5. **Cross-ecosystem discovery**: MCP servers become discoverable
    alongside A2A agents, plugins, and datasets through a single
    catalog format.
-6. **Composability**: MCP servers can be bundled with related
+6. **Composability**: MCP servers can be packaged with related
    artifacts (A2A agents, datasets) in nested catalogs.
 
 ## Relationship to MCP Server Cards (SEP-1649)
@@ -1813,9 +2130,9 @@ maps to an AI Catalog where each plugin is an entry:
 }
 ```
 
-## Plugin Bundles as Nested Catalogs
+## Plugin Packages as Nested Catalogs
 
-A plugin that bundles multiple components (MCP servers, skills,
+A plugin that contains multiple components (MCP servers, skills,
 commands, agents) naturally maps to a nested AI Catalog. This
 mirrors the plugin directory structure where a single plugin
 contains multiple artifact types:
@@ -1826,25 +2143,25 @@ contains multiple artifact types:
   "displayName": "example-plugin",
   "mediaType": "application/ai-catalog+json",
   "description": "Comprehensive plugin with commands, agents, skills, and MCP servers",
-  "tags": ["development", "bundle"],
+  "tags": ["development"],
   "publisher": {
     "identifier": "did:web:anthropic.com",
     "displayName": "Anthropic"
   },
-  "inline": {
+  "data": {
       "specVersion": "1.0",
     "entries": [
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
         "displayName": "Example Plugin MCP Server",
-        "mediaType": "application/mcp-server+json",
-        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/.mcp.json"
+        "mediaType": "application/mcp-server-card+json",
+        "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
       },
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
         "displayName": "Example Plugin Skills",
-        "mediaType": "application/vnd.agentskills.skill+md",
-        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills"
+        "mediaType": "application/agentskill+zip",
+        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip"
       }
     ]
   }
@@ -1873,7 +2190,7 @@ listing available plugins. AI Catalog extends this with:
    plugins. AI Catalog assigns `application/vnd.anthropic.claude-plugin+json`
    enabling clients to filter and route by artifact type.
 
-5. **Composability**: Plugin bundles that combine skills, MCP servers,
+5. **Composability**: Plugin packages that combine skills, MCP servers,
    and commands can be represented as nested catalogs, making the
    internal structure of a plugin package explicit and independently
    addressable.
