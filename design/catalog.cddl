@@ -1,0 +1,115 @@
+; Title:
+;   AI Catalog Schema
+; Description:
+;   Non-normative CDDL schema aligned with RFC 9727 (API Catalog).
+;   Intended to describe how AI catalogs may be represented for open discovery
+;   purposes, typically exposed under a `.well-known` path.
+; Author:
+;   Shingo OKAWA (@ognis1205)
+; Version:
+;   2025-12-29
+
+; API Catalog document as defined in RFC 9727.
+; See: https://www.rfc-editor.org/rfc/rfc9727
+ApiCatalog = {
+  ; An array of Link Context Objects.
+  ; Each object represents a link context (for example, an A2A Agent Card endpoint)
+  ; and the link relations associated with it (such as `describedby`).
+  linkset: [ * LinkContext ]
+}
+
+; Represents a Link Context Object as defined in RFC 9264, Section 4.2.2.
+; See: https://www.rfc-editor.org/rfc/rfc9264#section-4.2.2
+LinkContext = {
+  ; The `anchor` member.
+  ; When present, the value MUST be a URI reference as defined in RFC 3986.
+  ; Relative references are allowed by the specification but discouraged in practice.
+  ? anchor: uri-reference
+  ; Link relations associated with this link context.
+  ; The map key is the relation type:
+  ; - a registered relation type name, as defined in RFC 8288, Section 2.1.1, or
+  ; - a URI identifying an extension relation type, as defined in RFC 8288, Section 2.1.2.
+  ; The map value contains one or more Link Target Objects.
+  + relation-type => [ 1* LinkTarget ]
+}
+
+; A URI reference as defined in RFC 3986.
+; See: https://www.rfc-editor.org/rfc/rfc3986
+uri-reference = tstr
+
+; A link relation type as defined in RFC 8288.
+; It is either:
+; - a registered relation type name, as defined in RFC 8288, Section 2.1.1, or
+; - a URI identifying an extension relation type, as defined in RFC 8288, Section 2.1.2.
+; See: https://www.rfc-editor.org/rfc/rfc8288
+relation-type = registered-relation-type / uri-reference
+
+; Examples of registered relation types:
+;   "describedby", "service-desc", "service-meta"
+; See: https://www.iana.org/assignments/link-relations
+registered-relation-type = tstr
+
+; Represents a Link Target Object as defined in RFC 9264, Section 4.2.3.
+; See: https://www.rfc-editor.org/rfc/rfc9264#section-4.2.3
+LinkTarget = {
+  ; The `href` target URI of the link.
+  ; The value MUST be a URI reference as defined in RFC 3986.
+  ; Relative references are allowed by the specification but discouraged in practice.
+  href: uri-reference
+  ; The `hreflang` target attribute as defined in RFC 8288.
+  ; Each value MUST be a language tag following the syntax defined in RFC 5464.
+  ? hreflang: [ 1* language-tag ]
+  ; The `media` target attribute as defined in RFC 8288.
+  ; The value MUST follow the media query syntax as defined in W3C.REC-html5-20141028.
+  ? media: media-query
+  ; The `title` target attribute as defined in RFC 8288.
+  ; The value MUST be a JSON string.
+  ? title: tstr
+  ; The `title*` target attribute as defined in RFC 8288.
+  ; The value follows the encoding and language model defined in RFC 8187.
+  ? "title*" => [ 1* InternationalizedTargetAttribute ]
+  ; The `type` target attribute as defined in RFC 8288.
+  ; The value follows the media type syntax as defined in RFC 6838.
+  ? type: media-type
+  ; Extension target attributes without internationalization.
+  ; Attribute names MUST NOT end with "*".
+  * extension-attr => [ 1* tstr ]
+  ; Internationalized extension target attributes.
+  ; Attribute names MUST end with "*".
+  * extension-attr-i18n => [ 1* InternationalizedTargetAttribute ]
+}
+
+; Examples of language tags:
+;   "en", "en-US", "ja"
+; See: https://www.rfc-editor.org/rfc/rfc5646
+language-tag = tstr
+
+; Examples:
+;   "screen", "print", "screen and (min-width: 800px)"
+; See: https://www.w3.org/TR/2014/REC-html5-20141028/document-metadata.html#attr-link-media
+media-query = tstr
+
+; Represents an Internationalized Target Attribute as defined in RFC 9264, Section 4.2.4.2.
+; See: https://www.rfc-editor.org/rfc/rfc9264#section-4.2.4.2
+; See: https://www.rfc-editor.org/rfc/rfc8187
+InternationalizedTargetAttribute = {
+  ; The `value` member.
+  ; The actual (unescaped) content of the internationalized target attribute.
+  value: tstr
+  ; The `language` member.
+  ; A language tag identifying the language of the attribute content, as defined in RFC 5646.
+  language: language-tag
+}
+
+; Examples:
+;   "text/html", "application/xml", "application/json"
+; See: https://www.rfc-editor.org/rfc/rfc6838
+media-type = tstr
+
+; Extension attribute name without trailing "*".
+; See: https://www.rfc-editor.org/rfc/rfc8288
+extension-attr = tstr .regexp "^[^*]+$"
+
+; Extension attribute name ending with "*".
+; See: https://www.rfc-editor.org/rfc/rfc8288
+extension-attr-i18n = tstr .regexp "^.+\\*$"
