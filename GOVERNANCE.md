@@ -4,7 +4,8 @@ The AI Catalog project is governed by the Technical Steering Committee. The init
 
 | Company | Representative | Title | Contact |
 | :--- | :--- | :--- | :--- |
-|  |  |  |  |
+| Google | Junjie Bu | Senior Staff SWE | https://github.com/mindpower |
+| Microsoft | Darrel Miller | Partner API Architect | https://github.com/darrelmiller |
 
 ## Mission and Scope of the Project
 
