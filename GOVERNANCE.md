@@ -46,7 +46,7 @@ While the Project aims to operate as a consensus-based community, if any TSC dec
 Quorum for TSC meetings requires a majority of all voting members of the TSC to be present. The TSC may continue to meet if quorum is not met but will be prevented from making any decisions at the meeting. Decisions by vote require a majority vote of all TSC members.
 
 ### TSC Meetings
-TSC Meetings are held on the Linux Foundation's meeting platform. [https://zoom-lfx.platform.linuxfoundation.org/meetings/aicatalog](https://zoom-lfx.platform.linuxfoundation.org/meeting/91656063701) has meeting details and recordings of past meetings.
+TSC Meetings are held on the Linux Foundation's meeting platform. [https://zoom-lfx.platform.linuxfoundation.org/meetings/aicatalog](https://zoom-lfx.platform.linuxfoundation.org/meeting/91656063701?password=946db53a-d3d4-4dd2-a8d5-5ed46ae035d3) has meeting details and recordings of past meetings.
 Agenda and meeting notes are posted in the [TSC Meeting Notes](https://docs.google.com/document/d/1RriqwfC6fcL5NbpGrFFHXfvonQiIsXrutGuwpnBlAwM/edit?tab=t.ub1ywahpk09y) document.
 
 ## Project Communications
