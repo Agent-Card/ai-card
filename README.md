@@ -42,6 +42,8 @@ uv lock
 
 The generated site entry point is `dist/index.html`.
 
+Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+
 ## What problem are we solving?
 
 There are multiple evolving standards for communication protocols between AI clients and servers. While these protocols differ in capabilities and technical architecture, there are common ecosystem needs for producers and consumers of services built on top of them. This includes discovery, verifiable metadata, and trusted identity standards.
