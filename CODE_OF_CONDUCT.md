@@ -70,7 +70,7 @@ behavior is threatening or harassing, report it. We are dedicated to providing
 an environment where participants feel welcome and safe.
 
 Reports should be directed to
-[conduct@ai-catalog.example](mailto:conduct@ai-catalog.example), a temporary
+<TBD>, a temporary
 contact address for the AI Catalog project. It is the responsibility of the
 project maintainers to receive and address reported violations of the Code of
 Conduct. They may work with project leadership as needed to investigate and
