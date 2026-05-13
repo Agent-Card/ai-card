@@ -115,19 +115,19 @@ For example, a minimal catalog listing three AI artifacts:
   "specVersion": "1.0",
   "entries": [
     {
-      "identifier": "urn:example:skill:code-review",
+      "identifier": "urn:agent:example.com:skill:code-review",
       "displayName": "Code Review Assistant",
       "type": "application/ai-skills+zip",
       "url": "https://skills.example.com/code-review/skill.zip"
     },
     {
-      "identifier": "urn:example:mcp:weather",
+      "identifier": "urn:mcp:example.com:weather",
       "displayName": "Weather Service",
       "type": "application/mcp-server+json",
       "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
-      "identifier": "urn:example:a2a:research",
+      "identifier": "urn:agent:example.com:a2a:research",
       "displayName": "Research Assistant",
       "type": "application/a2a-agent-card+json",
       "url": "https://agents.example.com/researchAssistant"
@@ -189,10 +189,8 @@ A Catalog Entry object describes a single AI artifact in the catalog.
 It MUST contain the following members:
 
 `identifier`
-: A string identifying this artifact. This SHOULD be a URN
-  [[RFC8141]] or URI [[RFC3986]] (e.g., `urn:example:agent:name`).
-  See [Multi-Version Entries](#multi-version-entries) for uniqueness
-  rules when multiple versions are present.
+: A string identifying this artifact. This MUST be a URN conforming to the Agent Actor Naming Standards defined in [PR #19](https://github.com/Agent-Card/ai-catalog/pull/19), following the format `urn:{nid}:{publisher}:{namespace}:{name}` (e.g., `urn:agent:example.com:skill:code-review` or `urn:mcp:example.com:weather`).
+  See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present.
 
 `displayName`
 : A string containing a human-readable name for the artifact.
@@ -280,7 +278,7 @@ For example, a catalog listing two versions of the same agent:
   "specVersion": "1.0",
   "entries": [
     {
-      "identifier": "urn:acme:agent:finance",
+      "identifier": "urn:agent:acme.com:agent:finance",
       "displayName": "Acme Finance Agent",
       "version": "2.1.0",
       "type": "application/a2a-agent-card+json",
@@ -288,7 +286,7 @@ For example, a catalog listing two versions of the same agent:
       "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      "identifier": "urn:acme:agent:finance",
+      "identifier": "urn:agent:acme.com:agent:finance",
       "displayName": "Acme Finance Agent",
       "version": "2.0.0",
       "type": "application/a2a-agent-card+json",
@@ -402,7 +400,7 @@ provenance:
 
 ```json
 {
-  "identity": "urn:acme:agent:finance",
+  "identity": "urn:agent:acme.com:agent:finance",
   "identityType": "did",
   "trustSchema": {
     "identifier": "urn:trust:acme-enterprise-v1",
@@ -675,19 +673,19 @@ its own `host` and entries:
   },
   "entries": [
     {
-      "identifier": "urn:acme:catalog:finance",
+      "identifier": "urn:agent:acme.com:catalog:finance",
       "displayName": "Finance Services",
       "type": "application/ai-catalog+json",
       "url": "https://acme.com/catalogs/finance.json"
     },
     {
-      "identifier": "urn:acme:catalog:ml",
+      "identifier": "urn:agent:acme.com:catalog:ml",
       "displayName": "ML Models",
       "type": "application/ai-catalog+json",
       "url": "https://acme.com/catalogs/ml.json"
     },
     {
-      "identifier": "urn:acme:catalog:devops",
+      "identifier": "urn:agent:acme.com:catalog:devops",
       "displayName": "DevOps Tools",
       "type": "application/ai-catalog+json",
       "url": "https://acme.com/catalogs/devops.json"
@@ -703,7 +701,7 @@ agent, an MCP server, and a dataset together:
 
 ```json
 {
-  "identifier": "urn:acme:plugin:finance-suite",
+  "identifier": "urn:agent:acme.com:plugin:finance-suite",
   "displayName": "Finance Plugin",
   "type": "application/ai-catalog+json",
   "url": "https://acme.com/plugins/finance-suite.json",
@@ -1010,8 +1008,8 @@ this threat:
 ## Identifier Typosquatting
 
 Catalog entries are identified by URIs/URNs. An attacker can register
-identifiers similar to legitimate ones (e.g., `urn:acme:agent:financ`
-vs. `urn:acme:agent:finance`) to trick consumers into using a
+identifiers similar to legitimate ones (e.g., `urn:agent:acme.com:agent:financ`
+vs. `urn:agent:acme.com:agent:finance`) to trick consumers into using a
 malicious artifact.
 
 Registries and consumers SHOULD implement similarity checks on
@@ -1300,7 +1298,7 @@ artifact types including a nested catalog packaging related artifacts:
   },
   "entries": [
     {
-      "identifier": "urn:acme:agent:finance-a2a",
+      "identifier": "urn:agent:acme.com:agent:finance-a2a",
       "displayName": "Acme Finance A2A Agent",
       "version": "2.1.0",
       "type": "application/a2a-agent-card+json",
@@ -1312,7 +1310,7 @@ artifact types including a nested catalog packaging related artifacts:
         "displayName": "Acme Financial Corp"
       },
       "trustManifest": {
-        "identity": "urn:acme:agent:finance-a2a",
+        "identity": "urn:agent:acme.com:agent:finance-a2a",
         "attestations": [
           {
             "type": "publisher-identity",
@@ -1333,7 +1331,7 @@ artifact types including a nested catalog packaging related artifacts:
       "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      "identifier": "urn:acme:server:finance-mcp",
+      "identifier": "urn:agent:acme.com:server:finance-mcp",
       "displayName": "Acme Finance MCP Server",
       "version": "1.4.0",
       "type": "application/mcp-server+json",
@@ -1343,7 +1341,7 @@ artifact types including a nested catalog packaging related artifacts:
       "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
-      "identifier": "urn:acme:plugin:finance-suite",
+      "identifier": "urn:agent:acme.com:plugin:finance-suite",
       "displayName": "Acme Finance Suite",
       "type": "application/ai-catalog+json",
       "description": "A2A agent + MCP server + dataset for finance workflows.",
@@ -1352,24 +1350,24 @@ artifact types including a nested catalog packaging related artifacts:
         "specVersion": "1.0",
         "entries": [
           {
-            "identifier": "urn:acme:agent:finance-a2a",
+            "identifier": "urn:agent:acme.com:agent:finance-a2a",
             "displayName": "Finance A2A Agent",
             "type": "application/a2a-agent-card+json",
             "url": "https://api.acme-corp.com/agents/finance.json"
           },
           {
-            "identifier": "urn:acme:server:finance-mcp",
+            "identifier": "urn:agent:acme.com:server:finance-mcp",
             "displayName": "Finance MCP Server",
             "type": "application/mcp-server+json",
             "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
           {
-            "identifier": "urn:acme:data:market-2026q1",
+            "identifier": "urn:agent:acme.com:data:market-2026q1",
             "displayName": "Market Dataset Q1 2026",
             "type": "application/parquet",
             "url": "https://data.acme-corp.com/market-2026q1.parquet",
             "trustManifest": {
-              "identity": "urn:acme:data:market-2026q1",
+              "identity": "urn:agent:acme.com:data:market-2026q1",
               "provenance": [
                 {
                   "relation": "publishedFrom",
@@ -1382,7 +1380,7 @@ artifact types including a nested catalog packaging related artifacts:
         ]
       },
       "trustManifest": {
-        "identity": "urn:acme:plugin:finance-suite",
+        "identity": "urn:agent:acme.com:plugin:finance-suite",
         "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
       },
       "updatedAt": "2026-03-20T14:00:00Z"
@@ -1407,7 +1405,7 @@ document:
   },
   "entries": [
     {
-      "identifier": "urn:acme:agent:assistant",
+      "identifier": "urn:agent:acme.com:agent:assistant",
       "displayName": "Acme Corporate Assistant",
       "version": "3.0.0",
       "type": "application/a2a-agent-card+json",
@@ -1415,7 +1413,7 @@ document:
       "description": "General-purpose corporate assistant agent."
     },
     {
-      "identifier": "urn:acme:catalog:finance",
+      "identifier": "urn:agent:acme.com:catalog:finance",
       "displayName": "Finance Services",
       "type": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/finance.json",
@@ -1423,7 +1421,7 @@ document:
       "tags": ["finance", "trading", "compliance"]
     },
     {
-      "identifier": "urn:acme:catalog:engineering",
+      "identifier": "urn:agent:acme.com:catalog:engineering",
       "displayName": "Engineering Tools",
       "type": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/engineering.json",
@@ -1431,7 +1429,7 @@ document:
       "tags": ["engineering", "devops", "ci-cd"]
     },
     {
-      "identifier": "urn:acme:catalog:ml-models",
+      "identifier": "urn:agent:acme.com:catalog:ml-models",
       "displayName": "ML Models",
       "type": "application/ai-catalog+json",
       "url": "https://acme-corp.com/catalogs/ml-models.json",
@@ -1455,7 +1453,7 @@ containing both protocol-specific entries:
 
 ```json
 {
-  "identifier": "urn:acme:agent:finance",
+  "identifier": "urn:agent:acme.com:agent:finance",
   "displayName": "Acme Finance Agent",
   "type": "application/ai-catalog+json",
   "description": "Finance agent accessible via both MCP and A2A protocols.",
@@ -1468,13 +1466,13 @@ containing both protocol-specific entries:
     "specVersion": "1.0",
     "entries": [
       {
-        "identifier": "urn:acme:agent:finance:mcp",
+        "identifier": "urn:agent:acme.com:agent:finance:mcp",
         "displayName": "Acme Finance MCP Server",
         "type": "application/mcp-server+json",
         "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
       },
       {
-        "identifier": "urn:acme:agent:finance:a2a",
+        "identifier": "urn:agent:acme.com:agent:finance:a2a",
         "displayName": "Acme Finance A2A Agent",
         "type": "application/a2a-agent-card+json",
         "url": "https://api.acme-corp.com/agents/finance"
@@ -1482,7 +1480,7 @@ containing both protocol-specific entries:
     ]
   },
   "trustManifest": {
-    "identity": "urn:acme:agent:finance",
+    "identity": "urn:agent:acme.com:agent:finance",
     "attestations": [
       {
         "type": "SOC2-Type2",
@@ -1630,7 +1628,7 @@ authored by hand:
       "size": 1024,
       "artifactType": "application/a2a-agent-card+json",
       "annotations": {
-        "ai-catalog.identifier": "urn:acme:agent:finance-a2a",
+        "ai-catalog.identifier": "urn:agent:acme.com:agent:finance-a2a",
         "ai-catalog.displayName": "Acme Finance A2A Agent"
       }
     },
@@ -1640,7 +1638,7 @@ authored by hand:
       "size": 512,
       "artifactType": "application/mcp-server+json",
       "annotations": {
-        "ai-catalog.identifier": "urn:acme:server:finance-mcp",
+        "ai-catalog.identifier": "urn:agent:acme.com:server:finance-mcp",
         "ai-catalog.displayName": "Acme Finance MCP Server"
       }
     }
@@ -1772,7 +1770,7 @@ reflects the Registry format:
 
 ```json
 {
-  "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+  "identifier": "urn:mcp:io.modelcontextprotocol.anonymous:brave-search",
   "displayName": "Brave Search",
   "version": "1.0.2",
   "type": "application/json",
@@ -1835,7 +1833,7 @@ agents, skills, and other artifacts:
   },
   "entries": [
     {
-      "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
+      "identifier": "urn:mcp:io.modelcontextprotocol.anonymous:brave-search",
       "displayName": "Brave Search",
       "version": "1.0.2",
       "type": "application/json",
@@ -1844,7 +1842,7 @@ agents, skills, and other artifacts:
       "tags": ["search", "brave"]
     },
     {
-      "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
+      "identifier": "urn:mcp:io.github.modelcontextprotocol:filesystem",
       "displayName": "Filesystem",
       "version": "1.0.2",
       "type": "application/json",
@@ -1853,7 +1851,7 @@ agents, skills, and other artifacts:
       "tags": ["filesystem", "files"]
     },
     {
-      "identifier": "urn:mcp:io.github.example/weather-mcp",
+      "identifier": "urn:mcp:io.github.example:weather-mcp",
       "displayName": "Weather",
       "version": "0.5.0",
       "type": "application/json",
