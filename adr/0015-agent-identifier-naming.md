@@ -23,7 +23,7 @@ The `identifier` field MUST follow the URN format: `urn:{nid}:{publisher}:{names
 We propose this URN format for the following reasons:
 - **Nomenclature Stability**: The URN acts as an abstract, stable contract. Relocating workloads or changing infrastructure does not break client discovery code.
 - **Global Uniqueness**: Domain-anchored URNs guarantee cross-network uniqueness without infrastructure overhead.
-- **Separation of Concerns**: It separates the logical name used for discovery and routing from the cryptographic identity used for trust verification, allowing each to evolve independently.
+- **Separation of Concerns**: It separates the logical name used for discovery and routing from the cryptographic identity used for trust verification. The `identity` field in the `trustManifest` can utilize various security schemas for cryptographic verification (e.g., SPIFFE, DID, DNS), while this URN-based `identifier` provides a consistent and stable naming mechanism that remains constant even if the underlying security infrastructure changes.
 - **Interoperability**: Standardizing on this format enables registries to index and search agents consistently.
 
 ## Consequences
