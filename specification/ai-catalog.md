@@ -199,7 +199,7 @@ It MUST contain the following members:
 
 `type`
 : A string containing the identifier that specifies the type of the
-  referenced artifact. To ensure interoperability and avoid confusion with generic media types, this field MUST use one of the following fixed set of values:
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:
 
   - `application/a2a-agent-card+json` — an A2A Agent Card
   - `application/mcp-server+json` — an MCP Server
@@ -209,7 +209,7 @@ It MUST contain the following members:
   - `application/ai-skills+zip` — an AI Skill bundle (ZIP archive)
   - `application/ai-skills+md` — an AI Skill defined in Markdown
 
-  These values combine the artifact type with the payload format.
+  These values combine the artifact type with the payload format. For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:

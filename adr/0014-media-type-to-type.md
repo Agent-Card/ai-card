@@ -13,7 +13,7 @@ Furthermore, we need to support combined types that specify both the artifact ty
 
 ## Decision
 We will rename the `mediaType` field to `type` in the `CatalogEntry` schema.
-We will restrict the allowed values for the `type` field to a fixed set of recognized strings:
+The `type` field is an open text format, so any string value is accepted. The following are recognized "known types" in the ecosystem:
 - `application/agent-card+json`
 - `application/mcp-server+json`
 - `application/ai-catalog+json`
@@ -21,6 +21,8 @@ We will restrict the allowed values for the `type` field to a fixed set of recog
 - `application/ai-skills+tgz`
 - `application/ai-skills+zip`
 - `application/ai-skills+md`
+
+For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 ## Consequences
 - **Breaking Change**: This is a breaking change for any implementation relying on the `mediaType` field name.
