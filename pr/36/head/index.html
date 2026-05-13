@@ -266,7 +266,7 @@ It MUST contain the following members:</p>
 <dd>A string containing a human-readable name for the artifact.</dd>
 <dt><code>type</code></dt>
 <dd>A string containing the identifier that specifies the type of the
-  referenced artifact. To ensure interoperability and avoid confusion with generic media types, this field MUST use one of the following fixed set of values:</dd>
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:</dd>
 </dl>
 <ul>
 <li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
@@ -277,7 +277,7 @@ It MUST contain the following members:</p>
 <li><code>application/ai-skills+zip</code> — an AI Skill bundle (ZIP archive)</li>
 <li><code>application/ai-skills+md</code> — an AI Skill defined in Markdown</li>
 </ul>
-<p>These values combine the artifact type with the payload format.</p>
+<p>These values combine the artifact type with the payload format. For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
 <p>A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:</p>
 <dl>
