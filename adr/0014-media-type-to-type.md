@@ -1,4 +1,4 @@
-# ADR 001: Move from `mediaType` to `type` with Fixed Set of Values
+# ADR 0014: Move from `mediaType` to `type` with Fixed Set of Values
 
 ## Status
 Accepted
@@ -14,7 +14,7 @@ Furthermore, we need to support combined types that specify both the artifact ty
 ## Decision
 We will rename the `mediaType` field to `type` in the `CatalogEntry` schema.
 We will restrict the allowed values for the `type` field to a fixed set of recognized strings:
-- `application/a2a-agent-card+json`
+- `application/agent-card+json`
 - `application/mcp-server+json`
 - `application/ai-catalog+json`
 - `application/agent-registry`
