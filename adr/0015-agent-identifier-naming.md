@@ -12,8 +12,8 @@ The `ai-catalog` specification originally recommended using URNs or URIs for the
 To ensure global federation and industry-wide interoperability, we need a standardized, secure naming protocol for AI actors.
 
 ## Proposal
-We will align the agent identifier naming in `ai-catalog.md` with the standards defined in [PR #19](https://github.com/Agent-Card/ai-catalog/pull/19).
-The `identifier` field MUST follow the URN format: `urn:{nid}:{publisher}:{namespace}:{name}`.
+We will align the agent identifier naming in `ai-catalog.md` with the naming standards proposed in [PR #19](https://github.com/Agent-Card/ai-catalog/pull/19).
+The `identifier` field will follow the URN format: `urn:{nid}:{publisher}:{namespace}:{name}`.
 - `nid`: The Namespace Identifier (e.g., `agent`, `mcp`).
 - `publisher`: The domain where the agent is hosted (e.g., `example.com`).
 - `namespace`: Optional segments separated by `:`.
