@@ -13,11 +13,10 @@ To ensure global federation and industry-wide interoperability, we need a standa
 
 ## Proposal
 We will align the agent identifier naming in `ai-catalog.md` with the naming standards proposed in [PR #19](https://github.com/Agent-Card/ai-catalog/pull/19).
-The `identifier` field will follow the URN format: `urn:{nid}:{publisher}:{namespace}:{name}`.
-- `nid`: The Namespace Identifier (e.g., `agent`, `mcp`).
-- `publisher`: The domain where the agent is hosted (e.g., `example.com`).
-- `namespace`: Optional segments separated by `:`.
-- `name`: The specific name of the agent.
+The `identifier` field will follow the URN format: `urn:ai:{publisher}:{namespace}:{name}`.
+- `publisher`: The domain where the artifact is hosted (e.g., `example.com`).
+- `namespace`: Optional segments separated by `:` (e.g., `agent`, `mcp`, `skill`, `catalog`).
+- `name`: The specific name of the artifact.
 
 ## Rationale
 We propose this URN format for the following reasons:
