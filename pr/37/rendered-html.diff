@@ -82,40 +82,6 @@
        &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.0.json&quot;,
        &quot;updatedAt&quot;: &quot;2026-01-20T08:00:00Z&quot;
      }
-@@ -458,13 +458,13 @@
-     {
-       &quot;type&quot;: &quot;publisher-identity&quot;,
-       &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
--      &quot;mediaType&quot;: &quot;application/jwt&quot;,
-+      &quot;type&quot;: &quot;application/jwt&quot;,
-       &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
-     },
-     {
-       &quot;type&quot;: &quot;SOC2-Type2&quot;,
-       &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
--      &quot;mediaType&quot;: &quot;application/pdf&quot;,
-+      &quot;type&quot;: &quot;application/pdf&quot;,
-       &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
-     }
-   ],
-@@ -519,7 +519,7 @@
- <dt><code>uri</code></dt>
- <dd>A string containing the location of the attestation document.
-   This may be an HTTPS URL or an inline Data URI [[RFC2397]].</dd>
--<dt><code>mediaType</code></dt>
-+<dt><code>type</code></dt>
- <dd>A string indicating the format (e.g., "application/pdf",
-   "application/jwt").</dd>
- </dl>
-@@ -537,7 +537,7 @@
- <pre><code class="language-json">{
-   &quot;type&quot;: &quot;SOC2-Type2&quot;,
-   &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2-2026.pdf&quot;,
--  &quot;mediaType&quot;: &quot;application/pdf&quot;,
-+  &quot;type&quot;: &quot;application/pdf&quot;,
-   &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;,
-   &quot;size&quot;: 245760,
-   &quot;description&quot;: &quot;SOC2 Type 2 audit report for Acme Finance Agent (2026)&quot;
 @@ -681,12 +681,12 @@
  <section id="organizing-catalogs">
  <h1>Organizing Catalogs</h1>
@@ -226,22 +192,6 @@
        &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;,
        &quot;description&quot;: &quot;A2A agent for financial workflows.&quot;,
        &quot;tags&quot;: [&quot;finance&quot;, &quot;a2a&quot;],
-@@ -1313,13 +1313,13 @@
-           {
-             &quot;type&quot;: &quot;publisher-identity&quot;,
-             &quot;uri&quot;: &quot;https://trust.acme.com/certs/publisher.jwt&quot;,
--            &quot;mediaType&quot;: &quot;application/jwt&quot;,
-+            &quot;type&quot;: &quot;application/jwt&quot;,
-             &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
-           },
-           {
-             &quot;type&quot;: &quot;SOC2-Type2&quot;,
-             &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
--            &quot;mediaType&quot;: &quot;application/pdf&quot;,
-+            &quot;type&quot;: &quot;application/pdf&quot;,
-             &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
-           }
-         ],
 @@ -1332,7 +1332,7 @@
        &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
        &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
@@ -343,15 +293,6 @@
          &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance&quot;
        }
      ]
-@@ -1478,7 +1478,7 @@
-       {
-         &quot;type&quot;: &quot;SOC2-Type2&quot;,
-         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
--        &quot;mediaType&quot;: &quot;application/pdf&quot;,
-+        &quot;type&quot;: &quot;application/pdf&quot;,
-         &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
-       }
-     ]
 @@ -1498,7 +1498,7 @@
  <section id="logical-format-vs-physical-distribution">
  <h2>Logical Format vs. Physical Distribution</h2>
@@ -424,19 +365,10 @@
    &quot;displayName&quot;: &quot;Brave Search&quot;,
    &quot;version&quot;: &quot;1.0.2&quot;,
 -  &quot;mediaType&quot;: &quot;application/json&quot;,
-+  &quot;type&quot;: &quot;application/json&quot;,
++  &quot;type&quot;: &quot;application/mcp-server+json&quot;,
    &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
    &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
    &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
-@@ -1888,7 +1888,7 @@
-       {
-         &quot;type&quot;: &quot;publisher-identity&quot;,
-         &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;,
--        &quot;mediaType&quot;: &quot;application/jwt&quot;,
-+        &quot;type&quot;: &quot;application/jwt&quot;,
-         &quot;description&quot;: &quot;Verifies did:web:modelcontextprotocol.io as publisher&quot;
-       }
-     ],
 @@ -1913,7 +1913,7 @@
  <p><strong>Note:</strong> This example uses <code>application/json</code> because the MCP
  Registry has not registered a dedicated media type for <code>server.json</code>.
@@ -451,7 +383,7 @@
        &quot;displayName&quot;: &quot;Brave Search&quot;,
        &quot;version&quot;: &quot;1.0.2&quot;,
 -      &quot;mediaType&quot;: &quot;application/json&quot;,
-+      &quot;type&quot;: &quot;application/json&quot;,
++      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
        &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
        &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
        &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
@@ -460,7 +392,7 @@
        &quot;displayName&quot;: &quot;Filesystem&quot;,
        &quot;version&quot;: &quot;1.0.2&quot;,
 -      &quot;mediaType&quot;: &quot;application/json&quot;,
-+      &quot;type&quot;: &quot;application/json&quot;,
++      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
        &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
        &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
        &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
@@ -469,7 +401,7 @@
        &quot;displayName&quot;: &quot;Weather&quot;,
        &quot;version&quot;: &quot;0.5.0&quot;,
 -      &quot;mediaType&quot;: &quot;application/json&quot;,
-+      &quot;type&quot;: &quot;application/json&quot;,
++      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
        &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
        &quot;description&quot;: &quot;Python MCP server for weather data access&quot;,
        &quot;tags&quot;: [&quot;weather&quot;, &quot;python&quot;],
@@ -491,21 +423,6 @@
    &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
    &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
    &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
-@@ -2044,12 +2044,12 @@
-       {
-         &quot;type&quot;: &quot;publisher-identity&quot;,
-         &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
--        &quot;mediaType&quot;: &quot;application/jwt&quot;
-+        &quot;type&quot;: &quot;application/jwt&quot;
-       },
-       {
-         &quot;type&quot;: &quot;SOC2-Type2&quot;,
-         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
--        &quot;mediaType&quot;: &quot;application/pdf&quot;,
-+        &quot;type&quot;: &quot;application/pdf&quot;,
-         &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
-       }
-     ]
 @@ -2060,7 +2060,7 @@
  <ol>
  <li>Fetch <code>/.well-known/ai-catalog.json</code> to discover all artifacts on

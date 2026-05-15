@@ -93,40 +93,6 @@
  "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
  "updatedAt": "2026-01-20T08:00:00Z"
  }
-@@ -459,13 +462,13 @@
- {
- "type": "publisher-identity",
- "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
--"mediaType": "application/jwt",
-+"type": "application/jwt",
- "description": "Verifies did:web:acme-corp.com as publisher"
- },
- {
- "type": "SOC2-Type2",
- "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
--"mediaType": "application/pdf",
-+"type": "application/pdf",
- "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
- }
- ],
-@@ -529,7 +532,7 @@
- A string containing the location of the attestation document.
- This may be an HTTPS URL or an inline Data URI [[RFC2397]].
- 
--mediaType
-+type
- 
- A string indicating the format (e.g., "application/pdf",
- "application/jwt").
-@@ -554,7 +557,7 @@
- {
- "type": "SOC2-Type2",
- "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
--"mediaType": "application/pdf",
-+"type": "application/pdf",
- "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
- "size": 245760,
- "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
 @@ -720,13 +723,13 @@
  Organizing Catalogs
  
@@ -238,22 +204,6 @@
  "url": "https://api.acme-corp.com/agents/finance.json",
  "description": "A2A agent for financial workflows.",
  "tags": ["finance", "a2a"],
-@@ -1417,13 +1420,13 @@
- {
- "type": "publisher-identity",
- "uri": "https://trust.acme.com/certs/publisher.jwt",
--"mediaType": "application/jwt",
-+"type": "application/jwt",
- "description": "Verifies did:web:acme-corp.com as publisher"
- },
- {
- "type": "SOC2-Type2",
- "uri": "https://trust.acme.com/reports/soc2.pdf",
--"mediaType": "application/pdf",
-+"type": "application/pdf",
- "digest": "sha256:a1b2c3d4e5f6"
- }
- ],
 @@ -1436,7 +1439,7 @@
  "identifier": "urn:acme:server:finance-mcp",
  "displayName": "Acme Finance MCP Server",
@@ -355,15 +305,6 @@
  "url": "https://api.acme-corp.com/agents/finance"
  }
  ]
-@@ -1583,7 +1586,7 @@
- {
- "type": "SOC2-Type2",
- "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
--"mediaType": "application/pdf",
-+"type": "application/pdf",
- "digest": "sha256:a1b2c3d4e5f6"
- }
- ]
 @@ -1604,7 +1607,7 @@
  Logical Format vs. Physical Distribution
  
@@ -435,19 +376,10 @@
  "displayName": "Brave Search",
  "version": "1.0.2",
 -"mediaType": "application/json",
-+"type": "application/json",
++"type": "application/mcp-server+json",
  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
  "description": "MCP server for Brave Search API integration",
  "tags": ["search", "brave", "web"],
-@@ -1991,7 +1994,7 @@
- {
- "type": "publisher-identity",
- "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
--"mediaType": "application/jwt",
-+"type": "application/jwt",
- "description": "Verifies did:web:modelcontextprotocol.io as publisher"
- }
- ],
 @@ -2016,7 +2019,7 @@
  Note: This example uses application/json because the MCP
  Registry has not registered a dedicated media type for server.json.
@@ -462,7 +394,7 @@
  "displayName": "Brave Search",
  "version": "1.0.2",
 -"mediaType": "application/json",
-+"type": "application/json",
++"type": "application/mcp-server+json",
  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
  "description": "MCP server for Brave Search API integration",
  "tags": ["search", "brave"]
@@ -471,7 +403,7 @@
  "displayName": "Filesystem",
  "version": "1.0.2",
 -"mediaType": "application/json",
-+"type": "application/json",
++"type": "application/mcp-server+json",
  "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
  "description": "MCP server for filesystem operations",
  "tags": ["filesystem", "files"]
@@ -480,7 +412,7 @@
  "displayName": "Weather",
  "version": "0.5.0",
 -"mediaType": "application/json",
-+"type": "application/json",
++"type": "application/mcp-server+json",
  "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
  "description": "Python MCP server for weather data access",
  "tags": ["weather", "python"],
@@ -502,21 +434,6 @@
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
  "description": "MCP server for financial data and trading tools",
  "tags": ["finance", "mcp"],
-@@ -2158,12 +2161,12 @@
- {
- "type": "publisher-identity",
- "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
--"mediaType": "application/jwt"
-+"type": "application/jwt"
- },
- {
- "type": "SOC2-Type2",
- "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
--"mediaType": "application/pdf",
-+"type": "application/pdf",
- "digest": "sha256:a1b2c3d4e5f6"
- }
- ]
 @@ -2175,7 +2178,7 @@
  Fetch /.well-known/ai-catalog.json to discover all artifacts on
  a domain (MCP servers, A2A agents, plugins, etc.).
