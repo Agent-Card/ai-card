@@ -413,13 +413,13 @@ provenance:
     {
       "type": "publisher-identity",
       "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-      "type": "application/jwt",
+      "mediaType": "application/jwt",
       "description": "Verifies did:web:acme-corp.com as publisher"
     },
     {
       "type": "SOC2-Type2",
       "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-      "type": "application/pdf",
+      "mediaType": "application/pdf",
       "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
     }
   ],
@@ -480,7 +480,7 @@ contain:
 : A string containing the location of the attestation document.
   This may be an HTTPS URL or an inline Data URI [[RFC2397]].
 
-`type`
+`mediaType`
 : A string indicating the format (e.g., "application/pdf",
   "application/jwt").
 
@@ -502,7 +502,7 @@ For example, a compliance attestation with integrity verification:
 {
   "type": "SOC2-Type2",
   "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
-  "type": "application/pdf",
+  "mediaType": "application/pdf",
   "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
   "size": 245760,
   "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
@@ -1316,13 +1316,13 @@ artifact types including a nested catalog packaging related artifacts:
           {
             "type": "publisher-identity",
             "uri": "https://trust.acme.com/certs/publisher.jwt",
-            "type": "application/jwt",
+            "mediaType": "application/jwt",
             "description": "Verifies did:web:acme-corp.com as publisher"
           },
           {
             "type": "SOC2-Type2",
             "uri": "https://trust.acme.com/reports/soc2.pdf",
-            "type": "application/pdf",
+            "mediaType": "application/pdf",
             "digest": "sha256:a1b2c3d4e5f6"
           }
         ],
@@ -1486,7 +1486,7 @@ containing both protocol-specific entries:
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "type": "application/pdf",
+        "mediaType": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
@@ -1774,7 +1774,7 @@ reflects the Registry format:
   "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
   "displayName": "Brave Search",
   "version": "1.0.2",
-  "type": "application/json",
+  "type": "application/mcp-server+json",
   "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
   "description": "MCP server for Brave Search API integration",
   "tags": ["search", "brave", "web"],
@@ -1788,7 +1788,7 @@ reflects the Registry format:
       {
         "type": "publisher-identity",
         "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
-        "type": "application/jwt",
+        "mediaType": "application/jwt",
         "description": "Verifies did:web:modelcontextprotocol.io as publisher"
       }
     ],
@@ -1837,7 +1837,7 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
       "displayName": "Brave Search",
       "version": "1.0.2",
-      "type": "application/json",
+      "type": "application/mcp-server+json",
       "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
       "description": "MCP server for Brave Search API integration",
       "tags": ["search", "brave"]
@@ -1846,7 +1846,7 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
       "displayName": "Filesystem",
       "version": "1.0.2",
-      "type": "application/json",
+      "type": "application/mcp-server+json",
       "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
       "description": "MCP server for filesystem operations",
       "tags": ["filesystem", "files"]
@@ -1855,7 +1855,7 @@ agents, skills, and other artifacts:
       "identifier": "urn:mcp:io.github.example/weather-mcp",
       "displayName": "Weather",
       "version": "0.5.0",
-      "type": "application/json",
+      "type": "application/mcp-server+json",
       "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
       "description": "Python MCP server for weather data access",
       "tags": ["weather", "python"],
@@ -1954,12 +1954,12 @@ server can reference the Server Card as its artifact content:
       {
         "type": "publisher-identity",
         "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-        "type": "application/jwt"
+        "mediaType": "application/jwt"
       },
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "type": "application/pdf",
+        "mediaType": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
