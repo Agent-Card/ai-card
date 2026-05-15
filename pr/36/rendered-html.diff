@@ -50,8 +50,8 @@
 +  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:</dd>
  </dl>
  <ul>
-+<li><code>application/agent-card+json</code> — an A2A Agent Card</li>
-+<li><code>application/mcp-card+json</code> — an MCP Server Card</li>
++<li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
++<li><code>application/mcp-server+json</code> — an MCP Server Card</li>
  <li><code>application/ai-catalog+json</code> — a nested AI Catalog</li>
 -<li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
 -<li><code>application/mcp-server-card+json</code> — an MCP Server Card</li>
