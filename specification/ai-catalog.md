@@ -201,8 +201,8 @@ It MUST contain the following members:
 : A string containing the identifier that specifies the type of the
   referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:
 
-  - `application/agent-card+json` — an A2A Agent Card
-  - `application/mcp-card+json` — an MCP Server Card
+  - `application/a2a-agent-card+json` — an A2A Agent Card
+  - `application/mcp-server+json` — an MCP Server Card
   - `application/ai-catalog+json` — a nested AI Catalog
   - `application/ai-skills+tgz` — an AI Skill bundle (compressed tarball)
   - `application/ai-skills+zip` — an AI Skill bundle (ZIP archive)
