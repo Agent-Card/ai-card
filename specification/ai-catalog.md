@@ -204,11 +204,11 @@ It MUST contain the following members:
   - `application/a2a-agent-card+json` — an A2A Agent Card
   - `application/mcp-server+json` — an MCP Server Card
   - `application/ai-catalog+json` — a nested AI Catalog
-  - `application/ai-skills+tgz` — an AI Skill bundle (compressed tarball)
   - `application/ai-skills+zip` — an AI Skill bundle (ZIP archive)
-  - `application/ai-skills+md` — an AI Skill defined in Markdown
+  - `application/ai-skills+gzip` — an AI Skill bundle (gzipped tarball)
+  - `text/markdown; profile=ai-skill` — an AI Skill defined in a standard Markdown file
 
-  These values combine the artifact type with the payload format. For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
+  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For generic payload formats (like `text/markdown`), the standard `profile` parameter is used to specify the semantic schema (e.g., `profile=ai-skill`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
