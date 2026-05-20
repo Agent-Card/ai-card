@@ -268,17 +268,18 @@ It MUST contain the following members:</p>
 <dd>A string containing a human-readable name for the artifact.</dd>
 <dt><code>type</code></dt>
 <dd>A string containing the identifier that specifies the type of the
-  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:</dd>
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:</dd>
 </dl>
-<ul>
-<li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
-<li><code>application/mcp-server+json</code> — an MCP Server Card</li>
-<li><code>application/ai-catalog+json</code> — a nested AI Catalog</li>
-<li><code>application/ai-skills+tgz</code> — an AI Skill bundle (compressed tarball)</li>
-<li><code>application/ai-skills+zip</code> — an AI Skill bundle (ZIP archive)</li>
-<li><code>application/ai-skills+md</code> — an AI Skill defined in Markdown</li>
-</ul>
-<p>These values combine the artifact type with the payload format. For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
+<p><strong>Core Protocol Types (Governed by the AI Catalog WG):</strong>
+  - <code>application/ai-catalog+json</code> — a nested AI Catalog
+  - <code>application/agent-card+json</code> — reserved for a generic Agent Card format</p>
+<p><strong>Integrated Ecosystem &amp; Third-Party Types (Governed externally):</strong>
+  - <code>application/a2a-agent-card+json</code> — an A2A Agent Card
+  - <code>application/mcp-server+json</code> — an MCP Server Card
+  - <code>application/ai-skills+zip</code> — an AI Skill bundle (ZIP archive)
+  - <code>application/ai-skills+gzip</code> — an AI Skill bundle (gzipped tarball)
+  - <code>text/markdown; profile=ai-skill</code> — an AI Skill defined in a standard Markdown file</p>
+<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For generic payload formats (like <code>text/markdown</code>), the standard <code>profile</code> parameter is used to specify the semantic schema (e.g., <code>profile=ai-skill</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
 <p>A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:</p>
 <dl>
