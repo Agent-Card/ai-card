@@ -15,13 +15,18 @@ Furthermore, we need to support combined types that specify both the artifact ty
 
 ## Decision
 We will rename the `mediaType` field to `type` in the `CatalogEntry` schema.
-The `type` field is an open text format, so any string value is accepted. The following are recommended "known types" in the ecosystem for interoperability, designed to align with registerable IANA media type standards:
-- `application/a2a-agent-card+json` (A2A Agent Card)
-- `application/mcp-server+json` (MCP Server)
-- `application/ai-catalog+json` (nested AI Catalog)
-- `application/ai-skills+zip` (AI Skill bundle in a ZIP archive)
-- `application/ai-skills+gzip` (AI Skill bundle in a gzipped tarball)
-- `text/markdown; profile=ai-skill` (AI Skill defined in a standard Markdown file)
+The `type` field is an open text format, so any string value is accepted. To ensure clarity of ownership and governance, the recognized "known types" are partitioned into core protocol types and integrated third-party/ecosystem types:
+
+### Core Protocol Types (Governed by the AI Catalog WG)
+- `application/ai-catalog+json` — nested AI Catalog
+- `application/agent-card+json` — reserved for a generic Agent Card format
+
+### Integrated Ecosystem & Third-Party Types (Governed externally)
+- `application/a2a-agent-card+json` — A2A Agent Card
+- `application/mcp-server+json` — MCP Server Card
+- `application/ai-skills+zip` — AI Skill bundle in a ZIP archive
+- `application/ai-skills+gzip` — AI Skill bundle in a gzipped tarball
+- `text/markdown; profile=ai-skill` — AI Skill defined in a standard Markdown file
 
 For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 

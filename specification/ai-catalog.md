@@ -199,11 +199,15 @@ It MUST contain the following members:
 
 `type`
 : A string containing the identifier that specifies the type of the
-  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:
 
+  **Core Protocol Types (Governed by the AI Catalog WG):**
+  - `application/ai-catalog+json` — a nested AI Catalog
+  - `application/agent-card+json` — reserved for a generic Agent Card format
+
+  **Integrated Ecosystem & Third-Party Types (Governed externally):**
   - `application/a2a-agent-card+json` — an A2A Agent Card
   - `application/mcp-server+json` — an MCP Server Card
-  - `application/ai-catalog+json` — a nested AI Catalog
   - `application/ai-skills+zip` — an AI Skill bundle (ZIP archive)
   - `application/ai-skills+gzip` — an AI Skill bundle (gzipped tarball)
   - `text/markdown; profile=ai-skill` — an AI Skill defined in a standard Markdown file
