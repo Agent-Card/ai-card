@@ -417,13 +417,11 @@ provenance:
     {
       "type": "publisher-identity",
       "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-      "mediaType": "application/jwt",
       "description": "Verifies did:web:acme-corp.com as publisher"
     },
     {
       "type": "SOC2-Type2",
       "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-      "mediaType": "application/pdf",
       "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
     }
   ],
@@ -484,10 +482,6 @@ contain:
 : A string containing the location of the attestation document.
   This may be an HTTPS URL or an inline Data URI [[RFC2397]].
 
-`mediaType`
-: A string indicating the format (e.g., "application/pdf",
-  "application/jwt").
-
 The following members are OPTIONAL:
 
 `digest`
@@ -506,7 +500,6 @@ For example, a compliance attestation with integrity verification:
 {
   "type": "SOC2-Type2",
   "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
-  "mediaType": "application/pdf",
   "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
   "size": 245760,
   "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
@@ -1320,13 +1313,11 @@ artifact types including a nested catalog packaging related artifacts:
           {
             "type": "publisher-identity",
             "uri": "https://trust.acme.com/certs/publisher.jwt",
-            "mediaType": "application/jwt",
             "description": "Verifies did:web:acme-corp.com as publisher"
           },
           {
             "type": "SOC2-Type2",
             "uri": "https://trust.acme.com/reports/soc2.pdf",
-            "mediaType": "application/pdf",
             "digest": "sha256:a1b2c3d4e5f6"
           }
         ],
@@ -1490,7 +1481,6 @@ containing both protocol-specific entries:
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "mediaType": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
@@ -1792,7 +1782,6 @@ reflects the Registry format:
       {
         "type": "publisher-identity",
         "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
-        "mediaType": "application/jwt",
         "description": "Verifies did:web:modelcontextprotocol.io as publisher"
       }
     ],
@@ -1957,13 +1946,11 @@ server can reference the Server Card as its artifact content:
     "attestations": [
       {
         "type": "publisher-identity",
-        "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-        "mediaType": "application/jwt"
+        "uri": "https://trust.acme-corp.com/certs/publisher.jwt"
       },
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "mediaType": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
