@@ -266,17 +266,18 @@ It MUST contain the following members:</p>
 <dd>A string containing a human-readable name for the artifact.</dd>
 <dt><code>type</code></dt>
 <dd>A string containing the identifier that specifies the type of the
-  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:</dd>
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:</dd>
 </dl>
-<ul>
-<li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
-<li><code>application/mcp-server+json</code> — an MCP Server Card</li>
-<li><code>application/ai-catalog+json</code> — a nested AI Catalog</li>
-<li><code>application/ai-skills+tgz</code> — an AI Skill bundle (compressed tarball)</li>
-<li><code>application/ai-skills+zip</code> — an AI Skill bundle (ZIP archive)</li>
-<li><code>application/ai-skills+md</code> — an AI Skill defined in Markdown</li>
-</ul>
-<p>These values combine the artifact type with the payload format. For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
+<p><strong>Core Protocol Types (Governed by the AI Catalog WG):</strong>
+  - <code>application/ai-catalog+json</code> — a nested AI Catalog
+  - <code>application/agent-card+json</code> — reserved for a generic Agent Card format</p>
+<p><strong>Integrated Ecosystem &amp; Third-Party Types (Governed externally):</strong>
+  - <code>application/a2a-agent-card+json</code> — an A2A Agent Card
+  - <code>application/mcp-server+json</code> — an MCP Server Card
+  - <code>application/ai-skills+zip</code> — an AI Skill bundle (ZIP archive)
+  - <code>application/ai-skills+gzip</code> — an AI Skill bundle (gzipped tarball)
+  - <code>text/markdown; profile=ai-skill</code> — an AI Skill defined in a standard Markdown file</p>
+<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For generic payload formats (like <code>text/markdown</code>), the standard <code>profile</code> parameter is used to specify the semantic schema (e.g., <code>profile=ai-skill</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
 <p>A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:</p>
 <dl>
@@ -456,13 +457,11 @@ provenance:</p>
     {
       &quot;type&quot;: &quot;publisher-identity&quot;,
       &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
-      &quot;mediaType&quot;: &quot;application/jwt&quot;,
       &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
     },
     {
       &quot;type&quot;: &quot;SOC2-Type2&quot;,
       &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-      &quot;mediaType&quot;: &quot;application/pdf&quot;,
       &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
     }
   ],
@@ -517,9 +516,6 @@ contain:</p>
 <dt><code>uri</code></dt>
 <dd>A string containing the location of the attestation document.
   This may be an HTTPS URL or an inline Data URI [[RFC2397]].</dd>
-<dt><code>mediaType</code></dt>
-<dd>A string indicating the format (e.g., "application/pdf",
-  "application/jwt").</dd>
 </dl>
 <p>The following members are OPTIONAL:</p>
 <dl>
@@ -535,7 +531,6 @@ contain:</p>
 <pre><code class="language-json">{
   &quot;type&quot;: &quot;SOC2-Type2&quot;,
   &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2-2026.pdf&quot;,
-  &quot;mediaType&quot;: &quot;application/pdf&quot;,
   &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;,
   &quot;size&quot;: 245760,
   &quot;description&quot;: &quot;SOC2 Type 2 audit report for Acme Finance Agent (2026)&quot;
@@ -1311,13 +1306,11 @@ artifact types including a nested catalog packaging related artifacts:</p>
           {
             &quot;type&quot;: &quot;publisher-identity&quot;,
             &quot;uri&quot;: &quot;https://trust.acme.com/certs/publisher.jwt&quot;,
-            &quot;mediaType&quot;: &quot;application/jwt&quot;,
             &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
           },
           {
             &quot;type&quot;: &quot;SOC2-Type2&quot;,
             &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
-            &quot;mediaType&quot;: &quot;application/pdf&quot;,
             &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
           }
         ],
@@ -1476,7 +1469,6 @@ containing both protocol-specific entries:</p>
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,
         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;type&quot;: &quot;application/pdf&quot;,
         &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
       }
     ]
@@ -1886,7 +1878,6 @@ reflects the Registry format:</p>
       {
         &quot;type&quot;: &quot;publisher-identity&quot;,
         &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;,
-        &quot;mediaType&quot;: &quot;application/jwt&quot;,
         &quot;description&quot;: &quot;Verifies did:web:modelcontextprotocol.io as publisher&quot;
       }
     ],
@@ -2041,13 +2032,11 @@ server can reference the Server Card as its artifact content:</p>
     &quot;attestations&quot;: [
       {
         &quot;type&quot;: &quot;publisher-identity&quot;,
-        &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
-        &quot;mediaType&quot;: &quot;application/jwt&quot;
+        &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;
       },
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,
         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;mediaType&quot;: &quot;application/pdf&quot;,
         &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
       }
     ]
