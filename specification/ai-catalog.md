@@ -189,7 +189,21 @@ A Catalog Entry object describes a single AI artifact in the catalog.
 It MUST contain the following members:
 
 `identifier`
-: A string identifying this artifact. This MUST be a URN conforming to the Agent Actor Naming Standards defined in [PR #19](https://github.com/Agent-Card/ai-catalog/pull/19), following the format `urn:ai:{publisher}:{namespace}:{name}` (e.g., `urn:ai:example.com:skill:code-review` or `urn:ai:example.com:mcp:weather`).
+: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard `urn:ai` naming structure is **HIGHLY RECOMMENDED** and **MUST** be used for open or federated systems.
+
+  **Standard Naming Format:**
+  `urn:ai:{publisher}:{namespace}:{name}`
+
+  - `{publisher}`: The domain name of the organization publishing the artifact (e.g., `example.com`).
+  - `{namespace}`: The logical namespace, which can contain one or more colon-separated categories (e.g., `mcp`, `skill`, `agent`, `finance:agent`).
+  - `{name}`: The stable, unique name of the artifact within the publisher's namespace.
+
+  *Examples:*
+  - `urn:ai:example.com:skill:code-review`
+  - `urn:ai:example.com:mcp:weather`
+
+  For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.
+
   See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present.
 
 `displayName`
