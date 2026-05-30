@@ -197,16 +197,20 @@ It MUST contain the following members:
 
 `type`
 : A string containing the identifier that specifies the type of the
-  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable:
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:
 
+  **Core Protocol Types (Governed by the AI Catalog WG):**
+  - `application/ai-catalog+json` — a nested AI Catalog
+  - `application/agent-card+json` — reserved for a generic Agent Card format
+
+  **Integrated Ecosystem & Third-Party Types (Governed externally):**
   - `application/a2a-agent-card+json` — an A2A Agent Card
   - `application/mcp-server+json` — an MCP Server Card
-  - `application/ai-catalog+json` — a nested AI Catalog
-  - `application/ai-skills+tgz` — an AI Skill bundle (compressed tarball)
   - `application/ai-skills+zip` — an AI Skill bundle (ZIP archive)
-  - `application/ai-skills+md` — an AI Skill defined in Markdown
+  - `application/ai-skills+gzip` — an AI Skill bundle (gzipped tarball)
+  - `text/markdown; profile=ai-skill` — an AI Skill defined in a standard Markdown file
 
-  These values combine the artifact type with the payload format. For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
+  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For generic payload formats (like `text/markdown`), the standard `profile` parameter is used to specify the semantic schema (e.g., `profile=ai-skill`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
@@ -411,13 +415,11 @@ provenance:
     {
       "type": "publisher-identity",
       "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-      "mediaType": "application/jwt",
       "description": "Verifies did:web:acme-corp.com as publisher"
     },
     {
       "type": "SOC2-Type2",
       "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-      "mediaType": "application/pdf",
       "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
     }
   ],
@@ -478,10 +480,6 @@ contain:
 : A string containing the location of the attestation document.
   This may be an HTTPS URL or an inline Data URI [[RFC2397]].
 
-`mediaType`
-: A string indicating the format (e.g., "application/pdf",
-  "application/jwt").
-
 The following members are OPTIONAL:
 
 `digest`
@@ -500,7 +498,6 @@ For example, a compliance attestation with integrity verification:
 {
   "type": "SOC2-Type2",
   "uri": "https://trust.acme-corp.com/reports/soc2-2026.pdf",
-  "mediaType": "application/pdf",
   "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
   "size": 245760,
   "description": "SOC2 Type 2 audit report for Acme Finance Agent (2026)"
@@ -1314,13 +1311,11 @@ artifact types including a nested catalog packaging related artifacts:
           {
             "type": "publisher-identity",
             "uri": "https://trust.acme.com/certs/publisher.jwt",
-            "mediaType": "application/jwt",
             "description": "Verifies did:web:acme-corp.com as publisher"
           },
           {
             "type": "SOC2-Type2",
             "uri": "https://trust.acme.com/reports/soc2.pdf",
-            "mediaType": "application/pdf",
             "digest": "sha256:a1b2c3d4e5f6"
           }
         ],
@@ -1484,7 +1479,6 @@ containing both protocol-specific entries:
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "type": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
@@ -1786,7 +1780,6 @@ reflects the Registry format:
       {
         "type": "publisher-identity",
         "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
-        "mediaType": "application/jwt",
         "description": "Verifies did:web:modelcontextprotocol.io as publisher"
       }
     ],
@@ -1951,13 +1944,11 @@ server can reference the Server Card as its artifact content:
     "attestations": [
       {
         "type": "publisher-identity",
-        "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-        "mediaType": "application/jwt"
+        "uri": "https://trust.acme-corp.com/certs/publisher.jwt"
       },
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "mediaType": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f6"
       }
     ]
