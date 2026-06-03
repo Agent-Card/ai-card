@@ -413,10 +413,11 @@ carried on the Catalog Entry (see <a href="#publisher-object">Publisher Object</
   DID, SPIFFE ID, or URL.</dd>
 </dl>
 <p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
-field MUST match the entry's <code>identifier</code> field. This binding ensures trust
-claims are unambiguously associated with the catalog artifact.
-Consumers MUST reject a Trust Manifest whose <code>identity</code> does not
-match the containing entry's <code>identifier</code>.</p>
+field's authority or trust domain MUST align with the publisher domain segment of
+the entry's URN <code>identifier</code> field. This binding ensures trust claims are
+cryptographically bound to the authorized publisher of the catalog entry.
+Consumers MUST reject a Trust Manifest whose identity domain does not
+align with the publisher domain of the entry's <code>identifier</code>.</p>
 <p>When a Trust Manifest appears on a Host Info object, <code>identity</code>
 SHOULD match the host's <code>identifier</code> field when present.</p>
 <p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
@@ -458,7 +459,7 @@ properties may evolve across versions.</p>
 <p>For example, a Trust Manifest with identity, attestations, and
 provenance:</p>
 <pre><code class="language-json">{
-  &quot;identity&quot;: &quot;urn:ai:acme.com:agent:finance&quot;,
+  &quot;identity&quot;: &quot;did:web:acme.com:agent:finance&quot;,
   &quot;identityType&quot;: &quot;did&quot;,
   &quot;trustSchema&quot;: {
     &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
@@ -1314,7 +1315,8 @@ artifact types including a nested catalog packaging related artifacts:</p>
         &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
       },
       &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:ai:acme.com:agent:finance-a2a&quot;,
+        &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-a2a-pod&quot;,
+        &quot;identityType&quot;: &quot;spiffe&quot;,
         &quot;attestations&quot;: [
           {
             &quot;type&quot;: &quot;publisher-identity&quot;,
@@ -1477,7 +1479,8 @@ containing both protocol-specific entries:</p>
     ]
   },
   &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:ai:acme.com:agent:finance&quot;,
+    &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-agent-pod&quot;,
+    &quot;identityType&quot;: &quot;spiffe&quot;,
     &quot;attestations&quot;: [
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,

@@ -67,16 +67,32 @@
        &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
        &quot;version&quot;: &quot;2.0.0&quot;,
        &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-@@ -447,7 +458,7 @@
+@@ -402,10 +413,11 @@
+   DID, SPIFFE ID, or URL.</dd>
+ </dl>
+ <p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
+-field MUST match the entry's <code>identifier</code> field. This binding ensures trust
+-claims are unambiguously associated with the catalog artifact.
+-Consumers MUST reject a Trust Manifest whose <code>identity</code> does not
+-match the containing entry's <code>identifier</code>.</p>
++field's authority or trust domain MUST align with the publisher domain segment of
++the entry's URN <code>identifier</code> field. This binding ensures trust claims are
++cryptographically bound to the authorized publisher of the catalog entry.
++Consumers MUST reject a Trust Manifest whose identity domain does not
++align with the publisher domain of the entry's <code>identifier</code>.</p>
+ <p>When a Trust Manifest appears on a Host Info object, <code>identity</code>
+ SHOULD match the host's <code>identifier</code> field when present.</p>
+ <p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
+@@ -447,7 +459,7 @@
  <p>For example, a Trust Manifest with identity, attestations, and
  provenance:</p>
  <pre><code class="language-json">{
 -  &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
-+  &quot;identity&quot;: &quot;urn:ai:acme.com:agent:finance&quot;,
++  &quot;identity&quot;: &quot;did:web:acme.com:agent:finance&quot;,
    &quot;identityType&quot;: &quot;did&quot;,
    &quot;trustSchema&quot;: {
      &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
-@@ -696,19 +707,19 @@
+@@ -696,19 +708,19 @@
    },
    &quot;entries&quot;: [
      {
@@ -99,7 +115,7 @@
        &quot;displayName&quot;: &quot;DevOps Tools&quot;,
        &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
        &quot;url&quot;: &quot;https://acme.com/catalogs/devops.json&quot;
-@@ -721,7 +732,7 @@
+@@ -721,7 +733,7 @@
  acquired as a unit. For example, a finance plugin that ships an A2A
  agent, an MCP server, and a dataset together:</p>
  <pre><code class="language-json">{
@@ -108,7 +124,7 @@
    &quot;displayName&quot;: &quot;Finance Plugin&quot;,
    &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
    &quot;url&quot;: &quot;https://acme.com/plugins/finance-suite.json&quot;,
-@@ -1019,8 +1030,8 @@
+@@ -1019,8 +1031,8 @@
  <section id="identifier-typosquatting">
  <h2>Identifier Typosquatting</h2>
  <p>Catalog entries are identified by URIs/URNs. An attacker can register
@@ -119,7 +135,7 @@
  malicious artifact.</p>
  <p>Registries and consumers SHOULD implement similarity checks on
  identifiers. Publishers SHOULD use identifiers anchored to domains
-@@ -1291,7 +1302,7 @@
+@@ -1291,7 +1303,7 @@
    },
    &quot;entries&quot;: [
      {
@@ -128,16 +144,17 @@
        &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
        &quot;version&quot;: &quot;2.1.0&quot;,
        &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-@@ -1303,7 +1314,7 @@
+@@ -1303,7 +1315,8 @@
          &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
        },
        &quot;trustManifest&quot;: {
 -        &quot;identity&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
-+        &quot;identity&quot;: &quot;urn:ai:acme.com:agent:finance-a2a&quot;,
++        &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-a2a-pod&quot;,
++        &quot;identityType&quot;: &quot;spiffe&quot;,
          &quot;attestations&quot;: [
            {
              &quot;type&quot;: &quot;publisher-identity&quot;,
-@@ -1322,7 +1333,7 @@
+@@ -1322,7 +1335,7 @@
        &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
      },
      {
@@ -146,7 +163,7 @@
        &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
        &quot;version&quot;: &quot;1.4.0&quot;,
        &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-@@ -1332,7 +1343,7 @@
+@@ -1332,7 +1345,7 @@
        &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
      },
      {
@@ -155,7 +172,7 @@
        &quot;displayName&quot;: &quot;Acme Finance Suite&quot;,
        &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
        &quot;description&quot;: &quot;A2A agent + MCP server + dataset for finance workflows.&quot;,
-@@ -1341,24 +1352,24 @@
+@@ -1341,24 +1354,24 @@
          &quot;specVersion&quot;: &quot;1.0&quot;,
          &quot;entries&quot;: [
            {
@@ -184,7 +201,7 @@
                &quot;provenance&quot;: [
                  {
                    &quot;relation&quot;: &quot;publishedFrom&quot;,
-@@ -1371,7 +1382,7 @@
+@@ -1371,7 +1384,7 @@
          ]
        },
        &quot;trustManifest&quot;: {
@@ -193,7 +210,7 @@
          &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached&quot;
        },
        &quot;updatedAt&quot;: &quot;2026-03-20T14:00:00Z&quot;
-@@ -1394,7 +1405,7 @@
+@@ -1394,7 +1407,7 @@
    },
    &quot;entries&quot;: [
      {
@@ -202,7 +219,7 @@
        &quot;displayName&quot;: &quot;Acme Corporate Assistant&quot;,
        &quot;version&quot;: &quot;3.0.0&quot;,
        &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-@@ -1402,7 +1413,7 @@
+@@ -1402,7 +1415,7 @@
        &quot;description&quot;: &quot;General-purpose corporate assistant agent.&quot;
      },
      {
@@ -211,7 +228,7 @@
        &quot;displayName&quot;: &quot;Finance Services&quot;,
        &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
        &quot;url&quot;: &quot;https://acme-corp.com/catalogs/finance.json&quot;,
-@@ -1410,7 +1421,7 @@
+@@ -1410,7 +1423,7 @@
        &quot;tags&quot;: [&quot;finance&quot;, &quot;trading&quot;, &quot;compliance&quot;]
      },
      {
@@ -220,7 +237,7 @@
        &quot;displayName&quot;: &quot;Engineering Tools&quot;,
        &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
        &quot;url&quot;: &quot;https://acme-corp.com/catalogs/engineering.json&quot;,
-@@ -1418,7 +1429,7 @@
+@@ -1418,7 +1431,7 @@
        &quot;tags&quot;: [&quot;engineering&quot;, &quot;devops&quot;, &quot;ci-cd&quot;]
      },
      {
@@ -229,7 +246,7 @@
        &quot;displayName&quot;: &quot;ML Models&quot;,
        &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
        &quot;url&quot;: &quot;https://acme-corp.com/catalogs/ml-models.json&quot;,
-@@ -1439,7 +1450,7 @@
+@@ -1439,7 +1452,7 @@
  represented as one catalog entry whose content is a nested catalog
  containing both protocol-specific entries:</p>
  <pre><code class="language-json">{
@@ -238,7 +255,7 @@
    &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
    &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
    &quot;description&quot;: &quot;Finance agent accessible via both MCP and A2A protocols.&quot;,
-@@ -1452,13 +1463,13 @@
+@@ -1452,13 +1465,13 @@
      &quot;specVersion&quot;: &quot;1.0&quot;,
      &quot;entries&quot;: [
        {
@@ -254,16 +271,17 @@
          &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
          &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
          &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance&quot;
-@@ -1466,7 +1477,7 @@
+@@ -1466,7 +1479,8 @@
      ]
    },
    &quot;trustManifest&quot;: {
 -    &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
-+    &quot;identity&quot;: &quot;urn:ai:acme.com:agent:finance&quot;,
++    &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-agent-pod&quot;,
++    &quot;identityType&quot;: &quot;spiffe&quot;,
      &quot;attestations&quot;: [
        {
          &quot;type&quot;: &quot;SOC2-Type2&quot;,
-@@ -1643,7 +1654,7 @@
+@@ -1643,7 +1657,7 @@
        &quot;size&quot;: 1024,
        &quot;artifactType&quot;: &quot;application/a2a-agent-card+json&quot;,
        &quot;annotations&quot;: {
@@ -272,7 +290,7 @@
          &quot;ai-catalog.displayName&quot;: &quot;Acme Finance A2A Agent&quot;
        }
      },
-@@ -1653,7 +1664,7 @@
+@@ -1653,7 +1667,7 @@
        &quot;size&quot;: 512,
        &quot;artifactType&quot;: &quot;application/mcp-server+json&quot;,
        &quot;annotations&quot;: {
@@ -281,7 +299,7 @@
          &quot;ai-catalog.displayName&quot;: &quot;Acme Finance MCP Server&quot;
        }
      }
-@@ -1863,7 +1874,7 @@
+@@ -1863,7 +1877,7 @@
  <code>url</code> points to the <code>server.json</code> document and whose <code>type</code>
  reflects the Registry format:</p>
  <pre><code class="language-json">{
@@ -290,7 +308,7 @@
    &quot;displayName&quot;: &quot;Brave Search&quot;,
    &quot;version&quot;: &quot;1.0.2&quot;,
    &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-@@ -1875,7 +1886,7 @@
+@@ -1875,7 +1889,7 @@
      &quot;displayName&quot;: &quot;Model Context Protocol&quot;
    },
    &quot;trustManifest&quot;: {
@@ -299,7 +317,7 @@
      &quot;attestations&quot;: [
        {
          &quot;type&quot;: &quot;publisher-identity&quot;,
-@@ -1923,7 +1934,7 @@
+@@ -1923,7 +1937,7 @@
    },
    &quot;entries&quot;: [
      {
@@ -308,7 +326,7 @@
        &quot;displayName&quot;: &quot;Brave Search&quot;,
        &quot;version&quot;: &quot;1.0.2&quot;,
        &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-@@ -1932,7 +1943,7 @@
+@@ -1932,7 +1946,7 @@
        &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
      },
      {
@@ -317,7 +335,7 @@
        &quot;displayName&quot;: &quot;Filesystem&quot;,
        &quot;version&quot;: &quot;1.0.2&quot;,
        &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-@@ -1941,7 +1952,7 @@
+@@ -1941,7 +1955,7 @@
        &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
      },
      {
@@ -326,7 +344,7 @@
        &quot;displayName&quot;: &quot;Weather&quot;,
        &quot;version&quot;: &quot;0.5.0&quot;,
        &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-@@ -2019,7 +2030,7 @@
+@@ -2019,7 +2033,7 @@
  <p>The two mechanisms layer naturally. An AI Catalog entry for an MCP
  server can reference the Server Card as its artifact content:</p>
  <pre><code class="language-json">{
@@ -335,7 +353,7 @@
    &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
    &quot;type&quot;: &quot;application/mcp-server+json&quot;,
    &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
-@@ -2030,7 +2041,7 @@
+@@ -2030,7 +2044,7 @@
      &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
    },
    &quot;trustManifest&quot;: {
@@ -344,7 +362,7 @@
      &quot;attestations&quot;: [
        {
          &quot;type&quot;: &quot;publisher-identity&quot;,
-@@ -2280,7 +2291,7 @@
+@@ -2280,7 +2294,7 @@
      &quot;displayName&quot;: &quot;Anthropic&quot;
    },
    &quot;data&quot;: {
