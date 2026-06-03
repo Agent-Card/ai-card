@@ -361,10 +361,11 @@ A Trust Manifest MUST contain:
   DID, SPIFFE ID, or URL.
 
 When a Trust Manifest appears within a Catalog Entry, the `identity`
-field MUST match the entry's `identifier` field. This binding ensures trust
-claims are unambiguously associated with the catalog artifact.
-Consumers MUST reject a Trust Manifest whose `identity` does not
-match the containing entry's `identifier`.
+field's authority or trust domain MUST align with the publisher domain segment of
+the entry's URN `identifier` field. This binding ensures trust claims are
+cryptographically bound to the authorized publisher of the catalog entry.
+Consumers MUST reject a Trust Manifest whose identity domain does not
+align with the publisher domain of the entry's `identifier`.
 
 When a Trust Manifest appears on a Host Info object, `identity`
 SHOULD match the host's `identifier` field when present.
@@ -417,7 +418,7 @@ provenance:
 
 ```json
 {
-  "identity": "urn:ai:acme.com:agent:finance",
+  "identity": "did:web:acme.com:agent:finance",
   "identityType": "did",
   "trustSchema": {
     "identifier": "urn:trust:acme-enterprise-v1",
@@ -1320,7 +1321,8 @@ artifact types including a nested catalog packaging related artifacts:
         "displayName": "Acme Financial Corp"
       },
       "trustManifest": {
-        "identity": "urn:ai:acme.com:agent:finance-a2a",
+        "identity": "spiffe://acme.com/ns/finance/sa/finance-a2a-pod",
+        "identityType": "spiffe",
         "attestations": [
           {
             "type": "publisher-identity",
@@ -1488,7 +1490,8 @@ containing both protocol-specific entries:
     ]
   },
   "trustManifest": {
-    "identity": "urn:ai:acme.com:agent:finance",
+    "identity": "spiffe://acme.com/ns/finance/sa/finance-agent-pod",
+    "identityType": "spiffe",
     "attestations": [
       {
         "type": "SOC2-Type2",
