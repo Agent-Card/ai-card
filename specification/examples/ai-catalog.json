@@ -8,7 +8,6 @@
   "entries": [
     {
       "identifier": "urn:example:agent-finance-001",
-      "displayName": "Acme Finance Agent",
       "mediaType": "application/a2a-agent-card+json",
       "description": "Multi-protocol finance agent.",
       "tags": [

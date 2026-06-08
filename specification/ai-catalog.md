@@ -122,13 +122,11 @@ For example, a minimal catalog listing three AI artifacts:
     },
     {
       "identifier": "urn:example:mcp:weather",
-      "displayName": "Weather Service",
       "mediaType": "application/mcp-server-card+json",
       "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
       "identifier": "urn:example:a2a:research",
-      "displayName": "Research Assistant",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://agents.example.com/researchAssistant"
     }
@@ -194,9 +192,6 @@ It MUST contain the following members:
   See [Multi-Version Entries](#multi-version-entries) for uniqueness
   rules when multiple versions are present.
 
-`displayName`
-: A string containing a human-readable name for the artifact.
-
 `mediaType`
 : A string containing the media type that identifies the type of the
   referenced artifact. This is the mechanism by which clients
@@ -223,6 +218,20 @@ provide the artifact content:
   is opaque to this specification.
 
 The following members are OPTIONAL:
+
+`displayName`
+: A string containing a human-readable name for the artifact.
+  This field SHOULD be set only when the referenced artifact does not
+  already carry its own canonical human-readable name — for example a
+  raw dataset (`application/parquet`), a model blob, or a skill bundle
+  (`application/agentskill+zip`), none of which embed a self-describing
+  name. When the referenced artifact does carry such a name — for
+  example the `name` field of an A2A Agent Card or the `title` field of
+  an MCP Server Card — that artifact is the authoritative source and
+  `displayName` SHOULD be omitted to avoid duplicating a value that can
+  drift out of sync. When `displayName` is present and disagrees with a
+  name carried by the referenced artifact, consumers SHOULD treat the
+  artifact's own name as authoritative.
 
 `description`
 : A string containing a short description of the artifact.
@@ -279,7 +288,6 @@ For example, a catalog listing two versions of the same agent:
   "entries": [
     {
       "identifier": "urn:acme:agent:finance",
-      "displayName": "Acme Finance Agent",
       "version": "2.1.0",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
@@ -287,7 +295,6 @@ For example, a catalog listing two versions of the same agent:
     },
     {
       "identifier": "urn:acme:agent:finance",
-      "displayName": "Acme Finance Agent",
       "version": "2.0.0",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
@@ -896,7 +903,7 @@ A conformant Minimal Catalog is a JSON document with media type
 
 - `specVersion` — the specification version string
 - `entries` — an array of Catalog Entry objects, each containing at
-  minimum `identifier`, `displayName`, `mediaType`, and exactly one of `url` or
+  minimum `identifier`, `mediaType`, and exactly one of `url` or
   `data`
 
 All other fields (`host`, `publisher`, `trustManifest`,
@@ -1300,7 +1307,6 @@ artifact types including a nested catalog packaging related artifacts:
   "entries": [
     {
       "identifier": "urn:acme:agent:finance-a2a",
-      "displayName": "Acme Finance A2A Agent",
       "version": "2.1.0",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance.json",
@@ -1333,7 +1339,6 @@ artifact types including a nested catalog packaging related artifacts:
     },
     {
       "identifier": "urn:acme:server:finance-mcp",
-      "displayName": "Acme Finance MCP Server",
       "version": "1.4.0",
       "mediaType": "application/mcp-server-card+json",
       "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
@@ -1352,13 +1357,11 @@ artifact types including a nested catalog packaging related artifacts:
         "entries": [
           {
             "identifier": "urn:acme:agent:finance-a2a",
-            "displayName": "Finance A2A Agent",
             "mediaType": "application/a2a-agent-card+json",
             "url": "https://api.acme-corp.com/agents/finance.json"
           },
           {
             "identifier": "urn:acme:server:finance-mcp",
-            "displayName": "Finance MCP Server",
             "mediaType": "application/mcp-server-card+json",
             "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
@@ -1407,7 +1410,6 @@ document:
   "entries": [
     {
       "identifier": "urn:acme:agent:assistant",
-      "displayName": "Acme Corporate Assistant",
       "version": "3.0.0",
       "mediaType": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/assistant.json",
@@ -1468,13 +1470,11 @@ containing both protocol-specific entries:
     "entries": [
       {
         "identifier": "urn:acme:agent:finance:mcp",
-        "displayName": "Acme Finance MCP Server",
         "mediaType": "application/mcp-server-card+json",
         "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
       },
       {
         "identifier": "urn:acme:agent:finance:a2a",
-        "displayName": "Acme Finance A2A Agent",
         "mediaType": "application/a2a-agent-card+json",
         "url": "https://api.acme-corp.com/agents/finance"
       }
@@ -1734,7 +1734,7 @@ does not address.
 |:---|:---|
 | `server.json` document (whole file) | Artifact content via entry `url` or `data` |
 | `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
-| `title` | Entry `displayName` |
+| `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
 | `description` | Entry `description` |
 | `version` | Entry `version` |
 | `repository` | Entry `metadata.repository` |
@@ -1772,7 +1772,6 @@ reflects the Registry format:
 ```json
 {
   "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-  "displayName": "Brave Search",
   "version": "1.0.2",
   "mediaType": "application/json",
   "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
@@ -1835,7 +1834,6 @@ agents, skills, and other artifacts:
   "entries": [
     {
       "identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-      "displayName": "Brave Search",
       "version": "1.0.2",
       "mediaType": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
@@ -1844,7 +1842,6 @@ agents, skills, and other artifacts:
     },
     {
       "identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
-      "displayName": "Filesystem",
       "version": "1.0.2",
       "mediaType": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
@@ -1853,7 +1850,6 @@ agents, skills, and other artifacts:
     },
     {
       "identifier": "urn:mcp:io.github.example/weather-mcp",
-      "displayName": "Weather",
       "version": "0.5.0",
       "mediaType": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
@@ -1939,7 +1935,6 @@ server can reference the Server Card as its artifact content:
 ```json
 {
   "identifier": "urn:mcp:example.com:finance-server",
-  "displayName": "Acme Finance MCP Server",
   "mediaType": "application/mcp-server+json",
   "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
   "description": "MCP server for financial data and trading tools",
@@ -2023,7 +2018,7 @@ plugins/
 | Marketplace `description` | Catalog `metadata.description` |
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
-| Plugin `name` | Entry `displayName` and `identifier` (derived as URN) |
+| Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
 | Plugin `description` | Entry `description` |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
@@ -2071,7 +2066,6 @@ maps to an AI Catalog where each plugin is an entry:
   "entries": [
     {
       "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
-      "displayName": "agent-sdk-dev",
       "mediaType": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
       "description": "Development kit for working with the Claude Agent SDK",
@@ -2086,7 +2080,6 @@ maps to an AI Catalog where each plugin is an entry:
     },
     {
       "identifier": "urn:claude-plugin:adspirer:ads-agent",
-      "displayName": "adspirer-ads-agent",
       "mediaType": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
       "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
@@ -2107,7 +2100,6 @@ maps to an AI Catalog where each plugin is an entry:
     },
     {
       "identifier": "urn:claude-plugin:aikido:security",
-      "displayName": "aikido",
       "mediaType": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
       "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
@@ -2154,7 +2146,6 @@ contains multiple artifact types:
     "entries": [
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
-        "displayName": "Example Plugin MCP Server",
         "mediaType": "application/mcp-server-card+json",
         "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
       },
