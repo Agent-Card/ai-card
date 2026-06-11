@@ -5,21 +5,21 @@
  "entries": [
  {
 -"identifier": "urn:example:skill:code-review",
-+"identifier": "urn:ai:example.com:skill:code-review",
++"identifier": "urn:air:example.com:skill:code-review",
  "displayName": "Code Review Assistant",
  "type": "application/ai-skills+zip",
  "url": "https://skills.example.com/code-review/skill.zip"
  },
  {
 -"identifier": "urn:example:mcp:weather",
-+"identifier": "urn:ai:example.com:mcp:weather",
++"identifier": "urn:air:example.com:mcp:weather",
  "displayName": "Weather Service",
  "type": "application/mcp-server+json",
  "url": "https://api.example.com/.well-known/mcp/server-card.json"
  },
  {
 -"identifier": "urn:example:a2a:research",
-+"identifier": "urn:ai:example.com:a2a:research",
++"identifier": "urn:air:example.com:a2a:research",
  "displayName": "Research Assistant",
  "type": "application/a2a-agent-card+json",
  "url": "https://agents.example.com/researchAssistant"
@@ -34,7 +34,7 @@
 +A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard urn:ai naming structure is HIGHLY RECOMMENDED and MUST be used for open or federated systems.
 +
 +Standard Naming Format:
-+urn:ai:{publisher}:{namespace}:{name}
++urn:air:{publisher}:{namespace}:{name}
 +
 +{publisher}: The domain name of the organization publishing the artifact (e.g., example.com).
 +
@@ -43,8 +43,8 @@
 +{name}: The stable, unique name of the artifact within the publisher's namespace.
 +
 +Examples:
-+- urn:ai:example.com:skill:code-review
-+- urn:ai:example.com:mcp:weather
++- urn:air:example.com:skill:code-review
++- urn:air:example.com:mcp:weather
 +
 +For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.
 +
@@ -57,7 +57,7 @@
  "entries": [
  {
 -"identifier": "urn:acme:agent:finance",
-+"identifier": "urn:ai:acme.com:agent:finance",
++"identifier": "urn:air:acme.com:agent:finance",
  "displayName": "Acme Finance Agent",
  "version": "2.1.0",
  "type": "application/a2a-agent-card+json",
@@ -66,7 +66,7 @@
  },
  {
 -"identifier": "urn:acme:agent:finance",
-+"identifier": "urn:ai:acme.com:agent:finance",
++"identifier": "urn:air:acme.com:agent:finance",
  "displayName": "Acme Finance Agent",
  "version": "2.0.0",
  "type": "application/a2a-agent-card+json",
@@ -100,21 +100,21 @@
  "entries": [
  {
 -"identifier": "urn:acme:catalog:finance",
-+"identifier": "urn:ai:acme.com:catalog:finance",
++"identifier": "urn:air:acme.com:catalog:finance",
  "displayName": "Finance Services",
  "type": "application/ai-catalog+json",
  "url": "https://acme.com/catalogs/finance.json"
  },
  {
 -"identifier": "urn:acme:catalog:ml",
-+"identifier": "urn:ai:acme.com:catalog:ml",
++"identifier": "urn:air:acme.com:catalog:ml",
  "displayName": "ML Models",
  "type": "application/ai-catalog+json",
  "url": "https://acme.com/catalogs/ml.json"
  },
  {
 -"identifier": "urn:acme:catalog:devops",
-+"identifier": "urn:ai:acme.com:catalog:devops",
++"identifier": "urn:air:acme.com:catalog:devops",
  "displayName": "DevOps Tools",
  "type": "application/ai-catalog+json",
  "url": "https://acme.com/catalogs/devops.json"
@@ -123,7 +123,7 @@
  
  {
 -"identifier": "urn:acme:plugin:finance-suite",
-+"identifier": "urn:ai:acme.com:plugin:finance-suite",
++"identifier": "urn:air:acme.com:plugin:finance-suite",
  "displayName": "Finance Plugin",
  "type": "application/ai-catalog+json",
  "url": "https://acme.com/plugins/finance-suite.json",
@@ -133,8 +133,8 @@
  Catalog entries are identified by URIs/URNs. An attacker can register
 -identifiers similar to legitimate ones (e.g., urn:acme:agent:financ
 -vs. urn:acme:agent:finance) to trick consumers into using a
-+identifiers similar to legitimate ones (e.g., urn:ai:acme.com:agent:financ
-+vs. urn:ai:acme.com:agent:finance) to trick consumers into using a
++identifiers similar to legitimate ones (e.g., urn:air:acme.com:agent:financ
++vs. urn:air:acme.com:agent:finance) to trick consumers into using a
  malicious artifact.
  
  Registries and consumers SHOULD implement similarity checks on
@@ -143,7 +143,7 @@
  "entries": [
  {
 -"identifier": "urn:acme:agent:finance-a2a",
-+"identifier": "urn:ai:acme.com:agent:finance-a2a",
++"identifier": "urn:air:acme.com:agent:finance-a2a",
  "displayName": "Acme Finance A2A Agent",
  "version": "2.1.0",
  "type": "application/a2a-agent-card+json",
@@ -162,7 +162,7 @@
  },
  {
 -"identifier": "urn:acme:server:finance-mcp",
-+"identifier": "urn:ai:acme.com:server:finance-mcp",
++"identifier": "urn:air:acme.com:server:finance-mcp",
  "displayName": "Acme Finance MCP Server",
  "version": "1.4.0",
  "type": "application/mcp-server+json",
@@ -171,7 +171,7 @@
  },
  {
 -"identifier": "urn:acme:plugin:finance-suite",
-+"identifier": "urn:ai:acme.com:plugin:finance-suite",
++"identifier": "urn:air:acme.com:plugin:finance-suite",
  "displayName": "Acme Finance Suite",
  "type": "application/ai-catalog+json",
  "description": "A2A agent + MCP server + dataset for finance workflows.",
@@ -180,27 +180,27 @@
  "entries": [
  {
 -"identifier": "urn:acme:agent:finance-a2a",
-+"identifier": "urn:ai:acme.com:agent:finance-a2a",
++"identifier": "urn:air:acme.com:agent:finance-a2a",
  "displayName": "Finance A2A Agent",
  "type": "application/a2a-agent-card+json",
  "url": "https://api.acme-corp.com/agents/finance.json"
  },
  {
 -"identifier": "urn:acme:server:finance-mcp",
-+"identifier": "urn:ai:acme.com:server:finance-mcp",
++"identifier": "urn:air:acme.com:server:finance-mcp",
  "displayName": "Finance MCP Server",
  "type": "application/mcp-server+json",
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
  },
  {
 -"identifier": "urn:acme:data:market-2026q1",
-+"identifier": "urn:ai:acme.com:data:market-2026q1",
++"identifier": "urn:air:acme.com:data:market-2026q1",
  "displayName": "Market Dataset Q1 2026",
  "type": "application/parquet",
  "url": "https://data.acme-corp.com/market-2026q1.parquet",
  "trustManifest": {
 -"identity": "urn:acme:data:market-2026q1",
-+"identity": "urn:ai:acme.com:data:market-2026q1",
++"identity": "urn:air:acme.com:data:market-2026q1",
  "provenance": [
  {
  "relation": "publishedFrom",
@@ -209,7 +209,7 @@
  },
  "trustManifest": {
 -"identity": "urn:acme:plugin:finance-suite",
-+"identity": "urn:ai:acme.com:plugin:finance-suite",
++"identity": "urn:air:acme.com:plugin:finance-suite",
  "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
  },
  "updatedAt": "2026-03-20T14:00:00Z"
@@ -218,7 +218,7 @@
  "entries": [
  {
 -"identifier": "urn:acme:agent:assistant",
-+"identifier": "urn:ai:acme.com:agent:assistant",
++"identifier": "urn:air:acme.com:agent:assistant",
  "displayName": "Acme Corporate Assistant",
  "version": "3.0.0",
  "type": "application/a2a-agent-card+json",
@@ -227,7 +227,7 @@
  },
  {
 -"identifier": "urn:acme:catalog:finance",
-+"identifier": "urn:ai:acme.com:catalog:finance",
++"identifier": "urn:air:acme.com:catalog:finance",
  "displayName": "Finance Services",
  "type": "application/ai-catalog+json",
  "url": "https://acme-corp.com/catalogs/finance.json",
@@ -236,7 +236,7 @@
  },
  {
 -"identifier": "urn:acme:catalog:engineering",
-+"identifier": "urn:ai:acme.com:catalog:engineering",
++"identifier": "urn:air:acme.com:catalog:engineering",
  "displayName": "Engineering Tools",
  "type": "application/ai-catalog+json",
  "url": "https://acme-corp.com/catalogs/engineering.json",
@@ -245,7 +245,7 @@
  },
  {
 -"identifier": "urn:acme:catalog:ml-models",
-+"identifier": "urn:ai:acme.com:catalog:ml-models",
++"identifier": "urn:air:acme.com:catalog:ml-models",
  "displayName": "ML Models",
  "type": "application/ai-catalog+json",
  "url": "https://acme-corp.com/catalogs/ml-models.json",
@@ -254,7 +254,7 @@
  
  {
 -"identifier": "urn:acme:agent:finance",
-+"identifier": "urn:ai:acme.com:agent:finance",
++"identifier": "urn:air:acme.com:agent:finance",
  "displayName": "Acme Finance Agent",
  "type": "application/ai-catalog+json",
  "description": "Finance agent accessible via both MCP and A2A protocols.",
@@ -263,14 +263,14 @@
  "entries": [
  {
 -"identifier": "urn:acme:agent:finance:mcp",
-+"identifier": "urn:ai:acme.com:agent:finance:mcp",
++"identifier": "urn:air:acme.com:agent:finance:mcp",
  "displayName": "Acme Finance MCP Server",
  "type": "application/mcp-server+json",
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
  },
  {
 -"identifier": "urn:acme:agent:finance:a2a",
-+"identifier": "urn:ai:acme.com:agent:finance:a2a",
++"identifier": "urn:air:acme.com:agent:finance:a2a",
  "displayName": "Acme Finance A2A Agent",
  "type": "application/a2a-agent-card+json",
  "url": "https://api.acme-corp.com/agents/finance"
@@ -289,7 +289,7 @@
  "artifactType": "application/a2a-agent-card+json",
  "annotations": {
 -"ai-catalog.identifier": "urn:acme:agent:finance-a2a",
-+"ai-catalog.identifier": "urn:ai:acme.com:agent:finance-a2a",
++"ai-catalog.identifier": "urn:air:acme.com:agent:finance-a2a",
  "ai-catalog.displayName": "Acme Finance A2A Agent"
  }
  },
@@ -298,7 +298,7 @@
  "artifactType": "application/mcp-server+json",
  "annotations": {
 -"ai-catalog.identifier": "urn:acme:server:finance-mcp",
-+"ai-catalog.identifier": "urn:ai:acme.com:server:finance-mcp",
++"ai-catalog.identifier": "urn:air:acme.com:server:finance-mcp",
  "ai-catalog.displayName": "Acme Finance MCP Server"
  }
  }
@@ -307,7 +307,7 @@
  
  {
 -"identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-+"identifier": "urn:ai:io.modelcontextprotocol.anonymous:mcp:brave-search",
++"identifier": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
  "displayName": "Brave Search",
  "version": "1.0.2",
  "type": "application/mcp-server+json",
@@ -316,7 +316,7 @@
  },
  "trustManifest": {
 -"identity": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-+"identity": "urn:ai:io.modelcontextprotocol.anonymous:mcp:brave-search",
++"identity": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
  "attestations": [
  {
  "type": "publisher-identity",
@@ -325,7 +325,7 @@
  "entries": [
  {
 -"identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-+"identifier": "urn:ai:io.modelcontextprotocol.anonymous:mcp:brave-search",
++"identifier": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
  "displayName": "Brave Search",
  "version": "1.0.2",
  "type": "application/mcp-server+json",
@@ -334,7 +334,7 @@
  },
  {
 -"identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
-+"identifier": "urn:ai:io.github.modelcontextprotocol:mcp:filesystem",
++"identifier": "urn:air:io.github.modelcontextprotocol:mcp:filesystem",
  "displayName": "Filesystem",
  "version": "1.0.2",
  "type": "application/mcp-server+json",
@@ -343,7 +343,7 @@
  },
  {
 -"identifier": "urn:mcp:io.github.example/weather-mcp",
-+"identifier": "urn:ai:io.github.example:mcp:weather-mcp",
++"identifier": "urn:air:io.github.example:mcp:weather-mcp",
  "displayName": "Weather",
  "version": "0.5.0",
  "type": "application/mcp-server+json",
@@ -352,7 +352,7 @@
  
  {
 -"identifier": "urn:mcp:example.com:finance-server",
-+"identifier": "urn:ai:example.com:mcp:finance-server",
++"identifier": "urn:air:example.com:mcp:finance-server",
  "displayName": "Acme Finance MCP Server",
  "type": "application/mcp-server+json",
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
@@ -361,7 +361,7 @@
  },
  "trustManifest": {
 -"identity": "urn:mcp:example.com:finance-server",
-+"identity": "urn:ai:example.com:mcp:finance-server",
++"identity": "urn:air:example.com:mcp:finance-server",
  "attestations": [
  {
  "type": "publisher-identity",
