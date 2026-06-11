@@ -21,15 +21,15 @@ The `identifier` field remains an open string format (any valid URI or URN is ac
 
 ### 2. Standardized Naming Format (Highly Recommended / Federated Systems)
 For open, public, or federated systems where global discoverability is required, the identifier **MUST** follow the standard URN format:
-`urn:ai:{publisher}:{namespace}:{name}`
+`urn:air:{publisher}:{namespace}:{name}`
 
 - `publisher`: The domain name of the publisher organization (e.g., `example.com`).
 - `namespace`: Optional segment(s) separated by `:` to categorize the artifact (e.g., `mcp`, `skill`, `agent`, `finance:agent`).
 - `name`: The stable, unique logical name of the artifact within that publisher's namespace.
 
 *Examples:*
-- `urn:ai:example.com:skill:code-review`
-- `urn:ai:example.com:mcp:weather`
+- `urn:air:example.com:skill:code-review`
+- `urn:air:example.com:mcp:weather`
 
 All standard examples and specifications will be updated to follow this URN convention.
 
