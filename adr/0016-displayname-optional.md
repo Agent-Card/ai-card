@@ -23,7 +23,7 @@ Not all artifacts self-name, however. Opaque artifacts referenced by a catalog �
 
 Guidance: a publisher SHOULD set `displayName` only when the referenced artifact does not already carry its own canonical human-readable name. When the artifact does carry one, that artifact is the authoritative source and `displayName` SHOULD be omitted. When `displayName` *is* present, however, it takes precedence and is authoritative for display: a consumer SHOULD render it as given, even if it differs from a name carried by the referenced artifact — setting `displayName` is how a publisher deliberately overrides the artifact's own name.
 
-For an entry without `displayName`, a consumer SHOULD resolve a name in order: (1) the entry's `displayName` if present, (2) the referenced artifact's own canonical name (e.g. an A2A Agent Card `name` or MCP Server Card `title`) if already fetched or cached, then (3) the trailing segment of the entry's `identifier` URN. See [Resolving an Artifact's Display Name](../specification/ai-catalog.md#resolving-an-artifacts-display-name) in the specification.
+When rendering an entry, a consumer SHOULD resolve a name in order: (1) the entry's `displayName` if present, (2) the referenced artifact's own canonical name (e.g. an A2A Agent Card `name` or MCP Server Card `title`) if already fetched or cached, then (3) the trailing segment of the entry's `identifier` URN. See [Resolving an Artifact's Display Name](../specification/ai-catalog.md#resolving-an-artifacts-display-name) in the specification.
 
 This decision concerns only the Catalog Entry. `displayName` on `HostInfo` and `Publisher` is unchanged — those name the catalog host and publishing organization, which is genuinely catalog-authored metadata with no other home.
 
