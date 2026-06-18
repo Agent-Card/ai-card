@@ -203,10 +203,10 @@ It MUST contain the following members:
   determine what kind of AI artifact the entry represents. Well-known
   values include (but are not limited to):
 
-  - `application/ai-catalog+json` — a nested AI Catalog
-  - `application/a2a-agent-card+json` — an A2A Agent Card
-  - `application/mcp-server-card+json` — an MCP Server Card
-  - Any other media type defined by a protocol specification (e.g.,
+- `application/ai-catalog+json` — a nested AI Catalog
+- `application/a2a-agent-card+json` — an A2A Agent Card
+- `application/mcp-server-card+json` — an MCP Server Card
+- Any other media type defined by a protocol specification (e.g.,
     `application/agentskill+zip` for skill definitions)
 
 A Catalog Entry MUST contain exactly one of the following members to
