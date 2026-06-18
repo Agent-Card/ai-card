@@ -189,7 +189,7 @@ A Catalog Entry object describes a single AI artifact in the catalog.
 It MUST contain the following members:
 
 `identifier`
-: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard `urn:ai` naming structure is **HIGHLY RECOMMENDED** and **MUST** be used for open or federated systems.
+: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard `urn:air` naming structure is **HIGHLY RECOMMENDED** and **MUST** be used for open or federated systems.
 
   **Standard Naming Format:**
   `urn:air:{publisher}:{namespace}:{name}`

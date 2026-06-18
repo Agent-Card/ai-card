@@ -14,7 +14,7 @@ The `ai-catalog` specification originally recommended using URNs or URIs for the
 To ensure global federation and industry-wide interoperability, we need a standardized, secure naming protocol for AI actors. However, we also need to preserve flexibility for organizations running local, private, or closed catalog instances that do not participate in public federation.
 
 ## Decision
-We will define the `identifier` field as an open text format, while strongly recommending and standardizing the domain-anchored `urn:ai` scheme for open or federated ecosystems.
+We will define the `identifier` field as an open text format, while strongly recommending and standardizing the domain-anchored `urn:air` scheme for open or federated ecosystems.
 
 ### 1. Open/Flexible Naming (Local Systems)
 The `identifier` field remains an open string format (any valid URI or URN is accepted). Local, private, or closed systems can use any custom identifier formats as needed. When a non-standard format is used, client implementations are responsible for parsing and processing it accordingly.
