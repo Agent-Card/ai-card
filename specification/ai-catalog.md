@@ -229,9 +229,13 @@ The following members are OPTIONAL:
   example the `name` field of an A2A Agent Card or the `title` field of
   an MCP Server Card — that artifact is the authoritative source and
   `displayName` SHOULD be omitted to avoid duplicating a value that can
-  drift out of sync. When `displayName` is present and disagrees with a
-  name carried by the referenced artifact, consumers SHOULD treat the
-  artifact's own name as authoritative.
+  drift out of sync. When `displayName` *is* present, however, it takes
+  precedence: it is the authoritative value for display, and a consumer
+  SHOULD render it as given even when it differs from a name carried by
+  the referenced artifact. Setting `displayName` is how a publisher
+  deliberately overrides the artifact's own name. See
+  [Resolving an Artifact's Display Name](#resolving-an-artifacts-display-name)
+  for the full consumer resolution order.
 
 `description`
 : A string containing a short description of the artifact.
@@ -262,6 +266,36 @@ The following members are OPTIONAL:
 : A Trust Manifest object as defined in [Trust Manifest](#trust-manifest)
   providing verifiable identity and trust metadata for this artifact.
   See [Trust Manifest](#trust-manifest) for details.
+
+### Resolving an Artifact's Display Name
+
+Because `displayName` is OPTIONAL, a consumer rendering a catalog entry
+cannot assume it is present. To obtain a human-readable name, a consumer
+SHOULD resolve one in the following order:
+
+1. **`displayName` on the entry**, if present. A publisher-supplied
+   `displayName` always wins, even when it differs from a name carried by
+   the referenced artifact.
+2. **The referenced artifact's own canonical name**, if the consumer has
+   already fetched or cached the artifact — for example the `name` field
+   of an A2A Agent Card or the `title` field of an MCP Server Card.
+3. **The trailing segment of the entry's `identifier`** as a last
+   resort — the portion after its final `:` or `/` delimiter. For
+   example, `urn:example:mcp:weather` yields `weather` and
+   `urn:mcp:io.modelcontextprotocol.anonymous/brave-search` yields
+   `brave-search`.
+
+A consumer SHOULD NOT dereference an artifact at render time solely to
+obtain a name. A registry, directory, or other service built on top of a
+catalog SHOULD resolve the name once at ingestion — alongside any other
+derived metadata it attaches, such as relevance scores or tags — and
+cache the result, rather than fetching artifacts on the rendering path.
+
+This order also covers a referenced MCP Server Card whose `title` is
+itself absent: step 2 yields no name, so the consumer falls through to
+the `identifier` segment in step 3. A publisher MAY still set
+`displayName` on such an entry to provide a better name than the bare
+identifier segment.
 
 ## Multi-Version Entries
 
