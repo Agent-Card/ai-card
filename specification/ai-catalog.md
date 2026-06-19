@@ -2152,7 +2152,7 @@ contains multiple artifact types:
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
         "displayName": "Example Plugin Skills",
-        "type": "application/ai-skills+zip",
+        "type": "application/agent-skills+zip",
         "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip"
       }
     ]
