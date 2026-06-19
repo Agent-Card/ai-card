@@ -28,7 +28,7 @@ The `type` field is an open text format, so any string value is accepted. To ens
 
 #### Integrated Ecosystem & Third-Party Types (Governed externally)
 - `application/a2a-agent-card+json` — A2A Agent Card
-- `application/mcp-server+json` — MCP Server Card
+- `application/mcp-server-card+json` — MCP Server Card
 - `application/agent-skills+zip` — Agent Skill bundle in a ZIP archive
 - `application/agent-skills+gzip` — Agent Skill bundle in a gzipped tarball
 - `text/markdown; profile=agent-skill` — Agent Skill defined in a standard Markdown file
