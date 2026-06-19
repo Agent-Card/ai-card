@@ -43,7 +43,7 @@ We will completely remove the `mediaType` field from the `Attestation` object sc
 ### Suffixes and Parameters in `CatalogEntry`
 To ensure that our recommended types are fully registerable as official IANA media types, we adhere strictly to the IANA Structured Syntax Suffix registry rules (RFC 6838/6839):
 - **Custom Ecosystem Formats**: Types like A2A Agent Cards (`application/a2a-agent-card+json`), MCP Servers (`application/mcp-server+json`), and Nested Catalogs (`application/ai-catalog+json`) use custom domain prefixes combined with the standard, registered `+json` suffix.
-- **AI Skill Bundles**: Packages are represented using custom prefixes combined with standard, registered syntax suffixes for archives/compression: `+zip` (registered under RFC 9559) and `+gzip` (registered under RFC 6839). Unregistered suffixes like `+tgz` are avoided to prevent registration failure.
+- **Agent Skill Bundles**: Packages are represented using custom prefixes combined with standard, registered syntax suffixes for archives/compression: `+zip` (registered under RFC 9559) and `+gzip` (registered under RFC 6839). Unregistered suffixes like `+tgz` are avoided to prevent registration failure.
 - **Generic Formats (Markdown)**: Standard Markdown is represented by the generic, globally registered `text/markdown` media type. Because using `text/markdown` in isolation does not indicate the document is an Agent Skill (unlike custom prefixes), we use the standard IANA `profile` parameter (`profile=agent-skill`) to cleanly declare the semantic profile of the document while remaining 100% standard-compliant.
 
 ### Simplifying Attestations
