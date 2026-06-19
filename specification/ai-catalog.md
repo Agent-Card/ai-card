@@ -212,7 +212,7 @@ It MUST contain the following members:
   - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
   - `text/markdown; profile=agent-skill` — an Agent Skill defined in a standard Markdown file
 
-  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For generic payload formats (like `text/markdown`), the standard `profile` parameter is used to specify the semantic schema (e.g., `profile=ai-skill`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
+  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For generic payload formats (like `text/markdown`), the standard `profile` parameter is used to specify the semantic schema (e.g., `profile=agent-skill`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
