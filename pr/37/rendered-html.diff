@@ -53,7 +53,7 @@
 +  - <code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)
 +  - <code>application/agent-skills+gzip</code> — an Agent Skill bundle (gzipped tarball)
 +  - <code>text/markdown; profile=agent-skill</code> — an Agent Skill defined in a standard Markdown file</p>
-+<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For generic payload formats (like <code>text/markdown</code>), the standard <code>profile</code> parameter is used to specify the semantic schema (e.g., <code>profile=ai-skill</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
++<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For generic payload formats (like <code>text/markdown</code>), the standard <code>profile</code> parameter is used to specify the semantic schema (e.g., <code>profile=agent-skill</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
  <p>A Catalog Entry MUST contain exactly one of the following members to
  provide the artifact content:</p>
  <dl>
@@ -581,7 +581,7 @@
          &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:skills&quot;,
          &quot;displayName&quot;: &quot;Example Plugin Skills&quot;,
 -        &quot;mediaType&quot;: &quot;application/agentskill+zip&quot;,
-+        &quot;type&quot;: &quot;application/ai-skills+zip&quot;,
++        &quot;type&quot;: &quot;application/agent-skills+zip&quot;,
          &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip&quot;
        }
      ]
