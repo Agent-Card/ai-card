@@ -31,7 +31,7 @@ The `type` field is an open text format, so any string value is accepted. To ens
 - `application/mcp-server-card+json` — MCP Server Card
 - `application/agent-skills+zip` — Agent Skill bundle in a ZIP archive
 - `application/agent-skills+gzip` — Agent Skill bundle in a gzipped tarball
-- `text/markdown; profile=urn:ai-catalog:agent-skills` — Agent Skill defined in a standard Markdown file
+- `text/markdown; profile="urn:air:agent-skill"` — Agent Skill defined in a standard Markdown file
 
 *Notes*:
   -  **hyphens formats**: We decided to use `agent-skills` instead of `agentskills` . Standard IANA media types and URL schemas heavily favor hyphens for readability when combining words (similar to standard formats like x-www-form-urlencoded or octet-stream)
@@ -50,9 +50,9 @@ We will completely remove the `mediaType` field from the `Attestation` object sc
 
 ### Suffixes and Parameters in `CatalogEntry`
 To ensure that our recommended types are fully registerable as official IANA media types, we adhere strictly to the IANA Structured Syntax Suffix registry rules (RFC 6838/6839):
-- **Custom Ecosystem Formats**: Types like A2A Agent Cards (`application/a2a-agent-card+json`), MCP Servers (`application/mcp-server+json`), and Nested Catalogs (`application/ai-catalog+json`) use custom domain prefixes combined with the standard, registered `+json` suffix.
+- **Custom Ecosystem Formats**: Types like A2A Agent Cards (`application/a2a-agent-card+json`), MCP Servers (`application/mcp-server-card+json`), and Nested Catalogs (`application/ai-catalog+json`) use custom domain prefixes combined with the standard, registered `+json` suffix.
 - **Agent Skill Bundles**: Packages are represented using custom prefixes combined with standard, registered syntax suffixes for archives/compression: `+zip` (registered under RFC 9559) and `+gzip` (registered under RFC 6839). Unregistered suffixes like `+tgz` are avoided to prevent registration failure.
-- **Generic Formats (Markdown)**: Standard Markdown is represented by the generic, globally registered `text/markdown` media type. Because using `text/markdown` in isolation does not indicate the document is an Agent Skill (unlike custom prefixes), we use the standard IANA `profile` parameter (`profile=agent-skill`) to cleanly declare the semantic profile of the document while remaining 100% standard-compliant.
+- **Generic Formats (Markdown)**: Standard Markdown is represented by the generic, globally registered `text/markdown` media type. Because using `text/markdown` in isolation does not indicate the document is an Agent Skill (unlike custom prefixes), we use the standard IANA `profile` parameter (`profile="urn:air:agent-skill"`) to cleanly declare the semantic profile of the document while remaining 100% standard-compliant.
 
 ### Simplifying Attestations
 During the workgroup meeting on May 28, 2026, the team discussed the inconsistency of having both a `type` and `mediaType` in attestations. Darrel Miller decided to simplify the structure by removing the `mediaType` field entirely, noting that the content type of the attestation can easily be determined from the URL or via content negotiation during retrieval. The group agreed to proceed with this removal to simplify the schema and gather implementation feedback.
