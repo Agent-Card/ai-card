@@ -31,7 +31,15 @@ The `type` field is an open text format, so any string value is accepted. To ens
 - `application/mcp-server-card+json` — MCP Server Card
 - `application/agent-skills+zip` — Agent Skill bundle in a ZIP archive
 - `application/agent-skills+gzip` — Agent Skill bundle in a gzipped tarball
-- `text/markdown; profile=agent-skill` — Agent Skill defined in a standard Markdown file
+- `text/markdown; profile=urn:ai-catalog:agent-skills` — Agent Skill defined in a standard Markdown file
+
+*Notes*:
+  -  **hyphens formats**: We decided to use `agent-skills` instead of `agentskills` . Standard IANA media types and URL schemas heavily favor hyphens for readability when combining words (similar to standard formats like x-www-form-urlencoded or octet-stream)
+  - **profile parameter for markdown**: (Darrel Miller) For the profile to be strictly standard-compliant, the profile parameter must be a valid URI. Since the team agreed in PR #36 to use the urn:air: (AI Resource) namespace for identifiers, the profile should utilize that exact URN structure. [Note this ADR will need to be updated when the URN structure for AI resources is officially registered.]
+
+So, the fully compliant and correct format the team should use is:
+
+text/markdown; profile="urn:air:agent-skill"
 
 For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
