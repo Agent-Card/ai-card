@@ -1,0 +1,909 @@
+--- a/base/rendered.txt
++++ b/head/rendered.txt
+@@ -1,6 +1,6 @@
+ Abstract
+ 
+-This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.
++This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices define a substrate-neutral distribution-mapping contract and concrete bindings to OCI distribution registries and xRegistry, plus mappings to the MCP Registry server.json format and the Claude Code Plugins marketplace.
+ 
+ Status of This Document
+ 
+@@ -167,6 +167,15 @@
+ non-standard metadata. See Metadata Extensibility
+ for key naming conventions.
+ 
++signature
++
++A string containing a detached JWS [[RFC7515]] signature computed over
++the JCS-canonicalized [[RFC8785]] catalog document (excluding the
++signature member itself), providing catalog-level integrity over the
++entries array and host. It is verified exactly as a Trust Manifest
++signature (see Trust Manifest Signatures).
++See Trust Manifest Substitution.
++
+ Host Info
+ 
+ The Host Info object identifies the operator of the catalog. It MUST
+@@ -388,7 +397,11 @@
+ field MUST match the entry's identifier field. This binding ensures trust
+ claims are unambiguously associated with the catalog artifact.
+ Consumers MUST reject a Trust Manifest whose identity does not
+-match the containing entry's identifier.
++match the containing entry's identifier. The identity is restated
++here — rather than read from the entry's identifier — so that it falls
++within the signed payload; this is an intentional duplication, not
++redundant metadata, and removing it would leave the signature uncommitted
++to which identifier the trust claims apply.
+ 
+ When a Trust Manifest appears on a Host Info object, identity
+ SHOULD match the host's identifier field when present.
+@@ -398,6 +411,34 @@
+ requirement that all versions carry identical trust metadata — trust
+ properties may evolve across versions.
+ 
++Manifest Validity
++
++A Trust Manifest exists to carry verifiable trust evidence; an empty one
++adds nothing and misleads consumers into believing trust metadata is
++present. Beyond the required identity, a Trust Manifest MUST therefore
++contain at least one substantive trust member:
++
++a signature (with its required subject and issuedAt),
++
++a non-empty attestations array,
++
++a non-empty provenance array, or
++
++a trustSchema.
++
++The members identity and identityType (which restate or describe the
++entry identifier) and the informational members privacyPolicyUrl,
++termsOfServiceUrl, and metadata do NOT satisfy this requirement.
++subject, issuedAt, and expiresAt are not substantive on their own:
++an unsigned subject digest is attacker-settable and unverifiable, so
++they count only as part of a signature.
++
++A Trust Manifest that would carry only non-substantive members MUST be
++omitted entirely rather than included empty — the trustManifest member
++is itself OPTIONAL, so no information is lost. Consumers SHOULD treat a
++Trust Manifest that violates this rule as if no Trust Manifest were
++present.
++
+ Optional Members
+ 
+ The following members are OPTIONAL:
+@@ -433,16 +474,42 @@
+ 
+ A string containing a URL to the terms of service.
+ 
++subject
++
++A Subject object as defined in Subject Binding that
++cryptographically binds this Trust Manifest to the specific artifact it
++describes. A Trust Manifest that carries a signature MUST include a
++subject.
++
++issuedAt
++
++A string containing an ISO 8601 [[RFC3339]] timestamp indicating when
++the Trust Manifest was created and signed. A Trust Manifest that
++carries a signature MUST include issuedAt.
++
++expiresAt
++
++A string containing an ISO 8601 [[RFC3339]] timestamp after which the
++Trust Manifest MUST be considered stale. Consumers SHOULD reject a
++Trust Manifest whose expiresAt is in the past.
++
+ signature
+ 
+-A string containing a detached JWS [[RFC7515]] signature computed
+-over the Trust Manifest content. This enables integrity verification
+-of the trust metadata independent of the artifact.
++A string containing a detached JWS [[RFC7515]] signature computed over
++the canonicalized Trust Manifest content, including the subject and
++issuedAt members. Because the signed payload commits to the artifact
++digest carried in subject, neither the trust claims nor the artifact
++reference can be substituted without detection. See
++Trust Manifest Signatures.
+ 
+ metadata
+ 
+ An open map of string keys to arbitrary values for extending trust
+-metadata.
++metadata. Unlike the Catalog Entry's metadata (which is
++informational and unsigned), this map is part of the signed payload
++when the Trust Manifest carries a signature; use it for extensions
++that must be cryptographically bound to the manifest, and use the
++entry's metadata for unsigned, informational extensions.
+ 
+ For example, a Trust Manifest with identity, attestations, and
+ provenance:
+@@ -479,8 +546,58 @@
+ ],
+ "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
+ "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
++"subject": {
++"url": "https://api.acme-corp.com/agents/finance/v2.1.json",
++"mediaType": "application/a2a-agent-card+json",
++"digest": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
++},
++"issuedAt": "2026-03-15T10:00:00Z",
+ "signature": "eyJhbGciOiJFUzI1NiJ9..detached-jws-signature"
+ }
++
++Subject Binding
++
++The Subject object binds a Trust Manifest to the specific artifact it
++describes, closing the substitution gap in which an attacker who
++controls the catalog document leaves a validly-signed Trust Manifest in
++place but repoints the entry to a different artifact. Because the
++Subject is part of the signed payload, the artifact reference and its
++content digest cannot be changed without invalidating the signature.
++
++A Subject object MUST contain:
++
++mediaType
++
++A string containing the media type of the bound artifact. This MUST
++equal the containing Catalog Entry's mediaType.
++
++digest
++
++A string containing the cryptographic digest of the artifact content,
++in the format defined in Digest Format. For an
++artifact referenced by url, the digest is computed over the exact
++bytes served. For an artifact embedded in data, the digest is
++computed over the JCS-canonicalized [[RFC8785]] JSON value.
++
++The following member is OPTIONAL:
++
++url
++
++A string containing the URL of the bound artifact. When present, it
++MUST equal the containing Catalog Entry's url. Consumers MUST reject
++a Trust Manifest whose subject.url does not match the entry's url.
++
++A Trust Manifest that carries a signature MUST include a subject.
++When verifying such a manifest, consumers MUST confirm that the fetched
++artifact's media type and digest match the subject before relying on
++any claim in the Trust Manifest. See
++Verifying Artifact Integrity.
++
++The subject.mediaType and subject.url intentionally restate the
++entry's mediaType and url so that those values fall within the signed
++payload. This is a deliberate duplication, not redundant metadata:
++without it, an attacker who controls the catalog document could change
++the entry's media type or location without invalidating the signature.
+ 
+ Trust Schema Object
+ 
+@@ -610,6 +727,33 @@
+ carried by a Trust Manifest. Verification is OPTIONAL — consumers
+ that do not need trust assurance can skip this entirely.
+ 
++Safe Fetching
++
++Verification procedures direct consumers to fetch URLs that originate in
++the Trust Manifest itself (attestation.uri, statementUri,
++registryUri, and key-resolution endpoints). Because a manifest may be
++attacker-controlled before its identity is anchored, these fetches are a
++server-side request forgery (SSRF) and denial-of-service surface.
++Consumers performing verification MUST:
++
++Resolve and reject URLs targeting private, loopback, link-local, or
++cloud metadata addresses (e.g., 127.0.0.0/8, ::1,
++169.254.0.0/16, fc00::/7, 10.0.0.0/8, 172.16.0.0/12,
++192.168.0.0/16), and re-check the resolved address after any
++redirect.
++
++Restrict fetches to the https scheme (or inline data: URIs) and
++refuse to follow redirects that cross into a disallowed address range.
++
++Enforce a maximum response size and a request timeout. When
++attestation.size is present, reject responses that exceed it; in all
++cases apply a consumer-defined ceiling.
++
++Treat every fetched document as untrusted input.
++
++Consumers SHOULD prefer inline data: attestations and Data-URI logos
++to avoid leaking verification activity to third-party endpoints.
++
+ Digest Format
+ 
+ Digests in this specification use the format algorithm:hex-value,
+@@ -623,22 +767,60 @@
+ 
+ Trust Manifest Signatures
+ 
+-The signature field carries a detached JWS [[RFC7515]] computed
+-over the Trust Manifest content. To create or verify a signature:
++The signature field carries a detached JWS [[RFC7515]] computed over
++the Trust Manifest content, including the subject and issuedAt
++members. To create or verify a signature:
+ 
+ Canonicalize the Trust Manifest JSON using JCS (JSON
+-Canonicalization Scheme) [[RFC8785]]. Remove the signature
+-field itself before canonicalization.
+-
+-Sign (or verify) the canonical bytes as a detached JWS
+-payload using the publisher's private (or public) key.
+-
+-Encode the resulting JWS in compact serialization and store
+-it in the signature field.
+-
+-This approach ensures the signature is stable regardless of JSON
+-key ordering or whitespace, and can be verified independently of the
+-artifact content.
++Canonicalization Scheme) [[RFC8785]]. Remove the signature field
++itself before canonicalization; all other members — including
++subject and issuedAt — remain in the signed payload.
++
++Select an algorithm from the allowlist in
++Signature Algorithms. The JWS alg header
++parameter MUST identify the algorithm used.
++
++Sign (or verify) the canonical bytes as a detached JWS payload
++using the publisher's private (or public) key.
++
++Encode the resulting JWS in compact serialization and store it
++in the signature field.
++
++This approach ensures the signature is stable regardless of JSON key
++ordering or whitespace. Because the signed payload includes the
++subject binding, a verified signature commits the publisher to a
++specific artifact digest, not merely to the trust claims.
++
++Producers SHOULD avoid placing numeric values that do not round-trip
++under JCS serialization (e.g., integers outside the range exactly
++representable as IEEE 754 doubles) in a signed Trust Manifest, as such
++values can cause a verifier's canonicalization to differ from the
++producer's. Where large integers are required, encode them as strings.
++
++Signature Algorithms
++
++To prevent signature-forgery attacks, producers and consumers MUST
++constrain the JWS algorithms used for Trust Manifest signatures.
++
++Consumers MUST reject a signature whose JWS alg header is none.
++
++Consumers MUST reject symmetric (MAC-based) algorithms such as
++HS256; Trust Manifest signatures MUST use an asymmetric algorithm so
++that verification cannot be performed with attacker-supplied secret
++material (preventing public-key-as-HMAC-secret confusion).
++
++Producers MUST use, and consumers MUST support, one or more of the
++following asymmetric algorithms [[RFC7518]]: ES256, ES384,
++EdDSA, PS256, PS384, or RS256.
++
++Consumers MUST determine the expected algorithm and key from the
++resolved trust anchor (see Trust Anchoring) and
++MUST NOT let the alg header alone select a verification algorithm in
++a way that downgrades security. Consumers SHOULD pin the expected key
++via the JWS kid header.
++
++These constraints follow the JSON Web Token current best practices
++[[RFC8725]].
+ 
+ Key Resolution
+ 
+@@ -666,6 +848,32 @@
+ Resolve the domain's TLS certificate and extract the public key,
+ or look up a DNSKEY/TXT record containing the JWK thumbprint.
+ 
++Trust Anchoring
++
++Verifying a Trust Manifest signature proves that the manifest was signed
++by the holder of the key associated with its identity. It does NOT, by
++itself, prove that the identity is the legitimate publisher of the
++artifact. An attacker who controls the catalog document can replace both
++the identity and the key it resolves to, then sign the forged manifest
++with their own key — every internal check would still pass.
++
++Consumers MUST therefore anchor the identity (or signing key) to a
++trust root established out of band, independent of the catalog document.
++Acceptable anchors include:
++
++A pinned allowlist of trusted publisher identities or keys.
++
++A registry or marketplace that vets publisher identities and serves
++the catalog over a channel the consumer independently trusts.
++
++An identity method that proves control of a name the consumer already
++trusts (e.g., a did:web whose domain matches an expected publisher,
++validated against that domain's TLS-authenticated endpoint).
++
++A verified signature without an anchored identity establishes integrity
++and internal consistency only; consumers MUST NOT treat it as proof of
++publisher authenticity.
++
+ Verifying Host Identity
+ 
+ To verify the host of a catalog:
+@@ -694,17 +902,41 @@
+ Confirm the JWT claims bind the publisher.identifier to the Trust
+ Manifest's identity.
+ 
++The publisher object resides on the Catalog Entry, outside the Trust
++Manifest signature. Consumers MUST treat publisher fields as advisory
++unless a verified publisher-identity attestation cryptographically
++binds publisher.identifier to the signed manifest's identity.
++
+ Verifying Artifact Integrity
+ 
+-When a Trust Manifest includes provenance entries with sourceDigest:
+-
+-Fetch the artifact content from the entry's url.
+-
+-Compute the digest using the algorithm specified in the
+-sourceDigest field.
+-
+-Compare the computed digest to the declared value. Reject the
+-artifact if they differ.
++When a Trust Manifest carries a signature, it MUST include a subject
++that binds it to the artifact (see Subject Binding).
++To verify artifact integrity:
++
++Verify the Trust Manifest signature
++(Trust Manifest Signatures) and anchor
++the identity (Trust Anchoring).
++
++Confirm subject.mediaType equals the entry's mediaType, and, when
++subject.url is present, that it equals the entry's url.
++
++Fetch the artifact content from the entry's url, or take it from
++the entry's data, observing the limits in
++Safe Fetching.
++
++Compute the digest of the fetched bytes (for url) or of the
++JCS-canonicalized value (for data) using the algorithm named in
++subject.digest.
++
++Compare the computed digest to subject.digest. Reject the artifact
++if they differ.
++
++Because the subject is part of the signed payload, this check binds
++the publisher's signature to the exact artifact, defeating catalog-level
++substitution of the artifact URL or content. The OPTIONAL
++provenance[].sourceDigest records the digest of an upstream source
++(e.g., a Git commit) and is complementary to — not a substitute for —
++the subject digest.
+ 
+ Verifying Attestations
+ 
+@@ -717,6 +949,26 @@
+ 
+ Validate the attestation per its type (e.g., verify a JWT
+ signature, confirm a PDF certificate is current).
++
++Provenance Statements
++
++A Provenance Link MAY reference a signed provenance statement via
++statementUri and the key that signed it via signatureRef. To verify
++such a statement:
++
++Fetch the statement document from statementUri, observing
++Safe Fetching.
++
++Resolve the key indicated by signatureRef using the procedure in
++Key Resolution and anchor it per
++Trust Anchoring.
++
++Verify the statement's signature using an algorithm from
++Signature Algorithms.
++
++Confirm the statement's subject matches the artifact's subject
++digest. Treat an unverifiable statement as absent, not as a failure
++of the artifact itself.
+ 
+ Organizing Catalogs
+ 
+@@ -978,7 +1230,8 @@
+ All other fields (host, publisher, trustManifest,
+ metadata) are OPTIONAL. This level is sufficient for use cases that
+ only need a simple list of AI artifacts — for example, a catalog of
+-MCP servers or A2A agents.
++MCP servers or A2A agents. A trustManifest, when present at any level,
++MUST be substantive (see Manifest Validity).
+ 
+ Level 2: Discoverable Catalog
+ 
+@@ -993,8 +1246,22 @@
+ 
+ In addition to Level 2 requirements, a Trusted Catalog:
+ 
+-Includes trustManifest objects on entries and/or the host, as
+-defined in Trust Manifest
++Includes a trustManifest object on every entry whose trust is to be
++relied upon, and MAY include one on the host, as defined in
++Trust Manifest
++
++Each such trustManifest MUST carry a signature, a subject
++binding it to the artifact (Subject Binding), and
++an issuedAt timestamp
++
++Consumers MUST verify the signature, anchor the identity
++(Trust Anchoring), and confirm the subject
++digest before relying on any claim
++
++SHOULD provide catalog-level integrity, either by serving the catalog
++through a content-addressed channel (see
++Security Considerations) or by including a
++top-level catalog signature
+ 
+ MAY include publisher objects on entries with verifiable identifiers
+ 
+@@ -1036,14 +1303,18 @@
+ 
+ Layer 2 — Signed Trust Manifest
+ 
+-The Trust Manifest includes a signature field (detached JWS).
+-The consumer verifies the signature against the publisher's public
+-key before trusting any claims in the Trust Manifest — including
+-provenance digests, attestations, and identity bindings. This closes
+-the substitution gap from Layer 1: an attacker cannot forge a
+-signed Trust Manifest without the publisher's private key.
+-Consumers SHOULD verify signatures when present and SHOULD reject
+-Trust Manifests whose signature does not validate.
++The Trust Manifest includes a signature field (detached JWS) and a
++subject that binds the signature to the artifact's content digest
++(see Subject Binding). The consumer verifies the
++signature, anchors the signer's identity to a trust root
++(Trust Anchoring), and confirms the subject
++digest before trusting any claim. This closes the substitution gap
++from Layer 1: because the signed payload commits to the artifact
++digest, an attacker cannot repoint the entry to a different artifact
++or forge claims without the publisher's private key. Consumers that
++rely on trust metadata MUST verify signatures and MUST reject Trust
++Manifests whose signature does not validate, whose subject does not
++match the fetched artifact, or whose identity cannot be anchored.
+ 
+ Layer 3 — Content-Addressed Distribution (OCI)
+ 
+@@ -1086,11 +1357,39 @@
+ Layer 1 enables post-fetch integrity checks but does not prevent
+ whole-entry substitution.
+ 
+-Layer 2 prevents Trust Manifest forgery, ensuring provenance
+-digests and attestations are authentic.
++Layer 2 binds the signed Trust Manifest to the artifact digest
++via subject, preventing both Trust Manifest forgery and artifact
++substitution under a valid signature.
+ 
+ Layer 3 makes modification structurally impossible through
+ content-addressing.
++
++Trust Manifest Substitution
++
++Because a Trust Manifest is a peer element of the catalog entry rather
++than part of the artifact, an attacker who can write the catalog
++document can attempt to substitute the artifact, the Trust Manifest, or
++both. This specification defends against substitution with three
++compounding mechanisms:
++
++Subject binding. A signed Trust Manifest MUST include a subject
++that commits to the artifact's media type and content digest (see
++Subject Binding). The artifact reference therefore
++cannot be changed without invalidating the signature.
++
++Trust anchoring. A signature is only meaningful once the signer's
++identity is anchored to a trust root established out of band (see
++Trust Anchoring); otherwise an attacker can sign a
++forged manifest with their own key.
++
++Catalog-level integrity. Per-entry signatures do not prevent an
++attacker from adding, removing, or reordering whole entries. Hosts
++SHOULD additionally provide catalog-level integrity, either by serving
++the catalog through a content-addressed channel (Layer 3) or by
++including a top-level catalog signature computed over the
++JCS-canonicalized [[RFC8785]] catalog document (excluding the
++signature member itself) and verified exactly as a Trust Manifest
++signature.
+ 
+ Identifier Typosquatting
+ 
+@@ -1150,6 +1449,7 @@
+ specVersion string
+ entries CatalogEntry[]
+ host HostInfo
++signature string
+ }
+ class HostInfo {
+ displayName string
+@@ -1171,10 +1471,17 @@
+ }
+ class TrustManifest {
+ identity string
++subject Subject
+ trustSchema TrustSchema
+ attestations Attestation[]
+ provenance ProvenanceLink[]
++issuedAt string
+ signature string
++}
++class Subject {
++url string
++mediaType string
++digest string
+ }
+ class TrustSchema {
+ identifier string
+@@ -1197,6 +1504,7 @@
+ CatalogEntry --> "0..1" Publisher : publisher
+ CatalogEntry --> "0..1" TrustManifest : trustManifest
+ HostInfo --> "0..1" TrustManifest : trustManifest
++TrustManifest --> "0..1" Subject : subject
+ TrustManifest --> "0..1" TrustSchema : trustSchema
+ TrustManifest --> "*" Attestation : attestations
+ TrustManifest --> "*" ProvenanceLink : provenance
+@@ -1596,13 +1904,7 @@
+ catalog with protocol-specific entries, allowing clients to choose
+ MCP or A2A based on their capabilities.
+ 
+-Mapping to OCI Distribution
+-
+-This appendix describes how AI Catalog documents can be distributed
+-through OCI registries, enabling content-addressed storage, signing,
+-and replication using existing container infrastructure.
+-
+-Logical Format vs. Physical Distribution
++Mapping to Distribution Substrates
+ 
+ The AI Catalog specification defines a logical format: a JSON
+ document with entries, displayName, mediaType, and trustManifest
+@@ -1610,36 +1912,153 @@
+ artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
+ consume simple JSON.
+ 
+-OCI provides a physical distribution layer: content-addressed
+-storage, cryptographic signing via Cosign/Notation, global replication
+-through registries, and referrer-based metadata association. These are
+-valuable infrastructure capabilities, but OCI's data model uses
+-container-oriented vocabulary (manifests, layers, config,
+-digest) that does not naturally describe a catalog of AI artifacts.
+-
+-This specification treats OCI as one distribution option, not as the
+-canonical data model. The logical AI Catalog format remains the
+-authoring and consumption interface. Tooling bridges the two:
++That logical format can be physically distributed over more than one
++substrate — an OCI registry, an [[xRegistry]] registry, or a plain HTTP
++server. Each substrate has its own data model and its own native
++capabilities. To keep the logical format authoritative and to avoid
++diverging, substrate-specific dialects, every binding defined by this
++specification MUST satisfy the same contract: packing a logical document
++into the substrate and unpacking it again MUST reproduce an equivalent
++logical document.
+ 
+ Authoring Distribution Consumption
+ ───────── ──────────── ───────────
+-ai-catalog.json ──pack──► OCI Registry ──unpack──► ai-catalog.json
+-entries[] Index/Manifests entries[]
+-trustManifest Referrers trustManifest
+-
+-This separation means:
+-
+-Simplicity for authors: Publishers write AI Catalog JSON using
+-domain vocabulary. No knowledge of OCI manifests, digests, or layer
+-descriptors is required.
+-
+-Simplicity for consumers: Clients that fetch from
+-/.well-known/ai-catalog.json or a registry API receive the logical
+-JSON format. They never need to parse OCI structures.
+-
+-Power for infrastructure: Registries that want content-addressed
+-integrity, signing, and replication can store catalogs as OCI
+-artifacts using the mapping defined below.
++ai-catalog.json ──pack──► OCI / xRegistry / HTTP ──unpack──► ai-catalog.json
++entries[] substrate-native form entries[]
++trustManifest trustManifest
++
++This separation keeps authoring and consumption simple: publishers and
++clients work with domain vocabulary (entries, displayName,
++mediaType, trustManifest), while infrastructure that wants
++content-addressing, signing, replication, or registry APIs uses whichever
++binding below matches its substrate.
++
++Binding Invariants
++
++A conforming binding MUST preserve each of the following invariants. This
++list — not any single substrate's vocabulary — is the conformance bar for
++a pack/unpack round-trip.
++
++Logical concept
++
++Invariant a binding MUST preserve
++
++Entry identity (identifier)
++
++A stable, addressable identity for each entry
++
++Artifact content + mediaType
++
++The artifact bytes are retrievable together with their media type
++
++Catalog structure / nesting
++
++Nested catalogs remain navigable as a hierarchy
++
++Trust Manifest association
++
++An entry's Trust Manifest is discoverable from that entry
++
++Content integrity
++
++The served bytes are verifiably bound to trustManifest.subject.digest
++
++Signing
++
++The Trust Manifest's authenticity is cryptographically verifiable
++
++Delegate, Don't Duplicate
++
++Substrates differ in what they can express natively. OCI is
++content-addressed and has first-class signing (Cosign/Notation);
++xRegistry is a hierarchical resource API with versioning and
++cross-referencing but no native digest or signature primitive.
++
++To avoid expressing the same guarantee twice, a binding delegates an
++invariant to a native substrate primitive when one exists, and otherwise
++carries it in the logical Trust Manifest. A binding MUST NOT restate,
++in substrate vocabulary, a guarantee it has delegated, and MUST NOT drop
++a guarantee the substrate cannot express.
++
++Invariant
++
++OCI primitive (delegate)
++
++xRegistry primitive (delegate)
++
++Carried fallback
++
++Identity
++
++Repository path + digest
++
++resourceid / xid
++
++entry.identifier
++
++Content + media type
++
++layers[0] + artifactType
++
++Resource document + contenttype
++
++Entry artifact + mediaType
++
++Nesting
++
++Nested Image Index
++
++Nested Group / xref
++
++Nested entry
++
++Manifest association
++
++Referrers API (subject)
++
++xref / extension attribute
++
++Inline trustManifest
++
++Content integrity
++
++Content-addressed digest
++
++(none — carried)
++
++subject.digest
++
++Signing
++
++Cosign / Notation referrer
++
++(none — carried)
++
++Detached JWS in Trust Manifest
++
++The two sections that follow are concrete bindings of this contract. The
++OCI binding delegates the most (identity, content integrity, signing);
++the xRegistry binding delegates structure, identity, and discovery but
++carries content integrity and signing because xRegistry has no native
++primitive for them.
++
++Mapping to OCI Distribution
++
++This appendix binds the Mapping to Distribution
++Substrates contract to OCI
++registries, enabling content-addressed storage, signing, and replication
++using existing container infrastructure. OCI's data model uses
++container-oriented vocabulary (manifests, layers, config, digest)
++that does not naturally describe a catalog of AI artifacts, so tooling
++bridges the logical format and the OCI representation.
++
++Of the binding invariants, the OCI binding delegates identity,
++content integrity, and signing to OCI's own primitives. Consequently
++trustManifest.subject.digest is expected to equal the OCI descriptor
++digest of the served artifact, and the detached JWS in the Trust Manifest
++MAY be omitted from the packed representation because Cosign/Notation
++referrers carry signing instead. Unpacking reconstitutes (or re-signs)
++the logical Trust Manifest from those referrers.
+ 
+ Conceptual Mapping
+ 
+@@ -1857,6 +2276,174 @@
+ losslessly, allowing simple consumers to work with the logical format
+ while infrastructure-oriented deployments leverage OCI distribution.
+ 
++Mapping to xRegistry
++
++This appendix binds the Mapping to Distribution
++Substrates contract to [[xRegistry]],
++a hierarchical registry model organized as Registry → Groups → Resources
++→ Versions. xRegistry contributes structure, identity, versioning,
++cross-referencing, and a registry API; it has no native content-addressing
++or signature primitive.
++
++Of the binding invariants, the xRegistry binding delegates entry
++identity, catalog structure, artifact content, and manifest discovery to
++xRegistry's own primitives, but carries content integrity and signing
++in the Trust Manifest. The detached JWS and subject.digest remain
++authoritative exactly as in plain-HTTP distribution, because xRegistry
++cannot express either guarantee natively.
++
++Conceptual Mapping
++
++An AI Catalog document maps to an xRegistry Group whose Resources
++are the catalog entries; each entry's artifact is the Resource document.
++
++AI Catalog (Logical)
++
++xRegistry (Physical)
++
++AI Catalog document
++
++A Group instance (e.g. in a aicatalogs Group type), or the Registry root when serving a single catalog
++
++Catalog Entry
++
++A Resource within that Group
++
++Entry identifier
++
++Resource <SINGULAR>id and xid
++
++Entry mediaType
++
++Version contenttype (with format when a named format applies)
++
++Entry artifact content
++
++Resource document — inline (<RESOURCE> / <RESOURCE>base64) or external (<RESOURCE>url)
++
++Entry metadata (displayName, description, tags)
++
++name, description, labels
++
++Entry version
++
++Version versionid
++
++Nested Catalog Entry
++
++A nested Group referenced from the entry's Resource via meta.xref
++
++Trust Manifest
++
++An extension attribute on the Resource (an object), or a related Resource referenced by xref
++
++Content integrity (subject.digest)
++
++Carried in the Trust Manifest (xRegistry has no native digest)
++
++Signing
++
++Detached JWS retained in the Trust Manifest (xRegistry has no native signature)
++
++Packing: AI Catalog to xRegistry
++
++Tooling converts an AI Catalog JSON document into xRegistry resources:
++
++The catalog becomes a Group instance. Catalog-level metadata maps
++to Group attributes: displayName to name, host identity and other
++metadata to labels or extension attributes.
++
++Each catalog entry becomes a Resource in that Group. The entry's
++artifact content is stored as the Resource document — inline via
++<RESOURCE> / <RESOURCE>base64, or by reference via <RESOURCE>url.
++mediaType maps to contenttype; entry metadata maps to name,
++description, and labels. Multiple entry versions map to Versions.
++
++Trust Manifests are carried as an extension attribute on the
++Resource (for example aicatalog_trustmanifest), or as a related
++Resource referenced from meta.xref. The detached JWS and
++subject.digest are retained unchanged because xRegistry provides no
++native signing or content-addressing to delegate to.
++
++Nested catalog entries become nested Groups; the parent entry's
++Resource references the nested Group through meta.xref.
++
++Unpacking: xRegistry to AI Catalog
++
++Tooling converts xRegistry resources back to an AI Catalog JSON document:
++
++Retrieve the Group in document view (the xRegistry ?doc projection),
++which returns a single self-contained JSON document analogous to
++ai-catalog.json.
++
++For each Resource, read its document (inline or via <RESOURCE>url)
++and contenttype to recover the entry's artifact content and
++mediaType; map name, description, and labels back to entry
++metadata.
++
++Read the Trust Manifest from the extension attribute or xref'd
++Resource, and verify its detached JWS and subject.digest against the
++served bytes.
++
++Resolve xref'd nested Groups into nested catalog entries.
++
++Assemble the logical application/ai-catalog+json document.
++
++xRegistry Document Example
++
++The following shows the xRegistry document-view representation of a Group
++holding two entries. This is generated by tooling, not authored by hand:
++
++{
++"aicatalogid": "acme-services",
++"self": "https://registry.acme.com/aicatalogs/acme-services",
++"xid": "/aicatalogs/acme-services",
++"epoch": 1,
++"name": "Acme Services Inc.",
++"entriesurl": "https://registry.acme.com/aicatalogs/acme-services/entries",
++"entriescount": 2,
++"entries": {
++"finance-a2a": {
++"entryid": "finance-a2a",
++"xid": "/aicatalogs/acme-services/entries/finance-a2a",
++"name": "Acme Finance A2A Agent",
++"contenttype": "application/a2a-agent-card+json",
++"labels": {
++"ai-catalog.identifier": "urn:acme:agent:finance-a2a"
++},
++"entryurl": "https://cards.acme.com/finance/a2a-card.json",
++"aicatalog_trustmanifest": {
++"issuedAt": "2025-01-01T00:00:00Z",
++"subject": {
++"mediaType": "application/a2a-agent-card+json",
++"digest": "sha256:aaa111..."
++},
++"signature": "eyJhbGciOiJFUzI1NiJ9..detached-JWS.."
++}
++},
++"finance-mcp": {
++"entryid": "finance-mcp",
++"xid": "/aicatalogs/acme-services/entries/finance-mcp",
++"name": "Acme Finance MCP Server",
++"contenttype": "application/mcp-server-card+json",
++"labels": {
++"ai-catalog.identifier": "urn:acme:server:finance-mcp"
++},
++"entryurl": "https://cards.acme.com/finance/mcp-server.json"
++}
++}
++}
++
++Content Integrity and Signing
++
++Because xRegistry has no native content-addressing or signature
++primitive, this binding does not delegate those invariants: the Trust
++Manifest's detached JWS and subject.digest remain the source of truth,
++verified against the served Resource document during unpacking — the same
++model as plain-HTTP distribution. An implementation MAY additionally
++expose the digest as an extension attribute for discovery convenience, but
++that copy is advisory; the Trust Manifest remains authoritative.
++
+ Mapping to MCP Registry server.json
+ 
+ This appendix describes how the MCP Registry server.json format
