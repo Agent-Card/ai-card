@@ -208,11 +208,12 @@ It MUST contain the following members:
   **Integrated Ecosystem & Third-Party Types (Governed externally):**
   - `application/a2a-agent-card+json` — an A2A Agent Card
   - `application/mcp-server-card+json` — an MCP Server Card
+  - `application/agent-skills+json` — Agent Skill Metadata json file
+  - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file
   - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
   - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
-  - `text/markdown; profile="urn:air:agent-skill"` — an Agent Skill defined in a standard Markdown file
 
-  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For generic payload formats (like `text/markdown`), the standard `profile` parameter is used to specify the semantic schema (e.g., `profile="urn:air:agent-skill"`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
+  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
