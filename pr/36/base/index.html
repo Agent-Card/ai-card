@@ -194,13 +194,13 @@ members:</p>
     {
       &quot;identifier&quot;: &quot;urn:example:skill:code-review&quot;,
       &quot;displayName&quot;: &quot;Code Review Assistant&quot;,
-      &quot;type&quot;: &quot;application/ai-skills+zip&quot;,
+      &quot;type&quot;: &quot;application/agent-skills+zip&quot;,
       &quot;url&quot;: &quot;https://skills.example.com/code-review/skill.zip&quot;
     },
     {
       &quot;identifier&quot;: &quot;urn:example:mcp:weather&quot;,
       &quot;displayName&quot;: &quot;Weather Service&quot;,
-      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.example.com/.well-known/mcp/server-card.json&quot;
     },
     {
@@ -275,11 +275,12 @@ It MUST contain the following members:</p>
   - <code>application/agent-card+json</code> — reserved for a generic Agent Card format</p>
 <p><strong>Integrated Ecosystem &amp; Third-Party Types (Governed externally):</strong>
   - <code>application/a2a-agent-card+json</code> — an A2A Agent Card
-  - <code>application/mcp-server+json</code> — an MCP Server Card
-  - <code>application/ai-skills+zip</code> — an AI Skill bundle (ZIP archive)
-  - <code>application/ai-skills+gzip</code> — an AI Skill bundle (gzipped tarball)
-  - <code>text/markdown; profile=ai-skill</code> — an AI Skill defined in a standard Markdown file</p>
-<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For generic payload formats (like <code>text/markdown</code>), the standard <code>profile</code> parameter is used to specify the semantic schema (e.g., <code>profile=ai-skill</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
+  - <code>application/mcp-server-card+json</code> — an MCP Server Card
+  - <code>application/agent-skills+json</code> — Agent Skill Metadata json file
+  - <code>application/agent-skills+md</code> — an Agent Skill defined in a standard Markdown file
+  - <code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)
+  - <code>application/agent-skills+gzip</code> — an Agent Skill bundle (gzipped tarball)</p>
+<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
 <p>A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:</p>
 <dl>
@@ -1325,7 +1326,7 @@ artifact types including a nested catalog packaging related artifacts:</p>
       &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
       &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
       &quot;version&quot;: &quot;1.4.0&quot;,
-      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
       &quot;description&quot;: &quot;MCP server with finance tools.&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
@@ -1349,7 +1350,7 @@ artifact types including a nested catalog packaging related artifacts:</p>
           {
             &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
             &quot;displayName&quot;: &quot;Finance MCP Server&quot;,
-            &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+            &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
             &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
           },
           {
@@ -1454,7 +1455,7 @@ containing both protocol-specific entries:</p>
       {
         &quot;identifier&quot;: &quot;urn:acme:agent:finance:mcp&quot;,
         &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-        &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+        &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
         &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
       },
       {
@@ -1651,7 +1652,7 @@ authored by hand:</p>
       &quot;type&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
       &quot;digest&quot;: &quot;sha256:bbb222...&quot;,
       &quot;size&quot;: 512,
-      &quot;artifactType&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;artifactType&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;annotations&quot;: {
         &quot;ai-catalog.identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
         &quot;ai-catalog.displayName&quot;: &quot;Acme Finance MCP Server&quot;
@@ -1866,7 +1867,7 @@ reflects the Registry format:</p>
   &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
   &quot;displayName&quot;: &quot;Brave Search&quot;,
   &quot;version&quot;: &quot;1.0.2&quot;,
-  &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+  &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
   &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
   &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
@@ -1904,7 +1905,7 @@ catalog entry for discovery and trust evaluation, then retrieves the
 <p><strong>Note:</strong> This example uses <code>application/json</code> because the MCP
 Registry has not registered a dedicated media type for <code>server.json</code>.
 When referencing an MCP Server Card (SEP-1649) instead, use
-<code>application/mcp-server+json</code> — see
+<code>application/mcp-server-card+json</code> — see
 <a href="#relationship-to-mcp-server-cards-sep-1649">Relationship to MCP Server Cards</a>.</p>
 </blockquote>
 </section>
@@ -1926,7 +1927,7 @@ agents, skills, and other artifacts:</p>
       &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
       &quot;displayName&quot;: &quot;Brave Search&quot;,
       &quot;version&quot;: &quot;1.0.2&quot;,
-      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
       &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
       &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
@@ -1935,7 +1936,7 @@ agents, skills, and other artifacts:</p>
       &quot;identifier&quot;: &quot;urn:mcp:io.github.modelcontextprotocol/filesystem&quot;,
       &quot;displayName&quot;: &quot;Filesystem&quot;,
       &quot;version&quot;: &quot;1.0.2&quot;,
-      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
       &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
       &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
@@ -1944,7 +1945,7 @@ agents, skills, and other artifacts:</p>
       &quot;identifier&quot;: &quot;urn:mcp:io.github.example/weather-mcp&quot;,
       &quot;displayName&quot;: &quot;Weather&quot;,
       &quot;version&quot;: &quot;0.5.0&quot;,
-      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
       &quot;description&quot;: &quot;Python MCP server for weather data access&quot;,
       &quot;tags&quot;: [&quot;weather&quot;, &quot;python&quot;],
@@ -2021,7 +2022,7 @@ server can reference the Server Card as its artifact content:</p>
 <pre><code class="language-json">{
   &quot;identifier&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
   &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-  &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+  &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
@@ -2285,13 +2286,13 @@ contains multiple artifact types:</p>
       {
         &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;,
         &quot;displayName&quot;: &quot;Example Plugin MCP Server&quot;,
-        &quot;type&quot;: &quot;application/mcp-server+json&quot;,
+        &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
         &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json&quot;
       },
       {
         &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:skills&quot;,
         &quot;displayName&quot;: &quot;Example Plugin Skills&quot;,
-        &quot;type&quot;: &quot;application/ai-skills+zip&quot;,
+        &quot;type&quot;: &quot;application/agent-skills+zip&quot;,
         &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip&quot;
       }
     ]

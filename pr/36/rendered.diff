@@ -7,14 +7,16 @@
 -"identifier": "urn:example:skill:code-review",
 +"identifier": "urn:air:example.com:skill:code-review",
  "displayName": "Code Review Assistant",
- "type": "application/ai-skills+zip",
+-"type": "application/agent-skills+zip",
++"type": "application/ai-skills+zip",
  "url": "https://skills.example.com/code-review/skill.zip"
  },
  {
 -"identifier": "urn:example:mcp:weather",
 +"identifier": "urn:air:example.com:mcp:weather",
  "displayName": "Weather Service",
- "type": "application/mcp-server+json",
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
  "url": "https://api.example.com/.well-known/mcp/server-card.json"
  },
  {
@@ -52,7 +54,27 @@
  
  displayName
  
-@@ -317,7 +331,7 @@
+@@ -233,13 +247,12 @@
+ 
+ Integrated Ecosystem & Third-Party Types (Governed externally):
+ - application/a2a-agent-card+json — an A2A Agent Card
+-- application/mcp-server-card+json — an MCP Server Card
+-- application/agent-skills+json — Agent Skill Metadata json file
+-- application/agent-skills+md — an Agent Skill defined in a standard Markdown file
+-- application/agent-skills+zip — an Agent Skill bundle (ZIP archive)
+-- application/agent-skills+gzip — an Agent Skill bundle (gzipped tarball)
+-
+-These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (+json, +zip, +gzip). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
++- application/mcp-server+json — an MCP Server Card
++- application/ai-skills+zip — an AI Skill bundle (ZIP archive)
++- application/ai-skills+gzip — an AI Skill bundle (gzipped tarball)
++- text/markdown; profile=ai-skill — an AI Skill defined in a standard Markdown file
++
++These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (+json, +zip, +gzip). For generic payload formats (like text/markdown), the standard profile parameter is used to specify the semantic schema (e.g., profile=ai-skill). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
+ 
+ A Catalog Entry MUST contain exactly one of the following members to
+ provide the artifact content:
+@@ -318,7 +331,7 @@
  "specVersion": "1.0",
  "entries": [
  {
@@ -61,7 +83,7 @@
  "displayName": "Acme Finance Agent",
  "version": "2.1.0",
  "type": "application/a2a-agent-card+json",
-@@ -325,7 +339,7 @@
+@@ -326,7 +339,7 @@
  "updatedAt": "2026-03-15T10:00:00Z"
  },
  {
@@ -70,7 +92,7 @@
  "displayName": "Acme Finance Agent",
  "version": "2.0.0",
  "type": "application/a2a-agent-card+json",
-@@ -386,10 +400,11 @@
+@@ -387,10 +400,11 @@
  DID, SPIFFE ID, or URL.
  
  When a Trust Manifest appears within a Catalog Entry, the identity
@@ -86,7 +108,7 @@
  
  When a Trust Manifest appears on a Host Info object, identity
  SHOULD match the host's identifier field when present.
-@@ -449,7 +464,7 @@
+@@ -450,7 +464,7 @@
  provenance:
  
  {
@@ -95,7 +117,7 @@
  "identityType": "did",
  "trustSchema": {
  "identifier": "urn:trust:acme-enterprise-v1",
-@@ -737,19 +752,19 @@
+@@ -738,19 +752,19 @@
  },
  "entries": [
  {
@@ -118,7 +140,7 @@
  "displayName": "DevOps Tools",
  "type": "application/ai-catalog+json",
  "url": "https://acme.com/catalogs/devops.json"
-@@ -763,7 +778,7 @@
+@@ -764,7 +778,7 @@
  agent, an MCP server, and a dataset together:
  
  {
@@ -127,7 +149,7 @@
  "displayName": "Finance Plugin",
  "type": "application/ai-catalog+json",
  "url": "https://acme.com/plugins/finance-suite.json",
-@@ -1088,8 +1103,8 @@
+@@ -1089,8 +1103,8 @@
  Identifier Typosquatting
  
  Catalog entries are identified by URIs/URNs. An attacker can register
@@ -138,7 +160,7 @@
  malicious artifact.
  
  Registries and consumers SHOULD implement similarity checks on
-@@ -1394,7 +1409,7 @@
+@@ -1395,7 +1409,7 @@
  },
  "entries": [
  {
@@ -147,7 +169,7 @@
  "displayName": "Acme Finance A2A Agent",
  "version": "2.1.0",
  "type": "application/a2a-agent-card+json",
-@@ -1406,7 +1421,8 @@
+@@ -1407,7 +1421,8 @@
  "displayName": "Acme Financial Corp"
  },
  "trustManifest": {
@@ -157,7 +179,7 @@
  "attestations": [
  {
  "type": "publisher-identity",
-@@ -1425,7 +1441,7 @@
+@@ -1426,17 +1441,17 @@
  "updatedAt": "2026-03-15T10:00:00Z"
  },
  {
@@ -165,8 +187,11 @@
 +"identifier": "urn:air:acme.com:server:finance-mcp",
  "displayName": "Acme Finance MCP Server",
  "version": "1.4.0",
- "type": "application/mcp-server+json",
-@@ -1435,7 +1451,7 @@
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
+ "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+ "description": "MCP server with finance tools.",
+ "tags": ["finance", "mcp"],
  "updatedAt": "2026-03-15T10:00:00Z"
  },
  {
@@ -175,7 +200,7 @@
  "displayName": "Acme Finance Suite",
  "type": "application/ai-catalog+json",
  "description": "A2A agent + MCP server + dataset for finance workflows.",
-@@ -1444,24 +1460,24 @@
+@@ -1445,24 +1460,24 @@
  "specVersion": "1.0",
  "entries": [
  {
@@ -189,7 +214,8 @@
 -"identifier": "urn:acme:server:finance-mcp",
 +"identifier": "urn:air:acme.com:server:finance-mcp",
  "displayName": "Finance MCP Server",
- "type": "application/mcp-server+json",
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
  },
  {
@@ -204,7 +230,7 @@
  "provenance": [
  {
  "relation": "publishedFrom",
-@@ -1474,7 +1490,7 @@
+@@ -1475,7 +1490,7 @@
  ]
  },
  "trustManifest": {
@@ -213,7 +239,7 @@
  "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
  },
  "updatedAt": "2026-03-20T14:00:00Z"
-@@ -1497,7 +1513,7 @@
+@@ -1498,7 +1513,7 @@
  },
  "entries": [
  {
@@ -222,7 +248,7 @@
  "displayName": "Acme Corporate Assistant",
  "version": "3.0.0",
  "type": "application/a2a-agent-card+json",
-@@ -1505,7 +1521,7 @@
+@@ -1506,7 +1521,7 @@
  "description": "General-purpose corporate assistant agent."
  },
  {
@@ -231,7 +257,7 @@
  "displayName": "Finance Services",
  "type": "application/ai-catalog+json",
  "url": "https://acme-corp.com/catalogs/finance.json",
-@@ -1513,7 +1529,7 @@
+@@ -1514,7 +1529,7 @@
  "tags": ["finance", "trading", "compliance"]
  },
  {
@@ -240,7 +266,7 @@
  "displayName": "Engineering Tools",
  "type": "application/ai-catalog+json",
  "url": "https://acme-corp.com/catalogs/engineering.json",
-@@ -1521,7 +1537,7 @@
+@@ -1522,7 +1537,7 @@
  "tags": ["engineering", "devops", "ci-cd"]
  },
  {
@@ -249,7 +275,7 @@
  "displayName": "ML Models",
  "type": "application/ai-catalog+json",
  "url": "https://acme-corp.com/catalogs/ml-models.json",
-@@ -1543,7 +1559,7 @@
+@@ -1544,7 +1559,7 @@
  containing both protocol-specific entries:
  
  {
@@ -258,14 +284,15 @@
  "displayName": "Acme Finance Agent",
  "type": "application/ai-catalog+json",
  "description": "Finance agent accessible via both MCP and A2A protocols.",
-@@ -1556,13 +1572,13 @@
+@@ -1557,13 +1572,13 @@
  "specVersion": "1.0",
  "entries": [
  {
 -"identifier": "urn:acme:agent:finance:mcp",
 +"identifier": "urn:air:acme.com:agent:finance:mcp",
  "displayName": "Acme Finance MCP Server",
- "type": "application/mcp-server+json",
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
  },
  {
@@ -274,7 +301,7 @@
  "displayName": "Acme Finance A2A Agent",
  "type": "application/a2a-agent-card+json",
  "url": "https://api.acme-corp.com/agents/finance"
-@@ -1570,7 +1586,8 @@
+@@ -1571,7 +1586,8 @@
  ]
  },
  "trustManifest": {
@@ -284,7 +311,7 @@
  "attestations": [
  {
  "type": "SOC2-Type2",
-@@ -1744,7 +1761,7 @@
+@@ -1745,7 +1761,7 @@
  "size": 1024,
  "artifactType": "application/a2a-agent-card+json",
  "annotations": {
@@ -293,70 +320,97 @@
  "ai-catalog.displayName": "Acme Finance A2A Agent"
  }
  },
-@@ -1754,7 +1771,7 @@
+@@ -1753,9 +1769,9 @@
+ "type": "application/vnd.oci.image.manifest.v1+json",
+ "digest": "sha256:bbb222...",
  "size": 512,
- "artifactType": "application/mcp-server+json",
+-"artifactType": "application/mcp-server-card+json",
++"artifactType": "application/mcp-server+json",
  "annotations": {
 -"ai-catalog.identifier": "urn:acme:server:finance-mcp",
 +"ai-catalog.identifier": "urn:air:acme.com:server:finance-mcp",
  "ai-catalog.displayName": "Acme Finance MCP Server"
  }
  }
-@@ -1965,7 +1982,7 @@
+@@ -1966,10 +1982,10 @@
  reflects the Registry format:
  
  {
 -"identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-+"identifier": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
++"identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
  "displayName": "Brave Search",
  "version": "1.0.2",
- "type": "application/mcp-server+json",
-@@ -1977,7 +1994,7 @@
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
+ "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+ "description": "MCP server for Brave Search API integration",
+ "tags": ["search", "brave", "web"],
+@@ -1978,7 +1994,7 @@
  "displayName": "Model Context Protocol"
  },
  "trustManifest": {
 -"identity": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-+"identity": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
++"identity": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
  "attestations": [
  {
  "type": "publisher-identity",
-@@ -2025,7 +2042,7 @@
+@@ -2007,7 +2023,7 @@
+ Note: This example uses application/json because the MCP
+ Registry has not registered a dedicated media type for server.json.
+ When referencing an MCP Server Card (SEP-1649) instead, use
+-application/mcp-server-card+json — see
++application/mcp-server+json — see
+ Relationship to MCP Server Cards.
+ 
+ MCP Registry as AI Catalog
+@@ -2026,28 +2042,28 @@
  },
  "entries": [
  {
 -"identifier": "urn:mcp:io.modelcontextprotocol.anonymous/brave-search",
-+"identifier": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
++"identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
  "displayName": "Brave Search",
  "version": "1.0.2",
- "type": "application/mcp-server+json",
-@@ -2034,7 +2051,7 @@
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
+ "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+ "description": "MCP server for Brave Search API integration",
  "tags": ["search", "brave"]
  },
  {
 -"identifier": "urn:mcp:io.github.modelcontextprotocol/filesystem",
-+"identifier": "urn:air:io.github.modelcontextprotocol:mcp:filesystem",
++"identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
  "displayName": "Filesystem",
  "version": "1.0.2",
- "type": "application/mcp-server+json",
-@@ -2043,7 +2060,7 @@
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
+ "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
+ "description": "MCP server for filesystem operations",
  "tags": ["filesystem", "files"]
  },
  {
 -"identifier": "urn:mcp:io.github.example/weather-mcp",
-+"identifier": "urn:air:io.github.example:mcp:weather-mcp",
++"identifier": "urn:air:example.github.io:mcp:weather-mcp",
  "displayName": "Weather",
  "version": "0.5.0",
- "type": "application/mcp-server+json",
-@@ -2132,7 +2149,7 @@
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
+ "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
+ "description": "Python MCP server for weather data access",
+ "tags": ["weather", "python"],
+@@ -2133,9 +2149,9 @@
  server can reference the Server Card as its artifact content:
  
  {
 -"identifier": "urn:mcp:example.com:finance-server",
 +"identifier": "urn:air:example.com:mcp:finance-server",
  "displayName": "Acme Finance MCP Server",
- "type": "application/mcp-server+json",
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
-@@ -2143,7 +2160,7 @@
+ "description": "MCP server for financial data and trading tools",
+ "tags": ["finance", "mcp"],
+@@ -2144,7 +2160,7 @@
  "displayName": "Acme Financial Corp"
  },
  "trustManifest": {
@@ -365,3 +419,19 @@
  "attestations": [
  {
  "type": "publisher-identity",
+@@ -2401,13 +2417,13 @@
+ {
+ "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
+ "displayName": "Example Plugin MCP Server",
+-"type": "application/mcp-server-card+json",
++"type": "application/mcp-server+json",
+ "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
+ },
+ {
+ "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
+ "displayName": "Example Plugin Skills",
+-"type": "application/agent-skills+zip",
++"type": "application/ai-skills+zip",
+ "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip"
+ }
+ ]
