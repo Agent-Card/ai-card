@@ -1780,7 +1780,7 @@ reflects the Registry format:
 
 ```json
 {
-  "identifier": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
+  "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
   "displayName": "Brave Search",
   "version": "1.0.2",
   "type": "application/mcp-server+json",
@@ -1792,7 +1792,7 @@ reflects the Registry format:
     "displayName": "Model Context Protocol"
   },
   "trustManifest": {
-    "identity": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
+    "identity": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
     "attestations": [
       {
         "type": "publisher-identity",
@@ -1842,7 +1842,7 @@ agents, skills, and other artifacts:
   },
   "entries": [
     {
-      "identifier": "urn:air:io.modelcontextprotocol.anonymous:mcp:brave-search",
+      "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
       "displayName": "Brave Search",
       "version": "1.0.2",
       "type": "application/mcp-server+json",
@@ -1851,7 +1851,7 @@ agents, skills, and other artifacts:
       "tags": ["search", "brave"]
     },
     {
-      "identifier": "urn:air:io.github.modelcontextprotocol:mcp:filesystem",
+      "identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
       "displayName": "Filesystem",
       "version": "1.0.2",
       "type": "application/mcp-server+json",
@@ -1860,7 +1860,7 @@ agents, skills, and other artifacts:
       "tags": ["filesystem", "files"]
     },
     {
-      "identifier": "urn:air:io.github.example:mcp:weather-mcp",
+      "identifier": "urn:air:example.github.io:mcp:weather-mcp",
       "displayName": "Weather",
       "version": "0.5.0",
       "type": "application/mcp-server+json",
