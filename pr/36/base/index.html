@@ -6,12 +6,12 @@
   <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
   <script class="remove">
     var respecConfig = {
-      "specStatus": "unofficial",
+      "specStatus": "Official",
       "editors": [],
       "latestVersion": null,
       "noRecTrack": true,
       "shortName": "ai-catalog",
-      "edDraftURI": "https://agent-card.github.io/ai-catalog/",
+      "edDraftURI": "https://ai-catalog.io/",
       "localBiblio": {
             "RFC8785": {
                   "title": "JSON Canonicalization Scheme (JCS)",
@@ -400,7 +400,8 @@ carried on the Catalog Entry (see <a href="#publisher-object">Publisher Object</
 <dt><code>identity</code></dt>
 <dd>A string containing a globally unique URI [[RFC3986]] that serves as
   the primary subject identifier for this artifact. This SHOULD be a
-  DID, SPIFFE ID, or URL.</dd>
+  DID, SPIFFE ID, or URL; these are illustrative and the set of
+  identity schemes is open.</dd>
 </dl>
 <p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
 field MUST match the entry's <code>identifier</code> field. This binding ensures trust
