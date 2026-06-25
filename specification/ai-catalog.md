@@ -1368,7 +1368,7 @@ artifact types including a nested catalog packaging related artifacts:
           {
             "identifier": "urn:air:acme.com:server:finance-mcp",
             "displayName": "Finance MCP Server",
-            "type": "application/mcp-server+json",
+            "type": "application/mcp-server-card+json",
             "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
           {
@@ -1792,7 +1792,7 @@ reflects the Registry format:
     "displayName": "Model Context Protocol"
   },
   "trustManifest": {
-    "identity": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
+    "identity": "did:web:anonymous.modelcontextprotocol.io:mcp:brave-search",
     "attestations": [
       {
         "type": "publisher-identity",
