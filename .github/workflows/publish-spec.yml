@@ -89,6 +89,7 @@ jobs:
         run: |
           python3 tools/update_gh_pages.py root \
             --source-dir .site/root \
+            --cname ai-catalog.io \
             --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
             --commit-message "Publish specification site from main"
 
@@ -158,7 +159,7 @@ jobs:
       - name: Comment preview URL on pull request
         env:
           GH_TOKEN: ${{ github.token }}
-          PREVIEW_URL: https://agent-card.github.io/ai-catalog/pr/${{ github.event.pull_request.number }}/
+          PREVIEW_URL: https://ai-catalog.io/pr/${{ github.event.pull_request.number }}/
         run: |
           marker='<!-- ai-catalog-preview-url -->'
           body=$(cat <<EOF

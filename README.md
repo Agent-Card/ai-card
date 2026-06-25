@@ -1,6 +1,6 @@
 # Common AI Catalog and Registry Standard
 
-[![Specification](https://img.shields.io/badge/GitHub%20Pages-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://agent-card.github.io/ai-catalog/) [![Build](https://github.com/Agent-Card/ai-catalog/actions/workflows/publish-spec.yml/badge.svg?branch=main)](https://github.com/Agent-Card/ai-catalog/actions/workflows/publish-spec.yml)
+[![Specification](https://img.shields.io/badge/Specification-AI%20Catalog-222222?logo=githubpages&logoColor=white)](https://ai-catalog.io/) [![Build](https://github.com/Agent-Card/ai-catalog/actions/workflows/publish-spec.yml/badge.svg?branch=main)](https://github.com/Agent-Card/ai-catalog/actions/workflows/publish-spec.yml)
 
 ## tl;dr
 
@@ -12,9 +12,9 @@ Contact us via GitHub Discussions, [Issues](https://github.com/Agent-Card/ai-cat
 
 The AI Catalog specification is built from `specification/ai-catalog.md` and published to GitHub Pages by the workflow in `.github/workflows/publish-spec.yml`.
 
-Published site: [agent-card.github.io/ai-catalog](https://agent-card.github.io/ai-catalog/)
+Published site: [ai-catalog.io](https://ai-catalog.io/)
 
-Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://agent-card.github.io/ai-catalog/pr/<number>/`, including a rendered diff preview against the PR base branch. The workflow also keeps a pull request comment updated with the live preview URL while the PR remains open.
+Pushes to the `main` branch update the canonical published site. Same-repo pull requests publish rendered preview pages under `https://ai-catalog.io/pr/<number>/`, including a rendered diff preview against the PR base branch. The workflow also keeps a pull request comment updated with the live preview URL while the PR remains open.
 
 GitHub Pages for the repository should be configured to serve from the `gh-pages` branch at the repository root.
 
