@@ -51,6 +51,10 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Apply the changes locally without committing or pushing",
     )
+    parser.add_argument(
+        "--cname",
+        help="Custom domain to write into the CNAME file at the root of gh-pages (root mode only)",
+    )
     return parser.parse_args()
 
 
@@ -106,10 +110,12 @@ def clear_root(checkout_dir: Path, preserve_names: set[str]) -> None:
         remove_path(child)
 
 
-def stage_root_publish(checkout_dir: Path, source_dir: Path) -> None:
+def stage_root_publish(checkout_dir: Path, source_dir: Path, cname: str | None = None) -> None:
     clear_root(checkout_dir, {"pr"})
     copy_tree_contents(source_dir, checkout_dir)
     (checkout_dir / ".nojekyll").touch()
+    if cname:
+        (checkout_dir / "CNAME").write_text(cname + "\n", encoding="utf-8")
 
 
 def stage_preview_publish(checkout_dir: Path, source_dir: Path, pr_number: int) -> None:
@@ -183,7 +189,7 @@ def prepare_checkout(
 
 def apply_mode(args: argparse.Namespace, checkout_dir: Path) -> None:
     if args.mode == "root":
-        stage_root_publish(checkout_dir, args.source_dir.resolve())
+        stage_root_publish(checkout_dir, args.source_dir.resolve(), getattr(args, "cname", None))
         return
     if args.mode == "preview":
         stage_preview_publish(checkout_dir, args.source_dir.resolve(), args.pr_number)
