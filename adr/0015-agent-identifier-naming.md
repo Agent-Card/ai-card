@@ -4,9 +4,9 @@
 Accepted
 
 ## Date
-2026-05-13 (Proposed), 2026-05-28 (Accepted)
+2026-05-13 (Proposed), 2026-05-28 (Accepted), 2026-06-25 (Updated)
 
-**Participants:** Pamela Dingle (Microsoft), Sam Betts (Cisco), Junjie Bu (Google), Darrel Miller (Microsoft), Alan Blount (Google), Srinivas Krishnan (Google), Krishna Thota (Google)
+**Participants:** Pamela Dingle (Microsoft), Sam Betts (Cisco), Junjie Bu (Google), Darrel Miller (Microsoft), Alan Blount (Google), Srinivas Krishnan (Google), Krishna Thota (Google), Tadas Antanavicius (Pulse MCP), Ramiz Polic (Cisco), Jeffrey Damick (Amazon)
 
 ## Context
 The `ai-catalog` specification originally recommended using URNs or URIs for the `identifier` field in catalog entries, but did not mandate a specific format. This led to inconsistency in examples and potential interoperability issues across different registries and orchestrators.
