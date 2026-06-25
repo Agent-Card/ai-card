@@ -4,9 +4,9 @@
 Accepted
 
 ## Date
-2026-04-30 (Initial), 2026-05-14 (Revised), 2026-05-28 (Updated)
+2026-04-30 (Initial), 2026-05-14 (Revised), 2026-05-28 (Updated), 2026-06-18 (Updated), 2026-06-25 (Updated)
 
-**Participants:** Pamela Dingle (Microsoft), Sam Betts (Cisco), Junjie Bu (Google), Darrel Miller (Microsoft), Alan Blount (Google), Srinivas Krishnan (Google), Krishna Thota (Google)
+**Participants:** Pamela Dingle (Microsoft), Sam Betts (Cisco), Junjie Bu (Google), Darrel Miller (Microsoft), Alan Blount (Google), Srinivas Krishnan (Google), Krishna Thota (Google), Tadas Antanavicius (Pulse MCP), Jonathan Hefner (MCP/Anthropic)
 
 ## Context
 The `ai-catalog` specification originally used `mediaType` to identify the type of AI artifact in a catalog entry, intending to leverage standard IANA media types. However, in practice, we are using a closed, fixed set of types specific to the AI Catalog ecosystem (e.g., A2A agent cards, MCP servers, nested catalogs). Using the name `mediaType` implies support for any valid IANA media type and dynamic content negotiation, which is not the intent and can be confusing for implementers.
@@ -30,7 +30,7 @@ The `type` field is an open text format, so any string value is accepted. To ens
 - `application/a2a-agent-card+json` — A2A Agent Card
 - `application/mcp-server-card+json` — MCP Server Card
 - `application/agent-skills+json` — Agent Skill Metadata json file
-- `application/agent-skills+md` — Agent Skill defined in a standard Markdown file
+- `application/agent-skills+md` — Agent Skill defined in a standard Markdown file (the suffix +md is to be registered)
 - `application/agent-skills+zip` — Agent Skill bundle in a ZIP archive
 - `application/agent-skills+gzip` — Agent Skill bundle in a gzipped tarball
 
