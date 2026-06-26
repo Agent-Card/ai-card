@@ -1,0 +1,236 @@
+--- a/base/index.html
++++ b/head/index.html
+@@ -288,6 +288,7 @@
+ <ul>
+ <li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
+ <li><code>application/mcp-server-card+json</code> — an MCP Server Card</li>
++<li><code>application/mcp-server+json</code> — an MCP Registry <code>server.json</code> document</li>
+ <li><code>application/agent-skills+json</code> — Agent Skill Metadata json file</li>
+ <li><code>application/agent-skills+md</code> — an Agent Skill defined in a standard Markdown file (the suffix <code>+md</code> is to be registered)</li>
+ <li><code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)</li>
+@@ -2024,6 +2025,207 @@
+ </ol>
+ </section>
+ </section>
++<section class="appendix" id="mapping-to-mcp-registry-server-json">
++<h1>Mapping to MCP Registry server.json</h1>
++<p>This appendix describes how the MCP Registry <code>server.json</code> format
++(see <a href="https://github.com/modelcontextprotocol/registry">modelcontextprotocol/registry</a>)
++maps to AI Catalog as a <strong>first-class cataloged artifact type</strong>, enabling
++installable MCP servers to be discovered alongside other AI artifacts
++through a unified catalog.</p>
++<blockquote>
++<p><strong>Two MCP server artifacts, two types.</strong> The MCP ecosystem defines two
++distinct documents for a server, and AI Catalog gives each its own known
++<code>type</code>:</p>
++<ul>
++<li><strong>MCP Server Card</strong> (<code>application/mcp-server-card+json</code>) — a runtime
++  discovery document for a connectable HTTP server (identity, transport,
++  capabilities, auth). See <a href="#mapping-to-mcp-servers">Mapping to MCP Servers</a>.</li>
++<li><strong>MCP Registry <code>server.json</code></strong> (<code>application/mcp-server+json</code>) — an
++  installable <strong>package descriptor</strong> (package coordinates, transports,
++  environment variables, CLI arguments).</li>
++</ul>
++<p>These are different artifacts, so they use different media types. The
++Server Card deliberately uses <code>application/mcp-server-card+json</code> (not
++<code>application/mcp-server+json</code>) to leave the unqualified <code>mcp-server</code>
++name for the Registry <code>server.json</code> document
++(modelcontextprotocol/experimental-ext-server-card issue #9 / PR #18).
++A catalog entry references whichever artifact fits the use case — a
++<code>server.json</code> for installable packages, a Server Card for connectable
++endpoints — and a domain MAY list both.</p>
++</blockquote>
++<section id="overview-2">
++<h2>Overview</h2>
++<p>The MCP Registry defines a <code>server.json</code> format for describing MCP
++servers. Each <code>server.json</code> document captures everything needed to
++install, configure, and connect to a single MCP server: package
++coordinates (npm, PyPI, NuGet, OCI), remote endpoints (streamable-http,
++SSE), transport configuration, environment variables, and CLI arguments.</p>
++<p>In AI Catalog terms, a <code>server.json</code> document is the <strong>artifact
++content</strong> — the native metadata that a Catalog Entry references, declared
++with the known type <code>application/mcp-server+json</code>. AI Catalog does not
++duplicate or redefine <code>server.json</code> fields; it provides the discovery and
++trust layer that <code>server.json</code> does not address.</p>
++</section>
++<section id="conceptual-mapping-3">
++<h2>Conceptual Mapping</h2>
++<table>
++<thead>
++<tr>
++<th style="text-align: left;">MCP <code>server.json</code></th>
++<th style="text-align: left;">AI Catalog Equivalent</th>
++</tr>
++</thead>
++<tbody>
++<tr>
++<td style="text-align: left;"><code>server.json</code> document (whole file)</td>
++<td style="text-align: left;">Artifact content via entry <code>url</code> (type <code>application/mcp-server+json</code>) or <code>data</code></td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>name</code> (reverse-DNS identifier)</td>
++<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search</code>)</td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>title</code></td>
++<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>title</code>); entry <code>displayName</code> is omitted unless the artifact lacks a name</td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>description</code></td>
++<td style="text-align: left;">Entry <code>description</code></td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>version</code></td>
++<td style="text-align: left;">Entry <code>version</code></td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>repository</code></td>
++<td style="text-align: left;">Entry <code>metadata.repository</code></td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>packages[]</code> (npm, pypi, nuget, oci)</td>
++<td style="text-align: left;">Inside the artifact — not surfaced in the catalog</td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>remotes[]</code> (streamable-http, sse)</td>
++<td style="text-align: left;">Inside the artifact — not surfaced in the catalog</td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>environmentVariables[]</code></td>
++<td style="text-align: left;">Inside the artifact — not surfaced in the catalog</td>
++</tr>
++<tr>
++<td style="text-align: left;"><code>_meta</code></td>
++<td style="text-align: left;">Entry <code>metadata</code> for catalog-level hints; otherwise stays in the artifact</td>
++</tr>
++<tr>
++<td style="text-align: left;"><em>(not in server.json)</em></td>
++<td style="text-align: left;">Entry <code>publisher</code></td>
++</tr>
++<tr>
++<td style="text-align: left;"><em>(not in server.json)</em></td>
++<td style="text-align: left;">Entry <code>trustManifest</code> (identity, attestations, provenance)</td>
++</tr>
++<tr>
++<td style="text-align: left;"><em>(not in server.json)</em></td>
++<td style="text-align: left;">Entry <code>tags</code> for cross-artifact discovery</td>
++</tr>
++</tbody>
++</table>
++</section>
++<section id="mcp-server-as-catalog-entry-2">
++<h2>MCP Server as Catalog Entry</h2>
++<p>An MCP server published as a Registry <code>server.json</code> maps to a Catalog
++Entry whose <code>url</code> points to the <code>server.json</code> document and whose <code>type</code>
++is the known type <code>application/mcp-server+json</code>:</p>
++<pre><code class="language-json">{
++  &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
++  &quot;version&quot;: &quot;1.0.2&quot;,
++  &quot;type&quot;: &quot;application/mcp-server+json&quot;,
++  &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
++  &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
++  &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
++  &quot;publisher&quot;: {
++    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
++    &quot;displayName&quot;: &quot;Model Context Protocol&quot;
++  },
++  &quot;trustManifest&quot;: {
++    &quot;identity&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
++    &quot;attestations&quot;: [
++      {
++        &quot;type&quot;: &quot;publisher-identity&quot;,
++        &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;
++      }
++    ],
++    &quot;provenance&quot;: [
++      {
++        &quot;relation&quot;: &quot;publishedFrom&quot;,
++        &quot;sourceId&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;,
++        &quot;registryUri&quot;: &quot;https://registry.npmjs.org&quot;
++      }
++    ]
++  },
++  &quot;metadata&quot;: {
++    &quot;repository&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;
++  },
++  &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
++}
++</code></pre>
++<p>The <code>url</code> points to the complete <code>server.json</code>. A client fetches the
++catalog entry for discovery and trust evaluation, then retrieves the
++<code>server.json</code> for operational details (packages, transports, env vars).</p>
++</section>
++<section id="mcp-registry-as-ai-catalog">
++<h2>MCP Registry as AI Catalog</h2>
++<p>The MCP Registry — a centralized index of MCP servers — can be
++represented as an AI Catalog. This lets clients that understand
++<code>application/ai-catalog+json</code> discover installable MCP servers alongside
++A2A agents, skills, and other artifacts:</p>
++<pre><code class="language-json">{
++  &quot;specVersion&quot;: &quot;1.0&quot;,
++  &quot;host&quot;: {
++    &quot;displayName&quot;: &quot;MCP Server Registry&quot;,
++    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
++    &quot;documentationUrl&quot;: &quot;https://modelcontextprotocol.io/docs&quot;
++  },
++  &quot;entries&quot;: [
++    {
++      &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
++      &quot;version&quot;: &quot;1.0.2&quot;,
++      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
++      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
++      &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
++      &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
++    },
++    {
++      &quot;identifier&quot;: &quot;urn:air:modelcontextprotocol.github.io:mcp:filesystem&quot;,
++      &quot;version&quot;: &quot;1.0.2&quot;,
++      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
++      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
++      &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
++      &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
++    }
++  ]
++}
++</code></pre>
++</section>
++<section id="relationship-to-mcp-server-cards">
++<h2>Relationship to MCP Server Cards</h2>
++<p>A Registry <code>server.json</code> and an MCP Server Card describe the same kind of
++thing at different lifecycle stages, and they layer naturally:</p>
++<dl>
++<dt><code>server.json</code> (<code>application/mcp-server+json</code>)</dt>
++<dd>How do I <strong>install and configure</strong> this server? What packages,
++  transports, arguments, and environment variables does it need?</dd>
++<dt>Server Card (<code>application/mcp-server-card+json</code>)</dt>
++<dd>How do I <strong>connect to and use</strong> this running server? What transport
++  endpoint, capabilities, tools, and authentication does it expose?</dd>
++</dl>
++<p>A domain MAY publish both as separate catalog entries — one entry of each
++<code>type</code> pointing at the respective artifact — so clients can pick the
++representation that matches what they are doing (provisioning vs.
++connecting). AI Catalog provides the trust and cross-ecosystem indexing
++layer over both; each artifact carries its own protocol-specific detail.</p>
++</section>
++</section>
+ <section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
+ <h1>Mapping to Claude Code Plugins Marketplace</h1>
+ <p>This appendix describes how the Anthropic Claude Code Plugins
+@@ -2032,7 +2234,7 @@
+ maps to AI Catalog, enabling Claude Code plugins to be discovered,
+ indexed, and distributed through a unified catalog alongside other AI
+ artifacts.</p>
+-<section id="overview-2">
++<section id="overview-3">
+ <h2>Overview</h2>
+ <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
+ file that lists available plugins. Each plugin is a directory containing
+@@ -2051,7 +2253,7 @@
+     README.md
+ </code></pre>
+ </section>
+-<section id="conceptual-mapping-3">
++<section id="conceptual-mapping-4">
+ <h2>Conceptual Mapping</h2>
+ <table>
+ <thead>
