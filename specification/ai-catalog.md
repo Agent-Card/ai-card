@@ -122,13 +122,11 @@ For example, a minimal catalog listing three AI artifacts:
     },
     {
       "identifier": "urn:air:example.com:mcp:weather",
-      "displayName": "Weather Service",
       "type": "application/mcp-server-card+json",
       "url": "https://api.example.com/.well-known/mcp/server-card.json"
     },
     {
       "identifier": "urn:air:example.com:a2a:research",
-      "displayName": "Research Assistant",
       "type": "application/a2a-agent-card+json",
       "url": "https://agents.example.com/researchAssistant"
     }
@@ -207,9 +205,6 @@ It MUST contain the following members:
 
     See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present.
 
-`displayName`
-: A string containing a human-readable name for the artifact.
-
 `type`
 : A string containing the identifier that specifies the type of the
   referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:
@@ -245,6 +240,24 @@ provide the artifact content:
 
 The following members are OPTIONAL:
 
+`displayName`
+: A string containing a human-readable name for the artifact.
+  This field SHOULD be set only when the referenced artifact does not
+  already carry its own canonical human-readable name — for example a
+  raw dataset (`application/parquet`), a model blob, or a skill bundle
+  (`application/agent-skills+zip`), none of which embed a self-describing
+  name. When the referenced artifact does carry such a name — for
+  example the `name` field of an A2A Agent Card or the `title` field of
+  an MCP Server Card — that artifact is the authoritative source and
+  `displayName` SHOULD be omitted to avoid duplicating a value that can
+  drift out of sync. When `displayName` *is* present, however, it takes
+  precedence: it is the authoritative value for display, and a consumer
+  SHOULD render it as given even when it differs from a name carried by
+  the referenced artifact. Setting `displayName` is how a publisher
+  deliberately overrides the artifact's own name. See
+  [Resolving an Artifact's Display Name](#resolving-an-artifacts-display-name)
+  for the full consumer resolution order.
+
 `description`
 : A string containing a short description of the artifact.
 
@@ -275,6 +288,36 @@ The following members are OPTIONAL:
   providing verifiable identity and trust metadata for this artifact.
   See [Trust Manifest](#trust-manifest) for details.
 
+### Resolving an Artifact's Display Name
+
+Because `displayName` is OPTIONAL, a consumer rendering a catalog entry
+cannot assume it is present. To obtain a human-readable name, a consumer
+SHOULD resolve one in the following order:
+
+1. **`displayName` on the entry**, if present. A publisher-supplied
+   `displayName` always wins, even when it differs from a name carried by
+   the referenced artifact.
+2. **The referenced artifact's own canonical name**, if the consumer has
+   already fetched or cached the artifact — for example the `name` field
+   of an A2A Agent Card or the `title` field of an MCP Server Card.
+3. **The trailing segment of the entry's `identifier`** as a last
+   resort — the portion after its final `:` or `/` delimiter. For
+   example, `urn:air:example.com:mcp:weather` yields `weather` and
+   `urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search` yields
+   `brave-search`.
+
+A consumer SHOULD NOT dereference an artifact at render time solely to
+obtain a name. A registry, directory, or other service built on top of a
+catalog SHOULD resolve the name once at ingestion — alongside any other
+derived metadata it attaches, such as relevance scores or tags — and
+cache the result, rather than fetching artifacts on the rendering path.
+
+This order also covers a referenced MCP Server Card whose `title` is
+itself absent: step 2 yields no name, so the consumer falls through to
+the `identifier` segment in step 3. A publisher MAY still set
+`displayName` on such an entry to provide a better name than the bare
+identifier segment.
+
 ## Multi-Version Entries
 
 A catalog MAY contain multiple entries with the same `identifier` and
@@ -300,7 +343,6 @@ For example, a catalog listing two versions of the same agent:
   "entries": [
     {
       "identifier": "urn:air:acme.com:agent:finance",
-      "displayName": "Acme Finance Agent",
       "version": "2.1.0",
       "type": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
@@ -308,7 +350,6 @@ For example, a catalog listing two versions of the same agent:
     },
     {
       "identifier": "urn:air:acme.com:agent:finance",
-      "displayName": "Acme Finance Agent",
       "version": "2.0.0",
       "type": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
@@ -911,7 +952,7 @@ A conformant Minimal Catalog is a JSON document with media type
 
 - `specVersion` — the specification version string
 - `entries` — an array of Catalog Entry objects, each containing at
-  minimum `identifier`, `displayName`, `type`, and exactly one of `url` or
+  minimum `identifier`, `type`, and exactly one of `url` or
   `data`
 
 All other fields (`host`, `publisher`, `trustManifest`,
@@ -1315,7 +1356,6 @@ artifact types including a nested catalog packaging related artifacts:
   "entries": [
     {
       "identifier": "urn:air:acme.com:agent:finance-a2a",
-      "displayName": "Acme Finance A2A Agent",
       "version": "2.1.0",
       "type": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/finance.json",
@@ -1347,7 +1387,6 @@ artifact types including a nested catalog packaging related artifacts:
     },
     {
       "identifier": "urn:air:acme.com:server:finance-mcp",
-      "displayName": "Acme Finance MCP Server",
       "version": "1.4.0",
       "type": "application/mcp-server-card+json",
       "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
@@ -1366,13 +1405,11 @@ artifact types including a nested catalog packaging related artifacts:
         "entries": [
           {
             "identifier": "urn:air:acme.com:agent:finance-a2a",
-            "displayName": "Finance A2A Agent",
             "type": "application/a2a-agent-card+json",
             "url": "https://api.acme-corp.com/agents/finance.json"
           },
           {
             "identifier": "urn:air:acme.com:server:finance-mcp",
-            "displayName": "Finance MCP Server",
             "type": "application/mcp-server-card+json",
             "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
           },
@@ -1421,7 +1458,6 @@ document:
   "entries": [
     {
       "identifier": "urn:air:acme.com:agent:assistant",
-      "displayName": "Acme Corporate Assistant",
       "version": "3.0.0",
       "type": "application/a2a-agent-card+json",
       "url": "https://api.acme-corp.com/agents/assistant.json",
@@ -1482,13 +1518,11 @@ containing both protocol-specific entries:
     "entries": [
       {
         "identifier": "urn:air:acme.com:agent:finance:mcp",
-        "displayName": "Acme Finance MCP Server",
         "type": "application/mcp-server-card+json",
         "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
       },
       {
         "identifier": "urn:air:acme.com:agent:finance:a2a",
-        "displayName": "Acme Finance A2A Agent",
         "type": "application/a2a-agent-card+json",
         "url": "https://api.acme-corp.com/agents/finance"
       }
@@ -1748,7 +1782,7 @@ does not address.
 |:---|:---|
 | `server.json` document (whole file) | Artifact content via entry `url` or `data` |
 | `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
-| `title` | Entry `displayName` |
+| `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
 | `description` | Entry `description` |
 | `version` | Entry `version` |
 | `repository` | Entry `metadata.repository` |
@@ -1786,7 +1820,6 @@ reflects the Registry format:
 ```json
 {
   "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-  "displayName": "Brave Search",
   "version": "1.0.2",
   "type": "application/mcp-server-card+json",
   "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
@@ -1848,7 +1881,6 @@ agents, skills, and other artifacts:
   "entries": [
     {
       "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-      "displayName": "Brave Search",
       "version": "1.0.2",
       "type": "application/mcp-server-card+json",
       "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
@@ -1857,7 +1889,6 @@ agents, skills, and other artifacts:
     },
     {
       "identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
-      "displayName": "Filesystem",
       "version": "1.0.2",
       "type": "application/mcp-server-card+json",
       "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
@@ -1866,7 +1897,6 @@ agents, skills, and other artifacts:
     },
     {
       "identifier": "urn:air:example.github.io:mcp:weather-mcp",
-      "displayName": "Weather",
       "version": "0.5.0",
       "type": "application/mcp-server-card+json",
       "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
@@ -1952,7 +1982,6 @@ server can reference the Server Card as its artifact content:
 ```json
 {
   "identifier": "urn:air:example.com:mcp:finance-server",
-  "displayName": "Acme Finance MCP Server",
   "type": "application/mcp-server-card+json",
   "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
   "description": "MCP server for financial data and trading tools",
@@ -2034,7 +2063,7 @@ plugins/
 | Marketplace `description` | Catalog `metadata.description` |
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
-| Plugin `name` | Entry `displayName` and `identifier` (derived as URN) |
+| Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
 | Plugin `description` | Entry `description` |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
@@ -2082,7 +2111,6 @@ maps to an AI Catalog where each plugin is an entry:
   "entries": [
     {
       "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
-      "displayName": "agent-sdk-dev",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
       "description": "Development kit for working with the Claude Agent SDK",
@@ -2097,7 +2125,6 @@ maps to an AI Catalog where each plugin is an entry:
     },
     {
       "identifier": "urn:claude-plugin:adspirer:ads-agent",
-      "displayName": "adspirer-ads-agent",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
       "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
@@ -2118,7 +2145,6 @@ maps to an AI Catalog where each plugin is an entry:
     },
     {
       "identifier": "urn:claude-plugin:aikido:security",
-      "displayName": "aikido",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
       "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
@@ -2165,7 +2191,6 @@ contains multiple artifact types:
     "entries": [
       {
         "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
-        "displayName": "Example Plugin MCP Server",
         "type": "application/mcp-server-card+json",
         "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
       },
