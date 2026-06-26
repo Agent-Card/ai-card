@@ -1,0 +1,134 @@
+--- a/base/index.html
++++ b/head/index.html
+@@ -1810,12 +1810,13 @@
+ <p><strong>Note:</strong> The MCP ecosystem defines two distinct metadata documents
+ for servers. The <strong>Registry <code>server.json</code></strong> is an installable package
+ descriptor (package coordinates, transports, environment variables).
+-The <strong>MCP Server Card</strong> (<a href="#relationship-to-mcp-server-cards-sep-1649">SEP-1649</a>)
+-is a runtime discovery document at <code>/.well-known/mcp/server-card.json</code>
+-describing capabilities, tools, and authentication. An AI Catalog
+-entry can reference either artifact depending on the use case — use
+-<code>server.json</code> for installable packages and Server Cards for
+-connectable HTTP endpoints.</p>
++The <strong>MCP Server Card</strong> (<a href="#relationship-to-mcp-server-cards-sep-2127">SEP-2127</a>)
++is a runtime discovery document — hosted at any unreserved URI the
++catalog references (MCP reserves <code>&lt;streamable-http-url&gt;/server-card</code> as
++a predictable default) — describing capabilities, tools, and
++authentication. An AI Catalog entry can reference either artifact
++depending on the use case — use <code>server.json</code> for installable packages
++and Server Cards for connectable HTTP endpoints.</p>
+ </blockquote>
+ <section id="overview">
+ <h2>Overview</h2>
+@@ -1846,7 +1847,7 @@
+ </tr>
+ <tr>
+ <td style="text-align: left;"><code>name</code> (reverse-DNS identifier)</td>
+-<td style="text-align: left;">Entry <code>identifier</code> (mapped to URI form)</td>
++<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:modelcontextprotocol.io:mcp:brave-search</code>)</td>
+ </tr>
+ <tr>
+ <td style="text-align: left;"><code>title</code></td>
+@@ -1917,12 +1918,14 @@
+ <section id="mcp-server-as-catalog-entry">
+ <h2>MCP Server as Catalog Entry</h2>
+ <p>An MCP server listed in the Registry maps to a Catalog Entry whose
+-<code>url</code> points to the <code>server.json</code> document and whose <code>type</code>
+-reflects the Registry format:</p>
++<code>url</code> points to the <code>server.json</code> document. Because the MCP Registry has
++not registered a dedicated media type for <code>server.json</code>, the entry's
++open-text <code>type</code> uses the generic <code>application/json</code> (see the note after
++the example):</p>
+ <pre><code class="language-json">{
+   &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
+   &quot;version&quot;: &quot;1.0.2&quot;,
+-  &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
++  &quot;type&quot;: &quot;application/json&quot;,
+   &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
+   &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
+   &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
+@@ -1957,11 +1960,21 @@
+ catalog entry for discovery and trust evaluation, then retrieves the
+ <code>server.json</code> for operational details (packages, transports, env vars).</p>
+ <blockquote>
+-<p><strong>Note:</strong> This example uses <code>application/json</code> because the MCP
+-Registry has not registered a dedicated media type for <code>server.json</code>.
+-When referencing an MCP Server Card (SEP-1649) instead, use
++<p><strong>Note on <code>type</code>:</strong> The <code>type</code> member is an open-text type identifier
++(<a href="https://github.com/Agent-Card/ai-catalog/blob/main/adr/0014-media-type-to-type.md">ADR 0014</a>);
++any string is accepted, with a recommended set of "known types." There
++is no known type for the Registry <code>server.json</code> document, so this
++example uses the generic <code>application/json</code>. When an entry instead
++references an MCP <strong>Server Card</strong>, use the known type
+ <code>application/mcp-server-card+json</code> — see
+-<a href="#relationship-to-mcp-server-cards-sep-1649">Relationship to MCP Server Cards</a>.</p>
++<a href="#relationship-to-mcp-server-cards-sep-2127">Relationship to MCP Server Cards</a>.</p>
++<p>Note the deliberate naming distinction: the MCP Server Card extension
++uses <code>application/mcp-server-card+json</code> (not <code>application/mcp-server+json</code>)
++for the Server Card to avoid colliding with the Registry's <code>server.json</code>
++concept (modelcontextprotocol/experimental-ext-server-card issue #9 /
++PR #18). ADR 0014 makes <code>type</code> open-text, so this more precise,
++MCP-governed value is compatible with the AI Catalog's recommended
++known types.</p>
+ </blockquote>
+ </section>
+ <section id="mcp-registry-as-ai-catalog">
+@@ -1981,7 +1994,7 @@
+     {
+       &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
+       &quot;version&quot;: &quot;1.0.2&quot;,
+-      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
++      &quot;type&quot;: &quot;application/json&quot;,
+       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
+       &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
+       &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
+@@ -1989,7 +2002,7 @@
+     {
+       &quot;identifier&quot;: &quot;urn:air:modelcontextprotocol.github.io:mcp:filesystem&quot;,
+       &quot;version&quot;: &quot;1.0.2&quot;,
+-      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
++      &quot;type&quot;: &quot;application/json&quot;,
+       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
+       &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
+       &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
+@@ -1997,7 +2010,7 @@
+     {
+       &quot;identifier&quot;: &quot;urn:air:example.github.io:mcp:weather-mcp&quot;,
+       &quot;version&quot;: &quot;0.5.0&quot;,
+-      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
++      &quot;type&quot;: &quot;application/json&quot;,
+       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
+       &quot;description&quot;: &quot;Python MCP server for weather data access&quot;,
+       &quot;tags&quot;: [&quot;weather&quot;, &quot;python&quot;],
+@@ -2048,14 +2061,16 @@
+    artifacts (A2A agents, datasets) in nested catalogs.</li>
+ </ol>
+ </section>
+-<section id="relationship-to-mcp-server-cards-sep-1649">
+-<h2>Relationship to MCP Server Cards (SEP-1649)</h2>
++<section id="relationship-to-mcp-server-cards-sep-2127">
++<h2>Relationship to MCP Server Cards (SEP-2127)</h2>
+ <p>MCP Server Cards
+-(<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649">SEP-1649</a>)
++(<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">SEP-2127</a>)
+ define a static discovery document for individual HTTP-based MCP
+-servers at <code>/.well-known/mcp/server-card.json</code>. A Server Card mirrors
+-the MCP initialization handshake response: it carries the server's
+-name, version, transport configuration, capabilities, authentication
++servers. A Server Card MAY be hosted at any unreserved URI the catalog
++references; MCP reserves <code>&lt;streamable-http-url&gt;/server-card</code> as a
++predictable default location. A Server Card mirrors the MCP
++initialization handshake response: it carries the server's name,
++version, transport configuration, capabilities, authentication
+ requirements, and optionally the full list of tools, resources, and
+ prompts.</p>
+ <p>AI Catalog and MCP Server Cards address different layers of discovery:</p>
+@@ -2074,7 +2089,7 @@
+ <pre><code class="language-json">{
+   &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
+   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
+-  &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
++  &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/server-card&quot;,
+   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
+   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
+   &quot;publisher&quot;: {
