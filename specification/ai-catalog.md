@@ -191,20 +191,21 @@ It MUST contain the following members:
 `identifier`
 : A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard `urn:air` naming structure is **HIGHLY RECOMMENDED** and **MUST** be used for open or federated systems.
 
-  **Standard Naming Format:**
-  `urn:air:{publisher}:{namespace}:{name}`
+    **Standard Naming Format:**
+    `urn:air:{publisher}:{namespace}:{name}`
 
-  - `{publisher}`: The domain name of the organization publishing the artifact (e.g., `example.com`).
-  - `{namespace}`: The logical namespace, which can contain one or more colon-separated categories (e.g., `mcp`, `skill`, `agent`, `finance:agent`).
-  - `{name}`: The stable, unique name of the artifact within the publisher's namespace.
+    - `{publisher}`: The domain name of the organization publishing the artifact (e.g., `example.com`).
+    - `{namespace}`: The logical namespace, which can contain one or more colon-separated categories (e.g., `mcp`, `skill`, `agent`, `finance:agent`).
+    - `{name}`: The stable, unique name of the artifact within the publisher's namespace.
 
-  *Examples:*
-  - `urn:air:example.com:skill:code-review`
-  - `urn:air:example.com:mcp:weather`
+    *Examples:*
 
-  For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.
+    - `urn:air:example.com:skill:code-review`
+    - `urn:air:example.com:mcp:weather`
 
-  See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present.
+    For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.
+
+    See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present.
 
 `displayName`
 : A string containing a human-readable name for the artifact.
@@ -213,19 +214,21 @@ It MUST contain the following members:
 : A string containing the identifier that specifies the type of the
   referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:
 
-  **Core Protocol Types (Governed by the AI Catalog WG):**
-  - `application/ai-catalog+json` — a nested AI Catalog
-  - `application/agent-card+json` — reserved for a generic Agent Card format
+    **Core Protocol Types (Governed by the AI Catalog WG):**
 
-  **Integrated Ecosystem & Third-Party Types (Governed externally):**
-  - `application/a2a-agent-card+json` — an A2A Agent Card
-  - `application/mcp-server-card+json` — an MCP Server Card
-  - `application/agent-skills+json` — Agent Skill Metadata json file
-  - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file (the suffix `+md` is to be registered)
-  - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
-  - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
+    - `application/ai-catalog+json` — a nested AI Catalog
+    - `application/agent-card+json` — reserved for a generic Agent Card format
 
-  These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
+    **Integrated Ecosystem & Third-Party Types (Governed externally):**
+
+    - `application/a2a-agent-card+json` — an A2A Agent Card
+    - `application/mcp-server-card+json` — an MCP Server Card
+    - `application/agent-skills+json` — Agent Skill Metadata json file
+    - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file (the suffix `+md` is to be registered)
+    - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
+    - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
+
+    These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
 A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:
