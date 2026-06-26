@@ -316,11 +316,11 @@
 -requirements, and optionally the full list of tools, resources, and
 -prompts.
 +An MCP Server Card is a static discovery document for an individual
-+HTTP-based MCP server. It carries the server's name, version, transport
-+configuration, capabilities, authentication requirements, and optionally
-+the full list of tools, resources, and prompts. A Server Card MAY be
-+hosted at any unreserved URI the catalog references; MCP reserves
-+<streamable-http-url>/server-card as a predictable default location.
++HTTP-based MCP server, describing its identity and how to connect to it.
++A Catalog Entry references the card wherever the server publishes it, as
++in the examples below. See
++SEP-2127
++for the Server Card's schema, fields, and hosting conventions.
 +
 +In AI Catalog terms, the Server Card is the artifact content — the
 +native metadata that a Catalog Entry references via its url, declared
