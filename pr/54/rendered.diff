@@ -19,7 +19,7 @@
  
  Overview
  
-@@ -2142,6 +2145,210 @@
+@@ -2141,6 +2144,210 @@
  
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.

@@ -18,7 +18,7 @@
  <section id="overview">
  <h2>Overview</h2>
  <p>An MCP Server Card is a static discovery document for an individual
-@@ -2024,6 +2026,212 @@
+@@ -2023,6 +2025,212 @@
  </ol>
  </section>
  </section>
@@ -231,7 +231,7 @@
  <section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
  <h1>Mapping to Claude Code Plugins Marketplace</h1>
  <p>This appendix describes how the Anthropic Claude Code Plugins
-@@ -2032,7 +2240,7 @@
+@@ -2031,7 +2239,7 @@
  maps to AI Catalog, enabling Claude Code plugins to be discovered,
  indexed, and distributed through a unified catalog alongside other AI
  artifacts.</p>
@@ -240,7 +240,7 @@
  <h2>Overview</h2>
  <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
  file that lists available plugins. Each plugin is a directory containing
-@@ -2051,7 +2259,7 @@
+@@ -2050,7 +2258,7 @@
      README.md
  </code></pre>
  </section>
