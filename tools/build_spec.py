@@ -19,7 +19,7 @@ DEFAULT_CONFIG = REPO_ROOT / "specification/respec-config.json"
 
 
 DEFAULT_RESPEC_CONFIG = {
-    "specStatus": "unofficial",
+    "specStatus": "Official",
     "editors": [],
     "latestVersion": None,
     "noRecTrack": True,

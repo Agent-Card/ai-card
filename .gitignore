@@ -11,3 +11,4 @@ specification/ai-catalog.html
 respec-config.json
 __pycache__/
 dist/
+.site/
