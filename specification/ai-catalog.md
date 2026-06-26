@@ -1782,7 +1782,7 @@ does not address.
 | MCP `server.json` | AI Catalog Equivalent |
 |:---|:---|
 | `server.json` document (whole file) | Artifact content via entry `url` or `data` |
-| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:modelcontextprotocol.io:mcp:brave-search`) |
+| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search`) |
 | `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
 | `description` | Entry `description` |
 | `version` | Entry `version` |
