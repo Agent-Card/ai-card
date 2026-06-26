@@ -1755,12 +1755,13 @@ other AI artifacts through a unified catalog.
 > **Note:** The MCP ecosystem defines two distinct metadata documents
 > for servers. The **Registry `server.json`** is an installable package
 > descriptor (package coordinates, transports, environment variables).
-> The **MCP Server Card** ([SEP-1649](#relationship-to-mcp-server-cards-sep-1649))
-> is a runtime discovery document at `/.well-known/mcp/server-card.json`
-> describing capabilities, tools, and authentication. An AI Catalog
-> entry can reference either artifact depending on the use case — use
-> `server.json` for installable packages and Server Cards for
-> connectable HTTP endpoints.
+> The **MCP Server Card** ([SEP-2127](#relationship-to-mcp-server-cards-sep-2127))
+> is a runtime discovery document — hosted at any unreserved URI the
+> catalog references (MCP reserves `<streamable-http-url>/server-card` as
+> a predictable default) — describing capabilities, tools, and
+> authentication. An AI Catalog entry can reference either artifact
+> depending on the use case — use `server.json` for installable packages
+> and Server Cards for connectable HTTP endpoints.
 
 ## Overview
 
@@ -1781,7 +1782,7 @@ does not address.
 | MCP `server.json` | AI Catalog Equivalent |
 |:---|:---|
 | `server.json` document (whole file) | Artifact content via entry `url` or `data` |
-| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
+| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:modelcontextprotocol.io:mcp:brave-search`) |
 | `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
 | `description` | Entry `description` |
 | `version` | Entry `version` |
@@ -1814,14 +1815,16 @@ identity, trust verification, and cross-ecosystem discoverability.
 ## MCP Server as Catalog Entry
 
 An MCP server listed in the Registry maps to a Catalog Entry whose
-`url` points to the `server.json` document and whose `type`
-reflects the Registry format:
+`url` points to the `server.json` document. Because the MCP Registry has
+not registered a dedicated media type for `server.json`, the entry's
+open-text `type` uses the generic `application/json` (see the note after
+the example):
 
 ```json
 {
   "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
   "version": "1.0.2",
-  "type": "application/mcp-server-card+json",
+  "type": "application/json",
   "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
   "description": "MCP server for Brave Search API integration",
   "tags": ["search", "brave", "web"],
@@ -1857,11 +1860,22 @@ The `url` points to the complete `server.json`. A client fetches the
 catalog entry for discovery and trust evaluation, then retrieves the
 `server.json` for operational details (packages, transports, env vars).
 
-> **Note:** This example uses `application/json` because the MCP
-> Registry has not registered a dedicated media type for `server.json`.
-> When referencing an MCP Server Card (SEP-1649) instead, use
+> **Note on `type`:** The `type` member is an open-text type identifier
+> ([ADR 0014](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0014-media-type-to-type.md));
+> any string is accepted, with a recommended set of "known types." There
+> is no known type for the Registry `server.json` document, so this
+> example uses the generic `application/json`. When an entry instead
+> references an MCP **Server Card**, use the known type
 > `application/mcp-server-card+json` — see
-> [Relationship to MCP Server Cards](#relationship-to-mcp-server-cards-sep-1649).
+> [Relationship to MCP Server Cards](#relationship-to-mcp-server-cards-sep-2127).
+>
+> Note the deliberate naming distinction: the MCP Server Card extension
+> uses `application/mcp-server-card+json` (not `application/mcp-server+json`)
+> for the Server Card to avoid colliding with the Registry's `server.json`
+> concept (modelcontextprotocol/experimental-ext-server-card issue #9 /
+> PR #18). ADR 0014 makes `type` open-text, so this more precise,
+> MCP-governed value is compatible with the AI Catalog's recommended
+> known types.
 
 ## MCP Registry as AI Catalog
 
@@ -1882,7 +1896,7 @@ agents, skills, and other artifacts:
     {
       "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
       "version": "1.0.2",
-      "type": "application/mcp-server-card+json",
+      "type": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
       "description": "MCP server for Brave Search API integration",
       "tags": ["search", "brave"]
@@ -1890,7 +1904,7 @@ agents, skills, and other artifacts:
     {
       "identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
       "version": "1.0.2",
-      "type": "application/mcp-server-card+json",
+      "type": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
       "description": "MCP server for filesystem operations",
       "tags": ["filesystem", "files"]
@@ -1898,7 +1912,7 @@ agents, skills, and other artifacts:
     {
       "identifier": "urn:air:example.github.io:mcp:weather-mcp",
       "version": "0.5.0",
-      "type": "application/mcp-server-card+json",
+      "type": "application/json",
       "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
       "description": "Python MCP server for weather data access",
       "tags": ["weather", "python"],
@@ -1953,14 +1967,16 @@ fills this gap:
 6. **Composability**: MCP servers can be packaged with related
    artifacts (A2A agents, datasets) in nested catalogs.
 
-## Relationship to MCP Server Cards (SEP-1649)
+## Relationship to MCP Server Cards (SEP-2127)
 
 MCP Server Cards
-([SEP-1649](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649))
+([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
 define a static discovery document for individual HTTP-based MCP
-servers at `/.well-known/mcp/server-card.json`. A Server Card mirrors
-the MCP initialization handshake response: it carries the server's
-name, version, transport configuration, capabilities, authentication
+servers. A Server Card MAY be hosted at any unreserved URI the catalog
+references; MCP reserves `<streamable-http-url>/server-card` as a
+predictable default location. A Server Card mirrors the MCP
+initialization handshake response: it carries the server's name,
+version, transport configuration, capabilities, authentication
 requirements, and optionally the full list of tools, resources, and
 prompts.
 
@@ -1983,7 +1999,7 @@ server can reference the Server Card as its artifact content:
 {
   "identifier": "urn:air:example.com:mcp:finance-server",
   "type": "application/mcp-server-card+json",
-  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+  "url": "https://api.acme-corp.com/mcp/server-card",
   "description": "MCP server for financial data and trading tools",
   "tags": ["finance", "mcp"],
   "publisher": {
