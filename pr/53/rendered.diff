@@ -36,7 +36,7 @@
  },
  {
  "identifier": "urn:air:acme.com:agent:finance:a2a",
-@@ -1912,268 +1912,35 @@
+@@ -1912,268 +1912,34 @@
  losslessly, allowing simple consumers to work with the logical format
  while infrastructure-oriented deployments leverage OCI distribution.
  
@@ -316,8 +316,7 @@
 -requirements, and optionally the full list of tools, resources, and
 -prompts.
 +An MCP Server Card is a static discovery document for an individual
-+HTTP-based MCP server. It mirrors the MCP initialization handshake
-+response: it carries the server's name, version, transport
++HTTP-based MCP server. It carries the server's name, version, transport
 +configuration, capabilities, authentication requirements, and optionally
 +the full list of tools, resources, and prompts. A Server Card MAY be
 +hosted at any unreserved URI the catalog references; MCP reserves
@@ -331,7 +330,7 @@
  
  AI Catalog and MCP Server Cards address different layers of discovery:
  
-@@ -2189,13 +1956,63 @@
+@@ -2189,13 +1955,63 @@
  trust them? What other artifact types are available alongside MCP
  servers?
  
@@ -398,7 +397,7 @@
  "description": "MCP server for financial data and trading tools",
  "tags": ["finance", "mcp"],
  "publisher": {
-@@ -2218,12 +2035,75 @@
+@@ -2218,12 +2034,75 @@
  }
  }
  
@@ -475,7 +474,7 @@
  
  Evaluate the Trust Manifest for publisher identity and attestations.
  
-@@ -2238,6 +2118,30 @@
+@@ -2238,6 +2117,30 @@
  protocol-specific operational details. A domain with multiple MCP
  servers publishes one AI Catalog listing all of them, with each entry
  pointing to its respective Server Card.

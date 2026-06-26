@@ -36,7 +36,7 @@
        },
        {
          &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:a2a&quot;,
-@@ -1800,264 +1800,32 @@
+@@ -1800,264 +1800,31 @@
  while infrastructure-oriented deployments leverage OCI distribution.</p>
  </section>
  </section>
@@ -311,8 +311,7 @@
 -requirements, and optionally the full list of tools, resources, and
 -prompts.</p>
 +<p>An MCP Server Card is a static discovery document for an individual
-+HTTP-based MCP server. It mirrors the MCP initialization handshake
-+response: it carries the server's name, version, transport
++HTTP-based MCP server. It carries the server's name, version, transport
 +configuration, capabilities, authentication requirements, and optionally
 +the full list of tools, resources, and prompts. A Server Card MAY be
 +hosted at any unreserved URI the catalog references; MCP reserves
@@ -325,7 +324,7 @@
  <p>AI Catalog and MCP Server Cards address different layers of discovery:</p>
  <dl>
  <dt>MCP Server Card (per-server)</dt>
-@@ -2069,12 +1837,70 @@
+@@ -2069,12 +1836,70 @@
    trust them? What other artifact types are available alongside MCP
    servers?</dd>
  </dl>
@@ -399,7 +398,7 @@
    &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
    &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
    &quot;publisher&quot;: {
-@@ -2097,11 +1923,74 @@
+@@ -2097,11 +1922,74 @@
    }
  }
  </code></pre>
@@ -475,7 +474,7 @@
  <li>Evaluate the Trust Manifest for publisher identity and attestations.</li>
  <li>Fetch the Server Card at the entry's <code>url</code> for operational details
     (transport, capabilities, tools, authentication).</li>
-@@ -2113,6 +2002,26 @@
+@@ -2113,6 +2001,26 @@
  protocol-specific operational details. A domain with multiple MCP
  servers publishes one AI Catalog listing all of them, with each entry
  pointing to its respective Server Card.</p>
