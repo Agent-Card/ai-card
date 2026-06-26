@@ -1745,240 +1745,38 @@ Both approaches can coexist. A tooling bridge converts between them
 losslessly, allowing simple consumers to work with the logical format
 while infrastructure-oriented deployments leverage OCI distribution.
 
-# Mapping to MCP Registry server.json
+# Mapping to MCP Servers
 
-This appendix describes how the MCP Registry `server.json` format
-(see [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry))
-relates to AI Catalog, enabling MCP servers to be discovered alongside
-other AI artifacts through a unified catalog.
+This appendix describes how **remote (HTTP-connectable) MCP servers**
+map to AI Catalog, enabling them to be discovered alongside other AI
+artifacts through a unified catalog. The documented, supported path is
+to reference each server's **MCP Server Card**
+([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
+as the artifact content of a Catalog Entry.
 
-> **Note:** The MCP ecosystem defines two distinct metadata documents
-> for servers. The **Registry `server.json`** is an installable package
-> descriptor (package coordinates, transports, environment variables).
-> The **MCP Server Card** ([SEP-2127](#relationship-to-mcp-server-cards-sep-2127))
-> is a runtime discovery document — hosted at any unreserved URI the
-> catalog references (MCP reserves `<streamable-http-url>/server-card` as
-> a predictable default) — describing capabilities, tools, and
-> authentication. An AI Catalog entry can reference either artifact
-> depending on the use case — use `server.json` for installable packages
-> and Server Cards for connectable HTTP endpoints.
+> **Scope:** This mapping covers remote MCP servers described by an MCP
+> Server Card. Mapping AI Catalog to the **MCP Registry's `server.json`**
+> (an installable-package descriptor) is a *separate* concern that is
+> **not officially documented and should be treated as experimental** at
+> this stage — see
+> [Experimental: Mapping to the MCP Registry (`server.json`)](#experimental-mapping-to-the-mcp-registry-server-json)
+> at the end of this appendix.
 
 ## Overview
 
-The MCP Registry defines a `server.json` format for describing MCP
-servers. Each `server.json` document captures everything needed to
-install, configure, and connect to a single MCP server: package
-coordinates (npm, PyPI, NuGet, OCI), remote endpoints (streamable-http,
-SSE), transport configuration, environment variables, and CLI arguments.
+An MCP Server Card is a static discovery document for an individual
+HTTP-based MCP server. It mirrors the MCP initialization handshake
+response: it carries the server's name, version, transport
+configuration, capabilities, authentication requirements, and optionally
+the full list of tools, resources, and prompts. A Server Card MAY be
+hosted at any unreserved URI the catalog references; MCP reserves
+`<streamable-http-url>/server-card` as a predictable default location.
 
-In AI Catalog terms, a `server.json` document is the **artifact
-content** — the native metadata that a Catalog Entry references. The
-AI Catalog does not duplicate or redefine `server.json` fields.
-Instead, it provides the discovery and trust layer that `server.json`
-does not address.
-
-## Conceptual Mapping
-
-| MCP `server.json` | AI Catalog Equivalent |
-|:---|:---|
-| `server.json` document (whole file) | Artifact content via entry `url` or `data` |
-| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search`) |
-| `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
-| `description` | Entry `description` |
-| `version` | Entry `version` |
-| `repository` | Entry `metadata.repository` |
-| `packages[]` (npm, pypi, nuget, oci) | Inside the artifact — not surfaced in catalog |
-| `remotes[]` (streamable-http, sse) | Inside the artifact — not surfaced in catalog |
-| `environmentVariables[]` | Inside the artifact — not surfaced in catalog |
-| `_meta` | Entry `metadata` for catalog-level hints; otherwise stays in artifact |
-| *(not in server.json)* | Entry `publisher` |
-| *(not in server.json)* | Entry `trustManifest` (identity, attestations, provenance) |
-| *(not in server.json)* | Entry `tags` for cross-artifact discovery |
-| MCP Registry (centralized service) | AI Catalog (decentralized, any URL) |
-
-## Separation of Concerns
-
-The `server.json` format and AI Catalog address different concerns:
-
-server.json (Operational)
-: How do I install this server? What packages, transports, arguments,
-  and environment variables does it need?
-
-AI Catalog (Discovery + Trust)
-: What servers exist? Who published them? Can I trust them? Where is
-  their metadata?
-
-This separation means the AI Catalog entry is thin — it points at the
-`server.json` and adds only what `server.json` lacks: publisher
-identity, trust verification, and cross-ecosystem discoverability.
-
-## MCP Server as Catalog Entry
-
-An MCP server listed in the Registry maps to a Catalog Entry whose
-`url` points to the `server.json` document. Because the MCP Registry has
-not registered a dedicated media type for `server.json`, the entry's
-open-text `type` uses the generic `application/json` (see the note after
-the example):
-
-```json
-{
-  "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-  "version": "1.0.2",
-  "type": "application/json",
-  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-  "description": "MCP server for Brave Search API integration",
-  "tags": ["search", "brave", "web"],
-  "publisher": {
-    "identifier": "did:web:modelcontextprotocol.io",
-    "displayName": "Model Context Protocol"
-  },
-  "trustManifest": {
-    "identity": "did:web:anonymous.modelcontextprotocol.io:mcp:brave-search",
-    "attestations": [
-      {
-        "type": "publisher-identity",
-        "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
-        "description": "Verifies did:web:modelcontextprotocol.io as publisher"
-      }
-    ],
-    "provenance": [
-      {
-        "relation": "publishedFrom",
-        "sourceId": "https://github.com/modelcontextprotocol/servers",
-        "registryUri": "https://registry.npmjs.org"
-      }
-    ]
-  },
-  "metadata": {
-    "repository": "https://github.com/modelcontextprotocol/servers"
-  },
-  "updatedAt": "2026-03-15T10:00:00Z"
-}
-```
-
-The `url` points to the complete `server.json`. A client fetches the
-catalog entry for discovery and trust evaluation, then retrieves the
-`server.json` for operational details (packages, transports, env vars).
-
-> **Note on `type`:** The `type` member is an open-text type identifier
-> ([ADR 0014](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0014-media-type-to-type.md));
-> any string is accepted, with a recommended set of "known types." There
-> is no known type for the Registry `server.json` document, so this
-> example uses the generic `application/json`. When an entry instead
-> references an MCP **Server Card**, use the known type
-> `application/mcp-server-card+json` — see
-> [Relationship to MCP Server Cards](#relationship-to-mcp-server-cards-sep-2127).
->
-> Note the deliberate naming distinction: the MCP Server Card extension
-> uses `application/mcp-server-card+json` (not `application/mcp-server+json`)
-> for the Server Card to avoid colliding with the Registry's `server.json`
-> concept (modelcontextprotocol/experimental-ext-server-card issue #9 /
-> PR #18). ADR 0014 makes `type` open-text, so this more precise,
-> MCP-governed value is compatible with the AI Catalog's recommended
-> known types.
-
-## MCP Registry as AI Catalog
-
-The MCP Registry — a centralized index of MCP servers — can be
-represented as an AI Catalog. This enables clients that understand
-`application/ai-catalog+json` to discover MCP servers alongside A2A
-agents, skills, and other artifacts:
-
-```json
-{
-  "specVersion": "1.0",
-  "host": {
-    "displayName": "MCP Server Registry",
-    "identifier": "did:web:modelcontextprotocol.io",
-    "documentationUrl": "https://modelcontextprotocol.io/docs"
-  },
-  "entries": [
-    {
-      "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-      "version": "1.0.2",
-      "type": "application/json",
-      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-      "description": "MCP server for Brave Search API integration",
-      "tags": ["search", "brave"]
-    },
-    {
-      "identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
-      "version": "1.0.2",
-      "type": "application/json",
-      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
-      "description": "MCP server for filesystem operations",
-      "tags": ["filesystem", "files"]
-    },
-    {
-      "identifier": "urn:air:example.github.io:mcp:weather-mcp",
-      "version": "0.5.0",
-      "type": "application/json",
-      "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
-      "description": "Python MCP server for weather data access",
-      "tags": ["weather", "python"],
-      "publisher": {
-        "identifier": "did:web:example.github.io",
-        "displayName": "Example Corp"
-      }
-    }
-  ]
-}
-```
-
-## Decentralized Discovery
-
-The MCP Registry is a centralized service. AI Catalog enables
-decentralized discovery: any domain can publish its MCP servers at
-`/.well-known/ai-catalog.json` without registering with a central
-authority.
-
-A vendor hosting its own MCP servers can publish:
-
-```
-https://api.acme-corp.com/.well-known/ai-catalog.json
-```
-
-Clients and crawlers discover the catalog via the well-known URL,
-find entries by `type`, and fetch the referenced artifacts for
-operational details — whether those are MCP Server Cards, Registry
-`server.json` documents, or other AI artifact formats.
-
-The centralized MCP Registry and decentralized AI Catalogs are
-complementary. The registry can serve an AI Catalog as its response
-format, while individual domains publish their own catalogs for
-direct discovery.
-
-## What AI Catalog Adds to server.json
-
-The `server.json` format has no trust or identity layer. AI Catalog
-fills this gap:
-
-1. **Publisher identity**: Verifiable publisher with DID or domain
-   anchor, absent from `server.json`.
-2. **Trust verification**: Attestations (SOC2, HIPAA, publisher
-   identity proofs) via the Trust Manifest.
-3. **Provenance**: Links to source repositories, registries, and
-   build artifacts with cryptographic digests.
-4. **Signing**: Detached JWS signature on the Trust Manifest for
-   integrity verification.
-5. **Cross-ecosystem discovery**: MCP servers become discoverable
-   alongside A2A agents, plugins, and datasets through a single
-   catalog format.
-6. **Composability**: MCP servers can be packaged with related
-   artifacts (A2A agents, datasets) in nested catalogs.
-
-## Relationship to MCP Server Cards (SEP-2127)
-
-MCP Server Cards
-([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
-define a static discovery document for individual HTTP-based MCP
-servers. A Server Card MAY be hosted at any unreserved URI the catalog
-references; MCP reserves `<streamable-http-url>/server-card` as a
-predictable default location. A Server Card mirrors the MCP
-initialization handshake response: it carries the server's name,
-version, transport configuration, capabilities, authentication
-requirements, and optionally the full list of tools, resources, and
-prompts.
+In AI Catalog terms, the Server Card is the **artifact content** — the
+native metadata that a Catalog Entry references via its `url`, declared
+with the known type `application/mcp-server-card+json`. The AI Catalog
+does not duplicate or redefine Server Card fields; it provides the
+discovery and trust layer that the Server Card does not address.
 
 AI Catalog and MCP Server Cards address different layers of discovery:
 
@@ -1992,12 +1790,31 @@ AI Catalog (cross-artifact)
   trust them? What other artifact types are available alongside MCP
   servers?
 
-The two mechanisms layer naturally. An AI Catalog entry for an MCP
-server can reference the Server Card as its artifact content:
+## Conceptual Mapping
+
+| MCP Server Card | AI Catalog Equivalent |
+|:---|:---|
+| Server Card document (whole file) | Artifact content via entry `url` (type `application/mcp-server-card+json`) or `data` |
+| Server `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:example.com:mcp:finance-server`) |
+| `title` | Stays in the Server Card (which carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
+| `description` | Entry `description` |
+| `version` | Entry `version` |
+| transport / capabilities / tools / resources / auth | Inside the Server Card — not surfaced in the catalog |
+| `repository` | Entry `metadata.repository` |
+| *(not in the Server Card)* | Entry `publisher` |
+| *(not in the Server Card)* | Entry `trustManifest` (identity, attestations, provenance) |
+| *(not in the Server Card)* | Entry `tags` for cross-artifact discovery |
+
+## MCP Server as Catalog Entry
+
+A remote MCP server maps to a Catalog Entry whose `url` points to the
+server's Server Card and whose `type` is the known type
+`application/mcp-server-card+json`:
 
 ```json
 {
   "identifier": "urn:air:example.com:mcp:finance-server",
+  "version": "1.0.2",
   "type": "application/mcp-server-card+json",
   "url": "https://api.acme-corp.com/mcp/server-card",
   "description": "MCP server for financial data and trading tools",
@@ -2023,11 +1840,78 @@ server can reference the Server Card as its artifact content:
 }
 ```
 
+> **Note on `type`:** The `type` member is an open-text type identifier
+> ([ADR 0014](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0014-media-type-to-type.md));
+> any string is accepted, with a recommended set of "known types." The
+> known type for an MCP server referenced by its Server Card is
+> `application/mcp-server-card+json`. Note the deliberate naming
+> distinction: the MCP Server Card extension uses
+> `application/mcp-server-card+json` (not `application/mcp-server+json`)
+> to avoid colliding with the MCP Registry's `server.json` concept
+> (modelcontextprotocol/experimental-ext-server-card issue #9 / PR #18).
+
+## MCP Servers as an AI Catalog
+
+A domain that hosts remote MCP servers can publish them as an AI Catalog,
+letting clients that understand `application/ai-catalog+json` discover
+those servers alongside A2A agents, skills, and other artifacts. Each
+entry points to a server's Server Card:
+
+```json
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme MCP Servers",
+    "identifier": "did:web:acme-corp.com",
+    "documentationUrl": "https://acme-corp.com/docs"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:acme-corp.com:mcp:finance-server",
+      "version": "1.0.2",
+      "type": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/finance/server-card",
+      "description": "MCP server for financial data and trading tools",
+      "tags": ["finance", "mcp"]
+    },
+    {
+      "identifier": "urn:air:acme-corp.com:mcp:docs-search",
+      "version": "1.0.2",
+      "type": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/docs-search/server-card",
+      "description": "MCP server for searching internal documentation",
+      "tags": ["search", "docs"]
+    },
+    {
+      "identifier": "urn:air:acme-corp.com:mcp:ci-cd",
+      "version": "0.5.0",
+      "type": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/ci-cd/server-card",
+      "description": "MCP server for CI/CD pipeline operations",
+      "tags": ["ci", "cd", "devops"]
+    }
+  ]
+}
+```
+
+## Decentralized Discovery
+
+AI Catalog enables decentralized discovery: any domain can publish its
+MCP servers at `/.well-known/ai-catalog.json` without registering with a
+central authority.
+
+A vendor hosting its own MCP servers can publish:
+
+```
+https://api.acme-corp.com/.well-known/ai-catalog.json
+```
+
 A client discovering MCP servers follows this flow:
 
 1. Fetch `/.well-known/ai-catalog.json` to discover all artifacts on
    a domain (MCP servers, A2A agents, plugins, etc.).
-2. Filter entries by `type` to find MCP servers.
+2. Filter entries by `type` (`application/mcp-server-card+json`) to find
+   MCP servers.
 3. Evaluate the Trust Manifest for publisher identity and attestations.
 4. Fetch the Server Card at the entry's `url` for operational details
    (transport, capabilities, tools, authentication).
@@ -2039,6 +1923,64 @@ cross-ecosystem indexing layer, while the MCP Server Card provides the
 protocol-specific operational details. A domain with multiple MCP
 servers publishes one AI Catalog listing all of them, with each entry
 pointing to its respective Server Card.
+
+## What AI Catalog Adds
+
+A Server Card describes a single server but has no cross-server discovery
+or trust layer. AI Catalog fills this gap:
+
+1. **Publisher identity**: Verifiable publisher with DID or domain
+   anchor.
+2. **Trust verification**: Attestations (SOC2, HIPAA, publisher
+   identity proofs) via the Trust Manifest.
+3. **Provenance**: Links to source repositories, registries, and
+   build artifacts with cryptographic digests.
+4. **Signing**: Detached JWS signature on the Trust Manifest for
+   integrity verification.
+5. **Cross-ecosystem discovery**: MCP servers become discoverable
+   alongside A2A agents, plugins, and datasets through a single
+   catalog format.
+6. **Composability**: MCP servers can be packaged with related
+   artifacts (A2A agents, datasets) in nested catalogs.
+
+## Experimental: Mapping to the MCP Registry (`server.json`)
+
+> **Experimental — not officially documented.** The MCP Registry's
+> `server.json` format
+> (see [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry))
+> is a *different* document from the Server Card: it is an installable
+> **package descriptor** (package coordinates, transports, environment
+> variables, CLI arguments). Mapping AI Catalog entries directly to
+> `server.json` is **not part of the documented AI Catalog ↔ MCP
+> integration** above and the AI Catalog WG has not standardized it.
+> There is also **no registered media type** for `server.json`. Treat the
+> sketch below as experimental and subject to change; the documented path
+> for cataloging MCP servers is via their Server Cards.
+
+An entry could, experimentally, point its `url` at a `server.json`
+document. Because there is no known type for `server.json`, such an entry
+would use the generic open-text `type` `application/json`:
+
+```json
+{
+  "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
+  "version": "1.0.2",
+  "type": "application/json",
+  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
+  "description": "MCP server for Brave Search API integration",
+  "tags": ["search", "brave", "web"]
+}
+```
+
+The conceptual field correspondence would mirror the Server Card mapping
+above — the whole `server.json` is the referenced artifact; `name` maps
+to the entry `identifier`; `description`/`version` map to the
+like-named entry members; and `packages[]`, `remotes[]`, and
+`environmentVariables[]` stay inside the artifact rather than being
+surfaced in the catalog. The centralized MCP Registry and decentralized
+AI Catalogs would be complementary: the registry could serve an AI
+Catalog as its response format, while individual domains publish their
+own catalogs for direct discovery.
 
 # Mapping to Claude Code Plugins Marketplace
 
