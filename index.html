@@ -199,13 +199,11 @@ members:</p>
     },
     {
       &quot;identifier&quot;: &quot;urn:air:example.com:mcp:weather&quot;,
-      &quot;displayName&quot;: &quot;Weather Service&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.example.com/.well-known/mcp/server-card.json&quot;
     },
     {
       &quot;identifier&quot;: &quot;urn:air:example.com:a2a:research&quot;,
-      &quot;displayName&quot;: &quot;Research Assistant&quot;,
       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://agents.example.com/researchAssistant&quot;
     }
@@ -277,8 +275,6 @@ It MUST contain the following members:</p>
 <p>For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.</p>
 <p>See <a href="#multi-version-entries">Multi-Version Entries</a> for uniqueness rules when multiple versions are present.</p>
 </dd>
-<dt><code>displayName</code></dt>
-<dd>A string containing a human-readable name for the artifact.</dd>
 <dt><code>type</code></dt>
 <dd>
 <p>A string containing the identifier that specifies the type of the
@@ -314,6 +310,23 @@ provide the artifact content:</p>
 </dl>
 <p>The following members are OPTIONAL:</p>
 <dl>
+<dt><code>displayName</code></dt>
+<dd>A string containing a human-readable name for the artifact.
+  This field SHOULD be set only when the referenced artifact does not
+  already carry its own canonical human-readable name — for example a
+  raw dataset (<code>application/parquet</code>), a model blob, or a skill bundle
+  (<code>application/agent-skills+zip</code>), none of which embed a self-describing
+  name. When the referenced artifact does carry such a name — for
+  example the <code>name</code> field of an A2A Agent Card or the <code>title</code> field of
+  an MCP Server Card — that artifact is the authoritative source and
+  <code>displayName</code> SHOULD be omitted to avoid duplicating a value that can
+  drift out of sync. When <code>displayName</code> <em>is</em> present, however, it takes
+  precedence: it is the authoritative value for display, and a consumer
+  SHOULD render it as given even when it differs from a name carried by
+  the referenced artifact. Setting <code>displayName</code> is how a publisher
+  deliberately overrides the artifact's own name. See
+  <a href="#resolving-an-artifacts-display-name">Resolving an Artifact's Display Name</a>
+  for the full consumer resolution order.</dd>
 <dt><code>description</code></dt>
 <dd>A string containing a short description of the artifact.</dd>
 <dt><code>tags</code></dt>
@@ -338,6 +351,35 @@ provide the artifact content:</p>
   providing verifiable identity and trust metadata for this artifact.
   See <a href="#trust-manifest">Trust Manifest</a> for details.</dd>
 </dl>
+<section id="resolving-an-artifact-s-display-name">
+<h3>Resolving an Artifact&#x27;s Display Name</h3>
+<p>Because <code>displayName</code> is OPTIONAL, a consumer rendering a catalog entry
+cannot assume it is present. To obtain a human-readable name, a consumer
+SHOULD resolve one in the following order:</p>
+<ol>
+<li><strong><code>displayName</code> on the entry</strong>, if present. A publisher-supplied
+   <code>displayName</code> always wins, even when it differs from a name carried by
+   the referenced artifact.</li>
+<li><strong>The referenced artifact's own canonical name</strong>, if the consumer has
+   already fetched or cached the artifact — for example the <code>name</code> field
+   of an A2A Agent Card or the <code>title</code> field of an MCP Server Card.</li>
+<li><strong>The trailing segment of the entry's <code>identifier</code></strong> as a last
+   resort — the portion after its final <code>:</code> or <code>/</code> delimiter. For
+   example, <code>urn:air:example.com:mcp:weather</code> yields <code>weather</code> and
+   <code>urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search</code> yields
+   <code>brave-search</code>.</li>
+</ol>
+<p>A consumer SHOULD NOT dereference an artifact at render time solely to
+obtain a name. A registry, directory, or other service built on top of a
+catalog SHOULD resolve the name once at ingestion — alongside any other
+derived metadata it attaches, such as relevance scores or tags — and
+cache the result, rather than fetching artifacts on the rendering path.</p>
+<p>This order also covers a referenced MCP Server Card whose <code>title</code> is
+itself absent: step 2 yields no name, so the consumer falls through to
+the <code>identifier</code> segment in step 3. A publisher MAY still set
+<code>displayName</code> on such an entry to provide a better name than the bare
+identifier segment.</p>
+</section>
 </section>
 <section id="multi-version-entries">
 <h2>Multi-Version Entries</h2>
@@ -359,7 +401,6 @@ that need a specific version SHOULD match on both <code>identifier</code> and <c
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
       &quot;version&quot;: &quot;2.1.0&quot;,
       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
@@ -367,7 +408,6 @@ that need a specific version SHOULD match on both <code>identifier</code> and <c
     },
     {
       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
       &quot;version&quot;: &quot;2.0.0&quot;,
       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.0.json&quot;,
@@ -930,7 +970,7 @@ their declared level.</p>
 <ul>
 <li><code>specVersion</code> — the specification version string</li>
 <li><code>entries</code> — an array of Catalog Entry objects, each containing at
-  minimum <code>identifier</code>, <code>displayName</code>, <code>type</code>, and exactly one of <code>url</code> or
+  minimum <code>identifier</code>, <code>type</code>, and exactly one of <code>url</code> or
   <code>data</code></li>
 </ul>
 <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
@@ -1314,7 +1354,6 @@ artifact types including a nested catalog packaging related artifacts:</p>
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
       &quot;version&quot;: &quot;2.1.0&quot;,
       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;,
@@ -1346,7 +1385,6 @@ artifact types including a nested catalog packaging related artifacts:</p>
     },
     {
       &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
-      &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
       &quot;version&quot;: &quot;1.4.0&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
@@ -1365,13 +1403,11 @@ artifact types including a nested catalog packaging related artifacts:</p>
         &quot;entries&quot;: [
           {
             &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
-            &quot;displayName&quot;: &quot;Finance A2A Agent&quot;,
             &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
             &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;
           },
           {
             &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
-            &quot;displayName&quot;: &quot;Finance MCP Server&quot;,
             &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
             &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
           },
@@ -1418,7 +1454,6 @@ document:</p>
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:assistant&quot;,
-      &quot;displayName&quot;: &quot;Acme Corporate Assistant&quot;,
       &quot;version&quot;: &quot;3.0.0&quot;,
       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/assistant.json&quot;,
@@ -1476,13 +1511,11 @@ containing both protocol-specific entries:</p>
     &quot;entries&quot;: [
       {
         &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:mcp&quot;,
-        &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
         &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
         &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
       },
       {
         &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:a2a&quot;,
-        &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
         &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
         &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance&quot;
       }
@@ -1817,7 +1850,7 @@ does not address.</p>
 </tr>
 <tr>
 <td style="text-align: left;"><code>title</code></td>
-<td style="text-align: left;">Entry <code>displayName</code></td>
+<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>title</code>); entry <code>displayName</code> is omitted unless the artifact lacks a name</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>description</code></td>
@@ -1888,7 +1921,6 @@ identity, trust verification, and cross-ecosystem discoverability.</p>
 reflects the Registry format:</p>
 <pre><code class="language-json">{
   &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
-  &quot;displayName&quot;: &quot;Brave Search&quot;,
   &quot;version&quot;: &quot;1.0.2&quot;,
   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
@@ -1948,7 +1980,6 @@ agents, skills, and other artifacts:</p>
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
-      &quot;displayName&quot;: &quot;Brave Search&quot;,
       &quot;version&quot;: &quot;1.0.2&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
@@ -1957,7 +1988,6 @@ agents, skills, and other artifacts:</p>
     },
     {
       &quot;identifier&quot;: &quot;urn:air:modelcontextprotocol.github.io:mcp:filesystem&quot;,
-      &quot;displayName&quot;: &quot;Filesystem&quot;,
       &quot;version&quot;: &quot;1.0.2&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
@@ -1966,7 +1996,6 @@ agents, skills, and other artifacts:</p>
     },
     {
       &quot;identifier&quot;: &quot;urn:air:example.github.io:mcp:weather-mcp&quot;,
-      &quot;displayName&quot;: &quot;Weather&quot;,
       &quot;version&quot;: &quot;0.5.0&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
@@ -2044,7 +2073,6 @@ prompts.</p>
 server can reference the Server Card as its artifact content:</p>
 <pre><code class="language-json">{
   &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
-  &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
@@ -2146,7 +2174,7 @@ plugins/
 </tr>
 <tr>
 <td style="text-align: left;">Plugin <code>name</code></td>
-<td style="text-align: left;">Entry <code>displayName</code> and <code>identifier</code> (derived as URN)</td>
+<td style="text-align: left;">Entry <code>identifier</code> (derived as URN); the plugin manifest carries its own name, so entry <code>displayName</code> is omitted</td>
 </tr>
 <tr>
 <td style="text-align: left;">Plugin <code>description</code></td>
@@ -2227,7 +2255,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
-      &quot;displayName&quot;: &quot;agent-sdk-dev&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
       &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
@@ -2242,7 +2269,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
     },
     {
       &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
-      &quot;displayName&quot;: &quot;adspirer-ads-agent&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
       &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
@@ -2263,7 +2289,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
     },
     {
       &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
-      &quot;displayName&quot;: &quot;aikido&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
       &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
@@ -2308,7 +2333,6 @@ contains multiple artifact types:</p>
     &quot;entries&quot;: [
       {
         &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;,
-        &quot;displayName&quot;: &quot;Example Plugin MCP Server&quot;,
         &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
         &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json&quot;
       },
