@@ -2082,7 +2082,7 @@ trust layer that <code>server.json</code> does not address.</p>
 </tr>
 <tr>
 <td style="text-align: left;"><code>name</code> (reverse-DNS identifier)</td>
-<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. registry name <code>com.pulsemcp/remote-filesystem</code> → <code>urn:air:pulsemcp.com:mcp:remote-filesystem</code>)</td>
+<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <a href="https://github.com/Agent-Card/ai-catalog/blob/main/adr/0015-agent-identifier-naming.md"><code>urn:air:{publisher}:{namespace}:{name}</code></a> URN form — e.g. registry name <code>com.pulsemcp/remote-filesystem</code> → <code>urn:air:pulsemcp.com:mcp:remote-filesystem</code>). The mapping is not a mechanical transliteration: <code>publisher</code> is the publisher's actual domain (e.g. <code>pulsemcp.com</code>) and <code>namespace</code> is a chosen category (e.g. <code>mcp</code>), independent of the registry name's reverse-DNS segments.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>title</code></td>

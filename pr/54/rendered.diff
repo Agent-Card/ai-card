@@ -68,7 +68,7 @@
 +
 +name (reverse-DNS identifier)
 +
-+Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. registry name com.pulsemcp/remote-filesystem → urn:air:pulsemcp.com:mcp:remote-filesystem)
++Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. registry name com.pulsemcp/remote-filesystem → urn:air:pulsemcp.com:mcp:remote-filesystem). The mapping is not a mechanical transliteration: publisher is the publisher's actual domain (e.g. pulsemcp.com) and namespace is a chosen category (e.g. mcp), independent of the registry name's reverse-DNS segments.
 +
 +title
 +
