@@ -1809,7 +1809,7 @@ artifacts through a unified catalog. The documented, supported path is
 to reference each server's <strong>MCP Server Card</strong>
 (<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">SEP-2127</a>)
 as the artifact content of a Catalog Entry.</p>
-<p>A Server Card is a runtime discovery document for a single HTTP-based MCP
+<p>A Server Card is a static discovery document for a single HTTP-based MCP
 server (its identity and connection details). It is distinct from the MCP
 Registry's <code>server.json</code>, an installable-package descriptor — a separate
 artifact type mapped in
@@ -2037,7 +2037,7 @@ through a unified catalog.</p>
 distinct documents for a server, and AI Catalog gives each its own known
 <code>type</code>:</p>
 <ul>
-<li><strong>MCP Server Card</strong> (<code>application/mcp-server-card+json</code>) — a runtime
+<li><strong>MCP Server Card</strong> (<code>application/mcp-server-card+json</code>) — a static
   discovery document for a connectable HTTP server (identity, transport,
   capabilities, auth). See <a href="#mapping-to-mcp-servers">Mapping to MCP Servers</a>.</li>
 <li><strong>MCP Registry <code>server.json</code></strong> (<code>application/mcp-server+json</code>) — an

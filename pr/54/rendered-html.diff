@@ -9,7 +9,7 @@
  <li><code>application/agent-skills+md</code> — an Agent Skill defined in a standard Markdown file (the suffix <code>+md</code> is to be registered)</li>
  <li><code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)</li>
 @@ -1811,7 +1812,8 @@
- <p>A Server Card is a runtime discovery document for a single HTTP-based MCP
+ <p>A Server Card is a static discovery document for a single HTTP-based MCP
  server (its identity and connection details). It is distinct from the MCP
  Registry's <code>server.json</code>, an installable-package descriptor — a separate
 -artifact type that this appendix does not address.</p>
@@ -34,7 +34,7 @@
 +distinct documents for a server, and AI Catalog gives each its own known
 +<code>type</code>:</p>
 +<ul>
-+<li><strong>MCP Server Card</strong> (<code>application/mcp-server-card+json</code>) — a runtime
++<li><strong>MCP Server Card</strong> (<code>application/mcp-server-card+json</code>) — a static
 +  discovery document for a connectable HTTP server (identity, transport,
 +  capabilities, auth). See <a href="#mapping-to-mcp-servers">Mapping to MCP Servers</a>.</li>
 +<li><strong>MCP Registry <code>server.json</code></strong> (<code>application/mcp-server+json</code>) — an
