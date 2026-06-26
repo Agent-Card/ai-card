@@ -9,7 +9,7 @@
  
  application/agent-skills+json — Agent Skill Metadata json file
  
-@@ -2143,6 +2145,205 @@
+@@ -2143,6 +2145,210 @@
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
  
@@ -68,7 +68,7 @@
 +
 +name (reverse-DNS identifier)
 +
-+Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search)
++Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. registry name com.pulsemcp/remote-filesystem → urn:air:pulsemcp.com:mcp:remote-filesystem)
 +
 +title
 +
@@ -121,39 +121,44 @@
 +is the known type application/mcp-server+json:
 +
 +{
-+"identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-+"version": "1.0.2",
++"identifier": "urn:air:pulsemcp.com:mcp:remote-filesystem",
++"version": "0.1.5",
 +"type": "application/mcp-server+json",
-+"url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-+"description": "MCP server for Brave Search API integration",
-+"tags": ["search", "brave", "web"],
++"url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5",
++"description": "MCP server for remote filesystem operations on cloud storage",
++"tags": ["filesystem", "storage"],
 +"publisher": {
-+"identifier": "did:web:modelcontextprotocol.io",
-+"displayName": "Model Context Protocol"
++"identifier": "did:web:pulsemcp.com",
++"displayName": "PulseMCP"
 +},
 +"trustManifest": {
-+"identity": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
++"identity": "urn:air:pulsemcp.com:mcp:remote-filesystem",
 +"attestations": [
 +{
 +"type": "publisher-identity",
-+"uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt"
++"uri": "https://trust.pulsemcp.com/certs/publisher.jwt"
 +}
 +],
 +"provenance": [
 +{
 +"relation": "publishedFrom",
-+"sourceId": "https://github.com/modelcontextprotocol/servers",
++"sourceId": "https://github.com/pulsemcp/mcp-servers",
 +"registryUri": "https://registry.npmjs.org"
 +}
 +]
 +},
 +"metadata": {
-+"repository": "https://github.com/modelcontextprotocol/servers"
++"repository": "https://github.com/pulsemcp/mcp-servers"
 +},
 +"updatedAt": "2026-03-15T10:00:00Z"
 +}
 +
-+The url points to the complete server.json. A client fetches the
++The url resolves to the server's server.json. In the MCP Registry, a
++specific version is addressed as
++/v0/servers/{name}/versions/{version} — where {name} is the server's
++reverse-DNS registry name, URL-encoded (the / between namespace and
++name becomes %2F) — and the response carries the server.json document
++in its server field alongside registry _meta. A client fetches the
 +catalog entry for discovery and trust evaluation, then retrieves the
 +server.json for operational details (packages, transports, env vars).
 +
@@ -173,20 +178,20 @@
 +},
 +"entries": [
 +{
-+"identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-+"version": "1.0.2",
++"identifier": "urn:air:pulsemcp.com:mcp:remote-filesystem",
++"version": "0.1.5",
 +"type": "application/mcp-server+json",
-+"url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-+"description": "MCP server for Brave Search API integration",
-+"tags": ["search", "brave"]
++"url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5",
++"description": "MCP server for remote filesystem operations on cloud storage",
++"tags": ["filesystem", "storage"]
 +},
 +{
-+"identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:filesystem",
-+"version": "1.0.2",
++"identifier": "urn:air:pulsemcp.com:mcp:pulse-fetch",
++"version": "0.2.14",
 +"type": "application/mcp-server+json",
-+"url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
-+"description": "MCP server for filesystem operations",
-+"tags": ["filesystem", "files"]
++"url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp.servers%2Fpulse-fetch/versions/0.2.14",
++"description": "MCP server that extracts clean, structured content from web pages",
++"tags": ["fetch", "web"]
 +}
 +]
 +}

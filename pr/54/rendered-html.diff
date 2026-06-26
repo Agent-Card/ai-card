@@ -8,7 +8,7 @@
  <li><code>application/agent-skills+json</code> — Agent Skill Metadata json file</li>
  <li><code>application/agent-skills+md</code> — an Agent Skill defined in a standard Markdown file (the suffix <code>+md</code> is to be registered)</li>
  <li><code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)</li>
-@@ -2024,6 +2025,207 @@
+@@ -2024,6 +2025,212 @@
  </ol>
  </section>
  </section>
@@ -69,7 +69,7 @@
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>name</code> (reverse-DNS identifier)</td>
-+<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search</code>)</td>
++<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. registry name <code>com.pulsemcp/remote-filesystem</code> → <code>urn:air:pulsemcp.com:mcp:remote-filesystem</code>)</td>
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>title</code></td>
@@ -124,39 +124,44 @@
 +Entry whose <code>url</code> points to the <code>server.json</code> document and whose <code>type</code>
 +is the known type <code>application/mcp-server+json</code>:</p>
 +<pre><code class="language-json">{
-+  &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
-+  &quot;version&quot;: &quot;1.0.2&quot;,
++  &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
++  &quot;version&quot;: &quot;0.1.5&quot;,
 +  &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-+  &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
-+  &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
-+  &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
++  &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5&quot;,
++  &quot;description&quot;: &quot;MCP server for remote filesystem operations on cloud storage&quot;,
++  &quot;tags&quot;: [&quot;filesystem&quot;, &quot;storage&quot;],
 +  &quot;publisher&quot;: {
-+    &quot;identifier&quot;: &quot;did:web:modelcontextprotocol.io&quot;,
-+    &quot;displayName&quot;: &quot;Model Context Protocol&quot;
++    &quot;identifier&quot;: &quot;did:web:pulsemcp.com&quot;,
++    &quot;displayName&quot;: &quot;PulseMCP&quot;
 +  },
 +  &quot;trustManifest&quot;: {
-+    &quot;identity&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
++    &quot;identity&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
 +    &quot;attestations&quot;: [
 +      {
 +        &quot;type&quot;: &quot;publisher-identity&quot;,
-+        &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;
++        &quot;uri&quot;: &quot;https://trust.pulsemcp.com/certs/publisher.jwt&quot;
 +      }
 +    ],
 +    &quot;provenance&quot;: [
 +      {
 +        &quot;relation&quot;: &quot;publishedFrom&quot;,
-+        &quot;sourceId&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;,
++        &quot;sourceId&quot;: &quot;https://github.com/pulsemcp/mcp-servers&quot;,
 +        &quot;registryUri&quot;: &quot;https://registry.npmjs.org&quot;
 +      }
 +    ]
 +  },
 +  &quot;metadata&quot;: {
-+    &quot;repository&quot;: &quot;https://github.com/modelcontextprotocol/servers&quot;
++    &quot;repository&quot;: &quot;https://github.com/pulsemcp/mcp-servers&quot;
 +  },
 +  &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
 +}
 +</code></pre>
-+<p>The <code>url</code> points to the complete <code>server.json</code>. A client fetches the
++<p>The <code>url</code> resolves to the server's <code>server.json</code>. In the MCP Registry, a
++specific version is addressed as
++<code>/v0/servers/{name}/versions/{version}</code> — where <code>{name}</code> is the server's
++reverse-DNS registry name, URL-encoded (the <code>/</code> between namespace and
++name becomes <code>%2F</code>) — and the response carries the <code>server.json</code> document
++in its <code>server</code> field alongside registry <code>_meta</code>. A client fetches the
 +catalog entry for discovery and trust evaluation, then retrieves the
 +<code>server.json</code> for operational details (packages, transports, env vars).</p>
 +</section>
@@ -175,20 +180,20 @@
 +  },
 +  &quot;entries&quot;: [
 +    {
-+      &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
-+      &quot;version&quot;: &quot;1.0.2&quot;,
++      &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
++      &quot;version&quot;: &quot;0.1.5&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-+      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
-+      &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
-+      &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
++      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5&quot;,
++      &quot;description&quot;: &quot;MCP server for remote filesystem operations on cloud storage&quot;,
++      &quot;tags&quot;: [&quot;filesystem&quot;, &quot;storage&quot;]
 +    },
 +    {
-+      &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:filesystem&quot;,
-+      &quot;version&quot;: &quot;1.0.2&quot;,
++      &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:pulse-fetch&quot;,
++      &quot;version&quot;: &quot;0.2.14&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
-+      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
-+      &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
-+      &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
++      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp.servers%2Fpulse-fetch/versions/0.2.14&quot;,
++      &quot;description&quot;: &quot;MCP server that extracts clean, structured content from web pages&quot;,
++      &quot;tags&quot;: [&quot;fetch&quot;, &quot;web&quot;]
 +    }
 +  ]
 +}
@@ -216,7 +221,7 @@
  <section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
  <h1>Mapping to Claude Code Plugins Marketplace</h1>
  <p>This appendix describes how the Anthropic Claude Code Plugins
-@@ -2032,7 +2234,7 @@
+@@ -2032,7 +2239,7 @@
  maps to AI Catalog, enabling Claude Code plugins to be discovered,
  indexed, and distributed through a unified catalog alongside other AI
  artifacts.</p>
@@ -225,7 +230,7 @@
  <h2>Overview</h2>
  <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
  file that lists available plugins. Each plugin is a directory containing
-@@ -2051,7 +2253,7 @@
+@@ -2051,7 +2258,7 @@
      README.md
  </code></pre>
  </section>
