@@ -8,7 +8,17 @@
  <li><code>application/agent-skills+json</code> — Agent Skill Metadata json file</li>
  <li><code>application/agent-skills+md</code> — an Agent Skill defined in a standard Markdown file (the suffix <code>+md</code> is to be registered)</li>
  <li><code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)</li>
-@@ -2024,6 +2025,212 @@
+@@ -1811,7 +1812,8 @@
+ <p>A Server Card is a runtime discovery document for a single HTTP-based MCP
+ server (its identity and connection details). It is distinct from the MCP
+ Registry's <code>server.json</code>, an installable-package descriptor — a separate
+-artifact type that this appendix does not address.</p>
++artifact type mapped in
++<a href="#mapping-to-mcp-registry-server-json">Mapping to MCP Registry server.json</a>.</p>
+ <section id="overview">
+ <h2>Overview</h2>
+ <p>An MCP Server Card is a static discovery document for an individual
+@@ -2024,6 +2026,212 @@
  </ol>
  </section>
  </section>
@@ -221,7 +231,7 @@
  <section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
  <h1>Mapping to Claude Code Plugins Marketplace</h1>
  <p>This appendix describes how the Anthropic Claude Code Plugins
-@@ -2032,7 +2239,7 @@
+@@ -2032,7 +2240,7 @@
  maps to AI Catalog, enabling Claude Code plugins to be discovered,
  indexed, and distributed through a unified catalog alongside other AI
  artifacts.</p>
@@ -230,7 +240,7 @@
  <h2>Overview</h2>
  <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
  file that lists available plugins. Each plugin is a directory containing
-@@ -2051,7 +2258,7 @@
+@@ -2051,7 +2259,7 @@
      README.md
  </code></pre>
  </section>

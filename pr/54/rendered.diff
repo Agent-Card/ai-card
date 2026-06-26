@@ -9,10 +9,21 @@
  
  application/agent-skills+json — Agent Skill Metadata json file
  
-@@ -2143,6 +2145,210 @@
+@@ -1924,7 +1926,8 @@
+ A Server Card is a runtime discovery document for a single HTTP-based MCP
+ server (its identity and connection details). It is distinct from the MCP
+ Registry's server.json, an installable-package descriptor — a separate
+-artifact type that this appendix does not address.
++artifact type mapped in
++Mapping to MCP Registry server.json.
+ 
+ Overview
+ 
+@@ -2142,6 +2145,210 @@
+ 
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
- 
++
 +Mapping to MCP Registry server.json
 +
 +This appendix describes how the MCP Registry server.json format
@@ -216,7 +227,6 @@
 +representation that matches what they are doing (provisioning vs.
 +connecting). AI Catalog provides the trust and cross-ecosystem indexing
 +layer over both; each artifact carries its own protocol-specific detail.
-+
+ 
  Mapping to Claude Code Plugins Marketplace
  
- This appendix describes how the Anthropic Claude Code Plugins
