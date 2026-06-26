@@ -25,7 +25,7 @@
  name (reverse-DNS identifier)
  
 -Entry identifier (mapped to URI form)
-+Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. urn:air:modelcontextprotocol.io:mcp:brave-search)
++Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search)
  
  title
  

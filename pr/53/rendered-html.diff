@@ -25,7 +25,7 @@
  <tr>
  <td style="text-align: left;"><code>name</code> (reverse-DNS identifier)</td>
 -<td style="text-align: left;">Entry <code>identifier</code> (mapped to URI form)</td>
-+<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:modelcontextprotocol.io:mcp:brave-search</code>)</td>
++<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search</code>)</td>
  </tr>
  <tr>
  <td style="text-align: left;"><code>title</code></td>
