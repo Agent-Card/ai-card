@@ -67,8 +67,8 @@
 +
 +A Server Card is a runtime discovery document for a single HTTP-based MCP
 +server (its identity and connection details). It is distinct from the MCP
-+Registry's server.json — an installable-package descriptor — which is a
-+separate artifact type addressed in its own appendix.
++Registry's server.json, an installable-package descriptor — a separate
++artifact type that this appendix does not address.
  
  Overview
  
