@@ -1,6 +1,42 @@
 --- a/base/rendered.txt
 +++ b/head/rendered.txt
-@@ -1912,268 +1912,38 @@
+@@ -142,7 +142,7 @@
+ {
+ "identifier": "urn:air:example.com:mcp:weather",
+ "type": "application/mcp-server-card+json",
+-"url": "https://api.example.com/.well-known/mcp/server-card.json"
++"url": "https://api.example.com/mcp/server-card"
+ },
+ {
+ "identifier": "urn:air:example.com:a2a:research",
+@@ -1498,7 +1498,7 @@
+ "identifier": "urn:air:acme.com:server:finance-mcp",
+ "version": "1.4.0",
+ "type": "application/mcp-server-card+json",
+-"url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
++"url": "https://api.acme-corp.com/mcp/server-card",
+ "description": "MCP server with finance tools.",
+ "tags": ["finance", "mcp"],
+ "updatedAt": "2026-03-15T10:00:00Z"
+@@ -1520,7 +1520,7 @@
+ {
+ "identifier": "urn:air:acme.com:server:finance-mcp",
+ "type": "application/mcp-server-card+json",
+-"url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
++"url": "https://api.acme-corp.com/mcp/server-card"
+ },
+ {
+ "identifier": "urn:air:acme.com:data:market-2026q1",
+@@ -1624,7 +1624,7 @@
+ {
+ "identifier": "urn:air:acme.com:agent:finance:mcp",
+ "type": "application/mcp-server-card+json",
+-"url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
++"url": "https://api.acme-corp.com/mcp/server-card"
+ },
+ {
+ "identifier": "urn:air:acme.com:agent:finance:a2a",
+@@ -1912,268 +1912,35 @@
  losslessly, allowing simple consumers to work with the logical format
  while infrastructure-oriented deployments leverage OCI distribution.
  
@@ -29,13 +65,10 @@
 +(SEP-2127)
 +as the artifact content of a Catalog Entry.
 +
-+Scope: This mapping covers remote MCP servers described by an MCP
-+Server Card. Mapping AI Catalog to the MCP Registry's server.json
-+(an installable-package descriptor) is a separate concern that is
-+not officially documented and should be treated as experimental at
-+this stage — see
-+Experimental: Mapping to the MCP Registry (server.json)
-+at the end of this appendix.
++A Server Card is a runtime discovery document for a single HTTP-based MCP
++server (its identity and connection details). It is distinct from the MCP
++Registry's server.json — an installable-package descriptor — which is a
++separate artifact type addressed in its own appendix.
  
  Overview
  
@@ -298,7 +331,7 @@
  
  AI Catalog and MCP Server Cards address different layers of discovery:
  
-@@ -2189,13 +1959,63 @@
+@@ -2189,13 +1956,63 @@
  trust them? What other artifact types are available alongside MCP
  servers?
  
@@ -365,7 +398,7 @@
  "description": "MCP server for financial data and trading tools",
  "tags": ["finance", "mcp"],
  "publisher": {
-@@ -2218,12 +2038,75 @@
+@@ -2218,12 +2035,75 @@
  }
  }
  
@@ -442,7 +475,7 @@
  
  Evaluate the Trust Manifest for publisher identity and attestations.
  
-@@ -2238,6 +2121,67 @@
+@@ -2238,6 +2118,30 @@
  protocol-specific operational details. A domain with multiple MCP
  servers publishes one AI Catalog listing all of them, with each entry
  pointing to its respective Server Card.
@@ -470,43 +503,6 @@
 +
 +Composability: MCP servers can be packaged with related
 +artifacts (A2A agents, datasets) in nested catalogs.
-+
-+Experimental: Mapping to the MCP Registry (`server.json`)
-+
-+Experimental — not officially documented. The MCP Registry's
-+server.json format
-+(see modelcontextprotocol/registry)
-+is a different document from the Server Card: it is an installable
-+package descriptor (package coordinates, transports, environment
-+variables, CLI arguments). Mapping AI Catalog entries directly to
-+server.json is not part of the documented AI Catalog ↔ MCP
-+integration above and the AI Catalog WG has not standardized it.
-+There is also no registered media type for server.json. Treat the
-+sketch below as experimental and subject to change; the documented path
-+for cataloging MCP servers is via their Server Cards.
-+
-+An entry could, experimentally, point its url at a server.json
-+document. Because there is no known type for server.json, such an entry
-+would use the generic open-text type application/json:
-+
-+{
-+"identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-+"version": "1.0.2",
-+"type": "application/json",
-+"url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-+"description": "MCP server for Brave Search API integration",
-+"tags": ["search", "brave", "web"]
-+}
-+
-+The conceptual field correspondence would mirror the Server Card mapping
-+above — the whole server.json is the referenced artifact; name maps
-+to the entry identifier; description/version map to the
-+like-named entry members; and packages[], remotes[], and
-+environmentVariables[] stay inside the artifact rather than being
-+surfaced in the catalog. The centralized MCP Registry and decentralized
-+AI Catalogs would be complementary: the registry could serve an AI
-+Catalog as its response format, while individual domains publish their
-+own catalogs for direct discovery.
  
  Mapping to Claude Code Plugins Marketplace
  
