@@ -1817,11 +1817,11 @@ artifact type mapped in
 <section id="overview">
 <h2>Overview</h2>
 <p>An MCP Server Card is a static discovery document for an individual
-HTTP-based MCP server. It carries the server's name, version, transport
-configuration, capabilities, authentication requirements, and optionally
-the full list of tools, resources, and prompts. A Server Card MAY be
-hosted at any unreserved URI the catalog references; MCP reserves
-<code>&lt;streamable-http-url&gt;/server-card</code> as a predictable default location.</p>
+HTTP-based MCP server, describing its identity and how to connect to it.
+A Catalog Entry references the card wherever the server publishes it, as
+in the examples below. See
+<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">SEP-2127</a>
+for the Server Card's schema, fields, and hosting conventions.</p>
 <p>In AI Catalog terms, the Server Card is the <strong>artifact content</strong> — the
 native metadata that a Catalog Entry references via its <code>url</code>, declared
 with the known type <code>application/mcp-server-card+json</code>. The AI Catalog
