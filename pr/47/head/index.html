@@ -6,12 +6,12 @@
   <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
   <script class="remove">
     var respecConfig = {
-      "specStatus": "unofficial",
+      "specStatus": "Official",
       "editors": [],
       "latestVersion": null,
       "noRecTrack": true,
       "shortName": "ai-catalog",
-      "edDraftURI": "https://agent-card.github.io/ai-catalog/",
+      "edDraftURI": "https://ai-catalog.io/",
       "localBiblio": {
             "xRegistry": {
                   "title": "xRegistry: A Universal Registry Specification",
@@ -210,21 +210,21 @@ members:</p>
   &quot;specVersion&quot;: &quot;1.0&quot;,
   &quot;entries&quot;: [
     {
-      &quot;identifier&quot;: &quot;urn:example:skill:code-review&quot;,
+      &quot;identifier&quot;: &quot;urn:air:example.com:skill:code-review&quot;,
       &quot;displayName&quot;: &quot;Code Review Assistant&quot;,
-      &quot;mediaType&quot;: &quot;application/agentskill+zip&quot;,
+      &quot;type&quot;: &quot;application/agent-skills+zip&quot;,
       &quot;url&quot;: &quot;https://skills.example.com/code-review/skill.zip&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:example:mcp:weather&quot;,
+      &quot;identifier&quot;: &quot;urn:air:example.com:mcp:weather&quot;,
       &quot;displayName&quot;: &quot;Weather Service&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.example.com/.well-known/mcp/server-card.json&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:example:a2a:research&quot;,
+      &quot;identifier&quot;: &quot;urn:air:example.com:a2a:research&quot;,
       &quot;displayName&quot;: &quot;Research Assistant&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://agents.example.com/researchAssistant&quot;
     }
   ]
@@ -285,35 +285,56 @@ contain:</p>
 It MUST contain the following members:</p>
 <dl>
 <dt><code>identifier</code></dt>
-<dd>A string identifying this artifact. This SHOULD be a URN
-  [[RFC8141]] or URI [[RFC3986]] (e.g., <code>urn:example:agent:name</code>).
-  See <a href="#multi-version-entries">Multi-Version Entries</a> for uniqueness
-  rules when multiple versions are present.</dd>
+<dd>
+<p>A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard <code>urn:air</code> naming structure is <strong>HIGHLY RECOMMENDED</strong> and <strong>MUST</strong> be used for open or federated systems.</p>
+<p><strong>Standard Naming Format:</strong>
+<code>urn:air:{publisher}:{namespace}:{name}</code></p>
+<ul>
+<li><code>{publisher}</code>: The domain name of the organization publishing the artifact (e.g., <code>example.com</code>).</li>
+<li><code>{namespace}</code>: The logical namespace, which can contain one or more colon-separated categories (e.g., <code>mcp</code>, <code>skill</code>, <code>agent</code>, <code>finance:agent</code>).</li>
+<li><code>{name}</code>: The stable, unique name of the artifact within the publisher's namespace.</li>
+</ul>
+<p><em>Examples:</em></p>
+<ul>
+<li><code>urn:air:example.com:skill:code-review</code></li>
+<li><code>urn:air:example.com:mcp:weather</code></li>
+</ul>
+<p>For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.</p>
+<p>See <a href="#multi-version-entries">Multi-Version Entries</a> for uniqueness rules when multiple versions are present.</p>
+</dd>
 <dt><code>displayName</code></dt>
 <dd>A string containing a human-readable name for the artifact.</dd>
-<dt><code>mediaType</code></dt>
-<dd>A string containing the media type that identifies the type of the
-  referenced artifact. This is the mechanism by which clients
-  determine what kind of AI artifact the entry represents. Well-known
-  values include (but are not limited to):</dd>
-</dl>
+<dt><code>type</code></dt>
+<dd>
+<p>A string containing the identifier that specifies the type of the
+  referenced artifact. This field is an open text format, so any string value is accepted. However, to ensure interoperability, it is RECOMMENDED to use one of the following recognized "known types" in the ecosystem when applicable, partitioned by their respective governance boundaries:</p>
+<p><strong>Core Protocol Types (Governed by the AI Catalog WG):</strong></p>
 <ul>
 <li><code>application/ai-catalog+json</code> — a nested AI Catalog</li>
+<li><code>application/agent-card+json</code> — reserved for a generic Agent Card format</li>
+</ul>
+<p><strong>Integrated Ecosystem &amp; Third-Party Types (Governed externally):</strong></p>
+<ul>
 <li><code>application/a2a-agent-card+json</code> — an A2A Agent Card</li>
 <li><code>application/mcp-server-card+json</code> — an MCP Server Card</li>
-<li>Any other media type defined by a protocol specification (e.g.,
-    <code>application/agentskill+zip</code> for skill definitions)</li>
+<li><code>application/agent-skills+json</code> — Agent Skill Metadata json file</li>
+<li><code>application/agent-skills+md</code> — an Agent Skill defined in a standard Markdown file (the suffix <code>+md</code> is to be registered)</li>
+<li><code>application/agent-skills+zip</code> — an Agent Skill bundle (ZIP archive)</li>
+<li><code>application/agent-skills+gzip</code> — an Agent Skill bundle (gzipped tarball)</li>
 </ul>
+<p>These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (<code>+json</code>, <code>+zip</code>, <code>+gzip</code>). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.</p>
+</dd>
+</dl>
 <p>A Catalog Entry MUST contain exactly one of the following members to
 provide the artifact content:</p>
 <dl>
 <dt><code>url</code></dt>
 <dd>A string containing a URL where the full artifact document can be
   retrieved. The document served at this URL SHOULD be served with
-  the media type declared in the <code>mediaType</code> field.</dd>
+  the media type declared in the <code>type</code> field.</dd>
 <dt><code>data</code></dt>
 <dd>A JSON value containing the complete artifact document inline. The
-  structure of this value is determined by the <code>mediaType</code> field and
+  structure of this value is determined by the <code>type</code> field and
   is opaque to this specification.</dd>
 </dl>
 <p>The following members are OPTIONAL:</p>
@@ -362,18 +383,18 @@ that need a specific version SHOULD match on both <code>identifier</code> and <c
   &quot;specVersion&quot;: &quot;1.0&quot;,
   &quot;entries&quot;: [
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
       &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
       &quot;version&quot;: &quot;2.1.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
       &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
       &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
       &quot;version&quot;: &quot;2.0.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.0.json&quot;,
       &quot;updatedAt&quot;: &quot;2026-01-20T08:00:00Z&quot;
     }
@@ -520,7 +541,7 @@ present.</p>
 <p>For example, a Trust Manifest with identity, attestations, and
 provenance:</p>
 <pre><code class="language-json">{
-  &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
+  &quot;identity&quot;: &quot;did:web:acme.com:agent:finance&quot;,
   &quot;identityType&quot;: &quot;did&quot;,
   &quot;trustSchema&quot;: {
     &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
@@ -532,13 +553,11 @@ provenance:</p>
     {
       &quot;type&quot;: &quot;publisher-identity&quot;,
       &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
-      &quot;mediaType&quot;: &quot;application/jwt&quot;,
       &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
     },
     {
       &quot;type&quot;: &quot;SOC2-Type2&quot;,
       &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-      &quot;mediaType&quot;: &quot;application/pdf&quot;,
       &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
     }
   ],
@@ -637,9 +656,6 @@ contain:</p>
 <dt><code>uri</code></dt>
 <dd>A string containing the location of the attestation document.
   This may be an HTTPS URL or an inline Data URI [[RFC2397]].</dd>
-<dt><code>mediaType</code></dt>
-<dd>A string indicating the format (e.g., "application/pdf",
-  "application/jwt").</dd>
 </dl>
 <p>The following members are OPTIONAL:</p>
 <dl>
@@ -655,7 +671,6 @@ contain:</p>
 <pre><code class="language-json">{
   &quot;type&quot;: &quot;SOC2-Type2&quot;,
   &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2-2026.pdf&quot;,
-  &quot;mediaType&quot;: &quot;application/pdf&quot;,
   &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;,
   &quot;size&quot;: 245760,
   &quot;description&quot;: &quot;SOC2 Type 2 audit report for Acme Finance Agent (2026)&quot;
@@ -917,12 +932,12 @@ such a statement:</p>
 <section id="organizing-catalogs">
 <h1>Organizing Catalogs</h1>
 <p>As catalogs grow, a flat list of entries becomes unwieldy. Because any
-catalog entry can have a <code>mediaType</code> of <code>application/ai-catalog+json</code>,
+catalog entry can have a <code>type</code> of <code>application/ai-catalog+json</code>,
 catalogs are naturally composable — an entry can reference or inline
 another AI Catalog, creating a hierarchy of any depth.</p>
 <section id="nested-catalog-entries">
 <h2>Nested Catalog Entries</h2>
-<p>A catalog entry whose <code>mediaType</code> is <code>application/ai-catalog+json</code>
+<p>A catalog entry whose <code>type</code> is <code>application/ai-catalog+json</code>
 references (via <code>url</code>) or embeds (via <code>data</code>) another AI Catalog
 document. This mechanism supports two complementary use cases:</p>
 <p><strong>Organizational hierarchy.</strong> An enterprise with thousands of artifacts
@@ -937,21 +952,21 @@ its own <code>host</code> and entries:</p>
   },
   &quot;entries&quot;: [
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:finance&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:catalog:finance&quot;,
       &quot;displayName&quot;: &quot;Finance Services&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;url&quot;: &quot;https://acme.com/catalogs/finance.json&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:ml&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:catalog:ml&quot;,
       &quot;displayName&quot;: &quot;ML Models&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;url&quot;: &quot;https://acme.com/catalogs/ml.json&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:devops&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:catalog:devops&quot;,
       &quot;displayName&quot;: &quot;DevOps Tools&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;url&quot;: &quot;https://acme.com/catalogs/devops.json&quot;
     }
   ]
@@ -962,9 +977,9 @@ a nested catalog may be interpreted as a set of items that could be
 acquired as a unit. For example, a finance plugin that ships an A2A
 agent, an MCP server, and a dataset together:</p>
 <pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
+  &quot;identifier&quot;: &quot;urn:air:acme.com:plugin:finance-suite&quot;,
   &quot;displayName&quot;: &quot;Finance Plugin&quot;,
-  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+  &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
   &quot;url&quot;: &quot;https://acme.com/plugins/finance-suite.json&quot;,
   &quot;publisher&quot;: {
     &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
@@ -1149,7 +1164,7 @@ their declared level.</p>
 <ul>
 <li><code>specVersion</code> — the specification version string</li>
 <li><code>entries</code> — an array of Catalog Entry objects, each containing at
-  minimum <code>identifier</code>, <code>displayName</code>, <code>mediaType</code>, and exactly one of <code>url</code> or
+  minimum <code>identifier</code>, <code>displayName</code>, <code>type</code>, and exactly one of <code>url</code> or
   <code>data</code></li>
 </ul>
 <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
@@ -1303,8 +1318,8 @@ compounding mechanisms:</p>
 <section id="identifier-typosquatting">
 <h2>Identifier Typosquatting</h2>
 <p>Catalog entries are identified by URIs/URNs. An attacker can register
-identifiers similar to legitimate ones (e.g., <code>urn:acme:agent:financ</code>
-vs. <code>urn:acme:agent:finance</code>) to trick consumers into using a
+identifiers similar to legitimate ones (e.g., <code>urn:air:acme.com:agent:financ</code>
+vs. <code>urn:air:acme.com:agent:finance</code>) to trick consumers into using a
 malicious artifact.</p>
 <p>Registries and consumers SHOULD implement similarity checks on
 identifiers. Publishers SHOULD use identifiers anchored to domains
@@ -1334,7 +1349,7 @@ MUST treat it as untrusted input. In particular:</p>
 <li>Content with HTML or script-capable media types MUST be sandboxed
   and MUST NOT be executed in the consumer's security context.</li>
 <li>Consumers SHOULD validate that the <code>data</code> content is well-formed
-  JSON (or the expected format for the declared <code>mediaType</code>) before
+  JSON (or the expected format for the declared <code>type</code>) before
   processing.</li>
 </ul>
 </section>
@@ -1365,7 +1380,7 @@ classDiagram
     class CatalogEntry {
         identifier string
         displayName string
-        mediaType string
+        type string
         url | data
         version string
         publisher Publisher
@@ -1397,7 +1412,7 @@ classDiagram
     class Attestation {
         type string
         uri string
-        mediaType string
+        type string
         digest string
     }
     class ProvenanceLink {
@@ -1512,7 +1527,7 @@ HostInfo = {
 CatalogEntry = {
   identifier: text,
   displayName: text,
-  mediaType: text,
+  type: text,
   (url: text // data: any),
   ? version: text,
   ? description: text,
@@ -1554,7 +1569,7 @@ TrustSchema = {
 Attestation = {
   type: text,
   uri: text,
-  mediaType: text,
+  type: text,
   ? digest: text,
   ? size: uint,
   ? description: text
@@ -1584,10 +1599,10 @@ artifact types including a nested catalog packaging related artifacts:</p>
   },
   &quot;entries&quot;: [
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
       &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
       &quot;version&quot;: &quot;2.1.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;,
       &quot;description&quot;: &quot;A2A agent for financial workflows.&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;a2a&quot;],
@@ -1596,18 +1611,17 @@ artifact types including a nested catalog packaging related artifacts:</p>
         &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
       },
       &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+        &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-a2a-pod&quot;,
+        &quot;identityType&quot;: &quot;spiffe&quot;,
         &quot;attestations&quot;: [
           {
             &quot;type&quot;: &quot;publisher-identity&quot;,
             &quot;uri&quot;: &quot;https://trust.acme.com/certs/publisher.jwt&quot;,
-            &quot;mediaType&quot;: &quot;application/jwt&quot;,
             &quot;description&quot;: &quot;Verifies did:web:acme-corp.com as publisher&quot;
           },
           {
             &quot;type&quot;: &quot;SOC2-Type2&quot;,
             &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
-            &quot;mediaType&quot;: &quot;application/pdf&quot;,
             &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
           }
         ],
@@ -1617,43 +1631,43 @@ artifact types including a nested catalog packaging related artifacts:</p>
       &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
       &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
       &quot;version&quot;: &quot;1.4.0&quot;,
-      &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
       &quot;description&quot;: &quot;MCP server with finance tools.&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
       &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:plugin:finance-suite&quot;,
       &quot;displayName&quot;: &quot;Acme Finance Suite&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;description&quot;: &quot;A2A agent + MCP server + dataset for finance workflows.&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;suite&quot;],
       &quot;data&quot;: {
         &quot;specVersion&quot;: &quot;1.0&quot;,
         &quot;entries&quot;: [
           {
-            &quot;identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+            &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
             &quot;displayName&quot;: &quot;Finance A2A Agent&quot;,
-            &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+            &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
             &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;
           },
           {
-            &quot;identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
+            &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
             &quot;displayName&quot;: &quot;Finance MCP Server&quot;,
-            &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
+            &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
             &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
           },
           {
-            &quot;identifier&quot;: &quot;urn:acme:data:market-2026q1&quot;,
+            &quot;identifier&quot;: &quot;urn:air:acme.com:data:market-2026q1&quot;,
             &quot;displayName&quot;: &quot;Market Dataset Q1 2026&quot;,
-            &quot;mediaType&quot;: &quot;application/parquet&quot;,
+            &quot;type&quot;: &quot;application/parquet&quot;,
             &quot;url&quot;: &quot;https://data.acme-corp.com/market-2026q1.parquet&quot;,
             &quot;trustManifest&quot;: {
-              &quot;identity&quot;: &quot;urn:acme:data:market-2026q1&quot;,
+              &quot;identity&quot;: &quot;urn:air:acme.com:data:market-2026q1&quot;,
               &quot;provenance&quot;: [
                 {
                   &quot;relation&quot;: &quot;publishedFrom&quot;,
@@ -1666,7 +1680,7 @@ artifact types including a nested catalog packaging related artifacts:</p>
         ]
       },
       &quot;trustManifest&quot;: {
-        &quot;identity&quot;: &quot;urn:acme:plugin:finance-suite&quot;,
+        &quot;identity&quot;: &quot;urn:air:acme.com:plugin:finance-suite&quot;,
         &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached&quot;
       },
       &quot;updatedAt&quot;: &quot;2026-03-20T14:00:00Z&quot;
@@ -1689,33 +1703,33 @@ document:</p>
   },
   &quot;entries&quot;: [
     {
-      &quot;identifier&quot;: &quot;urn:acme:agent:assistant&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:agent:assistant&quot;,
       &quot;displayName&quot;: &quot;Acme Corporate Assistant&quot;,
       &quot;version&quot;: &quot;3.0.0&quot;,
-      &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+      &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/assistant.json&quot;,
       &quot;description&quot;: &quot;General-purpose corporate assistant agent.&quot;
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:finance&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:catalog:finance&quot;,
       &quot;displayName&quot;: &quot;Finance Services&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;url&quot;: &quot;https://acme-corp.com/catalogs/finance.json&quot;,
       &quot;description&quot;: &quot;Financial agents, MCP servers, and datasets.&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;trading&quot;, &quot;compliance&quot;]
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:engineering&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:catalog:engineering&quot;,
       &quot;displayName&quot;: &quot;Engineering Tools&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;url&quot;: &quot;https://acme-corp.com/catalogs/engineering.json&quot;,
       &quot;description&quot;: &quot;CI/CD agents, code review tools, and DevOps servers.&quot;,
       &quot;tags&quot;: [&quot;engineering&quot;, &quot;devops&quot;, &quot;ci-cd&quot;]
     },
     {
-      &quot;identifier&quot;: &quot;urn:acme:catalog:ml-models&quot;,
+      &quot;identifier&quot;: &quot;urn:air:acme.com:catalog:ml-models&quot;,
       &quot;displayName&quot;: &quot;ML Models&quot;,
-      &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+      &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
       &quot;url&quot;: &quot;https://acme-corp.com/catalogs/ml-models.json&quot;,
       &quot;description&quot;: &quot;Model cards and inference endpoints.&quot;,
       &quot;tags&quot;: [&quot;ml&quot;, &quot;models&quot;, &quot;inference&quot;]
@@ -1734,9 +1748,9 @@ catalogs.</p>
 represented as one catalog entry whose content is a nested catalog
 containing both protocol-specific entries:</p>
 <pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:acme:agent:finance&quot;,
+  &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
   &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
-  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+  &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
   &quot;description&quot;: &quot;Finance agent accessible via both MCP and A2A protocols.&quot;,
   &quot;tags&quot;: [&quot;finance&quot;, &quot;dual-protocol&quot;],
   &quot;publisher&quot;: {
@@ -1747,26 +1761,26 @@ containing both protocol-specific entries:</p>
     &quot;specVersion&quot;: &quot;1.0&quot;,
     &quot;entries&quot;: [
       {
-        &quot;identifier&quot;: &quot;urn:acme:agent:finance:mcp&quot;,
+        &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:mcp&quot;,
         &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-        &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
+        &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
         &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
       },
       {
-        &quot;identifier&quot;: &quot;urn:acme:agent:finance:a2a&quot;,
+        &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:a2a&quot;,
         &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
-        &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+        &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
         &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance&quot;
       }
     ]
   },
   &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:acme:agent:finance&quot;,
+    &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-agent-pod&quot;,
+    &quot;identityType&quot;: &quot;spiffe&quot;,
     &quot;attestations&quot;: [
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,
         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;mediaType&quot;: &quot;application/pdf&quot;,
         &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
       }
     ]
@@ -1781,7 +1795,7 @@ MCP or A2A based on their capabilities.</p>
 <section class="appendix" id="mapping-to-distribution-substrates">
 <h1>Mapping to Distribution Substrates</h1>
 <p>The AI Catalog specification defines a <strong>logical format</strong>: a JSON
-document with <code>entries</code>, <code>displayName</code>, <code>mediaType</code>, and <code>trustManifest</code>
+document with <code>entries</code>, <code>displayName</code>, <code>type</code>, and <code>trustManifest</code>
 fields that are immediately meaningful to anyone working with AI
 artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
 consume simple JSON.</p>
@@ -1945,10 +1959,10 @@ concepts to their OCI physical equivalents:</p>
 </tr>
 <tr>
 <td style="text-align: left;">Catalog Entry</td>
-<td style="text-align: left;">OCI Image Manifest with <code>artifactType</code> set to the entry's <code>mediaType</code></td>
+<td style="text-align: left;">OCI Image Manifest with <code>artifactType</code> set to the entry's <code>type</code></td>
 </tr>
 <tr>
-<td style="text-align: left;">Entry <code>mediaType</code></td>
+<td style="text-align: left;">Entry <code>type</code></td>
 <td style="text-align: left;">Manifest <code>artifactType</code> field</td>
 </tr>
 <tr>
@@ -2038,26 +2052,26 @@ containing two entries. Note that this is generated by tooling, not
 authored by hand:</p>
 <pre><code class="language-json">{
   &quot;schemaVersion&quot;: 2,
-  &quot;mediaType&quot;: &quot;application/vnd.oci.image.index.v1+json&quot;,
+  &quot;type&quot;: &quot;application/vnd.oci.image.index.v1+json&quot;,
   &quot;artifactType&quot;: &quot;application/ai-catalog+json&quot;,
   &quot;manifests&quot;: [
     {
-      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+      &quot;type&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
       &quot;digest&quot;: &quot;sha256:aaa111...&quot;,
       &quot;size&quot;: 1024,
       &quot;artifactType&quot;: &quot;application/a2a-agent-card+json&quot;,
       &quot;annotations&quot;: {
-        &quot;ai-catalog.identifier&quot;: &quot;urn:acme:agent:finance-a2a&quot;,
+        &quot;ai-catalog.identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
         &quot;ai-catalog.displayName&quot;: &quot;Acme Finance A2A Agent&quot;
       }
     },
     {
-      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+      &quot;type&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
       &quot;digest&quot;: &quot;sha256:bbb222...&quot;,
       &quot;size&quot;: 512,
       &quot;artifactType&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;annotations&quot;: {
-        &quot;ai-catalog.identifier&quot;: &quot;urn:acme:server:finance-mcp&quot;,
+        &quot;ai-catalog.identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
         &quot;ai-catalog.displayName&quot;: &quot;Acme Finance MCP Server&quot;
       }
     }
@@ -2112,7 +2126,7 @@ tradeoffs are:</p>
 </tr>
 <tr>
 <td style="text-align: left;">Vocabulary</td>
-<td style="text-align: left;"><code>entries</code>, <code>displayName</code>, <code>mediaType</code>, <code>trustManifest</code></td>
+<td style="text-align: left;"><code>entries</code>, <code>displayName</code>, <code>type</code>, <code>trustManifest</code></td>
 <td style="text-align: left;"><code>manifests</code>, <code>layers</code>, <code>config</code>, <code>annotations</code></td>
 </tr>
 <tr>
@@ -2440,13 +2454,13 @@ identity, trust verification, and cross-ecosystem discoverability.</p>
 <section id="mcp-server-as-catalog-entry">
 <h2>MCP Server as Catalog Entry</h2>
 <p>An MCP server listed in the Registry maps to a Catalog Entry whose
-<code>url</code> points to the <code>server.json</code> document and whose <code>mediaType</code>
+<code>url</code> points to the <code>server.json</code> document and whose <code>type</code>
 reflects the Registry format:</p>
 <pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
+  &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
   &quot;displayName&quot;: &quot;Brave Search&quot;,
   &quot;version&quot;: &quot;1.0.2&quot;,
-  &quot;mediaType&quot;: &quot;application/json&quot;,
+  &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
   &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
   &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;, &quot;web&quot;],
@@ -2455,12 +2469,11 @@ reflects the Registry format:</p>
     &quot;displayName&quot;: &quot;Model Context Protocol&quot;
   },
   &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
+    &quot;identity&quot;: &quot;did:web:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
     &quot;attestations&quot;: [
       {
         &quot;type&quot;: &quot;publisher-identity&quot;,
         &quot;uri&quot;: &quot;https://registry.modelcontextprotocol.io/certs/publisher.jwt&quot;,
-        &quot;mediaType&quot;: &quot;application/jwt&quot;,
         &quot;description&quot;: &quot;Verifies did:web:modelcontextprotocol.io as publisher&quot;
       }
     ],
@@ -2504,28 +2517,28 @@ agents, skills, and other artifacts:</p>
   },
   &quot;entries&quot;: [
     {
-      &quot;identifier&quot;: &quot;urn:mcp:io.modelcontextprotocol.anonymous/brave-search&quot;,
+      &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
       &quot;displayName&quot;: &quot;Brave Search&quot;,
       &quot;version&quot;: &quot;1.0.2&quot;,
-      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
       &quot;description&quot;: &quot;MCP server for Brave Search API integration&quot;,
       &quot;tags&quot;: [&quot;search&quot;, &quot;brave&quot;]
     },
     {
-      &quot;identifier&quot;: &quot;urn:mcp:io.github.modelcontextprotocol/filesystem&quot;,
+      &quot;identifier&quot;: &quot;urn:air:modelcontextprotocol.github.io:mcp:filesystem&quot;,
       &quot;displayName&quot;: &quot;Filesystem&quot;,
       &quot;version&quot;: &quot;1.0.2&quot;,
-      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
       &quot;description&quot;: &quot;MCP server for filesystem operations&quot;,
       &quot;tags&quot;: [&quot;filesystem&quot;, &quot;files&quot;]
     },
     {
-      &quot;identifier&quot;: &quot;urn:mcp:io.github.example/weather-mcp&quot;,
+      &quot;identifier&quot;: &quot;urn:air:example.github.io:mcp:weather-mcp&quot;,
       &quot;displayName&quot;: &quot;Weather&quot;,
       &quot;version&quot;: &quot;0.5.0&quot;,
-      &quot;mediaType&quot;: &quot;application/json&quot;,
+      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
       &quot;description&quot;: &quot;Python MCP server for weather data access&quot;,
       &quot;tags&quot;: [&quot;weather&quot;, &quot;python&quot;],
@@ -2548,7 +2561,7 @@ authority.</p>
 <pre><code>https://api.acme-corp.com/.well-known/ai-catalog.json
 </code></pre>
 <p>Clients and crawlers discover the catalog via the well-known URL,
-find entries by <code>mediaType</code>, and fetch the referenced artifacts for
+find entries by <code>type</code>, and fetch the referenced artifacts for
 operational details — whether those are MCP Server Cards, Registry
 <code>server.json</code> documents, or other AI artifact formats.</p>
 <p>The centralized MCP Registry and decentralized AI Catalogs are
@@ -2600,9 +2613,9 @@ prompts.</p>
 <p>The two mechanisms layer naturally. An AI Catalog entry for an MCP
 server can reference the Server Card as its artifact content:</p>
 <pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
+  &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
   &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-  &quot;mediaType&quot;: &quot;application/mcp-server+json&quot;,
+  &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
@@ -2611,17 +2624,15 @@ server can reference the Server Card as its artifact content:</p>
     &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
   },
   &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:mcp:example.com:finance-server&quot;,
+    &quot;identity&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
     &quot;attestations&quot;: [
       {
         &quot;type&quot;: &quot;publisher-identity&quot;,
-        &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;,
-        &quot;mediaType&quot;: &quot;application/jwt&quot;
+        &quot;uri&quot;: &quot;https://trust.acme-corp.com/certs/publisher.jwt&quot;
       },
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,
         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;mediaType&quot;: &quot;application/pdf&quot;,
         &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
       }
     ]
@@ -2632,7 +2643,7 @@ server can reference the Server Card as its artifact content:</p>
 <ol>
 <li>Fetch <code>/.well-known/ai-catalog.json</code> to discover all artifacts on
    a domain (MCP servers, A2A agents, plugins, etc.).</li>
-<li>Filter entries by <code>mediaType</code> to find MCP servers.</li>
+<li>Filter entries by <code>type</code> to find MCP servers.</li>
 <li>Evaluate the Trust Manifest for publisher identity and attestations.</li>
 <li>Fetch the Server Card at the entry's <code>url</code> for operational details
    (transport, capabilities, tools, authentication).</li>
@@ -2745,7 +2756,7 @@ plugins/
 </tr>
 <tr>
 <td style="text-align: left;"><em>(not in marketplace)</em></td>
-<td style="text-align: left;">Entry <code>mediaType</code></td>
+<td style="text-align: left;">Entry <code>type</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">Centralized marketplace repo</td>
@@ -2787,7 +2798,7 @@ maps to an AI Catalog where each plugin is an entry:</p>
     {
       &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
       &quot;displayName&quot;: &quot;agent-sdk-dev&quot;,
-      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+      &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
       &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
       &quot;tags&quot;: [&quot;development&quot;],
@@ -2802,7 +2813,7 @@ maps to an AI Catalog where each plugin is an entry:</p>
     {
       &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
       &quot;displayName&quot;: &quot;adspirer-ads-agent&quot;,
-      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+      &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
       &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
       &quot;tags&quot;: [&quot;productivity&quot;, &quot;ads&quot;],
@@ -2823,7 +2834,7 @@ maps to an AI Catalog where each plugin is an entry:</p>
     {
       &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
       &quot;displayName&quot;: &quot;aikido&quot;,
-      &quot;mediaType&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+      &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
       &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
       &quot;tags&quot;: [&quot;security&quot;],
@@ -2855,7 +2866,7 @@ contains multiple artifact types:</p>
 <pre><code class="language-json">{
   &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin&quot;,
   &quot;displayName&quot;: &quot;example-plugin&quot;,
-  &quot;mediaType&quot;: &quot;application/ai-catalog+json&quot;,
+  &quot;type&quot;: &quot;application/ai-catalog+json&quot;,
   &quot;description&quot;: &quot;Comprehensive plugin with commands, agents, skills, and MCP servers&quot;,
   &quot;tags&quot;: [&quot;development&quot;],
   &quot;publisher&quot;: {
@@ -2863,18 +2874,18 @@ contains multiple artifact types:</p>
     &quot;displayName&quot;: &quot;Anthropic&quot;
   },
   &quot;data&quot;: {
-      &quot;specVersion&quot;: &quot;1.0&quot;,
+    &quot;specVersion&quot;: &quot;1.0&quot;,
     &quot;entries&quot;: [
       {
         &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;,
         &quot;displayName&quot;: &quot;Example Plugin MCP Server&quot;,
-        &quot;mediaType&quot;: &quot;application/mcp-server-card+json&quot;,
+        &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
         &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json&quot;
       },
       {
         &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:skills&quot;,
         &quot;displayName&quot;: &quot;Example Plugin Skills&quot;,
-        &quot;mediaType&quot;: &quot;application/agentskill+zip&quot;,
+        &quot;type&quot;: &quot;application/agent-skills+zip&quot;,
         &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip&quot;
       }
     ]
