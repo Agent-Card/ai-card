@@ -255,7 +255,7 @@ The following members are OPTIONAL:
   SHOULD render it as given even when it differs from a name carried by
   the referenced artifact. Setting `displayName` is how a publisher
   deliberately overrides the artifact's own name. See
-  [Resolving an Artifact's Display Name](#resolving-an-artifacts-display-name)
+  [Resolving an Artifact's Display Name](#resolving-an-artifact-s-display-name)
   for the full consumer resolution order.
 
 `description`
@@ -381,7 +381,7 @@ The following members are OPTIONAL:
 : A string providing a type hint for the publisher identifier (e.g.,
   "did", "dns").
 
-# Trust Manifest {#trust-manifest}
+# Trust Manifest
 
 The Trust Manifest is an OPTIONAL companion to catalog entries and
 host objects. It is a JSON object that provides verifiable identity,
@@ -783,7 +783,7 @@ depth to prevent circular references. A depth limit of 4 is
 RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.
 
-# Metadata Extensibility {#metadata-extensibility}
+# Metadata Extensibility
 
 The `metadata` property appears on the AI Catalog top-level object,
 on Catalog Entry objects, and on Trust Manifest objects. It provides
@@ -818,7 +818,7 @@ Metadata values MAY be any valid JSON type (string, number, boolean,
 array, object, null). Consumers that do not recognize a metadata key
 SHOULD ignore it.
 
-# Version Handling {#version-handling}
+# Version Handling
 
 The `specVersion` field identifies which version of this specification
 a catalog conforms to. This section defines how producers and consumers
