@@ -368,7 +368,7 @@
 +
 +repository
 +
-+Entry metadata.repository
++Stays in the Server Card (which carries its own repository); omitted from the entry to avoid duplicating a value that can drift — catalog-level source/provenance links surface through the Trust Manifest when needed
 +
 +(not in the Server Card)
 +
