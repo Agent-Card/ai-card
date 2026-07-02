@@ -19,7 +19,7 @@
  
  Overview
  
-@@ -2141,6 +2144,204 @@
+@@ -2141,6 +2144,201 @@
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
  
@@ -94,7 +94,7 @@
 +
 +repository
 +
-+Entry metadata.repository
++Stays in the artifact (server.json carries its own repository); omitted from the entry to avoid duplicating a value that can drift — catalog-level source/provenance links surface through the Trust Manifest when needed
 +
 +packages[] (npm, pypi, nuget, oci)
 +
@@ -154,9 +154,6 @@
 +"registryUri": "https://registry.npmjs.org"
 +}
 +]
-+},
-+"metadata": {
-+"repository": "https://github.com/pulsemcp/mcp-servers"
 +},
 +"updatedAt": "2026-03-15T10:00:00Z"
 +}
