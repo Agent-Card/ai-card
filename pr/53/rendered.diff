@@ -9,6 +9,33 @@
  },
  {
  "identifier": "urn:air:example.com:a2a:research",
+@@ -428,7 +428,7 @@
+ A string providing a type hint for the publisher identifier (e.g.,
+ "did", "dns").
+ 
+-Trust Manifest
++Trust Manifest {#trust-manifest}
+ 
+ The Trust Manifest is an OPTIONAL companion to catalog entries and
+ host objects. It is a JSON object that provides verifiable identity,
+@@ -857,7 +857,7 @@
+ RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
+ document their limit.
+ 
+-Metadata Extensibility
++Metadata Extensibility {#metadata-extensibility}
+ 
+ The metadata property appears on the AI Catalog top-level object,
+ on Catalog Entry objects, and on Trust Manifest objects. It provides
+@@ -894,7 +894,7 @@
+ array, object, null). Consumers that do not recognize a metadata key
+ SHOULD ignore it.
+ 
+-Version Handling
++Version Handling {#version-handling}
+ 
+ The specVersion field identifies which version of this specification
+ a catalog conforms to. This section defines how producers and consumers
 @@ -1498,7 +1498,7 @@
  "identifier": "urn:air:acme.com:server:finance-mcp",
  "version": "1.4.0",
