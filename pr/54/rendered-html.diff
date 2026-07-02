@@ -20,7 +20,7 @@
  <section id="overview">
  <h2>Overview</h2>
  <p>An MCP Server Card is a static discovery document for an individual
-@@ -2016,6 +2022,203 @@
+@@ -2016,6 +2022,202 @@
  </ol>
  </section>
  </section>
@@ -113,7 +113,7 @@
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>_meta</code></td>
-+<td style="text-align: left;">Entry <code>metadata</code> for catalog-level hints; otherwise stays in the artifact</td>
++<td style="text-align: left;">Entry <code>metadata</code> for catalog-level hints; otherwise stays in the artifact — including the registry's own timestamps (<code>publishedAt</code>/<code>updatedAt</code> under <code>_meta</code>), so entry <code>updatedAt</code> is omitted to avoid duplicating a value the source already carries</td>
 +</tr>
 +<tr>
 +<td style="text-align: left;"><em>(not in server.json)</em></td>
@@ -159,8 +159,7 @@
 +        &quot;registryUri&quot;: &quot;https://registry.npmjs.org&quot;
 +      }
 +    ]
-+  },
-+  &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
++  }
 +}
 +</code></pre>
 +<p>The <code>url</code> resolves to the server's <code>server.json</code>. In the MCP Registry, a
@@ -224,7 +223,7 @@
  <section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
  <h1>Mapping to Claude Code Plugins Marketplace</h1>
  <p>This appendix describes how the Anthropic Claude Code Plugins
-@@ -2024,7 +2227,7 @@
+@@ -2024,7 +2226,7 @@
  maps to AI Catalog, enabling Claude Code plugins to be discovered,
  indexed, and distributed through a unified catalog alongside other AI
  artifacts.</p>
@@ -233,7 +232,7 @@
  <h2>Overview</h2>
  <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
  file that lists available plugins. Each plugin is a directory containing
-@@ -2043,7 +2246,7 @@
+@@ -2043,7 +2245,7 @@
      README.md
  </code></pre>
  </section>

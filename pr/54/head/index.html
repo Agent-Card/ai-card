@@ -2111,7 +2111,7 @@ trust layer that <code>server.json</code> does not address.</p>
 </tr>
 <tr>
 <td style="text-align: left;"><code>_meta</code></td>
-<td style="text-align: left;">Entry <code>metadata</code> for catalog-level hints; otherwise stays in the artifact</td>
+<td style="text-align: left;">Entry <code>metadata</code> for catalog-level hints; otherwise stays in the artifact — including the registry's own timestamps (<code>publishedAt</code>/<code>updatedAt</code> under <code>_meta</code>), so entry <code>updatedAt</code> is omitted to avoid duplicating a value the source already carries</td>
 </tr>
 <tr>
 <td style="text-align: left;"><em>(not in server.json)</em></td>
@@ -2157,8 +2157,7 @@ is the known type <code>application/mcp-server+json</code>:</p>
         &quot;registryUri&quot;: &quot;https://registry.npmjs.org&quot;
       }
     ]
-  },
-  &quot;updatedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;
+  }
 }
 </code></pre>
 <p>The <code>url</code> resolves to the server's <code>server.json</code>. In the MCP Registry, a

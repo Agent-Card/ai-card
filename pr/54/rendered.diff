@@ -22,7 +22,7 @@
  Overview
  
  An MCP Server Card is a static discovery document for an individual
-@@ -2132,6 +2140,201 @@
+@@ -2132,6 +2140,200 @@
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
  
@@ -113,7 +113,7 @@
 +
 +_meta
 +
-+Entry metadata for catalog-level hints; otherwise stays in the artifact
++Entry metadata for catalog-level hints; otherwise stays in the artifact — including the registry's own timestamps (publishedAt/updatedAt under _meta), so entry updatedAt is omitted to avoid duplicating a value the source already carries
 +
 +(not in server.json)
 +
@@ -157,8 +157,7 @@
 +"registryUri": "https://registry.npmjs.org"
 +}
 +]
-+},
-+"updatedAt": "2026-03-15T10:00:00Z"
++}
 +}
 +
 +The url resolves to the server's server.json. In the MCP Registry, a
