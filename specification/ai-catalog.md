@@ -1793,8 +1793,8 @@ AI Catalog (cross-artifact)
 | Server Card document (whole file) | Artifact content via entry `url` (type `application/mcp-server-card+json`) or `data` |
 | Server `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:example.com:mcp:finance-server`) |
 | `title` | Stays in the Server Card (which carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
-| `description` | Entry `description` |
-| `version` | Entry `version` |
+| `description` | Stays in the Server Card (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
+| `version` | Stays in the Server Card (which carries its own `version`); entry `version` is omitted unless the catalog lists multiple versions of one identifier (see [Multi-Version Entries](#multi-version-entries)) |
 | transport / capabilities / tools / resources / auth | Inside the Server Card — not surfaced in the catalog |
 | `repository` | Entry `metadata.repository` |
 | *(not in the Server Card)* | Entry `publisher` |
@@ -1810,10 +1810,8 @@ server's Server Card and whose `type` is the known type
 ```json
 {
   "identifier": "urn:air:example.com:mcp:finance-server",
-  "version": "1.0.2",
   "type": "application/mcp-server-card+json",
   "url": "https://api.acme-corp.com/mcp/server-card",
-  "description": "MCP server for financial data and trading tools",
   "tags": ["finance", "mcp"],
   "publisher": {
     "identifier": "did:web:acme-corp.com",
@@ -1864,26 +1862,20 @@ entry points to a server's Server Card:
   "entries": [
     {
       "identifier": "urn:air:acme-corp.com:mcp:finance-server",
-      "version": "1.0.2",
       "type": "application/mcp-server-card+json",
       "url": "https://api.acme-corp.com/finance/server-card",
-      "description": "MCP server for financial data and trading tools",
       "tags": ["finance", "mcp"]
     },
     {
       "identifier": "urn:air:acme-corp.com:mcp:docs-search",
-      "version": "1.0.2",
       "type": "application/mcp-server-card+json",
       "url": "https://api.acme-corp.com/docs-search/server-card",
-      "description": "MCP server for searching internal documentation",
       "tags": ["search", "docs"]
     },
     {
       "identifier": "urn:air:acme-corp.com:mcp:ci-cd",
-      "version": "0.5.0",
       "type": "application/mcp-server-card+json",
       "url": "https://api.acme-corp.com/ci-cd/server-card",
-      "description": "MCP server for CI/CD pipeline operations",
       "tags": ["ci", "cd", "devops"]
     }
   ]
