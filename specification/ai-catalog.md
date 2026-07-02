@@ -1754,11 +1754,6 @@ to reference each server's **MCP Server Card**
 ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
 as the artifact content of a Catalog Entry.
 
-A Server Card is a static discovery document for a single HTTP-based MCP
-server (its identity and connection details). It is distinct from the MCP
-Registry's `server.json`, an installable-package descriptor — a separate
-artifact type that this appendix does not address.
-
 ## Overview
 
 An MCP Server Card is a static discovery document for an individual
