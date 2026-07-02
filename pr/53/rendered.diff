@@ -9,6 +9,15 @@
  },
  {
  "identifier": "urn:air:example.com:a2a:research",
+@@ -1393,7 +1393,7 @@
+ 
+ CatalogEntry = {
+ identifier: text,
+-? displayName: text,
++displayName: text,
+ type: text,
+ (url: text // data: any),
+ ? version: text,
 @@ -1498,7 +1498,7 @@
  "identifier": "urn:air:acme.com:server:finance-mcp",
  "version": "1.4.0",
@@ -330,7 +339,7 @@
  
  AI Catalog and MCP Server Cards address different layers of discovery:
  
-@@ -2189,13 +1955,63 @@
+@@ -2189,14 +1955,62 @@
  trust them? What other artifact types are available alongside MCP
  servers?
  
@@ -356,11 +365,11 @@
 +
 +description
 +
-+Entry description
++Stays in the Server Card (which carries its own description); entry description is omitted to avoid duplicating a value that can drift
 +
 +version
 +
-+Entry version
++Stays in the Server Card (which carries its own version); entry version is omitted unless the catalog lists multiple versions of one identifier (see Multi-Version Entries)
 +
 +transport / capabilities / tools / resources / auth
 +
@@ -390,14 +399,14 @@
  
  {
  "identifier": "urn:air:example.com:mcp:finance-server",
-+"version": "1.0.2",
  "type": "application/mcp-server-card+json",
 -"url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+-"description": "MCP server for financial data and trading tools",
 +"url": "https://api.acme-corp.com/mcp/server-card",
- "description": "MCP server for financial data and trading tools",
  "tags": ["finance", "mcp"],
  "publisher": {
-@@ -2218,12 +2034,75 @@
+ "identifier": "did:web:acme-corp.com",
+@@ -2218,12 +2032,69 @@
  }
  }
  
@@ -428,26 +437,20 @@
 +"entries": [
 +{
 +"identifier": "urn:air:acme-corp.com:mcp:finance-server",
-+"version": "1.0.2",
 +"type": "application/mcp-server-card+json",
 +"url": "https://api.acme-corp.com/finance/server-card",
-+"description": "MCP server for financial data and trading tools",
 +"tags": ["finance", "mcp"]
 +},
 +{
 +"identifier": "urn:air:acme-corp.com:mcp:docs-search",
-+"version": "1.0.2",
 +"type": "application/mcp-server-card+json",
 +"url": "https://api.acme-corp.com/docs-search/server-card",
-+"description": "MCP server for searching internal documentation",
 +"tags": ["search", "docs"]
 +},
 +{
 +"identifier": "urn:air:acme-corp.com:mcp:ci-cd",
-+"version": "0.5.0",
 +"type": "application/mcp-server-card+json",
 +"url": "https://api.acme-corp.com/ci-cd/server-card",
-+"description": "MCP server for CI/CD pipeline operations",
 +"tags": ["ci", "cd", "devops"]
 +}
 +]
@@ -474,7 +477,7 @@
  
  Evaluate the Trust Manifest for publisher identity and attestations.
  
-@@ -2238,6 +2117,30 @@
+@@ -2238,6 +2109,30 @@
  protocol-specific operational details. A domain with multiple MCP
  servers publishes one AI Catalog listing all of them, with each entry
  pointing to its respective Server Card.

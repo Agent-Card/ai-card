@@ -9,6 +9,15 @@
      },
      {
        &quot;identifier&quot;: &quot;urn:air:example.com:a2a:research&quot;,
+@@ -1280,7 +1280,7 @@
+ 
+ CatalogEntry = {
+   identifier: text,
+-  ? displayName: text,
++  displayName: text,
+   type: text,
+   (url: text // data: any),
+   ? version: text,
 @@ -1387,7 +1387,7 @@
        &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
        &quot;version&quot;: &quot;1.4.0&quot;,
@@ -324,7 +333,7 @@
  <p>AI Catalog and MCP Server Cards address different layers of discovery:</p>
  <dl>
  <dt>MCP Server Card (per-server)</dt>
-@@ -2069,12 +1836,70 @@
+@@ -2069,13 +1836,69 @@
    trust them? What other artifact types are available alongside MCP
    servers?</dd>
  </dl>
@@ -355,11 +364,11 @@
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>description</code></td>
-+<td style="text-align: left;">Entry <code>description</code></td>
++<td style="text-align: left;">Stays in the Server Card (which carries its own <code>description</code>); entry <code>description</code> is omitted to avoid duplicating a value that can drift</td>
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>version</code></td>
-+<td style="text-align: left;">Entry <code>version</code></td>
++<td style="text-align: left;">Stays in the Server Card (which carries its own <code>version</code>); entry <code>version</code> is omitted unless the catalog lists multiple versions of one identifier (see <a href="#multi-version-entries">Multi-Version Entries</a>)</td>
 +</tr>
 +<tr>
 +<td style="text-align: left;">transport / capabilities / tools / resources / auth</td>
@@ -391,14 +400,14 @@
 +<code>application/mcp-server-card+json</code>:</p>
  <pre><code class="language-json">{
    &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
-+  &quot;version&quot;: &quot;1.0.2&quot;,
    &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
 -  &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
+-  &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
 +  &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/server-card&quot;,
-   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
    &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
    &quot;publisher&quot;: {
-@@ -2097,11 +1922,74 @@
+     &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
+@@ -2097,11 +1920,68 @@
    }
  }
  </code></pre>
@@ -430,26 +439,20 @@
 +  &quot;entries&quot;: [
 +    {
 +      &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:finance-server&quot;,
-+      &quot;version&quot;: &quot;1.0.2&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
 +      &quot;url&quot;: &quot;https://api.acme-corp.com/finance/server-card&quot;,
-+      &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
 +      &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;]
 +    },
 +    {
 +      &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:docs-search&quot;,
-+      &quot;version&quot;: &quot;1.0.2&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
 +      &quot;url&quot;: &quot;https://api.acme-corp.com/docs-search/server-card&quot;,
-+      &quot;description&quot;: &quot;MCP server for searching internal documentation&quot;,
 +      &quot;tags&quot;: [&quot;search&quot;, &quot;docs&quot;]
 +    },
 +    {
 +      &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:ci-cd&quot;,
-+      &quot;version&quot;: &quot;0.5.0&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
 +      &quot;url&quot;: &quot;https://api.acme-corp.com/ci-cd/server-card&quot;,
-+      &quot;description&quot;: &quot;MCP server for CI/CD pipeline operations&quot;,
 +      &quot;tags&quot;: [&quot;ci&quot;, &quot;cd&quot;, &quot;devops&quot;]
 +    }
 +  ]
@@ -474,7 +477,7 @@
  <li>Evaluate the Trust Manifest for publisher identity and attestations.</li>
  <li>Fetch the Server Card at the entry's <code>url</code> for operational details
     (transport, capabilities, tools, authentication).</li>
-@@ -2113,6 +2001,26 @@
+@@ -2113,6 +1993,26 @@
  protocol-specific operational details. A domain with multiple MCP
  servers publishes one AI Catalog listing all of them, with each entry
  pointing to its respective Server Card.</p>
