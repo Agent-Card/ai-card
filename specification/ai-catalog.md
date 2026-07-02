@@ -1894,23 +1894,34 @@ A vendor hosting its own MCP servers can publish:
 https://api.acme-corp.com/.well-known/ai-catalog.json
 ```
 
-A client discovering MCP servers follows this flow:
+The catalog and the Server Card play two complementary roles: the
+catalog is how a client *finds* a server's URL in the first place, and
+the Server Card is the connection entry point it points at. They are
+useful independently — a client that already knows a server's URL can
+point at its Server Card directly, with no catalog traversal, while a
+client starting from just a domain uses the catalog to enumerate what
+that domain offers.
 
-1. Fetch `/.well-known/ai-catalog.json` to discover all artifacts on
-   a domain (MCP servers, A2A agents, plugins, etc.).
-2. Filter entries by `type` (`application/mcp-server-card+json`) to find
-   MCP servers.
-3. Evaluate the Trust Manifest for publisher identity and attestations.
-4. Fetch the Server Card at the entry's `url` for operational details
-   (transport, capabilities, tools, authentication).
-5. Connect to the MCP server using the transport configuration from
-   the Server Card.
+Because of this, there is no single prescribed discovery ordering.
+Clients wire discovery in wherever it fits their architecture — probing
+a domain's catalog when it enters a session, watching outbound traffic
+at an egress boundary, or connecting to a known Server Card directly. A
+typical catalog-first path is: fetch `/.well-known/ai-catalog.json`,
+filter entries by `type` (`application/mcp-server-card+json`) to find
+MCP servers, follow an entry's `url` to its Server Card for connection
+details, and connect — evaluating the Trust Manifest (when present) for
+publisher identity and attestations along the way. Whatever the path,
+the Server Card is advisory: a client reconciles it against the live
+connection and MUST NOT treat it as authoritative for access control —
+the connection itself remains the source of truth. See the Server Card
+[best-practices guidance](https://github.com/modelcontextprotocol/experimental-ext-server-card)
+for the range of client integration strategies.
 
-This separation ensures that AI Catalog provides the trust and
-cross-ecosystem indexing layer, while the MCP Server Card provides the
-protocol-specific operational details. A domain with multiple MCP
-servers publishes one AI Catalog listing all of them, with each entry
-pointing to its respective Server Card.
+This separation lets AI Catalog provide the trust and cross-ecosystem
+indexing layer while the MCP Server Card provides the protocol-specific
+operational details. A domain with multiple MCP servers publishes one AI
+Catalog listing all of them, with each entry pointing to its respective
+Server Card.
 
 ## What AI Catalog Adds
 
