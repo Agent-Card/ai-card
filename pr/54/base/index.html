@@ -1280,7 +1280,7 @@ HostInfo = {
 
 CatalogEntry = {
   identifier: text,
-  displayName: text,
+  ? displayName: text,
   type: text,
   (url: text // data: any),
   ? version: text,
