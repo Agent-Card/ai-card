@@ -360,7 +360,7 @@
 +
 +version
 +
-+Stays in the Server Card (which carries its own version); entry version is omitted unless the catalog lists multiple versions of one identifier (see Multi-Version Entries)
++Stays in the Server Card (which carries its own version); entry version is omitted to avoid duplicating a value that can drift (a remote MCP server serves one Server Card, so a catalog never lists multiple versions of it)
 +
 +transport / capabilities / tools / resources / auth
 +
