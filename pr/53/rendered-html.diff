@@ -9,15 +9,6 @@
      },
      {
        &quot;identifier&quot;: &quot;urn:air:example.com:a2a:research&quot;,
-@@ -1280,7 +1280,7 @@
- 
- CatalogEntry = {
-   identifier: text,
--  ? displayName: text,
-+  displayName: text,
-   type: text,
-   (url: text // data: any),
-   ? version: text,
 @@ -1387,7 +1387,7 @@
        &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
        &quot;version&quot;: &quot;1.4.0&quot;,
