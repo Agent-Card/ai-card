@@ -1794,7 +1794,7 @@ AI Catalog (cross-artifact)
 | Server `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:example.com:mcp:finance-server`) |
 | `title` | Stays in the Server Card (which carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
 | `description` | Stays in the Server Card (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
-| `version` | Stays in the Server Card (which carries its own `version`); entry `version` is omitted unless the catalog lists multiple versions of one identifier (see [Multi-Version Entries](#multi-version-entries)) |
+| `version` | Stays in the Server Card (which carries its own `version`); entry `version` is omitted to avoid duplicating a value that can drift (a remote MCP server serves one Server Card, so a catalog never lists multiple versions of it) |
 | transport / capabilities / tools / resources / auth | Inside the Server Card — not surfaced in the catalog |
 | `repository` | Stays in the Server Card (which carries its own `repository`); omitted from the entry to avoid duplicating a value that can drift — catalog-level source/provenance links surface through the Trust Manifest when needed |
 | *(not in the Server Card)* | Entry `publisher` |
