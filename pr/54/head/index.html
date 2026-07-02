@@ -1863,11 +1863,11 @@ discovery and trust layer that the Server Card does not address.</p>
 </tr>
 <tr>
 <td style="text-align: left;"><code>description</code></td>
-<td style="text-align: left;">Entry <code>description</code></td>
+<td style="text-align: left;">Stays in the Server Card (which carries its own <code>description</code>); entry <code>description</code> is omitted to avoid duplicating a value that can drift</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>version</code></td>
-<td style="text-align: left;">Entry <code>version</code></td>
+<td style="text-align: left;">Stays in the Server Card (which carries its own <code>version</code>); entry <code>version</code> is omitted unless the catalog lists multiple versions of one identifier (see <a href="#multi-version-entries">Multi-Version Entries</a>)</td>
 </tr>
 <tr>
 <td style="text-align: left;">transport / capabilities / tools / resources / auth</td>
@@ -1899,10 +1899,8 @@ server's Server Card and whose <code>type</code> is the known type
 <code>application/mcp-server-card+json</code>:</p>
 <pre><code class="language-json">{
   &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
-  &quot;version&quot;: &quot;1.0.2&quot;,
   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/server-card&quot;,
-  &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
   &quot;publisher&quot;: {
     &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
@@ -1952,26 +1950,20 @@ entry points to a server's Server Card:</p>
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:finance-server&quot;,
-      &quot;version&quot;: &quot;1.0.2&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/finance/server-card&quot;,
-      &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;]
     },
     {
       &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:docs-search&quot;,
-      &quot;version&quot;: &quot;1.0.2&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/docs-search/server-card&quot;,
-      &quot;description&quot;: &quot;MCP server for searching internal documentation&quot;,
       &quot;tags&quot;: [&quot;search&quot;, &quot;docs&quot;]
     },
     {
       &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:ci-cd&quot;,
-      &quot;version&quot;: &quot;0.5.0&quot;,
       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
       &quot;url&quot;: &quot;https://api.acme-corp.com/ci-cd/server-card&quot;,
-      &quot;description&quot;: &quot;MCP server for CI/CD pipeline operations&quot;,
       &quot;tags&quot;: [&quot;ci&quot;, &quot;cd&quot;, &quot;devops&quot;]
     }
   ]
@@ -2090,11 +2082,11 @@ trust layer that <code>server.json</code> does not address.</p>
 </tr>
 <tr>
 <td style="text-align: left;"><code>description</code></td>
-<td style="text-align: left;">Entry <code>description</code></td>
+<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>description</code>); entry <code>description</code> is omitted to avoid duplicating a value that can drift</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>version</code></td>
-<td style="text-align: left;">Entry <code>version</code></td>
+<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>version</code>); entry <code>version</code> is omitted unless the catalog lists multiple versions of one identifier (see <a href="#multi-version-entries">Multi-Version Entries</a>) — the version-pinned <code>url</code> already identifies which version an entry points at</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>repository</code></td>
@@ -2138,10 +2130,8 @@ Entry whose <code>url</code> points to the <code>server.json</code> document and
 is the known type <code>application/mcp-server+json</code>:</p>
 <pre><code class="language-json">{
   &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
-  &quot;version&quot;: &quot;0.1.5&quot;,
   &quot;type&quot;: &quot;application/mcp-server+json&quot;,
   &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5&quot;,
-  &quot;description&quot;: &quot;MCP server for remote filesystem operations on cloud storage&quot;,
   &quot;tags&quot;: [&quot;filesystem&quot;, &quot;storage&quot;],
   &quot;publisher&quot;: {
     &quot;identifier&quot;: &quot;did:web:pulsemcp.com&quot;,
@@ -2194,18 +2184,14 @@ A2A agents, skills, and other artifacts:</p>
   &quot;entries&quot;: [
     {
       &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
-      &quot;version&quot;: &quot;0.1.5&quot;,
       &quot;type&quot;: &quot;application/mcp-server+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5&quot;,
-      &quot;description&quot;: &quot;MCP server for remote filesystem operations on cloud storage&quot;,
       &quot;tags&quot;: [&quot;filesystem&quot;, &quot;storage&quot;]
     },
     {
       &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:pulse-fetch&quot;,
-      &quot;version&quot;: &quot;0.2.14&quot;,
       &quot;type&quot;: &quot;application/mcp-server+json&quot;,
       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp.servers%2Fpulse-fetch/versions/0.2.14&quot;,
-      &quot;description&quot;: &quot;MCP server that extracts clean, structured content from web pages&quot;,
       &quot;tags&quot;: [&quot;fetch&quot;, &quot;web&quot;]
     }
   ]

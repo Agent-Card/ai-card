@@ -19,7 +19,7 @@
  
  Overview
  
-@@ -2141,6 +2144,210 @@
+@@ -2133,6 +2136,204 @@
  
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
@@ -87,11 +87,11 @@
 +
 +description
 +
-+Entry description
++Stays in the artifact (server.json carries its own description); entry description is omitted to avoid duplicating a value that can drift
 +
 +version
 +
-+Entry version
++Stays in the artifact (server.json carries its own version); entry version is omitted unless the catalog lists multiple versions of one identifier (see Multi-Version Entries) — the version-pinned url already identifies which version an entry points at
 +
 +repository
 +
@@ -133,10 +133,8 @@
 +
 +{
 +"identifier": "urn:air:pulsemcp.com:mcp:remote-filesystem",
-+"version": "0.1.5",
 +"type": "application/mcp-server+json",
 +"url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5",
-+"description": "MCP server for remote filesystem operations on cloud storage",
 +"tags": ["filesystem", "storage"],
 +"publisher": {
 +"identifier": "did:web:pulsemcp.com",
@@ -190,18 +188,14 @@
 +"entries": [
 +{
 +"identifier": "urn:air:pulsemcp.com:mcp:remote-filesystem",
-+"version": "0.1.5",
 +"type": "application/mcp-server+json",
 +"url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5",
-+"description": "MCP server for remote filesystem operations on cloud storage",
 +"tags": ["filesystem", "storage"]
 +},
 +{
 +"identifier": "urn:air:pulsemcp.com:mcp:pulse-fetch",
-+"version": "0.2.14",
 +"type": "application/mcp-server+json",
 +"url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp.servers%2Fpulse-fetch/versions/0.2.14",
-+"description": "MCP server that extracts clean, structured content from web pages",
 +"tags": ["fetch", "web"]
 +}
 +]

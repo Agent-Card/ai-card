@@ -18,7 +18,7 @@
  <section id="overview">
  <h2>Overview</h2>
  <p>An MCP Server Card is a static discovery document for an individual
-@@ -2023,6 +2025,212 @@
+@@ -2015,6 +2017,206 @@
  </ol>
  </section>
  </section>
@@ -87,11 +87,11 @@
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>description</code></td>
-+<td style="text-align: left;">Entry <code>description</code></td>
++<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>description</code>); entry <code>description</code> is omitted to avoid duplicating a value that can drift</td>
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>version</code></td>
-+<td style="text-align: left;">Entry <code>version</code></td>
++<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>version</code>); entry <code>version</code> is omitted unless the catalog lists multiple versions of one identifier (see <a href="#multi-version-entries">Multi-Version Entries</a>) — the version-pinned <code>url</code> already identifies which version an entry points at</td>
 +</tr>
 +<tr>
 +<td style="text-align: left;"><code>repository</code></td>
@@ -135,10 +135,8 @@
 +is the known type <code>application/mcp-server+json</code>:</p>
 +<pre><code class="language-json">{
 +  &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
-+  &quot;version&quot;: &quot;0.1.5&quot;,
 +  &quot;type&quot;: &quot;application/mcp-server+json&quot;,
 +  &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5&quot;,
-+  &quot;description&quot;: &quot;MCP server for remote filesystem operations on cloud storage&quot;,
 +  &quot;tags&quot;: [&quot;filesystem&quot;, &quot;storage&quot;],
 +  &quot;publisher&quot;: {
 +    &quot;identifier&quot;: &quot;did:web:pulsemcp.com&quot;,
@@ -191,18 +189,14 @@
 +  &quot;entries&quot;: [
 +    {
 +      &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:remote-filesystem&quot;,
-+      &quot;version&quot;: &quot;0.1.5&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
 +      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5&quot;,
-+      &quot;description&quot;: &quot;MCP server for remote filesystem operations on cloud storage&quot;,
 +      &quot;tags&quot;: [&quot;filesystem&quot;, &quot;storage&quot;]
 +    },
 +    {
 +      &quot;identifier&quot;: &quot;urn:air:pulsemcp.com:mcp:pulse-fetch&quot;,
-+      &quot;version&quot;: &quot;0.2.14&quot;,
 +      &quot;type&quot;: &quot;application/mcp-server+json&quot;,
 +      &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp.servers%2Fpulse-fetch/versions/0.2.14&quot;,
-+      &quot;description&quot;: &quot;MCP server that extracts clean, structured content from web pages&quot;,
 +      &quot;tags&quot;: [&quot;fetch&quot;, &quot;web&quot;]
 +    }
 +  ]
@@ -231,7 +225,7 @@
  <section class="appendix" id="mapping-to-claude-code-plugins-marketplace">
  <h1>Mapping to Claude Code Plugins Marketplace</h1>
  <p>This appendix describes how the Anthropic Claude Code Plugins
-@@ -2031,7 +2239,7 @@
+@@ -2023,7 +2225,7 @@
  maps to AI Catalog, enabling Claude Code plugins to be discovered,
  indexed, and distributed through a unified catalog alongside other AI
  artifacts.</p>
@@ -240,7 +234,7 @@
  <h2>Overview</h2>
  <p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
  file that lists available plugins. Each plugin is a directory containing
-@@ -2050,7 +2258,7 @@
+@@ -2042,7 +2244,7 @@
      README.md
  </code></pre>
  </section>
