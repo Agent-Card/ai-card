@@ -218,6 +218,7 @@ It MUST contain the following members:
 
     - `application/a2a-agent-card+json` — an A2A Agent Card
     - `application/mcp-server-card+json` — an MCP Server Card
+    - `application/mcp-server+json` — an MCP Registry `server.json` document
     - `application/agent-skills+json` — Agent Skill Metadata json file
     - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file (the suffix `+md` is to be registered)
     - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
@@ -1754,6 +1755,12 @@ to reference each server's **MCP Server Card**
 ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
 as the artifact content of a Catalog Entry.
 
+A Server Card is a static discovery document for a single HTTP-based MCP
+server (its identity and connection details). It is distinct from the MCP
+Registry's `server.json`, an installable-package descriptor — a separate
+artifact type mapped in
+[Mapping to MCP Registry server.json](#mapping-to-mcp-registry-server-json).
+
 ## Overview
 
 An MCP Server Card is a static discovery document for an individual
@@ -1932,6 +1939,161 @@ or trust layer. AI Catalog fills this gap:
    catalog format.
 6. **Composability**: MCP servers can be packaged with related
    artifacts (A2A agents, datasets) in nested catalogs.
+
+# Mapping to MCP Registry server.json
+
+This appendix describes how the MCP Registry `server.json` format
+(see [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry))
+maps to AI Catalog as a **first-class cataloged artifact type**, enabling
+installable MCP servers to be discovered alongside other AI artifacts
+through a unified catalog.
+
+> **Two MCP server artifacts, two types.** The MCP ecosystem defines two
+> distinct documents for a server, and AI Catalog gives each its own known
+> `type`:
+>
+> - **MCP Server Card** (`application/mcp-server-card+json`) — a static
+>   discovery document for a connectable HTTP server (identity, transport,
+>   capabilities, auth). See [Mapping to MCP Servers](#mapping-to-mcp-servers).
+> - **MCP Registry `server.json`** (`application/mcp-server+json`) — an
+>   installable **package descriptor** (package coordinates, transports,
+>   environment variables, CLI arguments).
+>
+> These are different artifacts, so they use different media types. The
+> Server Card deliberately uses `application/mcp-server-card+json` (not
+> `application/mcp-server+json`) to leave the unqualified `mcp-server`
+> name for the Registry `server.json` document
+> (modelcontextprotocol/experimental-ext-server-card issue #9 / PR #18).
+> A catalog entry references whichever artifact fits the use case — a
+> `server.json` for installable packages, a Server Card for connectable
+> endpoints — and a domain MAY list both.
+
+## Overview
+
+The MCP Registry defines a `server.json` format for describing MCP
+servers. Each `server.json` document captures everything needed to
+install, configure, and connect to a single MCP server: package
+coordinates (npm, PyPI, NuGet, OCI), remote endpoints (streamable-http,
+SSE), transport configuration, environment variables, and CLI arguments.
+
+In AI Catalog terms, a `server.json` document is the **artifact
+content** — the native metadata that a Catalog Entry references, declared
+with the known type `application/mcp-server+json`. AI Catalog does not
+duplicate or redefine `server.json` fields; it provides the discovery and
+trust layer that `server.json` does not address.
+
+## Conceptual Mapping
+
+| MCP `server.json` | AI Catalog Equivalent |
+|:---|:---|
+| `server.json` document (whole file) | Artifact content via entry `url` (type `application/mcp-server+json`) or `data` |
+| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the [`urn:air:{publisher}:{namespace}:{name}`](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0015-agent-identifier-naming.md) URN form — e.g. registry name `com.pulsemcp/remote-filesystem` → `urn:air:pulsemcp.com:mcp:remote-filesystem`). The mapping is not a mechanical transliteration: `publisher` is the publisher's actual domain (e.g. `pulsemcp.com`) and `namespace` is a chosen category (e.g. `mcp`), independent of the registry name's reverse-DNS segments. |
+| `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
+| `description` | Stays in the artifact (`server.json` carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
+| `version` | Stays in the artifact (`server.json` carries its own `version`); entry `version` is omitted unless the catalog lists multiple versions of one identifier (see [Multi-Version Entries](#multi-version-entries)) — the version-pinned `url` already identifies which version an entry points at |
+| `repository` | Stays in the artifact (`server.json` carries its own `repository`); omitted from the entry to avoid duplicating a value that can drift — catalog-level source/provenance links surface through the Trust Manifest when needed |
+| `packages[]` (npm, pypi, nuget, oci) | Inside the artifact — not surfaced in the catalog |
+| `remotes[]` (streamable-http, sse) | Inside the artifact — not surfaced in the catalog |
+| `environmentVariables[]` | Inside the artifact — not surfaced in the catalog |
+| `_meta` | Entry `metadata` for catalog-level hints; otherwise stays in the artifact — including the registry's own timestamps (`publishedAt`/`updatedAt` under `_meta`), so entry `updatedAt` is omitted to avoid duplicating a value the source already carries |
+| *(not in server.json)* | Entry `publisher` |
+| *(not in server.json)* | Entry `trustManifest` (identity, attestations, provenance) |
+| *(not in server.json)* | Entry `tags` for cross-artifact discovery |
+
+## MCP Server as Catalog Entry
+
+An MCP server published as a Registry `server.json` maps to a Catalog
+Entry whose `url` points to the `server.json` document and whose `type`
+is the known type `application/mcp-server+json`:
+
+```json
+{
+  "identifier": "urn:air:pulsemcp.com:mcp:remote-filesystem",
+  "type": "application/mcp-server+json",
+  "url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5",
+  "tags": ["filesystem", "storage"],
+  "publisher": {
+    "identifier": "did:web:pulsemcp.com",
+    "displayName": "PulseMCP"
+  },
+  "trustManifest": {
+    "identity": "urn:air:pulsemcp.com:mcp:remote-filesystem",
+    "attestations": [
+      {
+        "type": "publisher-identity",
+        "uri": "https://trust.pulsemcp.com/certs/publisher.jwt"
+      }
+    ],
+    "provenance": [
+      {
+        "relation": "publishedFrom",
+        "sourceId": "https://github.com/pulsemcp/mcp-servers",
+        "registryUri": "https://registry.npmjs.org"
+      }
+    ]
+  }
+}
+```
+
+The `url` resolves to the server's `server.json`. In the MCP Registry, a
+specific version is addressed as
+`/v0/servers/{name}/versions/{version}` — where `{name}` is the server's
+reverse-DNS registry name, URL-encoded (the `/` between namespace and
+name becomes `%2F`) — and the response carries the `server.json` document
+in its `server` field alongside registry `_meta`. A client fetches the
+catalog entry for discovery and trust evaluation, then retrieves the
+`server.json` for operational details (packages, transports, env vars).
+
+## MCP Registry as AI Catalog
+
+The MCP Registry — a centralized index of MCP servers — can be
+represented as an AI Catalog. This lets clients that understand
+`application/ai-catalog+json` discover installable MCP servers alongside
+A2A agents, skills, and other artifacts:
+
+```json
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "MCP Server Registry",
+    "identifier": "did:web:modelcontextprotocol.io",
+    "documentationUrl": "https://modelcontextprotocol.io/docs"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:pulsemcp.com:mcp:remote-filesystem",
+      "type": "application/mcp-server+json",
+      "url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp%2Fremote-filesystem/versions/0.1.5",
+      "tags": ["filesystem", "storage"]
+    },
+    {
+      "identifier": "urn:air:pulsemcp.com:mcp:pulse-fetch",
+      "type": "application/mcp-server+json",
+      "url": "https://registry.modelcontextprotocol.io/v0/servers/com.pulsemcp.servers%2Fpulse-fetch/versions/0.2.14",
+      "tags": ["fetch", "web"]
+    }
+  ]
+}
+```
+
+## Relationship to MCP Server Cards
+
+A Registry `server.json` and an MCP Server Card describe the same kind of
+thing at different lifecycle stages, and they layer naturally:
+
+`server.json` (`application/mcp-server+json`)
+: How do I **install and configure** this server? What packages,
+  transports, arguments, and environment variables does it need?
+
+Server Card (`application/mcp-server-card+json`)
+: How do I **connect to and use** this running server? What transport
+  endpoint, capabilities, tools, and authentication does it expose?
+
+A domain MAY publish both as separate catalog entries — one entry of each
+`type` pointing at the respective artifact — so clients can pick the
+representation that matches what they are doing (provisioning vs.
+connecting). AI Catalog provides the trust and cross-ecosystem indexing
+layer over both; each artifact carries its own protocol-specific detail.
 
 # Mapping to Claude Code Plugins Marketplace
 
