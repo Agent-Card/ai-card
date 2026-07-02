@@ -1796,7 +1796,7 @@ AI Catalog (cross-artifact)
 | `description` | Stays in the Server Card (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
 | `version` | Stays in the Server Card (which carries its own `version`); entry `version` is omitted unless the catalog lists multiple versions of one identifier (see [Multi-Version Entries](#multi-version-entries)) |
 | transport / capabilities / tools / resources / auth | Inside the Server Card — not surfaced in the catalog |
-| `repository` | Entry `metadata.repository` |
+| `repository` | Stays in the Server Card (which carries its own `repository`); omitted from the entry to avoid duplicating a value that can drift — catalog-level source/provenance links surface through the Trust Manifest when needed |
 | *(not in the Server Card)* | Entry `publisher` |
 | *(not in the Server Card)* | Entry `trustManifest` (identity, attestations, provenance) |
 | *(not in the Server Card)* | Entry `tags` for cross-artifact discovery |
