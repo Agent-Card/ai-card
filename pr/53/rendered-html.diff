@@ -36,7 +36,7 @@
        },
        {
          &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:a2a&quot;,
-@@ -1800,264 +1800,31 @@
+@@ -1800,264 +1800,27 @@
  while infrastructure-oriented deployments leverage OCI distribution.</p>
  </section>
  </section>
@@ -65,10 +65,6 @@
 +to reference each server's <strong>MCP Server Card</strong>
 +(<a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">SEP-2127</a>)
 +as the artifact content of a Catalog Entry.</p>
-+<p>A Server Card is a static discovery document for a single HTTP-based MCP
-+server (its identity and connection details). It is distinct from the MCP
-+Registry's <code>server.json</code>, an installable-package descriptor — a separate
-+artifact type that this appendix does not address.</p>
  <section id="overview">
  <h2>Overview</h2>
 -<p>The MCP Registry defines a <code>server.json</code> format for describing MCP
@@ -324,7 +320,7 @@
  <p>AI Catalog and MCP Server Cards address different layers of discovery:</p>
  <dl>
  <dt>MCP Server Card (per-server)</dt>
-@@ -2069,13 +1836,69 @@
+@@ -2069,13 +1832,69 @@
    trust them? What other artifact types are available alongside MCP
    servers?</dd>
  </dl>
@@ -398,7 +394,7 @@
    &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
    &quot;publisher&quot;: {
      &quot;identifier&quot;: &quot;did:web:acme-corp.com&quot;,
-@@ -2097,22 +1920,104 @@
+@@ -2097,22 +1916,104 @@
    }
  }
  </code></pre>

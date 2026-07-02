@@ -36,7 +36,7 @@
  },
  {
  "identifier": "urn:air:acme.com:agent:finance:a2a",
-@@ -1912,268 +1912,34 @@
+@@ -1912,268 +1912,29 @@
  losslessly, allowing simple consumers to work with the logical format
  while infrastructure-oriented deployments leverage OCI distribution.
  
@@ -64,11 +64,6 @@
 +to reference each server's MCP Server Card
 +(SEP-2127)
 +as the artifact content of a Catalog Entry.
-+
-+A Server Card is a static discovery document for a single HTTP-based MCP
-+server (its identity and connection details). It is distinct from the MCP
-+Registry's server.json, an installable-package descriptor — a separate
-+artifact type that this appendix does not address.
  
  Overview
  
@@ -330,7 +325,7 @@
  
  AI Catalog and MCP Server Cards address different layers of discovery:
  
-@@ -2189,14 +1955,62 @@
+@@ -2189,14 +1950,62 @@
  trust them? What other artifact types are available alongside MCP
  servers?
  
@@ -397,7 +392,7 @@
  "tags": ["finance", "mcp"],
  "publisher": {
  "identifier": "did:web:acme-corp.com",
-@@ -2218,26 +2032,110 @@
+@@ -2218,26 +2027,110 @@
  }
  }
  
