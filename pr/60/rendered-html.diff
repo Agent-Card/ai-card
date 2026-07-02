@@ -1,0 +1,102 @@
+--- a/base/index.html
++++ b/head/index.html
+@@ -328,14 +328,45 @@
+   <a href="#resolving-an-artifacts-display-name">Resolving an Artifact's Display Name</a>
+   for the full consumer resolution order.</dd>
+ <dt><code>description</code></dt>
+-<dd>A string containing a short description of the artifact.</dd>
++<dd>A string containing a short description of the artifact.
++  This field SHOULD be set only when the referenced artifact does not
++  already carry its own canonical description — for example a raw
++  dataset (<code>application/parquet</code>), a model blob, or a skill bundle
++  (<code>application/agent-skills+zip</code>), none of which embed a self-describing
++  description. When the referenced artifact does carry one — for example
++  the <code>description</code> field of an A2A Agent Card or of an MCP Server Card —
++  that artifact is the authoritative source and <code>description</code> SHOULD be
++  omitted to avoid duplicating a value that can drift out of sync. When
++  <code>description</code> <em>is</em> present, however, it takes precedence: it is the
++  authoritative value for display, and a consumer SHOULD render it as
++  given even when it differs from a description carried by the referenced
++  artifact. Setting <code>description</code> is how a publisher deliberately provides
++  a listing-specific blurb in place of the artifact's own. See
++  <a href="#resolving-an-artifacts-description">Resolving an Artifact's Description</a>
++  for the full consumer resolution order.</dd>
+ <dt><code>tags</code></dt>
+ <dd>An array of strings serving as keywords for filtering and discovery.</dd>
+ <dt><code>version</code></dt>
+-<dd>A string containing the version of this artifact.
++<dd>
++<p>A string containing the version of this artifact.
+   <a href="https://semver.org/">Semantic Versioning</a> is RECOMMENDED but not
+   required. See <a href="#multi-version-entries">Multi-Version Entries</a> for
+-  how versions interact with <code>identifier</code>.</dd>
++  how versions interact with <code>identifier</code>.</p>
++<p>Like <code>displayName</code> and <code>description</code>, <code>version</code> can restate a value the
++referenced artifact already carries (for example the <code>version</code> field of
++an A2A Agent Card or an MCP Server Card). For a single entry whose
++artifact carries its own version, <code>version</code> merely duplicates that value
++and SHOULD be omitted to avoid drift — a consumer can read the version
++from the artifact. Unlike <code>displayName</code> and <code>description</code>, however,
++<code>version</code> is not merely cosmetic: it is part of the entry's uniqueness
++key and consumers sort on it, so when a catalog lists multiple versions
++of the same <code>identifier</code> it is REQUIRED on those entries (see
++<a href="#multi-version-entries">Multi-Version Entries</a>). A present <code>version</code> is
++used for catalog-level sorting and selection rather than as a free-form
++display override, so it SHOULD equal the version the referenced artifact
++reports; an entry <code>version</code> that contradicts the artifact's own version
++is a publishing error, not a deliberate override.</p>
++</dd>
+ <dt><code>updatedAt</code></dt>
+ <dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
+   when this entry was last modified.</dd>
+@@ -379,6 +410,27 @@
+ the <code>identifier</code> segment in step 3. A publisher MAY still set
+ <code>displayName</code> on such an entry to provide a better name than the bare
+ identifier segment.</p>
++</section>
++<section id="resolving-an-artifact-s-description">
++<h3>Resolving an Artifact&#x27;s Description</h3>
++<p>Because <code>description</code> is OPTIONAL, a consumer rendering a catalog entry
++cannot assume it is present. To obtain a description, a consumer SHOULD
++resolve one in the following order:</p>
++<ol>
++<li><strong><code>description</code> on the entry</strong>, if present. A publisher-supplied
++   <code>description</code> always wins, even when it differs from a description
++   carried by the referenced artifact.</li>
++<li><strong>The referenced artifact's own canonical description</strong>, if the
++   consumer has already fetched or cached the artifact — for example the
++   <code>description</code> field of an A2A Agent Card or of an MCP Server Card.</li>
++<li><strong>No description</strong>, if neither is available. Consumers SHOULD render
++   the entry gracefully without one.</li>
++</ol>
++<p>As with a name, a consumer SHOULD NOT dereference an artifact at render
++time solely to obtain a description. A registry, directory, or other
++service built on top of a catalog SHOULD resolve the description once at
++ingestion — alongside any other derived metadata it caches — rather than
++fetching artifacts on the rendering path.</p>
+ </section>
+ </section>
+ <section id="multi-version-entries">
+@@ -1854,11 +1906,11 @@
+ </tr>
+ <tr>
+ <td style="text-align: left;"><code>description</code></td>
+-<td style="text-align: left;">Entry <code>description</code></td>
++<td style="text-align: left;">Stays in the artifact; entry <code>description</code> is omitted unless the artifact lacks one (same authoritative-source rule as <code>title</code>/<code>displayName</code>)</td>
+ </tr>
+ <tr>
+ <td style="text-align: left;"><code>version</code></td>
+-<td style="text-align: left;">Entry <code>version</code></td>
++<td style="text-align: left;">Stays in the artifact; entry <code>version</code> is omitted for a single entry, but is set (and MUST match the artifact) when the catalog lists multiple versions of the same <code>identifier</code></td>
+ </tr>
+ <tr>
+ <td style="text-align: left;"><code>repository</code></td>
+@@ -2178,7 +2230,7 @@
+ </tr>
+ <tr>
+ <td style="text-align: left;">Plugin <code>description</code></td>
+-<td style="text-align: left;">Entry <code>description</code></td>
++<td style="text-align: left;">Stays in the plugin manifest; entry <code>description</code> is omitted unless the manifest lacks one (same authoritative-source rule as the plugin name)</td>
+ </tr>
+ <tr>
+ <td style="text-align: left;">Plugin <code>category</code></td>
