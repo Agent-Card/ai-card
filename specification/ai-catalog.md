@@ -260,6 +260,21 @@ The following members are OPTIONAL:
 
 `description`
 : A string containing a short description of the artifact.
+  This field SHOULD be set only when the referenced artifact does not
+  already carry its own canonical description — for example a raw
+  dataset (`application/parquet`), a model blob, or a skill bundle
+  (`application/agent-skills+zip`), none of which embed a self-describing
+  description. When the referenced artifact does carry one — for example
+  the `description` field of an A2A Agent Card or of an MCP Server Card —
+  that artifact is the authoritative source and `description` SHOULD be
+  omitted to avoid duplicating a value that can drift out of sync. When
+  `description` *is* present, however, it takes precedence: it is the
+  authoritative value for display, and a consumer SHOULD render it as
+  given even when it differs from a description carried by the referenced
+  artifact. Setting `description` is how a publisher deliberately provides
+  a listing-specific blurb in place of the artifact's own. See
+  [Resolving an Artifact's Description](#resolving-an-artifacts-description)
+  for the full consumer resolution order.
 
 `tags`
 : An array of strings serving as keywords for filtering and discovery.
@@ -269,6 +284,21 @@ The following members are OPTIONAL:
   [Semantic Versioning](https://semver.org/) is RECOMMENDED but not
   required. See [Multi-Version Entries](#multi-version-entries) for
   how versions interact with `identifier`.
+
+    Like `displayName` and `description`, `version` can restate a value the
+    referenced artifact already carries (for example the `version` field of
+    an A2A Agent Card or an MCP Server Card). For a single entry whose
+    artifact carries its own version, `version` merely duplicates that value
+    and SHOULD be omitted to avoid drift — a consumer can read the version
+    from the artifact. Unlike `displayName` and `description`, however,
+    `version` is not merely cosmetic: it is part of the entry's uniqueness
+    key and consumers sort on it, so when a catalog lists multiple versions
+    of the same `identifier` it is REQUIRED on those entries (see
+    [Multi-Version Entries](#multi-version-entries)). A present `version` is
+    used for catalog-level sorting and selection rather than as a free-form
+    display override, so it SHOULD equal the version the referenced artifact
+    reports; an entry `version` that contradicts the artifact's own version
+    is a publishing error, not a deliberate override.
 
 `updatedAt`
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
@@ -317,6 +347,27 @@ itself absent: step 2 yields no name, so the consumer falls through to
 the `identifier` segment in step 3. A publisher MAY still set
 `displayName` on such an entry to provide a better name than the bare
 identifier segment.
+
+### Resolving an Artifact's Description
+
+Because `description` is OPTIONAL, a consumer rendering a catalog entry
+cannot assume it is present. To obtain a description, a consumer SHOULD
+resolve one in the following order:
+
+1. **`description` on the entry**, if present. A publisher-supplied
+   `description` always wins, even when it differs from a description
+   carried by the referenced artifact.
+2. **The referenced artifact's own canonical description**, if the
+   consumer has already fetched or cached the artifact — for example the
+   `description` field of an A2A Agent Card or of an MCP Server Card.
+3. **No description**, if neither is available. Consumers SHOULD render
+   the entry gracefully without one.
+
+As with a name, a consumer SHOULD NOT dereference an artifact at render
+time solely to obtain a description. A registry, directory, or other
+service built on top of a catalog SHOULD resolve the description once at
+ingestion — alongside any other derived metadata it caches — rather than
+fetching artifacts on the rendering path.
 
 ## Multi-Version Entries
 
@@ -1783,8 +1834,8 @@ does not address.
 | `server.json` document (whole file) | Artifact content via entry `url` or `data` |
 | `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
 | `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
-| `description` | Entry `description` |
-| `version` | Entry `version` |
+| `description` | Stays in the artifact; entry `description` is omitted unless the artifact lacks one (same authoritative-source rule as `title`/`displayName`) |
+| `version` | Stays in the artifact; entry `version` is omitted for a single entry, but is set (and MUST match the artifact) when the catalog lists multiple versions of the same `identifier` |
 | `repository` | Entry `metadata.repository` |
 | `packages[]` (npm, pypi, nuget, oci) | Inside the artifact — not surfaced in catalog |
 | `remotes[]` (streamable-http, sse) | Inside the artifact — not surfaced in catalog |
@@ -2064,7 +2115,7 @@ plugins/
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
 | Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
-| Plugin `description` | Entry `description` |
+| Plugin `description` | Stays in the plugin manifest; entry `description` is omitted unless the manifest lacks one (same authoritative-source rule as the plugin name) |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
 | Plugin `author` | Entry `publisher` |
