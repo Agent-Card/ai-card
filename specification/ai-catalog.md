@@ -1838,11 +1838,7 @@ server's Server Card and whose `type` is the known type
 > ([ADR 0014](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0014-media-type-to-type.md));
 > any string is accepted, with a recommended set of "known types." The
 > known type for an MCP server referenced by its Server Card is
-> `application/mcp-server-card+json`. Note the deliberate naming
-> distinction: the MCP Server Card extension uses
-> `application/mcp-server-card+json` (not `application/mcp-server+json`)
-> to avoid colliding with the MCP Registry's `server.json` concept
-> (modelcontextprotocol/experimental-ext-server-card issue #9 / PR #18).
+> `application/mcp-server-card+json`.
 
 ## MCP Servers as an AI Catalog
 
