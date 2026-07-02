@@ -9,17 +9,20 @@
  
  application/agent-skills+json — Agent Skill Metadata json file
  
-@@ -1924,7 +1926,8 @@
- A Server Card is a static discovery document for a single HTTP-based MCP
- server (its identity and connection details). It is distinct from the MCP
- Registry's server.json, an installable-package descriptor — a separate
--artifact type that this appendix does not address.
+@@ -1921,6 +1923,12 @@
+ (SEP-2127)
+ as the artifact content of a Catalog Entry.
+ 
++A Server Card is a static discovery document for a single HTTP-based MCP
++server (its identity and connection details). It is distinct from the MCP
++Registry's server.json, an installable-package descriptor — a separate
 +artifact type mapped in
 +Mapping to MCP Registry server.json.
- 
++
  Overview
  
-@@ -2137,6 +2140,201 @@
+ An MCP Server Card is a static discovery document for an individual
+@@ -2132,6 +2140,201 @@
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
  
