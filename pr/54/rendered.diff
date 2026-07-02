@@ -19,11 +19,10 @@
  
  Overview
  
-@@ -2133,6 +2136,204 @@
- 
+@@ -2141,6 +2144,204 @@
  Composability: MCP servers can be packaged with related
  artifacts (A2A agents, datasets) in nested catalogs.
-+
+ 
 +Mapping to MCP Registry server.json
 +
 +This appendix describes how the MCP Registry server.json format
@@ -221,6 +220,7 @@
 +representation that matches what they are doing (provisioning vs.
 +connecting). AI Catalog provides the trust and cross-ecosystem indexing
 +layer over both; each artifact carries its own protocol-specific detail.
- 
++
  Mapping to Claude Code Plugins Marketplace
  
+ This appendix describes how the Anthropic Claude Code Plugins
