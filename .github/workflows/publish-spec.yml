@@ -83,13 +83,13 @@ jobs:
 
       - name: Build canonical specification site
         run: |
-          uv run --python 3.12 --locked python tools/build_spec.py specification/ai-catalog.md .site/root/index.html --config specification/respec-config.json
+          uv run --python 3.12 --locked python tools/build_spec.py specification/ai-catalog.md .site/spec/index.html --config specification/respec-config.json
 
-      - name: Publish canonical site to gh-pages
+      - name: Publish canonical site to gh-pages/spec/
         run: |
-          python3 tools/update_gh_pages.py root \
-            --source-dir .site/root \
-            --cname ai-catalog.io \
+          python3 tools/update_gh_pages.py subdir \
+            --source-dir .site/spec \
+            --subdir-name spec \
             --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
             --commit-message "Publish specification site from main"
 

@@ -1,0 +1,84 @@
+name: Publish Documentation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - .github/workflows/publish-docs.yml
+      - docs/**
+      - mkdocs.yml
+      - pyproject.toml
+      - uv.lock
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/publish-docs.yml
+      - docs/**
+      - mkdocs.yml
+      - pyproject.toml
+      - uv.lock
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-pages-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Build documentation site
+        run: |
+          uv run --python 3.12 --locked --group docs mkdocs build --site-dir .site/docs --strict
+
+  publish:
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Build documentation site
+        run: |
+          uv run --python 3.12 --locked --group docs mkdocs build --site-dir .site/docs --strict
+
+      - name: Publish docs to gh-pages root
+        run: |
+          python3 tools/update_gh_pages.py root \
+            --source-dir .site/docs \
+            --cname ai-catalog.io \
+            --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            --commit-message "Publish documentation site from main"
