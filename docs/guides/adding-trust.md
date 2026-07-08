@@ -68,7 +68,7 @@ Trust builds on the three conformance levels:
 A Trust Manifest is an object on a Catalog Entry (or Host Info object) with one required field:
 
 `identity`
-:   A globally unique URI that serves as the primary subject identifier for this artifact — typically a DID, SPIFFE ID, or URL. When the Trust Manifest is on a Catalog Entry, the identity's **authority (trust domain) MUST align with the publisher domain segment of the entry's `identifier`** (e.g., an entry `urn:air:acme-corp.com:a2a:finance` requires an identity anchored to `acme-corp.com`). Consumers MUST reject a Trust Manifest whose identity domain does not align. This binding ensures trust claims are cryptographically bound to the authorized publisher.
+:   A globally unique URI that identifies this artifact. **Its trust domain must align with the publisher domain in the containing entry's `identifier`.** This binding ties trust claims to the authorized publisher.
 
 All other fields are optional:
 
