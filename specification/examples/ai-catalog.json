@@ -2,13 +2,13 @@
   "specVersion": "1.0",
   "host": {
     "displayName": "Acme Services Inc.",
-    "identifier": "did:example:org-acme-corp",
+    "identifier": "did:web:acme-corp.com",
     "documentationUrl": "https://docs.acme-corp.com/agents"
   },
   "entries": [
     {
-      "identifier": "urn:example:agent-finance-001",
-      "mediaType": "application/a2a-agent-card+json",
+      "identifier": "urn:air:acme-corp.com:agent:finance",
+      "type": "application/a2a-agent-card+json",
       "description": "Multi-protocol finance agent.",
       "tags": [
         "finance",
@@ -18,9 +18,9 @@
       "updatedAt": "2026-02-22T16:30:00Z"
     },
     {
-      "identifier": "urn:example:data:market-dataset-2026q1",
+      "identifier": "urn:air:acme-corp.com:data:market-2026q1",
       "displayName": "Market Dataset Q1 2026",
-      "mediaType": "application/parquet",
+      "type": "application/parquet",
       "description": "Artifact-focused card for training and evaluation.",
       "tags": [
         "dataset",
