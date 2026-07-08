@@ -21,7 +21,7 @@ AI Catalog solves this with a simple, typed JSON format that indexes any kind of
     {
       "identifier": "urn:air:acme-corp.com:mcp:weather",
       "type": "application/mcp-server-card+json",
-      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+      "url": "https://api.acme-corp.com/mcp/server-card"
     },
     {
       "identifier": "urn:air:acme-corp.com:a2a:research",

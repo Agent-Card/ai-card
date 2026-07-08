@@ -63,7 +63,7 @@ The Finance team owns and hosts `finance.json`. It can be updated independently 
     {
       "identifier": "urn:air:acme-corp.com:mcp:finance",
       "type": "application/mcp-server-card+json",
-      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+      "url": "https://api.acme-corp.com/mcp/server-card",
       "tags": ["finance", "mcp"]
     },
     {

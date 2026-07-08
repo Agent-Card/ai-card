@@ -26,7 +26,7 @@ An agent that supports both MCP and A2A protocols can be represented as a single
           {
             "identifier": "urn:air:acme-corp.com:mcp:finance",
             "type": "application/mcp-server-card+json",
-            "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+            "url": "https://api.acme-corp.com/mcp/server-card"
           },
           {
             "identifier": "urn:air:acme-corp.com:a2a:finance",
@@ -41,7 +41,6 @@ An agent that supports both MCP and A2A protocols can be represented as a single
           {
             "type": "SOC2-Type2",
             "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-            "mediaType": "application/pdf",
             "digest": "sha256:a1b2c3d4e5f6"
           }
         ]

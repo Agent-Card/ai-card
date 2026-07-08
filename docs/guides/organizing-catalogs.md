@@ -107,7 +107,7 @@ Bundle related artifacts together using the `data` field to embed the child cata
       {
         "identifier": "urn:air:acme-corp.com:mcp:finance",
         "type": "application/mcp-server-card+json",
-        "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+        "url": "https://api.acme-corp.com/mcp/server-card"
       },
       {
         "identifier": "urn:air:acme-corp.com:data:market-2026q1",
@@ -143,7 +143,7 @@ An agent that supports both MCP and A2A can be represented as one logical entry 
       {
         "identifier": "urn:air:acme-corp.com:mcp:finance",
         "type": "application/mcp-server-card+json",
-        "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+        "url": "https://api.acme-corp.com/mcp/server-card"
       },
       {
         "identifier": "urn:air:acme-corp.com:a2a:finance",

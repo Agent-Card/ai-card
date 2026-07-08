@@ -52,7 +52,7 @@ The mapping works as follows:
 | AI Catalog (logical) | OCI (physical) |
 |---|---|
 | AI Catalog document | OCI Image Index with `artifactType: "application/ai-catalog+json"` |
-| Catalog Entry | OCI Image Manifest with `artifactType` set to the entry's `mediaType` |
+| Catalog Entry | OCI Image Manifest with `artifactType` set to the entry's `type` |
 | Entry artifact content | Manifest `layers[0]` blob |
 | Entry metadata | Manifest `config` blob and/or `annotations` |
 | Nested catalog entry | Nested OCI Image Index |
@@ -74,9 +74,9 @@ OCI distribution provides Layer 3 trust: all content is addressed by cryptograph
 
 For the full OCI mapping specification including the Image Index structure and Referrers API usage, refer to the [Full Specification](../specification.md).
 
-## MCP Registry mapping
+## MCP servers
 
-If you operate an MCP Registry, your `server.json` entries map naturally to AI Catalog entries. The MCP Registry can serve an AI Catalog view of its contents, where each MCP server becomes a catalog entry with `mediaType: "application/mcp-server-card+json"`.
+Remote (HTTP-connectable) MCP servers map to AI Catalog entries by referencing each server's [MCP Server Card](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127). Each MCP server becomes a catalog entry with `type: "application/mcp-server-card+json"` whose `url` points to the server's Server Card. A domain — or a registry — that hosts several MCP servers can publish them all as a single AI Catalog.
 
 This enables cross-protocol discovery: a client that understands AI Catalog can discover MCP servers alongside A2A agents, datasets, and other artifact types from a single endpoint.
 
