@@ -67,7 +67,7 @@ AI Catalog has three conformance levels:
 | **2 — Discoverable** | Adds a `host` object + served at `/.well-known/` |
 | **3 — Trusted** | Adds Trust Manifests with identity, attestations, and provenance |
 
-You're already at Level 2 if you're serving the catalog at `/.well-known/ai-catalog.json`. Add a `host` object to make it official:
+Serving the catalog at `/.well-known/ai-catalog.json` enables automated discovery. To reach Level 2, add a `host` object identifying the catalog operator:
 
 ```json hl_lines="3 4 5 6"
 {

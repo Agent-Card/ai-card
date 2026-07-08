@@ -79,7 +79,7 @@ Nested AI Catalog entries allow publishers to organize large catalogs, delegate 
 
 #### Static Discovery
 
-As part of the specification, this project defines a standard way to publish a catalog at a well-known URL for a given domain, for example at `./well-known/ai-catalog.json`.
+As part of the specification, this project defines a standard way to publish a catalog at a well-known URL for a given domain, for example at `/.well-known/ai-catalog.json`.
 
 Implementing protocols may support dynamic card creation and discovery through their own methods for scenarios such as providing different card content based on a caller's identity.
 
