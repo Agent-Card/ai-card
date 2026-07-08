@@ -493,10 +493,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-registry-mapping" class="md-nav__link">
+  <a href="#mcp-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Registry mapping
+        MCP servers
       
     </span>
   </a>
@@ -857,10 +857,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-registry-mapping" class="md-nav__link">
+  <a href="#mcp-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP Registry mapping
+        MCP servers
       
     </span>
   </a>
@@ -952,7 +952,7 @@
 </tr>
 <tr>
 <td>Catalog Entry</td>
-<td>OCI Image Manifest with <code>artifactType</code> set to the entry's <code>mediaType</code></td>
+<td>OCI Image Manifest with <code>artifactType</code> set to the entry's <code>type</code></td>
 </tr>
 <tr>
 <td>Entry artifact content</td>
@@ -982,8 +982,8 @@
 <p>Clients that fetch from <code>/.well-known/ai-catalog.json</code> or a registry API always receive the logical JSON format — they never parse OCI structures directly.</p>
 <p>OCI distribution provides Layer 3 trust: all content is addressed by cryptographic digest, making substitution structurally impossible. See <a href="../adding-trust/#trust-layers">Adding Trust</a> for how this fits into the progressive trust model.</p>
 <p>For the full OCI mapping specification including the Image Index structure and Referrers API usage, refer to the <a href="../../specification/">Full Specification</a>.</p>
-<h2 id="mcp-registry-mapping">MCP Registry mapping<a class="headerlink" href="#mcp-registry-mapping" title="Permanent link">&para;</a></h2>
-<p>If you operate an MCP Registry, your <code>server.json</code> entries map naturally to AI Catalog entries. The MCP Registry can serve an AI Catalog view of its contents, where each MCP server becomes a catalog entry with <code>mediaType: "application/mcp-server-card+json"</code>.</p>
+<h2 id="mcp-servers">MCP servers<a class="headerlink" href="#mcp-servers" title="Permanent link">&para;</a></h2>
+<p>Remote (HTTP-connectable) MCP servers map to AI Catalog entries by referencing each server's <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">MCP Server Card</a>. Each MCP server becomes a catalog entry with <code>type: "application/mcp-server-card+json"</code> whose <code>url</code> points to the server's Server Card. A domain — or a registry — that hosts several MCP servers can publish them all as a single AI Catalog.</p>
 <p>This enables cross-protocol discovery: a client that understands AI Catalog can discover MCP servers alongside A2A agents, datasets, and other artifact types from a single endpoint.</p>
 <h2 id="dynamic-catalogs">Dynamic catalogs<a class="headerlink" href="#dynamic-catalogs" title="Permanent link">&para;</a></h2>
 <p>Nothing requires a static file. A catalog can be generated dynamically by an API endpoint — for example, serving different entries based on the caller's identity or filtering by query parameters. The response just needs to be valid <code>application/ai-catalog+json</code> JSON with <code>specVersion</code> and <code>entries</code>.</p>
