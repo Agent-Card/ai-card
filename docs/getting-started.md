@@ -18,7 +18,7 @@ Create a file named `ai-catalog.json` with the following content:
     {
       "identifier": "urn:air:myorg.com:mcp:my-server",
       "type": "application/mcp-server-card+json",
-      "url": "https://api.myorg.com/.well-known/mcp/server-card.json"
+      "url": "https://api.myorg.com/mcp/server-card"
     }
   ]
 }

@@ -68,7 +68,7 @@ Trust builds on the three conformance levels:
 A Trust Manifest is an object on a Catalog Entry (or Host Info object) with one required field:
 
 `identity`
-:   A globally unique URI that identifies this artifact. **Must match the containing entry's `identifier`.** This binding ensures trust claims are unambiguously associated with the right artifact.
+:   A globally unique URI that identifies this artifact. **Its trust domain must align with the publisher domain in the containing entry's `identifier`.** This binding ties trust claims to the authorized publisher.
 
 All other fields are optional:
 
@@ -95,7 +95,6 @@ The simplest trust step is asserting publisher identity. Use an attestation of t
     {
       "type": "publisher-identity",
       "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-      "mediaType": "application/jwt",
       "description": "Verifies did:web:acme-corp.com as publisher"
     }
   ]
@@ -111,14 +110,12 @@ For regulated environments, add compliance evidence:
   {
     "type": "SOC2-Type2",
     "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-    "mediaType": "application/pdf",
     "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
     "description": "SOC 2 Type 2 report, valid through 2026"
   },
   {
     "type": "ISO27001",
-    "uri": "https://trust.acme-corp.com/certs/iso27001.pdf",
-    "mediaType": "application/pdf"
+    "uri": "https://trust.acme-corp.com/certs/iso27001.pdf"
   }
 ]
 ```
@@ -214,13 +211,11 @@ A Trust Manifest with identity, compliance attestation, provenance, and signatur
       {
         "type": "publisher-identity",
         "uri": "https://trust.acme-corp.com/certs/publisher.jwt",
-        "mediaType": "application/jwt",
         "description": "Verifies did:web:acme-corp.com as publisher"
       },
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "mediaType": "application/pdf",
         "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
       }
     ],

@@ -15,7 +15,7 @@ The specification covers:
 - **Version handling** — compatibility rules for producers and consumers
 - **Security considerations** — trust layers, catalog poisoning, typosquatting, embedded content safety
 - **CDDL schema** — formal machine-readable schema
-- **Mappings** — how AI Catalog maps to OCI Distribution, MCP Registry `server.json`, and Claude Code Plugins
+- **Mappings** — how AI Catalog maps to OCI Distribution, MCP servers (via MCP Server Cards), and Claude Code Plugins
 
 ## Relationship to these docs
 

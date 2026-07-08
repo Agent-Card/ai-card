@@ -15,7 +15,7 @@ The simplest valid AI Catalog — just a `specVersion` and a list of entries. Th
     {
       "identifier": "urn:air:example.com:mcp:weather",
       "type": "application/mcp-server-card+json",
-      "url": "https://api.example.com/.well-known/mcp/server-card.json"
+      "url": "https://api.example.com/mcp/server-card"
     },
     {
       "identifier": "urn:air:example.com:a2a:research",

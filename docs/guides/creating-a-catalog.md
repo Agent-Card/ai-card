@@ -64,7 +64,7 @@ Every entry must have these three things:
 {
   "identifier": "urn:air:acme-corp.com:mcp:weather",
   "type": "application/mcp-server-card+json",
-  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+  "url": "https://api.acme-corp.com/mcp/server-card"
 }
 ```
 
@@ -82,11 +82,13 @@ Every entry must have these three things:
 | Artifact | `type` value |
 |---|---|
 | AI Catalog (nested) | `application/ai-catalog+json` |
+| Agent Card (generic) | `application/agent-card+json` |
 | A2A Agent Card | `application/a2a-agent-card+json` |
 | MCP Server Card | `application/mcp-server-card+json` |
-| Agent Skill (ZIP bundle) | `application/agent-skills+zip` |
-| Agent Skill (Markdown) | `application/agent-skills+md` |
 | Agent Skill metadata (JSON) | `application/agent-skills+json` |
+| Agent Skill (Markdown) | `application/agent-skills+md` |
+| Agent Skill (ZIP bundle) | `application/agent-skills+zip` |
+| Agent Skill (gzipped tarball) | `application/agent-skills+gzip` |
 | Dataset | `application/parquet`, `text/csv`, or appropriate type |
 
 This list is not exhaustive — AI Catalog accepts any string as a `type` value. The spec is intentionally artifact-agnostic.
@@ -246,7 +248,7 @@ Metadata keys should use reverse-DNS prefixes for vendor-specific keys (`com.acm
       "description": "Real-time weather data and forecasts.",
       "tags": ["weather", "data"],
       "version": "1.2.0",
-      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+      "url": "https://api.acme-corp.com/mcp/server-card",
       "updatedAt": "2026-04-01T09:00:00Z",
       "publisher": {
         "identifier": "did:web:acme-corp.com",
