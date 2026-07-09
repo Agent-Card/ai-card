@@ -1,0 +1,92 @@
+site_name: AI Catalog
+site_url: https://agent-card.github.io/ai-catalog/
+site_description: >-
+  A typed, nestable JSON format for discovering heterogeneous AI artifacts
+  across protocols — MCP servers, A2A agents, datasets, and more.
+site_author: Agent Card Working Group
+repo_url: https://github.com/Agent-Card/ai-catalog
+repo_name: Agent-Card/ai-catalog
+edit_uri: edit/main/docs/
+
+copyright: >-
+  Maintained by the <a href="https://github.com/Agent-Card/ai-catalog">Agent Card Working Group</a>
+  under the Linux Foundation
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Agent-Card/ai-catalog
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Guides:
+      - Creating a Catalog: guides/creating-a-catalog.md
+      - Serving Your Catalog: guides/serving-your-catalog.md
+      - Consuming Catalogs: guides/consuming-catalogs.md
+      - Organizing Catalogs: guides/organizing-catalogs.md
+      - Adding Trust: guides/adding-trust.md
+  - Examples:
+      - Minimal Catalog: examples/minimal-catalog.md
+      - Multi-Protocol Agent: examples/multi-protocol-agent.md
+      - Nested Catalogs: examples/nested-catalogs.md
+  - Full Specification: specification.md
