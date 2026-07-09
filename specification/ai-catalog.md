@@ -123,7 +123,7 @@ For example, a minimal catalog listing three AI artifacts:
     {
       "identifier": "urn:air:example.com:mcp:weather",
       "type": "application/mcp-server-card+json",
-      "url": "https://api.example.com/.well-known/mcp/server-card.json"
+      "url": "https://api.example.com/mcp/server-card"
     },
     {
       "identifier": "urn:air:example.com:a2a:research",
@@ -255,25 +255,22 @@ The following members are OPTIONAL:
   SHOULD render it as given even when it differs from a name carried by
   the referenced artifact. Setting `displayName` is how a publisher
   deliberately overrides the artifact's own name. See
-  [Resolving an Artifact's Display Name](#resolving-an-artifacts-display-name)
+  [Resolving an Artifact's Display Name](#resolving-an-artifact-s-display-name)
   for the full consumer resolution order.
 
 `description`
-: A string containing a short description of the artifact.
-  This field SHOULD be set only when the referenced artifact does not
-  already carry its own canonical description — for example a raw
-  dataset (`application/parquet`), a model blob, or a skill bundle
-  (`application/agent-skills+zip`), none of which embed a self-describing
-  description. When the referenced artifact does carry one — for example
-  the `description` field of an A2A Agent Card or of an MCP Server Card —
-  that artifact is the authoritative source and `description` SHOULD be
-  omitted to avoid duplicating a value that can drift out of sync. When
-  `description` *is* present, however, it takes precedence: it is the
-  authoritative value for display, and a consumer SHOULD render it as
-  given even when it differs from a description carried by the referenced
-  artifact. Setting `description` is how a publisher deliberately provides
-  a listing-specific blurb in place of the artifact's own. See
-  [Resolving an Artifact's Description](#resolving-an-artifacts-description)
+: A string containing a short description of the artifact. Like
+  `displayName`, `description` is OPTIONAL and follows the same
+  authoritative-source rule: when the referenced artifact carries its
+  own canonical description — for example the `description` field of an
+  A2A Agent Card or an MCP Server Card — that artifact is the
+  authoritative source and entry `description` SHOULD be omitted to
+  avoid duplicating a value that can drift out of sync. When entry
+  `description` *is* present, however, it takes precedence: a consumer
+  SHOULD render it as given even when it differs from a description
+  carried by the referenced artifact, which is how a publisher provides
+  a listing-specific blurb. See
+  [Resolving an Artifact's Description](#resolving-an-artifact-s-description)
   for the full consumer resolution order.
 
 `tags`
@@ -285,20 +282,20 @@ The following members are OPTIONAL:
   required. See [Multi-Version Entries](#multi-version-entries) for
   how versions interact with `identifier`.
 
-    Like `displayName` and `description`, `version` can restate a value the
-    referenced artifact already carries (for example the `version` field of
-    an A2A Agent Card or an MCP Server Card). For a single entry whose
-    artifact carries its own version, `version` merely duplicates that value
-    and SHOULD be omitted to avoid drift — a consumer can read the version
-    from the artifact. Unlike `displayName` and `description`, however,
-    `version` is not merely cosmetic: it is part of the entry's uniqueness
-    key and consumers sort on it, so when a catalog lists multiple versions
-    of the same `identifier` it is REQUIRED on those entries (see
-    [Multi-Version Entries](#multi-version-entries)). A present `version` is
-    used for catalog-level sorting and selection rather than as a free-form
-    display override, so it SHOULD equal the version the referenced artifact
-    reports; an entry `version` that contradicts the artifact's own version
-    is a publishing error, not a deliberate override.
+    Like `displayName` and `description`, `version` can restate a value
+    the referenced artifact already carries (an A2A Agent Card
+    `version`, an MCP Server Card `version`), and when a single entry
+    references such an artifact the entry `version` SHOULD be omitted to
+    avoid drift — the consumer can read it from the artifact. Unlike
+    `displayName` and `description`, however, `version` is not merely
+    cosmetic: it is part of the entry's uniqueness key, so it is
+    REQUIRED when a catalog lists multiple versions of the same
+    `identifier` (see [Multi-Version Entries](#multi-version-entries)).
+    A present `version` is used for catalog-level sorting and selection
+    rather than as a free-form display override, so it SHOULD equal the
+    version the referenced artifact reports; an entry `version` that
+    contradicts the artifact's own version is a publishing error, not a
+    deliberate override.
 
 `updatedAt`
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
@@ -350,24 +347,25 @@ identifier segment.
 
 ### Resolving an Artifact's Description
 
-Because `description` is OPTIONAL, a consumer rendering a catalog entry
-cannot assume it is present. To obtain a description, a consumer SHOULD
-resolve one in the following order:
+Because `description` is OPTIONAL, a consumer that wants to show a
+description cannot assume the entry carries one. It SHOULD resolve one in
+the following order:
 
 1. **`description` on the entry**, if present. A publisher-supplied
    `description` always wins, even when it differs from a description
    carried by the referenced artifact.
 2. **The referenced artifact's own canonical description**, if the
    consumer has already fetched or cached the artifact — for example the
-   `description` field of an A2A Agent Card or of an MCP Server Card.
-3. **No description**, if neither is available. Consumers SHOULD render
-   the entry gracefully without one.
+   `description` field of an A2A Agent Card or an MCP Server Card.
+3. **No description**, if neither is available. Unlike a name, a
+   description has no identifier-derived fallback; a consumer SHOULD
+   simply render the entry without one.
 
-As with a name, a consumer SHOULD NOT dereference an artifact at render
-time solely to obtain a description. A registry, directory, or other
-service built on top of a catalog SHOULD resolve the description once at
-ingestion — alongside any other derived metadata it caches — rather than
-fetching artifacts on the rendering path.
+As with name resolution, a consumer SHOULD NOT dereference an artifact at
+render time solely to obtain a description. A registry, directory, or
+other service built on top of a catalog SHOULD resolve the description
+once at ingestion and cache the result, rather than fetching artifacts on
+the rendering path.
 
 ## Multi-Version Entries
 
@@ -432,7 +430,7 @@ The following members are OPTIONAL:
 : A string providing a type hint for the publisher identifier (e.g.,
   "did", "dns").
 
-# Trust Manifest {#trust-manifest}
+# Trust Manifest
 
 The Trust Manifest is an OPTIONAL companion to catalog entries and
 host objects. It is a JSON object that provides verifiable identity,
@@ -834,7 +832,7 @@ depth to prevent circular references. A depth limit of 4 is
 RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.
 
-# Metadata Extensibility {#metadata-extensibility}
+# Metadata Extensibility
 
 The `metadata` property appears on the AI Catalog top-level object,
 on Catalog Entry objects, and on Trust Manifest objects. It provides
@@ -869,7 +867,7 @@ Metadata values MAY be any valid JSON type (string, number, boolean,
 array, object, null). Consumers that do not recognize a metadata key
 SHOULD ignore it.
 
-# Version Handling {#version-handling}
+# Version Handling
 
 The `specVersion` field identifies which version of this specification
 a catalog conforms to. This section defines how producers and consumers
@@ -1440,7 +1438,7 @@ artifact types including a nested catalog packaging related artifacts:
       "identifier": "urn:air:acme.com:server:finance-mcp",
       "version": "1.4.0",
       "type": "application/mcp-server-card+json",
-      "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
+      "url": "https://api.acme-corp.com/mcp/server-card",
       "description": "MCP server with finance tools.",
       "tags": ["finance", "mcp"],
       "updatedAt": "2026-03-15T10:00:00Z"
@@ -1462,7 +1460,7 @@ artifact types including a nested catalog packaging related artifacts:
           {
             "identifier": "urn:air:acme.com:server:finance-mcp",
             "type": "application/mcp-server-card+json",
-            "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+            "url": "https://api.acme-corp.com/mcp/server-card"
           },
           {
             "identifier": "urn:air:acme.com:data:market-2026q1",
@@ -1570,7 +1568,7 @@ containing both protocol-specific entries:
       {
         "identifier": "urn:air:acme.com:agent:finance:mcp",
         "type": "application/mcp-server-card+json",
-        "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
+        "url": "https://api.acme-corp.com/mcp/server-card"
       },
       {
         "identifier": "urn:air:acme.com:agent:finance:a2a",
@@ -1796,224 +1794,29 @@ Both approaches can coexist. A tooling bridge converts between them
 losslessly, allowing simple consumers to work with the logical format
 while infrastructure-oriented deployments leverage OCI distribution.
 
-# Mapping to MCP Registry server.json
+# Mapping to MCP Servers
 
-This appendix describes how the MCP Registry `server.json` format
-(see [modelcontextprotocol/registry](https://github.com/modelcontextprotocol/registry))
-relates to AI Catalog, enabling MCP servers to be discovered alongside
-other AI artifacts through a unified catalog.
-
-> **Note:** The MCP ecosystem defines two distinct metadata documents
-> for servers. The **Registry `server.json`** is an installable package
-> descriptor (package coordinates, transports, environment variables).
-> The **MCP Server Card** ([SEP-1649](#relationship-to-mcp-server-cards-sep-1649))
-> is a runtime discovery document at `/.well-known/mcp/server-card.json`
-> describing capabilities, tools, and authentication. An AI Catalog
-> entry can reference either artifact depending on the use case — use
-> `server.json` for installable packages and Server Cards for
-> connectable HTTP endpoints.
+This appendix describes how **remote (HTTP-connectable) MCP servers**
+map to AI Catalog, enabling them to be discovered alongside other AI
+artifacts through a unified catalog. The documented, supported path is
+to reference each server's **MCP Server Card**
+([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
+as the artifact content of a Catalog Entry.
 
 ## Overview
 
-The MCP Registry defines a `server.json` format for describing MCP
-servers. Each `server.json` document captures everything needed to
-install, configure, and connect to a single MCP server: package
-coordinates (npm, PyPI, NuGet, OCI), remote endpoints (streamable-http,
-SSE), transport configuration, environment variables, and CLI arguments.
+An MCP Server Card is a static discovery document for an individual
+HTTP-based MCP server, describing its identity and how to connect to it.
+A Catalog Entry references the card wherever the server publishes it, as
+in the examples below. See
+[SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
+for the Server Card's schema, fields, and hosting conventions.
 
-In AI Catalog terms, a `server.json` document is the **artifact
-content** — the native metadata that a Catalog Entry references. The
-AI Catalog does not duplicate or redefine `server.json` fields.
-Instead, it provides the discovery and trust layer that `server.json`
-does not address.
-
-## Conceptual Mapping
-
-| MCP `server.json` | AI Catalog Equivalent |
-|:---|:---|
-| `server.json` document (whole file) | Artifact content via entry `url` or `data` |
-| `name` (reverse-DNS identifier) | Entry `identifier` (mapped to URI form) |
-| `title` | Stays in the artifact (`server.json` carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
-| `description` | Stays in the artifact; entry `description` is omitted unless the artifact lacks one (same authoritative-source rule as `title`/`displayName`) |
-| `version` | Stays in the artifact; entry `version` is omitted for a single entry, but is set (and MUST match the artifact) when the catalog lists multiple versions of the same `identifier` |
-| `repository` | Entry `metadata.repository` |
-| `packages[]` (npm, pypi, nuget, oci) | Inside the artifact — not surfaced in catalog |
-| `remotes[]` (streamable-http, sse) | Inside the artifact — not surfaced in catalog |
-| `environmentVariables[]` | Inside the artifact — not surfaced in catalog |
-| `_meta` | Entry `metadata` for catalog-level hints; otherwise stays in artifact |
-| *(not in server.json)* | Entry `publisher` |
-| *(not in server.json)* | Entry `trustManifest` (identity, attestations, provenance) |
-| *(not in server.json)* | Entry `tags` for cross-artifact discovery |
-| MCP Registry (centralized service) | AI Catalog (decentralized, any URL) |
-
-## Separation of Concerns
-
-The `server.json` format and AI Catalog address different concerns:
-
-server.json (Operational)
-: How do I install this server? What packages, transports, arguments,
-  and environment variables does it need?
-
-AI Catalog (Discovery + Trust)
-: What servers exist? Who published them? Can I trust them? Where is
-  their metadata?
-
-This separation means the AI Catalog entry is thin — it points at the
-`server.json` and adds only what `server.json` lacks: publisher
-identity, trust verification, and cross-ecosystem discoverability.
-
-## MCP Server as Catalog Entry
-
-An MCP server listed in the Registry maps to a Catalog Entry whose
-`url` points to the `server.json` document and whose `type`
-reflects the Registry format:
-
-```json
-{
-  "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-  "version": "1.0.2",
-  "type": "application/mcp-server-card+json",
-  "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-  "description": "MCP server for Brave Search API integration",
-  "tags": ["search", "brave", "web"],
-  "publisher": {
-    "identifier": "did:web:modelcontextprotocol.io",
-    "displayName": "Model Context Protocol"
-  },
-  "trustManifest": {
-    "identity": "did:web:anonymous.modelcontextprotocol.io:mcp:brave-search",
-    "attestations": [
-      {
-        "type": "publisher-identity",
-        "uri": "https://registry.modelcontextprotocol.io/certs/publisher.jwt",
-        "description": "Verifies did:web:modelcontextprotocol.io as publisher"
-      }
-    ],
-    "provenance": [
-      {
-        "relation": "publishedFrom",
-        "sourceId": "https://github.com/modelcontextprotocol/servers",
-        "registryUri": "https://registry.npmjs.org"
-      }
-    ]
-  },
-  "metadata": {
-    "repository": "https://github.com/modelcontextprotocol/servers"
-  },
-  "updatedAt": "2026-03-15T10:00:00Z"
-}
-```
-
-The `url` points to the complete `server.json`. A client fetches the
-catalog entry for discovery and trust evaluation, then retrieves the
-`server.json` for operational details (packages, transports, env vars).
-
-> **Note:** This example uses `application/json` because the MCP
-> Registry has not registered a dedicated media type for `server.json`.
-> When referencing an MCP Server Card (SEP-1649) instead, use
-> `application/mcp-server-card+json` — see
-> [Relationship to MCP Server Cards](#relationship-to-mcp-server-cards-sep-1649).
-
-## MCP Registry as AI Catalog
-
-The MCP Registry — a centralized index of MCP servers — can be
-represented as an AI Catalog. This enables clients that understand
-`application/ai-catalog+json` to discover MCP servers alongside A2A
-agents, skills, and other artifacts:
-
-```json
-{
-  "specVersion": "1.0",
-  "host": {
-    "displayName": "MCP Server Registry",
-    "identifier": "did:web:modelcontextprotocol.io",
-    "documentationUrl": "https://modelcontextprotocol.io/docs"
-  },
-  "entries": [
-    {
-      "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-      "version": "1.0.2",
-      "type": "application/mcp-server-card+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-      "description": "MCP server for Brave Search API integration",
-      "tags": ["search", "brave"]
-    },
-    {
-      "identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
-      "version": "1.0.2",
-      "type": "application/mcp-server-card+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
-      "description": "MCP server for filesystem operations",
-      "tags": ["filesystem", "files"]
-    },
-    {
-      "identifier": "urn:air:example.github.io:mcp:weather-mcp",
-      "version": "0.5.0",
-      "type": "application/mcp-server-card+json",
-      "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
-      "description": "Python MCP server for weather data access",
-      "tags": ["weather", "python"],
-      "publisher": {
-        "identifier": "did:web:example.github.io",
-        "displayName": "Example Corp"
-      }
-    }
-  ]
-}
-```
-
-## Decentralized Discovery
-
-The MCP Registry is a centralized service. AI Catalog enables
-decentralized discovery: any domain can publish its MCP servers at
-`/.well-known/ai-catalog.json` without registering with a central
-authority.
-
-A vendor hosting its own MCP servers can publish:
-
-```
-https://api.acme-corp.com/.well-known/ai-catalog.json
-```
-
-Clients and crawlers discover the catalog via the well-known URL,
-find entries by `type`, and fetch the referenced artifacts for
-operational details — whether those are MCP Server Cards, Registry
-`server.json` documents, or other AI artifact formats.
-
-The centralized MCP Registry and decentralized AI Catalogs are
-complementary. The registry can serve an AI Catalog as its response
-format, while individual domains publish their own catalogs for
-direct discovery.
-
-## What AI Catalog Adds to server.json
-
-The `server.json` format has no trust or identity layer. AI Catalog
-fills this gap:
-
-1. **Publisher identity**: Verifiable publisher with DID or domain
-   anchor, absent from `server.json`.
-2. **Trust verification**: Attestations (SOC2, HIPAA, publisher
-   identity proofs) via the Trust Manifest.
-3. **Provenance**: Links to source repositories, registries, and
-   build artifacts with cryptographic digests.
-4. **Signing**: Detached JWS signature on the Trust Manifest for
-   integrity verification.
-5. **Cross-ecosystem discovery**: MCP servers become discoverable
-   alongside A2A agents, plugins, and datasets through a single
-   catalog format.
-6. **Composability**: MCP servers can be packaged with related
-   artifacts (A2A agents, datasets) in nested catalogs.
-
-## Relationship to MCP Server Cards (SEP-1649)
-
-MCP Server Cards
-([SEP-1649](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649))
-define a static discovery document for individual HTTP-based MCP
-servers at `/.well-known/mcp/server-card.json`. A Server Card mirrors
-the MCP initialization handshake response: it carries the server's
-name, version, transport configuration, capabilities, authentication
-requirements, and optionally the full list of tools, resources, and
-prompts.
+In AI Catalog terms, the Server Card is the **artifact content** — the
+native metadata that a Catalog Entry references via its `url`, declared
+with the known type `application/mcp-server-card+json`. The AI Catalog
+does not duplicate or redefine Server Card fields; it provides the
+discovery and trust layer that the Server Card does not address.
 
 AI Catalog and MCP Server Cards address different layers of discovery:
 
@@ -2027,15 +1830,32 @@ AI Catalog (cross-artifact)
   trust them? What other artifact types are available alongside MCP
   servers?
 
-The two mechanisms layer naturally. An AI Catalog entry for an MCP
-server can reference the Server Card as its artifact content:
+## Conceptual Mapping
+
+| MCP Server Card | AI Catalog Equivalent |
+|:---|:---|
+| Server Card document (whole file) | Artifact content via entry `url` (type `application/mcp-server-card+json`) or `data` |
+| Server `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:example.com:mcp:finance-server`) |
+| `title` | Stays in the Server Card (which carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
+| `description` | Stays in the Server Card (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
+| `version` | Stays in the Server Card (which carries its own `version`); entry `version` is omitted to avoid duplicating a value that can drift (a remote MCP server serves one Server Card, so a catalog never lists multiple versions of it) |
+| transport / capabilities / tools / resources / auth | Inside the Server Card — not surfaced in the catalog |
+| `repository` | Stays in the Server Card (which carries its own `repository`); omitted from the entry to avoid duplicating a value that can drift — catalog-level source/provenance links surface through the Trust Manifest when needed |
+| *(not in the Server Card)* | Entry `publisher` |
+| *(not in the Server Card)* | Entry `trustManifest` (identity, attestations, provenance) |
+| *(not in the Server Card)* | Entry `tags` for cross-artifact discovery |
+
+## MCP Server as Catalog Entry
+
+A remote MCP server maps to a Catalog Entry whose `url` points to the
+server's Server Card and whose `type` is the known type
+`application/mcp-server-card+json`:
 
 ```json
 {
   "identifier": "urn:air:example.com:mcp:finance-server",
   "type": "application/mcp-server-card+json",
-  "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
-  "description": "MCP server for financial data and trading tools",
+  "url": "https://api.acme-corp.com/mcp/server-card",
   "tags": ["finance", "mcp"],
   "publisher": {
     "identifier": "did:web:acme-corp.com",
@@ -2058,22 +1878,109 @@ server can reference the Server Card as its artifact content:
 }
 ```
 
-A client discovering MCP servers follows this flow:
+> **Note on `type`:** The `type` member is an open-text type identifier
+> ([ADR 0014](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0014-media-type-to-type.md));
+> any string is accepted, with a recommended set of "known types." The
+> known type for an MCP server referenced by its Server Card is
+> `application/mcp-server-card+json`.
 
-1. Fetch `/.well-known/ai-catalog.json` to discover all artifacts on
-   a domain (MCP servers, A2A agents, plugins, etc.).
-2. Filter entries by `type` to find MCP servers.
-3. Evaluate the Trust Manifest for publisher identity and attestations.
-4. Fetch the Server Card at the entry's `url` for operational details
-   (transport, capabilities, tools, authentication).
-5. Connect to the MCP server using the transport configuration from
-   the Server Card.
+## MCP Servers as an AI Catalog
 
-This separation ensures that AI Catalog provides the trust and
-cross-ecosystem indexing layer, while the MCP Server Card provides the
-protocol-specific operational details. A domain with multiple MCP
-servers publishes one AI Catalog listing all of them, with each entry
-pointing to its respective Server Card.
+A domain that hosts remote MCP servers can publish them as an AI Catalog,
+letting clients that understand `application/ai-catalog+json` discover
+those servers alongside A2A agents, skills, and other artifacts. Each
+entry points to a server's Server Card:
+
+```json
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Acme MCP Servers",
+    "identifier": "did:web:acme-corp.com",
+    "documentationUrl": "https://acme-corp.com/docs"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:acme-corp.com:mcp:finance-server",
+      "type": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/finance/server-card",
+      "tags": ["finance", "mcp"]
+    },
+    {
+      "identifier": "urn:air:acme-corp.com:mcp:docs-search",
+      "type": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/docs-search/server-card",
+      "tags": ["search", "docs"]
+    },
+    {
+      "identifier": "urn:air:acme-corp.com:mcp:ci-cd",
+      "type": "application/mcp-server-card+json",
+      "url": "https://api.acme-corp.com/ci-cd/server-card",
+      "tags": ["ci", "cd", "devops"]
+    }
+  ]
+}
+```
+
+## Decentralized Discovery
+
+AI Catalog enables decentralized discovery: any domain can publish its
+MCP servers at `/.well-known/ai-catalog.json` without registering with a
+central authority.
+
+A vendor hosting its own MCP servers can publish:
+
+```
+https://api.acme-corp.com/.well-known/ai-catalog.json
+```
+
+The catalog and the Server Card play two complementary roles: the
+catalog is how a client *finds* a server's URL in the first place, and
+the Server Card is the connection entry point it points at. They are
+useful independently — a client that already knows a server's URL can
+point at its Server Card directly, with no catalog traversal, while a
+client starting from just a domain uses the catalog to enumerate what
+that domain offers.
+
+Because of this, there is no single prescribed discovery ordering.
+Clients wire discovery in wherever it fits their architecture — probing
+a domain's catalog when it enters a session, watching outbound traffic
+at an egress boundary, or connecting to a known Server Card directly. A
+typical catalog-first path is: fetch `/.well-known/ai-catalog.json`,
+filter entries by `type` (`application/mcp-server-card+json`) to find
+MCP servers, follow an entry's `url` to its Server Card for connection
+details, and connect — evaluating the Trust Manifest (when present) for
+publisher identity and attestations along the way. Whatever the path,
+the Server Card is advisory: a client reconciles it against the live
+connection and MUST NOT treat it as authoritative for access control —
+the connection itself remains the source of truth. See the Server Card
+[best-practices guidance](https://github.com/modelcontextprotocol/experimental-ext-server-card)
+for the range of client integration strategies.
+
+This separation lets AI Catalog provide the trust and cross-ecosystem
+indexing layer while the MCP Server Card provides the protocol-specific
+operational details. A domain with multiple MCP servers publishes one AI
+Catalog listing all of them, with each entry pointing to its respective
+Server Card.
+
+## What AI Catalog Adds
+
+A Server Card describes a single server but has no cross-server discovery
+or trust layer. AI Catalog fills this gap:
+
+1. **Publisher identity**: Verifiable publisher with DID or domain
+   anchor.
+2. **Trust verification**: Attestations (SOC2, HIPAA, publisher
+   identity proofs) via the Trust Manifest.
+3. **Provenance**: Links to source repositories, registries, and
+   build artifacts with cryptographic digests.
+4. **Signing**: Detached JWS signature on the Trust Manifest for
+   integrity verification.
+5. **Cross-ecosystem discovery**: MCP servers become discoverable
+   alongside A2A agents, plugins, and datasets through a single
+   catalog format.
+6. **Composability**: MCP servers can be packaged with related
+   artifacts (A2A agents, datasets) in nested catalogs.
 
 # Mapping to Claude Code Plugins Marketplace
 
@@ -2115,7 +2022,7 @@ plugins/
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
 | Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
-| Plugin `description` | Stays in the plugin manifest; entry `description` is omitted unless the manifest lacks one (same authoritative-source rule as the plugin name) |
+| Plugin `description` | Stays in the plugin manifest (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
 | Plugin `author` | Entry `publisher` |
