@@ -41,21 +41,7 @@
  </section>
  
  <section id="sotd">
-@@ -199,11 +217,13 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:air:example.com:mcp:weather&quot;,
-+      &quot;displayName&quot;: &quot;Weather Service&quot;,
-       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-       &quot;url&quot;: &quot;https://api.example.com/.well-known/mcp/server-card.json&quot;
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:air:example.com:a2a:research&quot;,
-+      &quot;displayName&quot;: &quot;Research Assistant&quot;,
-       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-       &quot;url&quot;: &quot;https://agents.example.com/researchAssistant&quot;
-     }
-@@ -219,6 +239,13 @@
+@@ -219,6 +237,13 @@
  <dd>An open map of string keys to arbitrary values for custom or
    non-standard metadata. See <a href="#metadata-extensibility">Metadata Extensibility</a>
    for key naming conventions.</dd>
@@ -69,92 +55,7 @@
  </dl>
  </section>
  <section id="host-info">
-@@ -275,6 +302,8 @@
- <p>For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.</p>
- <p>See <a href="#multi-version-entries">Multi-Version Entries</a> for uniqueness rules when multiple versions are present.</p>
- </dd>
-+<dt><code>displayName</code></dt>
-+<dd>A string containing a human-readable name for the artifact.</dd>
- <dt><code>type</code></dt>
- <dd>
- <p>A string containing the identifier that specifies the type of the
-@@ -310,23 +339,6 @@
- </dl>
- <p>The following members are OPTIONAL:</p>
- <dl>
--<dt><code>displayName</code></dt>
--<dd>A string containing a human-readable name for the artifact.
--  This field SHOULD be set only when the referenced artifact does not
--  already carry its own canonical human-readable name — for example a
--  raw dataset (<code>application/parquet</code>), a model blob, or a skill bundle
--  (<code>application/agent-skills+zip</code>), none of which embed a self-describing
--  name. When the referenced artifact does carry such a name — for
--  example the <code>name</code> field of an A2A Agent Card or the <code>title</code> field of
--  an MCP Server Card — that artifact is the authoritative source and
--  <code>displayName</code> SHOULD be omitted to avoid duplicating a value that can
--  drift out of sync. When <code>displayName</code> <em>is</em> present, however, it takes
--  precedence: it is the authoritative value for display, and a consumer
--  SHOULD render it as given even when it differs from a name carried by
--  the referenced artifact. Setting <code>displayName</code> is how a publisher
--  deliberately overrides the artifact's own name. See
--  <a href="#resolving-an-artifacts-display-name">Resolving an Artifact's Display Name</a>
--  for the full consumer resolution order.</dd>
- <dt><code>description</code></dt>
- <dd>A string containing a short description of the artifact.</dd>
- <dt><code>tags</code></dt>
-@@ -351,35 +363,6 @@
-   providing verifiable identity and trust metadata for this artifact.
-   See <a href="#trust-manifest">Trust Manifest</a> for details.</dd>
- </dl>
--<section id="resolving-an-artifact-s-display-name">
--<h3>Resolving an Artifact&#x27;s Display Name</h3>
--<p>Because <code>displayName</code> is OPTIONAL, a consumer rendering a catalog entry
--cannot assume it is present. To obtain a human-readable name, a consumer
--SHOULD resolve one in the following order:</p>
--<ol>
--<li><strong><code>displayName</code> on the entry</strong>, if present. A publisher-supplied
--   <code>displayName</code> always wins, even when it differs from a name carried by
--   the referenced artifact.</li>
--<li><strong>The referenced artifact's own canonical name</strong>, if the consumer has
--   already fetched or cached the artifact — for example the <code>name</code> field
--   of an A2A Agent Card or the <code>title</code> field of an MCP Server Card.</li>
--<li><strong>The trailing segment of the entry's <code>identifier</code></strong> as a last
--   resort — the portion after its final <code>:</code> or <code>/</code> delimiter. For
--   example, <code>urn:air:example.com:mcp:weather</code> yields <code>weather</code> and
--   <code>urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search</code> yields
--   <code>brave-search</code>.</li>
--</ol>
--<p>A consumer SHOULD NOT dereference an artifact at render time solely to
--obtain a name. A registry, directory, or other service built on top of a
--catalog SHOULD resolve the name once at ingestion — alongside any other
--derived metadata it attaches, such as relevance scores or tags — and
--cache the result, rather than fetching artifacts on the rendering path.</p>
--<p>This order also covers a referenced MCP Server Card whose <code>title</code> is
--itself absent: step 2 yields no name, so the consumer falls through to
--the <code>identifier</code> segment in step 3. A publisher MAY still set
--<code>displayName</code> on such an entry to provide a better name than the bare
--identifier segment.</p>
--</section>
- </section>
- <section id="multi-version-entries">
- <h2>Multi-Version Entries</h2>
-@@ -401,6 +384,7 @@
-   &quot;entries&quot;: [
-     {
-       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
-+      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
-       &quot;version&quot;: &quot;2.1.0&quot;,
-       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
-@@ -408,6 +392,7 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance&quot;,
-+      &quot;displayName&quot;: &quot;Acme Finance Agent&quot;,
-       &quot;version&quot;: &quot;2.0.0&quot;,
-       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.0.json&quot;,
-@@ -463,17 +448,44 @@
+@@ -463,17 +488,44 @@
    identity schemes is open.</dd>
  </dl>
  <p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
@@ -204,7 +105,7 @@
  </section>
  <section id="optional-members">
  <h2>Optional Members</h2>
-@@ -498,13 +510,33 @@
+@@ -498,13 +550,33 @@
    artifact.</dd>
  <dt><code>termsOfServiceUrl</code></dt>
  <dd>A string containing a URL to the terms of service.</dd>
@@ -242,7 +143,7 @@
  </dl>
  <p>For example, a Trust Manifest with identity, attestations, and
  provenance:</p>
-@@ -538,9 +570,53 @@
+@@ -538,9 +610,53 @@
    ],
    &quot;privacyPolicyUrl&quot;: &quot;https://acme-corp.com/legal/privacy&quot;,
    &quot;termsOfServiceUrl&quot;: &quot;https://acme-corp.com/legal/terms&quot;,
@@ -296,7 +197,7 @@
  </section>
  <section id="trust-schema-object">
  <h2>Trust Schema Object</h2>
-@@ -639,6 +715,30 @@
+@@ -639,6 +755,30 @@
  <p>This section describes how consumers verify the trust metadata
  carried by a Trust Manifest. Verification is OPTIONAL — consumers
  that do not need trust assurance can skip this entirely.</p>
@@ -327,7 +228,7 @@
  <section id="digest-format">
  <h3>Digest Format</h3>
  <p>Digests in this specification use the format <code>algorithm:hex-value</code>,
-@@ -651,20 +751,53 @@
+@@ -651,20 +791,53 @@
  </section>
  <section id="trust-manifest-signatures">
  <h3>Trust Manifest Signatures</h3>
@@ -392,7 +293,7 @@
  </section>
  <section id="key-resolution">
  <h3>Key Resolution</h3>
-@@ -686,6 +819,29 @@
+@@ -686,6 +859,29 @@
    or look up a DNSKEY/TXT record containing the JWK thumbprint.</dd>
  </dl>
  </section>
@@ -422,7 +323,7 @@
  <section id="verifying-host-identity">
  <h3>Verifying Host Identity</h3>
  <p>To verify the host of a catalog:</p>
-@@ -710,17 +866,37 @@
+@@ -710,17 +906,37 @@
  <li>Confirm the JWT claims bind the <code>publisher.identifier</code> to the Trust
     Manifest's <code>identity</code>.</li>
  </ol>
@@ -466,7 +367,7 @@
  </section>
  <section id="verifying-attestations">
  <h3>Verifying Attestations</h3>
-@@ -731,6 +907,24 @@
+@@ -731,6 +947,24 @@
     declared digest.</li>
  <li>Validate the attestation per its <code>type</code> (e.g., verify a JWT
     signature, confirm a PDF certificate is current).</li>
@@ -491,14 +392,7 @@
  </ol>
  </section>
  </section>
-@@ -970,13 +1164,14 @@
- <ul>
- <li><code>specVersion</code> — the specification version string</li>
- <li><code>entries</code> — an array of Catalog Entry objects, each containing at
--  minimum <code>identifier</code>, <code>type</code>, and exactly one of <code>url</code> or
-+  minimum <code>identifier</code>, <code>displayName</code>, <code>type</code>, and exactly one of <code>url</code> or
-   <code>data</code></li>
- </ul>
+@@ -976,7 +1210,8 @@
  <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
  <code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
  only need a simple list of AI artifacts — for example, a catalog of
@@ -508,7 +402,7 @@
  </section>
  <section id="level-2-discoverable-catalog">
  <h2>Level 2: Discoverable Catalog</h2>
-@@ -991,8 +1186,19 @@
+@@ -991,8 +1226,19 @@
  <h2>Level 3: Trusted Catalog</h2>
  <p>In addition to Level 2 requirements, a Trusted Catalog:</p>
  <ul>
@@ -530,7 +424,7 @@
  <li>MAY include <code>publisher</code> objects on entries with verifiable identifiers</li>
  <li>Enables verifiable identity, compliance attestations, and provenance
    tracking</li>
-@@ -1028,14 +1234,18 @@
+@@ -1028,14 +1274,18 @@
    verification guards against transport-level tampering but not
    catalog-level substitution.</strong></dd>
  <dt><strong>Layer 2 — Signed Trust Manifest</strong></dt>
@@ -557,7 +451,7 @@
  <dt><strong>Layer 3 — Content-Addressed Distribution (OCI)</strong></dt>
  <dd>The catalog is distributed through an OCI registry where all content
    — entries, artifacts, and Trust Manifests — is addressed by
-@@ -1072,10 +1282,37 @@
+@@ -1072,10 +1322,37 @@
    unauthorized modification.</li>
  <li><strong>Layer 1</strong> enables post-fetch integrity checks but does not prevent
    whole-entry substitution.</li>
@@ -597,7 +491,7 @@
  </ul>
  </section>
  <section id="identifier-typosquatting">
-@@ -1133,6 +1370,7 @@
+@@ -1133,6 +1410,7 @@
          specVersion string
          entries CatalogEntry[]
          host HostInfo
@@ -605,7 +499,7 @@
      }
      class HostInfo {
          displayName string
-@@ -1154,10 +1392,17 @@
+@@ -1154,10 +1432,17 @@
      }
      class TrustManifest {
          identity string
@@ -623,7 +517,7 @@
      }
      class TrustSchema {
          identifier string
-@@ -1180,6 +1425,7 @@
+@@ -1180,6 +1465,7 @@
      CatalogEntry --> "0..1" Publisher : publisher
      CatalogEntry --> "0..1" TrustManifest : trustManifest
      HostInfo --> "0..1" TrustManifest : trustManifest
@@ -631,59 +525,7 @@
      TrustManifest --> "0..1" TrustSchema : trustSchema
      TrustManifest --> "*" Attestation : attestations
      TrustManifest --> "*" ProvenanceLink : provenance
-@@ -1354,6 +1600,7 @@
-   &quot;entries&quot;: [
-     {
-       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
-+      &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
-       &quot;version&quot;: &quot;2.1.0&quot;,
-       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;,
-@@ -1385,6 +1632,7 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
-+      &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-       &quot;version&quot;: &quot;1.4.0&quot;,
-       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-       &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
-@@ -1403,11 +1651,13 @@
-         &quot;entries&quot;: [
-           {
-             &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance-a2a&quot;,
-+            &quot;displayName&quot;: &quot;Finance A2A Agent&quot;,
-             &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-             &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance.json&quot;
-           },
-           {
-             &quot;identifier&quot;: &quot;urn:air:acme.com:server:finance-mcp&quot;,
-+            &quot;displayName&quot;: &quot;Finance MCP Server&quot;,
-             &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-             &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
-           },
-@@ -1454,6 +1704,7 @@
-   &quot;entries&quot;: [
-     {
-       &quot;identifier&quot;: &quot;urn:air:acme.com:agent:assistant&quot;,
-+      &quot;displayName&quot;: &quot;Acme Corporate Assistant&quot;,
-       &quot;version&quot;: &quot;3.0.0&quot;,
-       &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-       &quot;url&quot;: &quot;https://api.acme-corp.com/agents/assistant.json&quot;,
-@@ -1511,11 +1762,13 @@
-     &quot;entries&quot;: [
-       {
-         &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:mcp&quot;,
-+        &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-         &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-         &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;
-       },
-       {
-         &quot;identifier&quot;: &quot;urn:air:acme.com:agent:finance:a2a&quot;,
-+        &quot;displayName&quot;: &quot;Acme Finance A2A Agent&quot;,
-         &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
-         &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance&quot;
-       }
-@@ -1539,46 +1792,154 @@
+@@ -1539,46 +1825,154 @@
  catalog with protocol-specific entries, allowing clients to choose
  MCP or A2A based on their capabilities.</p>
  </section>
@@ -873,7 +715,7 @@
  <section id="conceptual-mapping">
  <h2>Conceptual Mapping</h2>
  <p>The OCI image specification (v1.1+) supports arbitrary artifact types
-@@ -1800,6 +2161,182 @@
+@@ -1800,6 +2194,182 @@
  while infrastructure-oriented deployments leverage OCI distribution.</p>
  </section>
  </section>
@@ -1053,68 +895,19 @@
 +that copy is advisory; the Trust Manifest remains authoritative.</p>
 +</section>
 +</section>
- <section class="appendix" id="mapping-to-mcp-registry-server-json">
- <h1>Mapping to MCP Registry server.json</h1>
- <p>This appendix describes how the MCP Registry <code>server.json</code> format
-@@ -1830,7 +2367,7 @@
- Instead, it provides the discovery and trust layer that <code>server.json</code>
- does not address.</p>
+ <section class="appendix" id="mapping-to-mcp-servers">
+ <h1>Mapping to MCP Servers</h1>
+ <p>This appendix describes how <strong>remote (HTTP-connectable) MCP servers</strong>
+@@ -1833,7 +2403,7 @@
+   servers?</dd>
+ </dl>
  </section>
 -<section id="conceptual-mapping-2">
 +<section id="conceptual-mapping-3">
  <h2>Conceptual Mapping</h2>
  <table>
  <thead>
-@@ -1850,7 +2387,7 @@
- </tr>
- <tr>
- <td style="text-align: left;"><code>title</code></td>
--<td style="text-align: left;">Stays in the artifact (<code>server.json</code> carries its own <code>title</code>); entry <code>displayName</code> is omitted unless the artifact lacks a name</td>
-+<td style="text-align: left;">Entry <code>displayName</code></td>
- </tr>
- <tr>
- <td style="text-align: left;"><code>description</code></td>
-@@ -1921,6 +2458,7 @@
- reflects the Registry format:</p>
- <pre><code class="language-json">{
-   &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
-+  &quot;displayName&quot;: &quot;Brave Search&quot;,
-   &quot;version&quot;: &quot;1.0.2&quot;,
-   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-   &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
-@@ -1980,6 +2518,7 @@
-   &quot;entries&quot;: [
-     {
-       &quot;identifier&quot;: &quot;urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search&quot;,
-+      &quot;displayName&quot;: &quot;Brave Search&quot;,
-       &quot;version&quot;: &quot;1.0.2&quot;,
-       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/brave-search/server.json&quot;,
-@@ -1988,6 +2527,7 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:air:modelcontextprotocol.github.io:mcp:filesystem&quot;,
-+      &quot;displayName&quot;: &quot;Filesystem&quot;,
-       &quot;version&quot;: &quot;1.0.2&quot;,
-       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/filesystem/server.json&quot;,
-@@ -1996,6 +2536,7 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:air:example.github.io:mcp:weather-mcp&quot;,
-+      &quot;displayName&quot;: &quot;Weather&quot;,
-       &quot;version&quot;: &quot;0.5.0&quot;,
-       &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-       &quot;url&quot;: &quot;https://registry.modelcontextprotocol.io/servers/weather/server.json&quot;,
-@@ -2073,6 +2614,7 @@
- server can reference the Server Card as its artifact content:</p>
- <pre><code class="language-json">{
-   &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
-+  &quot;displayName&quot;: &quot;Acme Finance MCP Server&quot;,
-   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-   &quot;url&quot;: &quot;https://api.acme-corp.com/.well-known/mcp/server-card.json&quot;,
-   &quot;description&quot;: &quot;MCP server for financial data and trading tools&quot;,
-@@ -2142,7 +2684,7 @@
+@@ -2043,7 +2613,7 @@
      README.md
  </code></pre>
  </section>
@@ -1123,44 +916,3 @@
  <h2>Conceptual Mapping</h2>
  <table>
  <thead>
-@@ -2174,7 +2716,7 @@
- </tr>
- <tr>
- <td style="text-align: left;">Plugin <code>name</code></td>
--<td style="text-align: left;">Entry <code>identifier</code> (derived as URN); the plugin manifest carries its own name, so entry <code>displayName</code> is omitted</td>
-+<td style="text-align: left;">Entry <code>displayName</code> and <code>identifier</code> (derived as URN)</td>
- </tr>
- <tr>
- <td style="text-align: left;">Plugin <code>description</code></td>
-@@ -2255,6 +2797,7 @@
-   &quot;entries&quot;: [
-     {
-       &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
-+      &quot;displayName&quot;: &quot;agent-sdk-dev&quot;,
-       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
-       &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
-       &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
-@@ -2269,6 +2812,7 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
-+      &quot;displayName&quot;: &quot;adspirer-ads-agent&quot;,
-       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
-       &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
-       &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
-@@ -2289,6 +2833,7 @@
-     },
-     {
-       &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
-+      &quot;displayName&quot;: &quot;aikido&quot;,
-       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
-       &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
-       &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
-@@ -2333,6 +2878,7 @@
-     &quot;entries&quot;: [
-       {
-         &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;,
-+        &quot;displayName&quot;: &quot;Example Plugin MCP Server&quot;,
-         &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
-         &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json&quot;
-       },

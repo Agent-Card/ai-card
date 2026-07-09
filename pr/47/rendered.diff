@@ -8,21 +8,7 @@
  
  Status of This Document
  
-@@ -141,11 +141,13 @@
- },
- {
- "identifier": "urn:air:example.com:mcp:weather",
-+"displayName": "Weather Service",
- "type": "application/mcp-server-card+json",
- "url": "https://api.example.com/.well-known/mcp/server-card.json"
- },
- {
- "identifier": "urn:air:example.com:a2a:research",
-+"displayName": "Research Assistant",
- "type": "application/a2a-agent-card+json",
- "url": "https://agents.example.com/researchAssistant"
- }
-@@ -164,6 +166,15 @@
+@@ -164,6 +164,15 @@
  An open map of string keys to arbitrary values for custom or
  non-standard metadata. See Metadata Extensibility
  for key naming conventions.
@@ -38,99 +24,7 @@
  
  Host Info
  
-@@ -232,6 +243,10 @@
- 
- See Multi-Version Entries for uniqueness rules when multiple versions are present.
- 
-+displayName
-+
-+A string containing a human-readable name for the artifact.
-+
- type
- 
- A string containing the identifier that specifies the type of the
-@@ -275,25 +290,6 @@
- is opaque to this specification.
- 
- The following members are OPTIONAL:
--
--displayName
--
--A string containing a human-readable name for the artifact.
--This field SHOULD be set only when the referenced artifact does not
--already carry its own canonical human-readable name — for example a
--raw dataset (application/parquet), a model blob, or a skill bundle
--(application/agent-skills+zip), none of which embed a self-describing
--name. When the referenced artifact does carry such a name — for
--example the name field of an A2A Agent Card or the title field of
--an MCP Server Card — that artifact is the authoritative source and
--displayName SHOULD be omitted to avoid duplicating a value that can
--drift out of sync. When displayName is present, however, it takes
--precedence: it is the authoritative value for display, and a consumer
--SHOULD render it as given even when it differs from a name carried by
--the referenced artifact. Setting displayName is how a publisher
--deliberately overrides the artifact's own name. See
--Resolving an Artifact's Display Name
--for the full consumer resolution order.
- 
- description
- 
-@@ -331,38 +327,6 @@
- A Trust Manifest object as defined in Trust Manifest
- providing verifiable identity and trust metadata for this artifact.
- See Trust Manifest for details.
--
--Resolving an Artifact's Display Name
--
--Because displayName is OPTIONAL, a consumer rendering a catalog entry
--cannot assume it is present. To obtain a human-readable name, a consumer
--SHOULD resolve one in the following order:
--
--displayName on the entry, if present. A publisher-supplied
--displayName always wins, even when it differs from a name carried by
--the referenced artifact.
--
--The referenced artifact's own canonical name, if the consumer has
--already fetched or cached the artifact — for example the name field
--of an A2A Agent Card or the title field of an MCP Server Card.
--
--The trailing segment of the entry's identifier as a last
--resort — the portion after its final : or / delimiter. For
--example, urn:air:example.com:mcp:weather yields weather and
--urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search yields
--brave-search.
--
--A consumer SHOULD NOT dereference an artifact at render time solely to
--obtain a name. A registry, directory, or other service built on top of a
--catalog SHOULD resolve the name once at ingestion — alongside any other
--derived metadata it attaches, such as relevance scores or tags — and
--cache the result, rather than fetching artifacts on the rendering path.
--
--This order also covers a referenced MCP Server Card whose title is
--itself absent: step 2 yields no name, so the consumer falls through to
--the identifier segment in step 3. A publisher MAY still set
--displayName on such an entry to provide a better name than the bare
--identifier segment.
- 
- Multi-Version Entries
- 
-@@ -388,6 +352,7 @@
- "entries": [
- {
- "identifier": "urn:air:acme.com:agent:finance",
-+"displayName": "Acme Finance Agent",
- "version": "2.1.0",
- "type": "application/a2a-agent-card+json",
- "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
-@@ -395,6 +360,7 @@
- },
- {
- "identifier": "urn:air:acme.com:agent:finance",
-+"displayName": "Acme Finance Agent",
- "version": "2.0.0",
- "type": "application/a2a-agent-card+json",
- "url": "https://api.acme-corp.com/agents/finance/v2.0.json",
-@@ -455,11 +421,14 @@
+@@ -455,11 +464,14 @@
  identity schemes is open.
  
  When a Trust Manifest appears within a Catalog Entry, the identity
@@ -150,7 +44,7 @@
  
  When a Trust Manifest appears on a Host Info object, identity
  SHOULD match the host's identifier field when present.
-@@ -469,6 +438,34 @@
+@@ -469,6 +481,34 @@
  requirement that all versions carry identical trust metadata — trust
  properties may evolve across versions.
  
@@ -185,7 +79,7 @@
  Optional Members
  
  The following members are OPTIONAL:
-@@ -504,16 +501,42 @@
+@@ -504,16 +544,42 @@
  
  A string containing a URL to the terms of service.
  
@@ -232,7 +126,7 @@
  
  For example, a Trust Manifest with identity, attestations, and
  provenance:
-@@ -548,8 +571,58 @@
+@@ -548,8 +614,58 @@
  ],
  "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
  "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
@@ -291,7 +185,7 @@
  
  Trust Schema Object
  
-@@ -673,6 +746,33 @@
+@@ -673,6 +789,33 @@
  carried by a Trust Manifest. Verification is OPTIONAL — consumers
  that do not need trust assurance can skip this entirely.
  
@@ -325,7 +219,7 @@
  Digest Format
  
  Digests in this specification use the format algorithm:hex-value,
-@@ -686,22 +786,60 @@
+@@ -686,22 +829,60 @@
  
  Trust Manifest Signatures
  
@@ -400,7 +294,7 @@
  
  Key Resolution
  
-@@ -729,6 +867,32 @@
+@@ -729,6 +910,32 @@
  Resolve the domain's TLS certificate and extract the public key,
  or look up a DNSKEY/TXT record containing the JWK thumbprint.
  
@@ -433,7 +327,7 @@
  Verifying Host Identity
  
  To verify the host of a catalog:
-@@ -757,17 +921,41 @@
+@@ -757,17 +964,41 @@
  Confirm the JWT claims bind the publisher.identifier to the Trust
  Manifest's identity.
  
@@ -484,7 +378,7 @@
  
  Verifying Attestations
  
-@@ -780,6 +968,26 @@
+@@ -780,6 +1011,26 @@
  
  Validate the attestation per its type (e.g., verify a JWT
  signature, confirm a PDF certificate is current).
@@ -511,14 +405,7 @@
  
  Organizing Catalogs
  
-@@ -1035,13 +1243,14 @@
- specVersion — the specification version string
- 
- entries — an array of Catalog Entry objects, each containing at
--minimum identifier, type, and exactly one of url or
-+minimum identifier, displayName, type, and exactly one of url or
- data
- 
+@@ -1041,7 +1292,8 @@
  All other fields (host, publisher, trustManifest,
  metadata) are OPTIONAL. This level is sufficient for use cases that
  only need a simple list of AI artifacts — for example, a catalog of
@@ -528,7 +415,7 @@
  
  Level 2: Discoverable Catalog
  
-@@ -1056,8 +1265,22 @@
+@@ -1056,8 +1308,22 @@
  
  In addition to Level 2 requirements, a Trusted Catalog:
  
@@ -553,7 +440,7 @@
  
  MAY include publisher objects on entries with verifiable identifiers
  
-@@ -1099,14 +1322,18 @@
+@@ -1099,14 +1365,18 @@
  
  Layer 2 — Signed Trust Manifest
  
@@ -580,7 +467,7 @@
  
  Layer 3 — Content-Addressed Distribution (OCI)
  
-@@ -1149,11 +1376,39 @@
+@@ -1149,11 +1419,39 @@
  Layer 1 enables post-fetch integrity checks but does not prevent
  whole-entry substitution.
  
@@ -622,7 +509,7 @@
  
  Identifier Typosquatting
  
-@@ -1213,6 +1468,7 @@
+@@ -1213,6 +1511,7 @@
  specVersion string
  entries CatalogEntry[]
  host HostInfo
@@ -630,7 +517,7 @@
  }
  class HostInfo {
  displayName string
-@@ -1234,10 +1490,17 @@
+@@ -1234,10 +1533,17 @@
  }
  class TrustManifest {
  identity string
@@ -648,7 +535,7 @@
  }
  class TrustSchema {
  identifier string
-@@ -1260,6 +1523,7 @@
+@@ -1260,6 +1566,7 @@
  CatalogEntry --> "0..1" Publisher : publisher
  CatalogEntry --> "0..1" TrustManifest : trustManifest
  HostInfo --> "0..1" TrustManifest : trustManifest
@@ -656,59 +543,7 @@
  TrustManifest --> "0..1" TrustSchema : trustSchema
  TrustManifest --> "*" Attestation : attestations
  TrustManifest --> "*" ProvenanceLink : provenance
-@@ -1465,6 +1729,7 @@
- "entries": [
- {
- "identifier": "urn:air:acme.com:agent:finance-a2a",
-+"displayName": "Acme Finance A2A Agent",
- "version": "2.1.0",
- "type": "application/a2a-agent-card+json",
- "url": "https://api.acme-corp.com/agents/finance.json",
-@@ -1496,6 +1761,7 @@
- },
- {
- "identifier": "urn:air:acme.com:server:finance-mcp",
-+"displayName": "Acme Finance MCP Server",
- "version": "1.4.0",
- "type": "application/mcp-server-card+json",
- "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
-@@ -1514,11 +1780,13 @@
- "entries": [
- {
- "identifier": "urn:air:acme.com:agent:finance-a2a",
-+"displayName": "Finance A2A Agent",
- "type": "application/a2a-agent-card+json",
- "url": "https://api.acme-corp.com/agents/finance.json"
- },
- {
- "identifier": "urn:air:acme.com:server:finance-mcp",
-+"displayName": "Finance MCP Server",
- "type": "application/mcp-server-card+json",
- "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
- },
-@@ -1565,6 +1833,7 @@
- "entries": [
- {
- "identifier": "urn:air:acme.com:agent:assistant",
-+"displayName": "Acme Corporate Assistant",
- "version": "3.0.0",
- "type": "application/a2a-agent-card+json",
- "url": "https://api.acme-corp.com/agents/assistant.json",
-@@ -1623,11 +1892,13 @@
- "entries": [
- {
- "identifier": "urn:air:acme.com:agent:finance:mcp",
-+"displayName": "Acme Finance MCP Server",
- "type": "application/mcp-server-card+json",
- "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json"
- },
- {
- "identifier": "urn:air:acme.com:agent:finance:a2a",
-+"displayName": "Acme Finance A2A Agent",
- "type": "application/a2a-agent-card+json",
- "url": "https://api.acme-corp.com/agents/finance"
- }
-@@ -1651,13 +1922,7 @@
+@@ -1651,13 +1958,7 @@
  catalog with protocol-specific entries, allowing clients to choose
  MCP or A2A based on their capabilities.
  
@@ -723,7 +558,7 @@
  
  The AI Catalog specification defines a logical format: a JSON
  document with entries, displayName, type, and trustManifest
-@@ -1665,36 +1930,153 @@
+@@ -1665,36 +1966,153 @@
  artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
  consume simple JSON.
  
@@ -904,10 +739,11 @@
  
  Conceptual Mapping
  
-@@ -1912,6 +2294,174 @@
+@@ -1911,6 +2329,174 @@
+ Both approaches can coexist. A tooling bridge converts between them
  losslessly, allowing simple consumers to work with the logical format
  while infrastructure-oriented deployments leverage OCI distribution.
- 
++
 +Mapping to xRegistry
 +
 +This appendix binds the Mapping to Distribution
@@ -1075,97 +911,6 @@
 +model as plain-HTTP distribution. An implementation MAY additionally
 +expose the digest as an extension attribute for discovery convenience, but
 +that copy is advisory; the Trust Manifest remains authoritative.
-+
- Mapping to MCP Registry server.json
  
- This appendix describes how the MCP Registry server.json format
-@@ -1959,7 +2509,7 @@
+ Mapping to MCP Servers
  
- title
- 
--Stays in the artifact (server.json carries its own title); entry displayName is omitted unless the artifact lacks a name
-+Entry displayName
- 
- description
- 
-@@ -2031,6 +2581,7 @@
- 
- {
- "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-+"displayName": "Brave Search",
- "version": "1.0.2",
- "type": "application/mcp-server-card+json",
- "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-@@ -2090,6 +2641,7 @@
- "entries": [
- {
- "identifier": "urn:air:anonymous.modelcontextprotocol.io:mcp:brave-search",
-+"displayName": "Brave Search",
- "version": "1.0.2",
- "type": "application/mcp-server-card+json",
- "url": "https://registry.modelcontextprotocol.io/servers/brave-search/server.json",
-@@ -2098,6 +2650,7 @@
- },
- {
- "identifier": "urn:air:modelcontextprotocol.github.io:mcp:filesystem",
-+"displayName": "Filesystem",
- "version": "1.0.2",
- "type": "application/mcp-server-card+json",
- "url": "https://registry.modelcontextprotocol.io/servers/filesystem/server.json",
-@@ -2106,6 +2659,7 @@
- },
- {
- "identifier": "urn:air:example.github.io:mcp:weather-mcp",
-+"displayName": "Weather",
- "version": "0.5.0",
- "type": "application/mcp-server-card+json",
- "url": "https://registry.modelcontextprotocol.io/servers/weather/server.json",
-@@ -2194,6 +2748,7 @@
- 
- {
- "identifier": "urn:air:example.com:mcp:finance-server",
-+"displayName": "Acme Finance MCP Server",
- "type": "application/mcp-server-card+json",
- "url": "https://api.acme-corp.com/.well-known/mcp/server-card.json",
- "description": "MCP server for financial data and trading tools",
-@@ -2295,7 +2850,7 @@
- 
- Plugin name
- 
--Entry identifier (derived as URN); the plugin manifest carries its own name, so entry displayName is omitted
-+Entry displayName and identifier (derived as URN)
- 
- Plugin description
- 
-@@ -2378,6 +2933,7 @@
- "entries": [
- {
- "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
-+"displayName": "agent-sdk-dev",
- "type": "application/vnd.anthropic.claude-plugin+json",
- "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
- "description": "Development kit for working with the Claude Agent SDK",
-@@ -2392,6 +2948,7 @@
- },
- {
- "identifier": "urn:claude-plugin:adspirer:ads-agent",
-+"displayName": "adspirer-ads-agent",
- "type": "application/vnd.anthropic.claude-plugin+json",
- "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
- "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
-@@ -2412,6 +2969,7 @@
- },
- {
- "identifier": "urn:claude-plugin:aikido:security",
-+"displayName": "aikido",
- "type": "application/vnd.anthropic.claude-plugin+json",
- "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
- "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
-@@ -2456,6 +3014,7 @@
- "entries": [
- {
- "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
-+"displayName": "Example Plugin MCP Server",
- "type": "application/mcp-server-card+json",
- "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
- },
