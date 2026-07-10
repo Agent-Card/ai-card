@@ -140,10 +140,10 @@ The following members are OPTIONAL:
 : A Host Info object as defined in [Host Info](#host-info) identifying the
   operator of this catalog.
 
-`metadata`
-: An open map of string keys to arbitrary values for custom or
-  non-standard metadata. See [Metadata Extensibility](#metadata-extensibility)
-  for key naming conventions.
+`extensions`
+: An array of Extension objects containing custom, vendor-specific, or
+  non-standard fields. See [Extensions](#extensions) for definitions and
+  official extension types.
 
 ## Host Info
 
@@ -274,8 +274,8 @@ The following members are OPTIONAL:
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
   when this entry was last modified.
 
-`metadata`
-: An open map of string keys to arbitrary values for custom data.
+`extensions`
+: An array of Extension objects containing custom data.
 
 `publisher`
 : A Publisher object as defined in [Publisher Object](#publisher-object)
@@ -455,9 +455,8 @@ The following members are OPTIONAL:
   over the Trust Manifest content. This enables integrity verification
   of the trust metadata independent of the artifact.
 
-`metadata`
-: An open map of string keys to arbitrary values for extending trust
-  metadata.
+`extensions`
+: An array of Extension objects for extending trust metadata.
 
 For example, a Trust Manifest with identity, attestations, and
 provenance:
@@ -783,40 +782,41 @@ depth to prevent circular references. A depth limit of 4 is
 RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.
 
-# Metadata Extensibility
+# Extensions
 
-The `metadata` property appears on the AI Catalog top-level object,
+The `extensions` property appears on the AI Catalog top-level object,
 on Catalog Entry objects, and on Trust Manifest objects. It provides
 a single, well-defined extension point for custom or vendor-specific
 properties.
 
-## Key Naming
+## Format and Key Naming
 
-Metadata keys MUST be non-empty strings. To avoid collisions between
-independent publishers, the following conventions are RECOMMENDED:
+The `extensions` field is an array of objects. Each object MUST contain
+a `type` string and a `data` object.
 
-- **Reverse-DNS prefix** for vendor-specific keys:
+To avoid collisions between independent publishers, the `type` field MUST
+be a valid URL or a reverse-DNS string:
+
+- **Reverse-DNS prefix** for vendor-specific extensions:
   `com.example.confidenceScore`, `io.acme.deploymentRegion`.
-- **Short, unqualified names** for keys the publisher considers
-  broadly useful and unlikely to conflict: `repository`, `homepage`,
-  `license`.
-- **Avoid keys that duplicate** defined catalog fields (`displayName`,
-  `description`, `tags`, `version`). Consumers MAY ignore metadata
-  entries that shadow standard fields.
+- **URL prefix** for publicly accessible extension schemas:
+  `https://cisco.com/extensions/security-scan`.
 
-## Reserved Keys
+Consumers that do not recognize an extension `type` MUST ignore it without
+throwing an error.
 
-No metadata keys are reserved by this specification. Future
-specification versions MAY promote commonly used metadata keys into
-standard fields. When this occurs, the metadata key SHOULD be
-retained for backward compatibility and the standard field takes
-precedence.
+## Official Extensions
 
-## Value Types
+While publishers are free to create custom extensions, this specification
+defines a set of "Official" known types for commonly requested schemas:
 
-Metadata values MAY be any valid JSON type (string, number, boolean,
-array, object, null). Consumers that do not recognize a metadata key
-SHOULD ignore it.
+1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
+   - Used to store generic, schemaless key-value pairs (replacing the legacy metadata field).
+2. **SBOM** (`https://ai-catalog.org/extensions/sbom`)
+   - Used to embed or link to a Software Bill of Materials for the catalog entry.
+
+As custom extensions become highly popular, the AI-Catalog TSC may promote
+them to Official Known Types or core standard fields in future specification versions.
 
 # Version Handling
 
@@ -1267,7 +1267,12 @@ AICatalog = {
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? metadata: { * text => any }
+  ? extensions: [* Extension]
+}
+
+Extension = {
+  type: text,
+  data: any
 }
 
 HostInfo = {
@@ -1289,7 +1294,7 @@ CatalogEntry = {
   ? publisher: Publisher,
   ? trustManifest: TrustManifest,
   ? updatedAt: tdate,
-  ? metadata: { * text => any }
+  ? extensions: [* Extension]
 }
 
 Publisher = {
@@ -1311,7 +1316,7 @@ TrustManifest = {
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text,
   ? signature: text,
-  ? metadata: { * text => any }
+  ? extensions: [* Extension]
 }
 
 TrustSchema = {
