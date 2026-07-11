@@ -57,7 +57,7 @@
 
 <section id="abstract">
   <h2>Abstract</h2>
-  <p>This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.</p>
+  <p>This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, MCP Server Cards, and the Claude Code Plugins marketplace.</p>
 </section>
 
 <section id="sotd">
@@ -907,8 +907,9 @@ following well-known URI [[RFC8615]]:</p>
 </code></pre>
 <p>Clients performing domain-level discovery SHOULD attempt to retrieve
 this well-known URL. If a valid AI Catalog document is returned, the
-client SHOULD use the <code>url</code> entries to retrieve individual artifacts
-and their associated Trust Manifests.</p>
+client SHOULD use the entries' <code>url</code> values to retrieve individual
+artifacts. Trust metadata, when present, is carried inline on the
+entries as Trust Manifests.</p>
 <p>Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
 other locations (e.g., as part of an API response or a package
 registry) are fully conformant.</p>
@@ -1375,7 +1376,7 @@ artifact types including a nested catalog packaging related artifacts:</p>
           {
             &quot;type&quot;: &quot;SOC2-Type2&quot;,
             &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
-            &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+            &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
           }
         ],
         &quot;privacyPolicyUrl&quot;: &quot;https://acme.com/legal/privacy&quot;,
@@ -1528,7 +1529,7 @@ containing both protocol-specific entries:</p>
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,
         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
       }
     ]
   }
@@ -1849,7 +1850,7 @@ discovery and trust layer that the Server Card does not address.</p>
 </tr>
 <tr>
 <td style="text-align: left;">Server <code>name</code> (reverse-DNS identifier)</td>
-<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:example.com:mcp:finance-server</code>)</td>
+<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:acme-corp.com:mcp:finance-server</code>)</td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>title</code></td>
@@ -1892,7 +1893,7 @@ discovery and trust layer that the Server Card does not address.</p>
 server's Server Card and whose <code>type</code> is the known type
 <code>application/mcp-server-card+json</code>:</p>
 <pre><code class="language-json">{
-  &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
+  &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:finance-server&quot;,
   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
   &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/server-card&quot;,
   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
@@ -1901,7 +1902,7 @@ server's Server Card and whose <code>type</code> is the known type
     &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
   },
   &quot;trustManifest&quot;: {
-    &quot;identity&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
+    &quot;identity&quot;: &quot;urn:air:acme-corp.com:mcp:finance-server&quot;,
     &quot;attestations&quot;: [
       {
         &quot;type&quot;: &quot;publisher-identity&quot;,
@@ -1910,7 +1911,7 @@ server's Server Card and whose <code>type</code> is the known type
       {
         &quot;type&quot;: &quot;SOC2-Type2&quot;,
         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
-        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
       }
     ]
   }
