@@ -41,7 +41,7 @@ An agent that supports both MCP and A2A protocols can be represented as a single
           {
             "type": "SOC2-Type2",
             "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-            "digest": "sha256:a1b2c3d4e5f6"
+            "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
           }
         ]
       }

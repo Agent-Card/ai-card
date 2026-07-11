@@ -90,7 +90,6 @@ The simplest trust step is asserting publisher identity. Use an attestation of t
 ```json
 "trustManifest": {
   "identity": "urn:air:acme-corp.com:a2a:finance",
-  "identityType": "did",
   "attestations": [
     {
       "type": "publisher-identity",
@@ -139,7 +138,7 @@ Provenance links trace where an artifact came from:
 ]
 ```
 
-Three `relation` types are defined:
+The `relation` field is an open string. Three common values:
 
 | Relation | Meaning |
 |---|---|
@@ -200,7 +199,6 @@ A Trust Manifest with identity, compliance attestation, provenance, and signatur
   },
   "trustManifest": {
     "identity": "urn:air:acme-corp.com:a2a:finance",
-    "identityType": "did",
     "trustSchema": {
       "identifier": "urn:trust:acme-enterprise-v1",
       "version": "1.0",
