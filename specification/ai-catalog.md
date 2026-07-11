@@ -1153,7 +1153,6 @@ classDiagram
     class Attestation {
         type string
         uri string
-        type string
         digest string
     }
     class ProvenanceLink {
@@ -1325,7 +1324,6 @@ TrustSchema = {
 Attestation = {
   type: text,
   uri: text,
-  type: text,
   ? digest: text,
   ? size: uint,
   ? description: text
@@ -1669,11 +1667,11 @@ authored by hand:
 ```json
 {
   "schemaVersion": 2,
-  "type": "application/vnd.oci.image.index.v1+json",
+  "mediaType": "application/vnd.oci.image.index.v1+json",
   "artifactType": "application/ai-catalog+json",
   "manifests": [
     {
-      "type": "application/vnd.oci.image.manifest.v1+json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:aaa111...",
       "size": 1024,
       "artifactType": "application/a2a-agent-card+json",
@@ -1683,7 +1681,7 @@ authored by hand:
       }
     },
     {
-      "type": "application/vnd.oci.image.manifest.v1+json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:bbb222...",
       "size": 512,
       "artifactType": "application/mcp-server-card+json",
