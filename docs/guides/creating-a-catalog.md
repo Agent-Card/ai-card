@@ -86,7 +86,7 @@ Every entry must have these three things:
 | A2A Agent Card | `application/a2a-agent-card+json` |
 | MCP Server Card | `application/mcp-server-card+json` |
 | Agent Skill metadata (JSON) | `application/agent-skills+json` |
-| Agent Skill (Markdown) | `application/agent-skills+md` |
+| Agent Skill (Markdown) | `text/markdown;profile="urn:air:agent-skill"` |
 | Agent Skill (ZIP bundle) | `application/agent-skills+zip` |
 | Agent Skill (gzipped tarball) | `application/agent-skills+gzip` |
 | Dataset | `application/parquet`, `text/csv`, or appropriate type |

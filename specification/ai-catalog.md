@@ -219,7 +219,7 @@ It MUST contain the following members:
     - `application/a2a-agent-card+json` — an A2A Agent Card
     - `application/mcp-server-card+json` — an MCP Server Card
     - `application/agent-skills+json` — Agent Skill Metadata json file
-    - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file (the suffix `+md` is to be registered)
+    - `text/markdown;profile="urn:air:agent-skill"` — an Agent Skill defined in a standard Markdown file (the `profile` parameter identifies the document as an Agent Skill)
     - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
     - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
 
