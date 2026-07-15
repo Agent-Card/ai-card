@@ -1052,7 +1052,7 @@ as advisory, not authoritative.</p>
 </section>
 <section id="nested-catalog-depth-and-circular-references">
 <h2>Nested Catalog Depth and Circular References</h2>
-<p>Clients processing nested catalogs MUST enforce a maximum recursion
+<p>Clients processing nested catalogs SHOULD enforce a maximum recursion
 depth to prevent denial-of-service attacks via deeply nested or
 circular catalog references. A maximum depth of 4 is RECOMMENDED.</p>
 <p>Depth limits alone do not prevent circular references at shallow
