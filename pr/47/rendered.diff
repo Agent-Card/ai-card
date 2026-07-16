@@ -3,7 +3,7 @@
 @@ -1,6 +1,6 @@
  Abstract
  
--This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.
+-This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, MCP Server Cards, and the Claude Code Plugins marketplace.
 +This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices define a substrate-neutral distribution-mapping contract and concrete bindings to OCI distribution registries and xRegistry, plus mappings to the MCP Registry server.json format and the Claude Code Plugins marketplace.
  
  Status of This Document
@@ -405,7 +405,7 @@
  
  Organizing Catalogs
  
-@@ -1041,7 +1292,8 @@
+@@ -1042,7 +1293,8 @@
  All other fields (host, publisher, trustManifest,
  metadata) are OPTIONAL. This level is sufficient for use cases that
  only need a simple list of AI artifacts — for example, a catalog of
@@ -415,7 +415,7 @@
  
  Level 2: Discoverable Catalog
  
-@@ -1056,8 +1308,22 @@
+@@ -1057,8 +1309,22 @@
  
  In addition to Level 2 requirements, a Trusted Catalog:
  
@@ -440,7 +440,7 @@
  
  MAY include publisher objects on entries with verifiable identifiers
  
-@@ -1099,14 +1365,18 @@
+@@ -1100,14 +1366,18 @@
  
  Layer 2 — Signed Trust Manifest
  
@@ -467,7 +467,7 @@
  
  Layer 3 — Content-Addressed Distribution (OCI)
  
-@@ -1149,11 +1419,39 @@
+@@ -1150,11 +1420,39 @@
  Layer 1 enables post-fetch integrity checks but does not prevent
  whole-entry substitution.
  
@@ -509,7 +509,7 @@
  
  Identifier Typosquatting
  
-@@ -1213,6 +1511,7 @@
+@@ -1214,6 +1512,7 @@
  specVersion string
  entries CatalogEntry[]
  host HostInfo
@@ -517,7 +517,7 @@
  }
  class HostInfo {
  displayName string
-@@ -1234,10 +1533,17 @@
+@@ -1235,10 +1534,17 @@
  }
  class TrustManifest {
  identity string
@@ -543,7 +543,7 @@
  TrustManifest --> "0..1" TrustSchema : trustSchema
  TrustManifest --> "*" Attestation : attestations
  TrustManifest --> "*" ProvenanceLink : provenance
-@@ -1651,13 +1958,7 @@
+@@ -1650,13 +1957,7 @@
  catalog with protocol-specific entries, allowing clients to choose
  MCP or A2A based on their capabilities.
  
@@ -558,7 +558,7 @@
  
  The AI Catalog specification defines a logical format: a JSON
  document with entries, displayName, type, and trustManifest
-@@ -1665,36 +1966,153 @@
+@@ -1664,36 +1965,153 @@
  artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
  consume simple JSON.
  
@@ -739,7 +739,7 @@
  
  Conceptual Mapping
  
-@@ -1911,6 +2329,174 @@
+@@ -1910,6 +2328,174 @@
  Both approaches can coexist. A tooling bridge converts between them
  losslessly, allowing simple consumers to work with the logical format
  while infrastructure-oriented deployments leverage OCI distribution.
