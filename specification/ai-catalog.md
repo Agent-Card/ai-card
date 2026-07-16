@@ -1110,8 +1110,9 @@ following well-known URI [[RFC8615]]:
 
 Clients performing domain-level discovery SHOULD attempt to retrieve
 this well-known URL. If a valid AI Catalog document is returned, the
-client SHOULD use the `url` entries to retrieve individual artifacts
-and their associated Trust Manifests.
+client SHOULD use the entries' `url` values to retrieve individual
+artifacts. Trust metadata, when present, is carried inline on the
+entries as Trust Manifests.
 
 Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
 other locations (e.g., as part of an API response or a package
@@ -1277,7 +1278,7 @@ as advisory, not authoritative.
 
 ## Nested Catalog Depth and Circular References
 
-Clients processing nested catalogs MUST enforce a maximum recursion
+Clients processing nested catalogs SHOULD enforce a maximum recursion
 depth to prevent denial-of-service attacks via deeply nested or
 circular catalog references. A maximum depth of 4 is RECOMMENDED.
 
@@ -1429,7 +1430,6 @@ classDiagram
     class Attestation {
         type string
         uri string
-        type string
         digest string
     }
     class ProvenanceLink {
@@ -1602,7 +1602,6 @@ TrustSchema = {
 Attestation = {
   type: text,
   uri: text,
-  type: text,
   ? digest: text,
   ? size: uint,
   ? description: text
@@ -1655,7 +1654,7 @@ artifact types including a nested catalog packaging related artifacts:
           {
             "type": "SOC2-Type2",
             "uri": "https://trust.acme.com/reports/soc2.pdf",
-            "digest": "sha256:a1b2c3d4e5f6"
+            "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
           }
         ],
         "privacyPolicyUrl": "https://acme.com/legal/privacy",
@@ -1813,7 +1812,7 @@ containing both protocol-specific entries:
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "digest": "sha256:a1b2c3d4e5f6"
+        "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
       }
     ]
   }
@@ -1993,11 +1992,11 @@ authored by hand:
 ```json
 {
   "schemaVersion": 2,
-  "type": "application/vnd.oci.image.index.v1+json",
+  "mediaType": "application/vnd.oci.image.index.v1+json",
   "artifactType": "application/ai-catalog+json",
   "manifests": [
     {
-      "type": "application/vnd.oci.image.manifest.v1+json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:aaa111...",
       "size": 1024,
       "artifactType": "application/a2a-agent-card+json",
@@ -2007,7 +2006,7 @@ authored by hand:
       }
     },
     {
-      "type": "application/vnd.oci.image.manifest.v1+json",
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "digest": "sha256:bbb222...",
       "size": 512,
       "artifactType": "application/mcp-server-card+json",
@@ -2243,7 +2242,7 @@ AI Catalog (cross-artifact)
 | MCP Server Card | AI Catalog Equivalent |
 |:---|:---|
 | Server Card document (whole file) | Artifact content via entry `url` (type `application/mcp-server-card+json`) or `data` |
-| Server `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:example.com:mcp:finance-server`) |
+| Server `name` (reverse-DNS identifier) | Entry `identifier` (mapped to the `urn:air:{publisher}:{namespace}:{name}` URN form — e.g. `urn:air:acme-corp.com:mcp:finance-server`) |
 | `title` | Stays in the Server Card (which carries its own `title`); entry `displayName` is omitted unless the artifact lacks a name |
 | `description` | Stays in the Server Card (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
 | `version` | Stays in the Server Card (which carries its own `version`); entry `version` is omitted to avoid duplicating a value that can drift (a remote MCP server serves one Server Card, so a catalog never lists multiple versions of it) |
@@ -2261,7 +2260,7 @@ server's Server Card and whose `type` is the known type
 
 ```json
 {
-  "identifier": "urn:air:example.com:mcp:finance-server",
+  "identifier": "urn:air:acme-corp.com:mcp:finance-server",
   "type": "application/mcp-server-card+json",
   "url": "https://api.acme-corp.com/mcp/server-card",
   "tags": ["finance", "mcp"],
@@ -2270,7 +2269,7 @@ server's Server Card and whose `type` is the known type
     "displayName": "Acme Financial Corp"
   },
   "trustManifest": {
-    "identity": "urn:air:example.com:mcp:finance-server",
+    "identity": "urn:air:acme-corp.com:mcp:finance-server",
     "attestations": [
       {
         "type": "publisher-identity",
@@ -2279,7 +2278,7 @@ server's Server Card and whose `type` is the known type
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "digest": "sha256:a1b2c3d4e5f6"
+        "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
       }
     ]
   }

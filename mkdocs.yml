@@ -78,15 +78,18 @@ extra:
 
 nav:
   - Home: index.md
+  - Specification: specification.md
   - Getting Started: getting-started.md
   - Guides:
       - Creating a Catalog: guides/creating-a-catalog.md
-      - Serving Your Catalog: guides/serving-your-catalog.md
-      - Consuming Catalogs: guides/consuming-catalogs.md
       - Organizing Catalogs: guides/organizing-catalogs.md
+      - Consuming Catalogs: guides/consuming-catalogs.md
+      - Serving Your Catalog: guides/serving-your-catalog.md
       - Adding Trust: guides/adding-trust.md
   - Examples:
       - Minimal Catalog: examples/minimal-catalog.md
       - Multi-Protocol Agent: examples/multi-protocol-agent.md
       - Nested Catalogs: examples/nested-catalogs.md
-  - Full Specification: specification.md
+  - Implementations: implementations.md
+
+
