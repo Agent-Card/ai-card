@@ -141,7 +141,7 @@ The following members are OPTIONAL:
   operator of this catalog.
 
 `extensions`
-: An array of Extension objects containing custom, vendor-specific, or
+: A JSON object (map) containing custom, vendor-specific, or
   non-standard fields. See [Extensions](#extensions) for definitions and
   official extension types.
 
@@ -275,7 +275,7 @@ The following members are OPTIONAL:
   when this entry was last modified.
 
 `extensions`
-: An array of Extension objects containing custom data.
+: A JSON object (map) containing custom data.
 
 `publisher`
 : A Publisher object as defined in [Publisher Object](#publisher-object)
@@ -456,7 +456,7 @@ The following members are OPTIONAL:
   of the trust metadata independent of the artifact.
 
 `extensions`
-: An array of Extension objects for extending trust metadata.
+: A JSON object (map) for extending trust metadata.
 
 For example, a Trust Manifest with identity, attestations, and
 provenance:
@@ -791,10 +791,10 @@ properties.
 
 ## Format and Key Naming
 
-The `extensions` field is an array of objects. Each object MUST contain
-a `type` string and a `data` object.
+The `extensions` field is a JSON object (map). Each key in the object MUST
+represent the extension type (namespace), and the corresponding value contains the extension data.
 
-To avoid collisions between independent publishers, the `type` field MUST
+To avoid collisions between independent publishers, the keys MUST
 be a valid URL or a reverse-DNS string:
 
 - **Reverse-DNS prefix** for vendor-specific extensions:
@@ -802,8 +802,36 @@ be a valid URL or a reverse-DNS string:
 - **URL prefix** for publicly accessible extension schemas:
   `https://cisco.com/extensions/security-scan`.
 
-Consumers that do not recognize an extension `type` MUST ignore it without
+Consumers that do not recognize an extension key MUST ignore it without
 throwing an error.
+
+For example, a catalog entry with `extensions` representing metadata and a custom schema:
+
+```json
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:air:treasury.gov:okf:fiscaldata",
+      "type": "text/vnd.okf+markdown",
+      "tags": ["finance", "treasury"],
+      "extensions": {
+        "metadata": {
+          "location": "US-West",
+          "environment": "staging",
+          "version-compatible": [">=1.0.0"]
+        },
+        "okf": {
+          "@context": "https://openknowledgeformat.org/ns#",
+          "type": "Financial Dataset",
+          "taxonomy": "us-gaap",
+          "conformsTo": ["us-gaap:Revenue", "ifrs:Revenue"]
+        }
+      }
+    }
+  ]
+}
+```
 
 ## Official Extensions
 
@@ -812,8 +840,6 @@ defines a set of "Official" known types for commonly requested schemas:
 
 1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
    - Used to store generic, schemaless key-value pairs (replacing the legacy metadata field).
-2. **SBOM** (`https://ai-catalog.org/extensions/sbom`)
-   - Used to embed or link to a Software Bill of Materials for the catalog entry.
 
 As custom extensions become highly popular, the AI-Catalog TSC may promote
 them to Official Known Types or core standard fields in future specification versions.
@@ -1267,12 +1293,7 @@ AICatalog = {
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? extensions: [* Extension]
-}
-
-Extension = {
-  type: text,
-  data: any
+  ? extensions: { * text => any }
 }
 
 HostInfo = {
@@ -1294,7 +1315,7 @@ CatalogEntry = {
   ? publisher: Publisher,
   ? trustManifest: TrustManifest,
   ? updatedAt: tdate,
-  ? extensions: [* Extension]
+  ? extensions: { * text => any }
 }
 
 Publisher = {
@@ -1316,7 +1337,7 @@ TrustManifest = {
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text,
   ? signature: text,
-  ? extensions: [* Extension]
+  ? extensions: { * text => any }
 }
 
 TrustSchema = {

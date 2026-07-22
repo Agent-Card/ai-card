@@ -20,9 +20,7 @@ The primary concerns from the AI-Catalog perspective were:
 After extensive discussions in the July 2 and July 9, 2026 working group meetings, the team concluded that the requirements of the two projects are fundamentally different. ARD requires the ability to aggregate rich, namespaced descriptions of resources directly in the discovery payload, while AI-Catalog requires strict, minimal schema definitions.
 
 ## Decision
-The ARD (Agentic Resource Discovery) specification will be **loosely coupled** with the AI-Catalog specification. 
-
-AI-Catalog will proceed without native `@context` support and will instead rely on simpler mechanisms (such as an `extensions` array/object) for minimal extensions. ARD will evolve its data model independently to fully support the rich, namespaced metadata and semantic schemas required for comprehensive, web-scale agentic resource discovery.
+AI-Catalog will proceed without native `@context` support and will instead rely on simpler mechanisms (such as an `extensions` map) for minimal extensions. ARD will evolve its data model independently to fully support the rich, namespaced metadata and semantic schemas required for comprehensive, web-scale agentic resource discovery.
 
 ## Rationale
 - **Preserves Core Visions:** Allows AI-Catalog to remain a lightweight, strictly-typed "thin pointer" registry format.
