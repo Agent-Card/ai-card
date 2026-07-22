@@ -9,7 +9,7 @@
 -  non-standard metadata. See <a href="#metadata-extensibility">Metadata Extensibility</a>
 -  for key naming conventions.</dd>
 +<dt><code>extensions</code></dt>
-+<dd>An array of Extension objects containing custom, vendor-specific, or
++<dd>A JSON object (map) containing custom, vendor-specific, or
 +  non-standard fields. See <a href="#extensions">Extensions</a> for definitions and
 +  official extension types.</dd>
  </dl>
@@ -22,7 +22,7 @@
 -<dt><code>metadata</code></dt>
 -<dd>An open map of string keys to arbitrary values for custom data.</dd>
 +<dt><code>extensions</code></dt>
-+<dd>An array of Extension objects containing custom data.</dd>
++<dd>A JSON object (map) containing custom data.</dd>
  <dt><code>publisher</code></dt>
  <dd>A Publisher object as defined in <a href="#publisher-object">Publisher Object</a>
    identifying the entity that publishes this artifact. This is the
@@ -34,11 +34,11 @@
 -<dd>An open map of string keys to arbitrary values for extending trust
 -  metadata.</dd>
 +<dt><code>extensions</code></dt>
-+<dd>An array of Extension objects for extending trust metadata.</dd>
++<dd>A JSON object (map) for extending trust metadata.</dd>
  </dl>
  <p>For example, a Trust Manifest with identity, attestations, and
  provenance:</p>
-@@ -806,40 +805,39 @@
+@@ -806,40 +805,62 @@
  document their limit.</p>
  </section>
  </section>
@@ -57,9 +57,9 @@
 -independent publishers, the following conventions are RECOMMENDED:</p>
 +<section id="format-and-key-naming">
 +<h2>Format and Key Naming</h2>
-+<p>The <code>extensions</code> field is an array of objects. Each object MUST contain
-+a <code>type</code> string and a <code>data</code> object.</p>
-+<p>To avoid collisions between independent publishers, the <code>type</code> field MUST
++<p>The <code>extensions</code> field is a JSON object (map). Each key in the object MUST
++represent the extension type (namespace), and the corresponding value contains the extension data.</p>
++<p>To avoid collisions between independent publishers, the keys MUST
 +be a valid URL or a reverse-DNS string:</p>
  <ul>
 -<li><strong>Reverse-DNS prefix</strong> for vendor-specific keys:
@@ -88,8 +88,33 @@
 -<p>Metadata values MAY be any valid JSON type (string, number, boolean,
 -array, object, null). Consumers that do not recognize a metadata key
 -SHOULD ignore it.</p>
-+<p>Consumers that do not recognize an extension <code>type</code> MUST ignore it without
++<p>Consumers that do not recognize an extension key MUST ignore it without
 +throwing an error.</p>
++<p>For example, a catalog entry with <code>extensions</code> representing metadata and a custom schema:</p>
++<pre><code class="language-json">{
++  &quot;specVersion&quot;: &quot;1.0&quot;,
++  &quot;entries&quot;: [
++    {
++      &quot;identifier&quot;: &quot;urn:air:treasury.gov:okf:fiscaldata&quot;,
++      &quot;type&quot;: &quot;text/vnd.okf+markdown&quot;,
++      &quot;tags&quot;: [&quot;finance&quot;, &quot;treasury&quot;],
++      &quot;extensions&quot;: {
++        &quot;metadata&quot;: {
++          &quot;location&quot;: &quot;US-West&quot;,
++          &quot;environment&quot;: &quot;staging&quot;,
++          &quot;version-compatible&quot;: [&quot;&gt;=1.0.0&quot;]
++        },
++        &quot;okf&quot;: {
++          &quot;@context&quot;: &quot;https://openknowledgeformat.org/ns#&quot;,
++          &quot;type&quot;: &quot;Financial Dataset&quot;,
++          &quot;taxonomy&quot;: &quot;us-gaap&quot;,
++          &quot;conformsTo&quot;: [&quot;us-gaap:Revenue&quot;, &quot;ifrs:Revenue&quot;]
++        }
++      }
++    }
++  ]
++}
++</code></pre>
 +</section>
 +<section id="official-extensions">
 +<h2>Official Extensions</h2>
@@ -98,43 +123,36 @@
 +<ol>
 +<li><strong>Metadata</strong> (<code>https://ai-catalog.org/extensions/metadata</code>)
 +   - Used to store generic, schemaless key-value pairs (replacing the legacy metadata field).</li>
-+<li><strong>SBOM</strong> (<code>https://ai-catalog.org/extensions/sbom</code>)
-+   - Used to embed or link to a Software Bill of Materials for the catalog entry.</li>
 +</ol>
 +<p>As custom extensions become highly popular, the AI-Catalog TSC may promote
 +them to Official Known Types or core standard fields in future specification versions.</p>
  </section>
  </section>
  <section id="version-handling">
-@@ -1267,7 +1265,12 @@
+@@ -1267,7 +1288,7 @@
    specVersion: text,
    ? host: HostInfo,
    entries: [* CatalogEntry],
 -  ? metadata: { * text =&gt; any }
-+  ? extensions: [* Extension]
-+}
-+
-+Extension = {
-+  type: text,
-+  data: any
++  ? extensions: { * text =&gt; any }
  }
  
  HostInfo = {
-@@ -1289,7 +1292,7 @@
+@@ -1289,7 +1310,7 @@
    ? publisher: Publisher,
    ? trustManifest: TrustManifest,
    ? updatedAt: tdate,
 -  ? metadata: { * text =&gt; any }
-+  ? extensions: [* Extension]
++  ? extensions: { * text =&gt; any }
  }
  
  Publisher = {
-@@ -1310,7 +1313,7 @@
+@@ -1310,7 +1331,7 @@
    ? privacyPolicyUrl: text,
    ? termsOfServiceUrl: text,
    ? signature: text,
 -  ? metadata: { * text =&gt; any }
-+  ? extensions: [* Extension]
++  ? extensions: { * text =&gt; any }
  }
  
  TrustSchema = {
