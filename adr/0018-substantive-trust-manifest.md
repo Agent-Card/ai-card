@@ -1,4 +1,4 @@
-# ADR-0015: Require a Substantive Trust Manifest
+# ADR-0018: Require a Substantive Trust Manifest
 
 **Status:** Accepted
 
@@ -9,13 +9,12 @@
 ## Context
 
 The Trust Manifest is an OPTIONAL companion to a Catalog Entry. Within
-it, however, only `identity` was unconditionally REQUIRED, and `identity`
-MUST equal the entry's `identifier`. Every other member — `signature`,
+it, however, only `identity` was unconditionally REQUIRED. Every other member — `signature`,
 `attestations`, `provenance`, `trustSchema`, and the informational fields
 — was independently OPTIONAL.
 
 As a result the smallest valid Trust Manifest was `{ "identity": "..." }`,
-which merely restates the entry identifier and carries no trust signal.
+which carries no trust signal by itself.
 Only Level 3 (Trusted Catalog) forced a real payload (`signature` +
 `subject` + `issuedAt`). Between "no manifest" and Level 3 the format
 permitted a present-but-empty manifest that looks like trust metadata
@@ -36,8 +35,8 @@ member:
 - a non-empty `provenance` array, or
 - a `trustSchema`.
 
-`identity` and `identityType` (which restate or describe the entry
-identifier) and the informational members `privacyPolicyUrl`,
+`identity` and `identityType` (which identify the workload principal)
+and the informational members `privacyPolicyUrl`,
 `termsOfServiceUrl`, and `metadata` do not satisfy this requirement.
 `subject`, `issuedAt`, and `expiresAt` are not substantive on their own:
 an unsigned `subject` digest is attacker-settable and unverifiable, so
@@ -57,7 +56,7 @@ rule as if no Trust Manifest were present.
 - The rule is independent of conformance level: even a Level 1 catalog
   that includes a manifest must make it substantive. Level 3 remains
   stricter, requiring a `signature` specifically (see
-  [ADR-0014](0014-trust-manifest-artifact-binding.md)).
+  [ADR-0017](0017-trust-manifest-artifact-binding.md)).
 - Unsigned manifests remain valid when they carry attestations,
   provenance, or a trust schema, preserving low-assurance use cases that
   do not sign.

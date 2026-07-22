@@ -21,7 +21,7 @@
         "displayName": "Acme Services Inc."
       },
       "trustManifest": {
-        "identity": "urn:example:agent-finance-001",
+        "identity": "did:web:acme-corp.com",
         "identityType": "did",
         "attestations": [
           {
