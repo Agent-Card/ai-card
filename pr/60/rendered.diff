@@ -29,7 +29,7 @@
  
  tags
  
-@@ -309,6 +321,21 @@
+@@ -309,6 +321,23 @@
  Semantic Versioning is RECOMMENDED but not
  required. See Multi-Version Entries for
  how versions interact with identifier.
@@ -47,11 +47,13 @@
 +rather than as a free-form display override, so it SHOULD equal the
 +version the referenced artifact reports; an entry version that
 +contradicts the artifact's own version is a publishing error, not a
-+deliberate override.
++deliberate override. See
++Resolving an Artifact's Version
++for the full consumer resolution order.
  
  updatedAt
  
-@@ -363,6 +390,30 @@
+@@ -363,6 +392,68 @@
  the identifier segment in step 3. A publisher MAY still set
  displayName on such an entry to provide a better name than the bare
  identifier segment.
@@ -79,10 +81,48 @@
 +other service built on top of a catalog SHOULD resolve the description
 +once at ingestion and cache the result, rather than fetching artifacts on
 +the rendering path.
++
++Resolving an Artifact's Version
++
++Because version is OPTIONAL on a single entry — and present only when
++the entry disambiguates others that share its identifier (see
++Multi-Version Entries) or deliberately restates
++the artifact's version — a consumer cannot assume every entry carries
++one. To obtain a version, a consumer SHOULD resolve one in the following
++order:
++
++version on the entry, if present. Unlike displayName and
++description, a present version is not a free-form display
++override: it is authoritative for catalog-level sorting and version
++selection. Within a multi-version listing it is REQUIRED and, combined
++with identifier, uniquely addresses the entry.
++
++The referenced artifact's own version, if the consumer has already
++fetched or cached the artifact — for example the version field of an
++A2A Agent Card, an MCP Server Card, or an MCP Registry server.json.
++A single entry that omits version because the artifact already
++carries it is resolved here.
++
++No version, if neither is available — the entry represents an
++unversioned artifact. A consumer that needs to order such entries
++SHOULD fall back to updatedAt, consistent with
++Multi-Version Entries.
++
++When both the entry and the referenced artifact carry a version and
++they disagree, the entry version is authoritative for catalog-level
++sorting and selection; the mismatch is a publishing error (it breaks
++latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
++silently preferring the artifact's value.
++
++As with name and description resolution, a consumer SHOULD NOT dereference
++an artifact at render time solely to obtain a version. A registry,
++directory, or other service built on top of a catalog SHOULD resolve the
++version once at ingestion and cache the result, rather than fetching
++artifacts on the rendering path.
  
  Multi-Version Entries
  
-@@ -964,9 +1015,8 @@
+@@ -964,9 +1055,8 @@
  
  Clients performing domain-level discovery SHOULD attempt to retrieve
  this well-known URL. If a valid AI Catalog document is returned, the
@@ -94,7 +134,7 @@
  
  Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
  other locations (e.g., as part of an API response or a package
-@@ -1125,7 +1175,7 @@
+@@ -1125,7 +1215,7 @@
  
  Nested Catalog Depth and Circular References
  
@@ -103,7 +143,7 @@
  depth to prevent denial-of-service attacks via deeply nested or
  circular catalog references. A maximum depth of 4 is RECOMMENDED.
  
-@@ -1248,6 +1298,7 @@
+@@ -1248,6 +1338,7 @@
  class Attestation {
  type string
  uri string
@@ -111,7 +151,7 @@
  digest string
  }
  class ProvenanceLink {
-@@ -1435,6 +1486,7 @@
+@@ -1435,6 +1526,7 @@
  Attestation = {
  type: text,
  uri: text,
@@ -119,7 +159,7 @@
  ? digest: text,
  ? size: uint,
  ? description: text
-@@ -1485,7 +1537,7 @@
+@@ -1485,7 +1577,7 @@
  {
  "type": "SOC2-Type2",
  "uri": "https://trust.acme.com/reports/soc2.pdf",
@@ -128,7 +168,7 @@
  }
  ],
  "privacyPolicyUrl": "https://acme.com/legal/privacy",
-@@ -1639,7 +1691,7 @@
+@@ -1639,7 +1731,7 @@
  {
  "type": "SOC2-Type2",
  "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
@@ -137,7 +177,7 @@
  }
  ]
  }
-@@ -1799,11 +1851,11 @@
+@@ -1799,11 +1891,11 @@
  
  {
  "schemaVersion": 2,
@@ -151,7 +191,7 @@
  "digest": "sha256:aaa111...",
  "size": 1024,
  "artifactType": "application/a2a-agent-card+json",
-@@ -1813,7 +1865,7 @@
+@@ -1813,7 +1905,7 @@
  }
  },
  {
@@ -160,7 +200,7 @@
  "digest": "sha256:bbb222...",
  "size": 512,
  "artifactType": "application/mcp-server-card+json",
-@@ -1961,7 +2013,7 @@
+@@ -1961,7 +2053,7 @@
  
  Server name (reverse-DNS identifier)
  
@@ -169,7 +209,7 @@
  
  title
  
-@@ -2002,7 +2054,7 @@
+@@ -2002,7 +2094,7 @@
  application/mcp-server-card+json:
  
  {
@@ -178,7 +218,7 @@
  "type": "application/mcp-server-card+json",
  "url": "https://api.acme-corp.com/mcp/server-card",
  "tags": ["finance", "mcp"],
-@@ -2011,7 +2063,7 @@
+@@ -2011,7 +2103,7 @@
  "displayName": "Acme Financial Corp"
  },
  "trustManifest": {
@@ -187,7 +227,7 @@
  "attestations": [
  {
  "type": "publisher-identity",
-@@ -2020,7 +2072,7 @@
+@@ -2020,7 +2112,7 @@
  {
  "type": "SOC2-Type2",
  "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
@@ -196,7 +236,7 @@
  }
  ]
  }
-@@ -2191,7 +2243,7 @@
+@@ -2191,7 +2283,7 @@
  
  Plugin description
  
@@ -205,3 +245,27 @@
  
  Plugin category
  
+@@ -2272,7 +2364,6 @@
+ "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
+ "type": "application/vnd.anthropic.claude-plugin+json",
+ "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
+-"description": "Development kit for working with the Claude Agent SDK",
+ "tags": ["development"],
+ "publisher": {
+ "identifier": "did:web:anthropic.com",
+@@ -2286,7 +2377,6 @@
+ "identifier": "urn:claude-plugin:adspirer:ads-agent",
+ "type": "application/vnd.anthropic.claude-plugin+json",
+ "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
+-"description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
+ "tags": ["productivity", "ads"],
+ "metadata": {
+ "homepage": "https://www.adspirer.com"
+@@ -2306,7 +2396,6 @@
+ "identifier": "urn:claude-plugin:aikido:security",
+ "type": "application/vnd.anthropic.claude-plugin+json",
+ "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
+-"description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
+ "tags": ["security"],
+ "publisher": {
+ "identifier": "did:web:aikido.dev",

@@ -9,7 +9,7 @@
  </section>
  
  <section id="sotd">
-@@ -328,14 +328,42 @@
+@@ -328,14 +328,44 @@
    <a href="#resolving-an-artifact-s-display-name">Resolving an Artifact's Display Name</a>
    for the full consumer resolution order.</dd>
  <dt><code>description</code></dt>
@@ -50,12 +50,14 @@
 +rather than as a free-form display override, so it SHOULD equal the
 +version the referenced artifact reports; an entry <code>version</code> that
 +contradicts the artifact's own version is a publishing error, not a
-+deliberate override.</p>
++deliberate override. See
++<a href="#resolving-an-artifact-s-version">Resolving an Artifact's Version</a>
++for the full consumer resolution order.</p>
 +</dd>
  <dt><code>updatedAt</code></dt>
  <dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
    when this entry was last modified.</dd>
-@@ -380,6 +408,28 @@
+@@ -380,6 +410,63 @@
  <code>displayName</code> on such an entry to provide a better name than the bare
  identifier segment.</p>
  </section>
@@ -81,10 +83,45 @@
 +once at ingestion and cache the result, rather than fetching artifacts on
 +the rendering path.</p>
 +</section>
++<section id="resolving-an-artifact-s-version">
++<h3>Resolving an Artifact&#x27;s Version</h3>
++<p>Because <code>version</code> is OPTIONAL on a single entry — and present only when
++the entry disambiguates others that share its <code>identifier</code> (see
++<a href="#multi-version-entries">Multi-Version Entries</a>) or deliberately restates
++the artifact's version — a consumer cannot assume every entry carries
++one. To obtain a version, a consumer SHOULD resolve one in the following
++order:</p>
++<ol>
++<li><strong><code>version</code> on the entry</strong>, if present. Unlike <code>displayName</code> and
++   <code>description</code>, a present <code>version</code> is not a free-form display
++   override: it is authoritative for catalog-level sorting and version
++   selection. Within a multi-version listing it is REQUIRED and, combined
++   with <code>identifier</code>, uniquely addresses the entry.</li>
++<li><strong>The referenced artifact's own version</strong>, if the consumer has already
++   fetched or cached the artifact — for example the <code>version</code> field of an
++   A2A Agent Card, an MCP Server Card, or an MCP Registry <code>server.json</code>.
++   A single entry that omits <code>version</code> because the artifact already
++   carries it is resolved here.</li>
++<li><strong>No version</strong>, if neither is available — the entry represents an
++   unversioned artifact. A consumer that needs to order such entries
++   SHOULD fall back to <code>updatedAt</code>, consistent with
++   <a href="#multi-version-entries">Multi-Version Entries</a>.</li>
++</ol>
++<p>When both the entry and the referenced artifact carry a <code>version</code> and
++they disagree, the entry <code>version</code> is authoritative for catalog-level
++sorting and selection; the mismatch is a publishing error (it breaks
++latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
++silently preferring the artifact's value.</p>
++<p>As with name and description resolution, a consumer SHOULD NOT dereference
++an artifact at render time solely to obtain a version. A registry,
++directory, or other service built on top of a catalog SHOULD resolve the
++version once at ingestion and cache the result, rather than fetching
++artifacts on the rendering path.</p>
++</section>
  </section>
  <section id="multi-version-entries">
  <h2>Multi-Version Entries</h2>
-@@ -907,9 +957,8 @@
+@@ -907,9 +994,8 @@
  </code></pre>
  <p>Clients performing domain-level discovery SHOULD attempt to retrieve
  this well-known URL. If a valid AI Catalog document is returned, the
@@ -96,7 +133,7 @@
  <p>Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
  other locations (e.g., as part of an API response or a package
  registry) are fully conformant.</p>
-@@ -1052,7 +1101,7 @@
+@@ -1052,7 +1138,7 @@
  </section>
  <section id="nested-catalog-depth-and-circular-references">
  <h2>Nested Catalog Depth and Circular References</h2>
@@ -105,7 +142,7 @@
  depth to prevent denial-of-service attacks via deeply nested or
  circular catalog references. A maximum depth of 4 is RECOMMENDED.</p>
  <p>Depth limits alone do not prevent circular references at shallow
-@@ -1168,6 +1217,7 @@
+@@ -1168,6 +1254,7 @@
      class Attestation {
          type string
          uri string
@@ -113,7 +150,7 @@
          digest string
      }
      class ProvenanceLink {
-@@ -1323,6 +1373,7 @@
+@@ -1323,6 +1410,7 @@
  Attestation = {
    type: text,
    uri: text,
@@ -121,7 +158,7 @@
    ? digest: text,
    ? size: uint,
    ? description: text
-@@ -1374,7 +1425,7 @@
+@@ -1374,7 +1462,7 @@
            {
              &quot;type&quot;: &quot;SOC2-Type2&quot;,
              &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
@@ -130,7 +167,7 @@
            }
          ],
          &quot;privacyPolicyUrl&quot;: &quot;https://acme.com/legal/privacy&quot;,
-@@ -1527,7 +1578,7 @@
+@@ -1527,7 +1615,7 @@
        {
          &quot;type&quot;: &quot;SOC2-Type2&quot;,
          &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
@@ -139,7 +176,7 @@
        }
      ]
    }
-@@ -1690,11 +1741,11 @@
+@@ -1690,11 +1778,11 @@
  authored by hand:</p>
  <pre><code class="language-json">{
    &quot;schemaVersion&quot;: 2,
@@ -153,7 +190,7 @@
        &quot;digest&quot;: &quot;sha256:aaa111...&quot;,
        &quot;size&quot;: 1024,
        &quot;artifactType&quot;: &quot;application/a2a-agent-card+json&quot;,
-@@ -1704,7 +1755,7 @@
+@@ -1704,7 +1792,7 @@
        }
      },
      {
@@ -162,7 +199,7 @@
        &quot;digest&quot;: &quot;sha256:bbb222...&quot;,
        &quot;size&quot;: 512,
        &quot;artifactType&quot;: &quot;application/mcp-server-card+json&quot;,
-@@ -1848,7 +1899,7 @@
+@@ -1848,7 +1936,7 @@
  </tr>
  <tr>
  <td style="text-align: left;">Server <code>name</code> (reverse-DNS identifier)</td>
@@ -171,7 +208,7 @@
  </tr>
  <tr>
  <td style="text-align: left;"><code>title</code></td>
-@@ -1891,7 +1942,7 @@
+@@ -1891,7 +1979,7 @@
  server's Server Card and whose <code>type</code> is the known type
  <code>application/mcp-server-card+json</code>:</p>
  <pre><code class="language-json">{
@@ -180,7 +217,7 @@
    &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
    &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/server-card&quot;,
    &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
-@@ -1900,7 +1951,7 @@
+@@ -1900,7 +1988,7 @@
      &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
    },
    &quot;trustManifest&quot;: {
@@ -189,7 +226,7 @@
      &quot;attestations&quot;: [
        {
          &quot;type&quot;: &quot;publisher-identity&quot;,
-@@ -1909,7 +1960,7 @@
+@@ -1909,7 +1997,7 @@
        {
          &quot;type&quot;: &quot;SOC2-Type2&quot;,
          &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
@@ -198,7 +235,7 @@
        }
      ]
    }
-@@ -2078,7 +2129,7 @@
+@@ -2078,7 +2166,7 @@
  </tr>
  <tr>
  <td style="text-align: left;">Plugin <code>description</code></td>
@@ -207,3 +244,27 @@
  </tr>
  <tr>
  <td style="text-align: left;">Plugin <code>category</code></td>
+@@ -2157,7 +2245,6 @@
+       &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
+       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+       &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
+-      &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
+       &quot;tags&quot;: [&quot;development&quot;],
+       &quot;publisher&quot;: {
+         &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
+@@ -2171,7 +2258,6 @@
+       &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
+       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+       &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
+-      &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
+       &quot;tags&quot;: [&quot;productivity&quot;, &quot;ads&quot;],
+       &quot;metadata&quot;: {
+         &quot;homepage&quot;: &quot;https://www.adspirer.com&quot;
+@@ -2191,7 +2277,6 @@
+       &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
+       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
+       &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
+-      &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
+       &quot;tags&quot;: [&quot;security&quot;],
+       &quot;publisher&quot;: {
+         &quot;identifier&quot;: &quot;did:web:aikido.dev&quot;,

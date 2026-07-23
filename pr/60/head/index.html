@@ -362,7 +362,9 @@ A present <code>version</code> is used for catalog-level sorting and selection
 rather than as a free-form display override, so it SHOULD equal the
 version the referenced artifact reports; an entry <code>version</code> that
 contradicts the artifact's own version is a publishing error, not a
-deliberate override.</p>
+deliberate override. See
+<a href="#resolving-an-artifact-s-version">Resolving an Artifact's Version</a>
+for the full consumer resolution order.</p>
 </dd>
 <dt><code>updatedAt</code></dt>
 <dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
@@ -429,6 +431,41 @@ render time solely to obtain a description. A registry, directory, or
 other service built on top of a catalog SHOULD resolve the description
 once at ingestion and cache the result, rather than fetching artifacts on
 the rendering path.</p>
+</section>
+<section id="resolving-an-artifact-s-version">
+<h3>Resolving an Artifact&#x27;s Version</h3>
+<p>Because <code>version</code> is OPTIONAL on a single entry — and present only when
+the entry disambiguates others that share its <code>identifier</code> (see
+<a href="#multi-version-entries">Multi-Version Entries</a>) or deliberately restates
+the artifact's version — a consumer cannot assume every entry carries
+one. To obtain a version, a consumer SHOULD resolve one in the following
+order:</p>
+<ol>
+<li><strong><code>version</code> on the entry</strong>, if present. Unlike <code>displayName</code> and
+   <code>description</code>, a present <code>version</code> is not a free-form display
+   override: it is authoritative for catalog-level sorting and version
+   selection. Within a multi-version listing it is REQUIRED and, combined
+   with <code>identifier</code>, uniquely addresses the entry.</li>
+<li><strong>The referenced artifact's own version</strong>, if the consumer has already
+   fetched or cached the artifact — for example the <code>version</code> field of an
+   A2A Agent Card, an MCP Server Card, or an MCP Registry <code>server.json</code>.
+   A single entry that omits <code>version</code> because the artifact already
+   carries it is resolved here.</li>
+<li><strong>No version</strong>, if neither is available — the entry represents an
+   unversioned artifact. A consumer that needs to order such entries
+   SHOULD fall back to <code>updatedAt</code>, consistent with
+   <a href="#multi-version-entries">Multi-Version Entries</a>.</li>
+</ol>
+<p>When both the entry and the referenced artifact carry a <code>version</code> and
+they disagree, the entry <code>version</code> is authoritative for catalog-level
+sorting and selection; the mismatch is a publishing error (it breaks
+latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
+silently preferring the artifact's value.</p>
+<p>As with name and description resolution, a consumer SHOULD NOT dereference
+an artifact at render time solely to obtain a version. A registry,
+directory, or other service built on top of a catalog SHOULD resolve the
+version once at ingestion and cache the result, rather than fetching
+artifacts on the rendering path.</p>
 </section>
 </section>
 <section id="multi-version-entries">
@@ -2208,7 +2245,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
       &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
-      &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
       &quot;tags&quot;: [&quot;development&quot;],
       &quot;publisher&quot;: {
         &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
@@ -2222,7 +2258,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
       &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
-      &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
       &quot;tags&quot;: [&quot;productivity&quot;, &quot;ads&quot;],
       &quot;metadata&quot;: {
         &quot;homepage&quot;: &quot;https://www.adspirer.com&quot;
@@ -2242,7 +2277,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
       &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
-      &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
       &quot;tags&quot;: [&quot;security&quot;],
       &quot;publisher&quot;: {
         &quot;identifier&quot;: &quot;did:web:aikido.dev&quot;,
