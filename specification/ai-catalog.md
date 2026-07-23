@@ -295,7 +295,9 @@ The following members are OPTIONAL:
     rather than as a free-form display override, so it SHOULD equal the
     version the referenced artifact reports; an entry `version` that
     contradicts the artifact's own version is a publishing error, not a
-    deliberate override.
+    deliberate override. See
+    [Resolving an Artifact's Version](#resolving-an-artifact-s-version)
+    for the full consumer resolution order.
 
 `updatedAt`
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
@@ -366,6 +368,42 @@ render time solely to obtain a description. A registry, directory, or
 other service built on top of a catalog SHOULD resolve the description
 once at ingestion and cache the result, rather than fetching artifacts on
 the rendering path.
+
+### Resolving an Artifact's Version
+
+Because `version` is OPTIONAL on a single entry — and present only when
+the entry disambiguates others that share its `identifier` (see
+[Multi-Version Entries](#multi-version-entries)) or deliberately restates
+the artifact's version — a consumer cannot assume every entry carries
+one. To obtain a version, a consumer SHOULD resolve one in the following
+order:
+
+1. **`version` on the entry**, if present. Unlike `displayName` and
+   `description`, a present `version` is not a free-form display
+   override: it is authoritative for catalog-level sorting and version
+   selection. Within a multi-version listing it is REQUIRED and, combined
+   with `identifier`, uniquely addresses the entry.
+2. **The referenced artifact's own version**, if the consumer has already
+   fetched or cached the artifact — for example the `version` field of an
+   A2A Agent Card, an MCP Server Card, or an MCP Registry `server.json`.
+   A single entry that omits `version` because the artifact already
+   carries it is resolved here.
+3. **No version**, if neither is available — the entry represents an
+   unversioned artifact. A consumer that needs to order such entries
+   SHOULD fall back to `updatedAt`, consistent with
+   [Multi-Version Entries](#multi-version-entries).
+
+When both the entry and the referenced artifact carry a `version` and
+they disagree, the entry `version` is authoritative for catalog-level
+sorting and selection; the mismatch is a publishing error (it breaks
+latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
+silently preferring the artifact's value.
+
+As with name and description resolution, a consumer SHOULD NOT dereference
+an artifact at render time solely to obtain a version. A registry,
+directory, or other service built on top of a catalog SHOULD resolve the
+version once at ingestion and cache the result, rather than fetching
+artifacts on the rendering path.
 
 ## Multi-Version Entries
 
@@ -2071,7 +2109,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
-      "description": "Development kit for working with the Claude Agent SDK",
       "tags": ["development"],
       "publisher": {
         "identifier": "did:web:anthropic.com",
@@ -2085,7 +2122,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:adspirer:ads-agent",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
-      "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
       "tags": ["productivity", "ads"],
       "metadata": {
         "homepage": "https://www.adspirer.com"
@@ -2105,7 +2141,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:aikido:security",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
-      "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
       "tags": ["security"],
       "publisher": {
         "identifier": "did:web:aikido.dev",
