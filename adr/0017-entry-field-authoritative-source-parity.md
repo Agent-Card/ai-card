@@ -1,4 +1,4 @@
-# ADR-0017: `description` and `version` Follow `displayName`'s Authoritative-Source Rule
+# ADR-0018: `description` and `version` Follow `displayName`'s Authoritative-Source Rule
 
 ## Status
 Proposed
