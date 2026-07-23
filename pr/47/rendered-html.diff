@@ -64,14 +64,14 @@
 -cryptographically bound to the authorized publisher of the catalog entry.
 -Consumers MUST reject a Trust Manifest whose identity domain does not
 -align with the publisher domain of the entry's <code>identifier</code>.</p>
-+field MUST match the entry's <code>identifier</code> field. This binding ensures trust
-+claims are unambiguously associated with the catalog artifact.
-+Consumers MUST reject a Trust Manifest whose <code>identity</code> does not
-+match the containing entry's <code>identifier</code>. The <code>identity</code> is restated
-+here — rather than read from the entry's <code>identifier</code> — so that it falls
-+within the signed payload; this is an intentional duplication, not
-+redundant metadata, and removing it would leave the signature uncommitted
-+to which identifier the trust claims apply.</p>
++field's trust domain MUST align with the publisher domain in the
++containing entry's <code>identifier</code> field. This binding ensures
++trust claims are associated with the authorized publisher namespace even
++when <code>identity</code> and <code>identifier</code> use different URI schemes.
++Consumers MUST reject a Trust Manifest whose <code>identity</code> domain does not
++align with the publisher domain in the containing entry's <code>identifier</code>.
++The <code>identity</code> is carried here so domain binding is part of the signed
++payload, rather than inferred only from unsigned entry context.</p>
  <p>When a Trust Manifest appears on a Host Info object, <code>identity</code>
  SHOULD match the host's <code>identifier</code> field when present.</p>
  <p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
@@ -91,8 +91,8 @@
 +<li>a non-empty <code>provenance</code> array, or</li>
 +<li>a <code>trustSchema</code>.</li>
 +</ul>
-+<p>The members <code>identity</code> and <code>identityType</code> (which restate or describe the
-+entry identifier) and the informational members <code>privacyPolicyUrl</code>,
++<p>The members <code>identity</code> and <code>identityType</code> (which identify the workload
++principal) and the informational members <code>privacyPolicyUrl</code>,
 +<code>termsOfServiceUrl</code>, and <code>metadata</code> do NOT satisfy this requirement.
 +<code>subject</code>, <code>issuedAt</code>, and <code>expiresAt</code> are not substantive on their own:
 +an unsigned <code>subject</code> digest is attacker-settable and unverifiable, so
