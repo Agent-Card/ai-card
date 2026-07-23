@@ -415,14 +415,14 @@ A Trust Manifest MUST contain:
   identity schemes is open.
 
 When a Trust Manifest appears within a Catalog Entry, the `identity`
-field MUST match the entry's `identifier` field. This binding ensures trust
-claims are unambiguously associated with the catalog artifact.
-Consumers MUST reject a Trust Manifest whose `identity` does not
-match the containing entry's `identifier`. The `identity` is restated
-here — rather than read from the entry's `identifier` — so that it falls
-within the signed payload; this is an intentional duplication, not
-redundant metadata, and removing it would leave the signature uncommitted
-to which identifier the trust claims apply.
+field's trust domain MUST align with the publisher domain in the
+containing entry's `identifier` field. This binding ensures
+trust claims are associated with the authorized publisher namespace even
+when `identity` and `identifier` use different URI schemes.
+Consumers MUST reject a Trust Manifest whose `identity` domain does not
+align with the publisher domain in the containing entry's `identifier`.
+The `identity` is carried here so domain binding is part of the signed
+payload, rather than inferred only from unsigned entry context.
 
 When a Trust Manifest appears on a Host Info object, `identity`
 SHOULD match the host's `identifier` field when present.
@@ -444,8 +444,8 @@ contain at least one *substantive* trust member:
 - a non-empty `provenance` array, or
 - a `trustSchema`.
 
-The members `identity` and `identityType` (which restate or describe the
-entry identifier) and the informational members `privacyPolicyUrl`,
+The members `identity` and `identityType` (which identify the workload
+principal) and the informational members `privacyPolicyUrl`,
 `termsOfServiceUrl`, and `metadata` do NOT satisfy this requirement.
 `subject`, `issuedAt`, and `expiresAt` are not substantive on their own:
 an unsigned `subject` digest is attacker-settable and unverifiable, so
