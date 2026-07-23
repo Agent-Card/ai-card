@@ -1,5 +1,14 @@
 --- a/base/index.html
 +++ b/head/index.html
+@@ -57,7 +57,7 @@
+ 
+ <section id="abstract">
+   <h2>Abstract</h2>
+-  <p>This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, MCP Server Cards, and the Claude Code Plugins marketplace.</p>
++  <p>This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.</p>
+ </section>
+ 
+ <section id="sotd">
 @@ -328,14 +328,42 @@
    <a href="#resolving-an-artifact-s-display-name">Resolving an Artifact's Display Name</a>
    for the full consumer resolution order.</dd>
@@ -46,11 +55,10 @@
  <dt><code>updatedAt</code></dt>
  <dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
    when this entry was last modified.</dd>
-@@ -379,6 +407,28 @@
- the <code>identifier</code> segment in step 3. A publisher MAY still set
+@@ -380,6 +408,28 @@
  <code>displayName</code> on such an entry to provide a better name than the bare
  identifier segment.</p>
-+</section>
+ </section>
 +<section id="resolving-an-artifact-s-description">
 +<h3>Resolving an Artifact&#x27;s Description</h3>
 +<p>Because <code>description</code> is OPTIONAL, a consumer that wants to show a
@@ -72,10 +80,125 @@
 +other service built on top of a catalog SHOULD resolve the description
 +once at ingestion and cache the result, rather than fetching artifacts on
 +the rendering path.</p>
- </section>
++</section>
  </section>
  <section id="multi-version-entries">
-@@ -2079,7 +2129,7 @@
+ <h2>Multi-Version Entries</h2>
+@@ -907,9 +957,8 @@
+ </code></pre>
+ <p>Clients performing domain-level discovery SHOULD attempt to retrieve
+ this well-known URL. If a valid AI Catalog document is returned, the
+-client SHOULD use the entries' <code>url</code> values to retrieve individual
+-artifacts. Trust metadata, when present, is carried inline on the
+-entries as Trust Manifests.</p>
++client SHOULD use the <code>url</code> entries to retrieve individual artifacts
++and their associated Trust Manifests.</p>
+ <p>Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
+ other locations (e.g., as part of an API response or a package
+ registry) are fully conformant.</p>
+@@ -1052,7 +1101,7 @@
+ </section>
+ <section id="nested-catalog-depth-and-circular-references">
+ <h2>Nested Catalog Depth and Circular References</h2>
+-<p>Clients processing nested catalogs SHOULD enforce a maximum recursion
++<p>Clients processing nested catalogs MUST enforce a maximum recursion
+ depth to prevent denial-of-service attacks via deeply nested or
+ circular catalog references. A maximum depth of 4 is RECOMMENDED.</p>
+ <p>Depth limits alone do not prevent circular references at shallow
+@@ -1168,6 +1217,7 @@
+     class Attestation {
+         type string
+         uri string
++        type string
+         digest string
+     }
+     class ProvenanceLink {
+@@ -1323,6 +1373,7 @@
+ Attestation = {
+   type: text,
+   uri: text,
++  type: text,
+   ? digest: text,
+   ? size: uint,
+   ? description: text
+@@ -1374,7 +1425,7 @@
+           {
+             &quot;type&quot;: &quot;SOC2-Type2&quot;,
+             &quot;uri&quot;: &quot;https://trust.acme.com/reports/soc2.pdf&quot;,
+-            &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
++            &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+           }
+         ],
+         &quot;privacyPolicyUrl&quot;: &quot;https://acme.com/legal/privacy&quot;,
+@@ -1527,7 +1578,7 @@
+       {
+         &quot;type&quot;: &quot;SOC2-Type2&quot;,
+         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
+-        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
++        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+       }
+     ]
+   }
+@@ -1690,11 +1741,11 @@
+ authored by hand:</p>
+ <pre><code class="language-json">{
+   &quot;schemaVersion&quot;: 2,
+-  &quot;mediaType&quot;: &quot;application/vnd.oci.image.index.v1+json&quot;,
++  &quot;type&quot;: &quot;application/vnd.oci.image.index.v1+json&quot;,
+   &quot;artifactType&quot;: &quot;application/ai-catalog+json&quot;,
+   &quot;manifests&quot;: [
+     {
+-      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
++      &quot;type&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+       &quot;digest&quot;: &quot;sha256:aaa111...&quot;,
+       &quot;size&quot;: 1024,
+       &quot;artifactType&quot;: &quot;application/a2a-agent-card+json&quot;,
+@@ -1704,7 +1755,7 @@
+       }
+     },
+     {
+-      &quot;mediaType&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
++      &quot;type&quot;: &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+       &quot;digest&quot;: &quot;sha256:bbb222...&quot;,
+       &quot;size&quot;: 512,
+       &quot;artifactType&quot;: &quot;application/mcp-server-card+json&quot;,
+@@ -1848,7 +1899,7 @@
+ </tr>
+ <tr>
+ <td style="text-align: left;">Server <code>name</code> (reverse-DNS identifier)</td>
+-<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:acme-corp.com:mcp:finance-server</code>)</td>
++<td style="text-align: left;">Entry <code>identifier</code> (mapped to the <code>urn:air:{publisher}:{namespace}:{name}</code> URN form — e.g. <code>urn:air:example.com:mcp:finance-server</code>)</td>
+ </tr>
+ <tr>
+ <td style="text-align: left;"><code>title</code></td>
+@@ -1891,7 +1942,7 @@
+ server's Server Card and whose <code>type</code> is the known type
+ <code>application/mcp-server-card+json</code>:</p>
+ <pre><code class="language-json">{
+-  &quot;identifier&quot;: &quot;urn:air:acme-corp.com:mcp:finance-server&quot;,
++  &quot;identifier&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
+   &quot;type&quot;: &quot;application/mcp-server-card+json&quot;,
+   &quot;url&quot;: &quot;https://api.acme-corp.com/mcp/server-card&quot;,
+   &quot;tags&quot;: [&quot;finance&quot;, &quot;mcp&quot;],
+@@ -1900,7 +1951,7 @@
+     &quot;displayName&quot;: &quot;Acme Financial Corp&quot;
+   },
+   &quot;trustManifest&quot;: {
+-    &quot;identity&quot;: &quot;urn:air:acme-corp.com:mcp:finance-server&quot;,
++    &quot;identity&quot;: &quot;urn:air:example.com:mcp:finance-server&quot;,
+     &quot;attestations&quot;: [
+       {
+         &quot;type&quot;: &quot;publisher-identity&quot;,
+@@ -1909,7 +1960,7 @@
+       {
+         &quot;type&quot;: &quot;SOC2-Type2&quot;,
+         &quot;uri&quot;: &quot;https://trust.acme-corp.com/reports/soc2.pdf&quot;,
+-        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890&quot;
++        &quot;digest&quot;: &quot;sha256:a1b2c3d4e5f6&quot;
+       }
+     ]
+   }
+@@ -2078,7 +2129,7 @@
  </tr>
  <tr>
  <td style="text-align: left;">Plugin <code>description</code></td>

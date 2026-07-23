@@ -1,5 +1,13 @@
 --- a/base/rendered.txt
 +++ b/head/rendered.txt
+@@ -1,6 +1,6 @@
+ Abstract
+ 
+-This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, MCP Server Cards, and the Claude Code Plugins marketplace.
++This document defines the AI Catalog, a JSON format for discovering heterogeneous AI artifacts such as MCP servers, A2A agents, Claude Code plugins, datasets, and model cards. Each catalog entry declares the artifact's type via a media type and references or inlines the native artifact metadata, enabling a single discovery mechanism across protocols and platforms. The specification defines three conformance levels — Minimal, Discoverable, and Trusted — allowing implementations to start with a simple list of entries and progressively add host identity, well-known URI discovery, and verifiable trust metadata as needed. An optional Trust Manifest extension provides identity binding, compliance attestations, provenance tracking, and cryptographic signatures without wrapping or modifying the artifact's native format. Informative appendices describe mappings to OCI distribution registries, the MCP Registry server.json format, and the Claude Code Plugins marketplace.
+ 
+ Status of This Document
+ 
 @@ -297,7 +297,19 @@
  
  description
@@ -74,7 +82,121 @@
  
  Multi-Version Entries
  
-@@ -2192,7 +2243,7 @@
+@@ -964,9 +1015,8 @@
+ 
+ Clients performing domain-level discovery SHOULD attempt to retrieve
+ this well-known URL. If a valid AI Catalog document is returned, the
+-client SHOULD use the entries' url values to retrieve individual
+-artifacts. Trust metadata, when present, is carried inline on the
+-entries as Trust Manifests.
++client SHOULD use the url entries to retrieve individual artifacts
++and their associated Trust Manifests.
+ 
+ Use of the well-known URI is OPTIONAL. Hosts that publish catalogs at
+ other locations (e.g., as part of an API response or a package
+@@ -1125,7 +1175,7 @@
+ 
+ Nested Catalog Depth and Circular References
+ 
+-Clients processing nested catalogs SHOULD enforce a maximum recursion
++Clients processing nested catalogs MUST enforce a maximum recursion
+ depth to prevent denial-of-service attacks via deeply nested or
+ circular catalog references. A maximum depth of 4 is RECOMMENDED.
+ 
+@@ -1248,6 +1298,7 @@
+ class Attestation {
+ type string
+ uri string
++type string
+ digest string
+ }
+ class ProvenanceLink {
+@@ -1435,6 +1486,7 @@
+ Attestation = {
+ type: text,
+ uri: text,
++type: text,
+ ? digest: text,
+ ? size: uint,
+ ? description: text
+@@ -1485,7 +1537,7 @@
+ {
+ "type": "SOC2-Type2",
+ "uri": "https://trust.acme.com/reports/soc2.pdf",
+-"digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
++"digest": "sha256:a1b2c3d4e5f6"
+ }
+ ],
+ "privacyPolicyUrl": "https://acme.com/legal/privacy",
+@@ -1639,7 +1691,7 @@
+ {
+ "type": "SOC2-Type2",
+ "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+-"digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
++"digest": "sha256:a1b2c3d4e5f6"
+ }
+ ]
+ }
+@@ -1799,11 +1851,11 @@
+ 
+ {
+ "schemaVersion": 2,
+-"mediaType": "application/vnd.oci.image.index.v1+json",
++"type": "application/vnd.oci.image.index.v1+json",
+ "artifactType": "application/ai-catalog+json",
+ "manifests": [
+ {
+-"mediaType": "application/vnd.oci.image.manifest.v1+json",
++"type": "application/vnd.oci.image.manifest.v1+json",
+ "digest": "sha256:aaa111...",
+ "size": 1024,
+ "artifactType": "application/a2a-agent-card+json",
+@@ -1813,7 +1865,7 @@
+ }
+ },
+ {
+-"mediaType": "application/vnd.oci.image.manifest.v1+json",
++"type": "application/vnd.oci.image.manifest.v1+json",
+ "digest": "sha256:bbb222...",
+ "size": 512,
+ "artifactType": "application/mcp-server-card+json",
+@@ -1961,7 +2013,7 @@
+ 
+ Server name (reverse-DNS identifier)
+ 
+-Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. urn:air:acme-corp.com:mcp:finance-server)
++Entry identifier (mapped to the urn:air:{publisher}:{namespace}:{name} URN form — e.g. urn:air:example.com:mcp:finance-server)
+ 
+ title
+ 
+@@ -2002,7 +2054,7 @@
+ application/mcp-server-card+json:
+ 
+ {
+-"identifier": "urn:air:acme-corp.com:mcp:finance-server",
++"identifier": "urn:air:example.com:mcp:finance-server",
+ "type": "application/mcp-server-card+json",
+ "url": "https://api.acme-corp.com/mcp/server-card",
+ "tags": ["finance", "mcp"],
+@@ -2011,7 +2063,7 @@
+ "displayName": "Acme Financial Corp"
+ },
+ "trustManifest": {
+-"identity": "urn:air:acme-corp.com:mcp:finance-server",
++"identity": "urn:air:example.com:mcp:finance-server",
+ "attestations": [
+ {
+ "type": "publisher-identity",
+@@ -2020,7 +2072,7 @@
+ {
+ "type": "SOC2-Type2",
+ "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
+-"digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
++"digest": "sha256:a1b2c3d4e5f6"
+ }
+ ]
+ }
+@@ -2191,7 +2243,7 @@
  
  Plugin description
  
