@@ -1021,11 +1021,8 @@ its tooling cannot resolve a canonical SPIFFE ID.
 
 Note that the signature proves the publisher claims the alias, not
 that the alias's own trust domain acknowledges the link. Consumers
-making authorization decisions inside the alias's trust domain SHOULD
-additionally obtain proof of control native to the alias scheme — for
-example a DID Document whose own `alsoKnownAs` references the
-canonical `identity`, a DNS TXT record, or a SPIFFE/SPIRE registration
-entry. Such proofs are outside the scope of this specification.
+making authorization decisions inside the alias's trust domain MAY
+additionally obtain proof of control native to the alias scheme.
 
 ### Verifying Artifact Integrity
 
