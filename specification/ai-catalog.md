@@ -816,13 +816,16 @@ For example, a catalog entry with `extensions` representing metadata and a custo
       "type": "text/vnd.okf+markdown",
       "tags": ["finance", "treasury"],
       "extensions": {
-        "metadata": {
+        "https://ai-catalog.org/extensions/metadata": {
           "location": "US-West",
           "environment": "staging",
           "version-compatible": [">=1.0.0"]
         },
-        "okf": {
-          "@context": "https://openknowledgeformat.org/ns#",
+        "https://openknowledgeformat.org/ns#": {
+          "@context": {
+            "us-gaap": "https://xbrl.fasb.org/us-gaap/",
+            "ifrs": "https://xbrl.ifrs.org/taxonomy/"
+          },
           "type": "Financial Dataset",
           "taxonomy": "us-gaap",
           "conformsTo": ["us-gaap:Revenue", "ifrs:Revenue"]
@@ -839,7 +842,7 @@ While publishers are free to create custom extensions, this specification
 defines a set of "Official" known types for commonly requested schemas:
 
 1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
-   - Used to store generic, schemaless key-value pairs (replacing the legacy metadata field).
+   - Used to store generic, schemaless key-value pairs.
 
 As custom extensions become highly popular, the AI-Catalog TSC may promote
 them to Official Known Types or core standard fields in future specification versions.
