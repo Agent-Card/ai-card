@@ -83,6 +83,9 @@ All other fields are optional:
 | `signature` | Detached JWS signature over the Trust Manifest content |
 | `metadata` | Open map for custom trust metadata |
 
+!!! tip "Attestation document format"
+    Attestation documents are not restricted to any particular format — they can be human-readable (e.g., a PDF audit report) or machine-readable for automated verification (e.g., JWTs, Verifiable Credentials).
+
 ## Adding publisher identity
 
 The simplest trust step is asserting publisher identity. Use an attestation of type `"publisher-identity"`:
@@ -113,6 +116,12 @@ For regulated environments, add compliance evidence:
     "description": "SOC 2 Type 2 report, valid through 2026"
   },
   {
+    "type": "ISO27701",
+    "uri": "https://trust.acme-corp.com/credentials/iso27701.sd-jwt",
+    "digest": "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+    "description": "ISO/IEC 27701 privacy management certification (IETF SD-JWT VC) issued by did:web:auditor.example"
+  },
+  {
     "type": "ISO27001",
     "uri": "https://trust.acme-corp.com/certs/iso27001.pdf"
   }
@@ -122,7 +131,7 @@ For regulated environments, add compliance evidence:
 The `digest` field allows clients to verify the attestation document hasn't been tampered with after being referenced in the catalog.
 
 !!! tip "Attestation freshness"
-    Attestations have no built-in expiry. Include a `description` with the validity period, and update the catalog entry's `updatedAt` field when you refresh attestations.
+    Attestations have no built-in expiry. Include a `description` with the validity period, and update the catalog entry's `updatedAt` field when you refresh attestations. Alternatively, you can rely on expiry mechanisms defined by the attestation document format (e.g., Verifiable Credential validity).
 
 ## Adding provenance
 
@@ -214,7 +223,14 @@ A Trust Manifest with identity, compliance attestation, provenance, and signatur
       {
         "type": "SOC2-Type2",
         "uri": "https://trust.acme-corp.com/reports/soc2.pdf",
-        "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890"
+        "digest": "sha256:a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
+        "description": "SOC 2 Type 2 report, valid through 2026"
+      },
+      {
+        "type": "ISO27701",
+        "uri": "https://trust.acme-corp.com/credentials/iso27701.sd-jwt",
+        "digest": "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+        "description": "ISO/IEC 27701 privacy management certification (IETF SD-JWT VC) issued by did:web:auditor.example"
       }
     ],
     "provenance": [
