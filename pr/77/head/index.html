@@ -834,13 +834,16 @@ throwing an error.</p>
       &quot;type&quot;: &quot;text/vnd.okf+markdown&quot;,
       &quot;tags&quot;: [&quot;finance&quot;, &quot;treasury&quot;],
       &quot;extensions&quot;: {
-        &quot;metadata&quot;: {
+        &quot;https://ai-catalog.org/extensions/metadata&quot;: {
           &quot;location&quot;: &quot;US-West&quot;,
           &quot;environment&quot;: &quot;staging&quot;,
           &quot;version-compatible&quot;: [&quot;&gt;=1.0.0&quot;]
         },
-        &quot;okf&quot;: {
-          &quot;@context&quot;: &quot;https://openknowledgeformat.org/ns#&quot;,
+        &quot;https://openknowledgeformat.org/ns#&quot;: {
+          &quot;@context&quot;: {
+            &quot;us-gaap&quot;: &quot;https://xbrl.fasb.org/us-gaap/&quot;,
+            &quot;ifrs&quot;: &quot;https://xbrl.ifrs.org/taxonomy/&quot;
+          },
           &quot;type&quot;: &quot;Financial Dataset&quot;,
           &quot;taxonomy&quot;: &quot;us-gaap&quot;,
           &quot;conformsTo&quot;: [&quot;us-gaap:Revenue&quot;, &quot;ifrs:Revenue&quot;]
@@ -857,7 +860,7 @@ throwing an error.</p>
 defines a set of "Official" known types for commonly requested schemas:</p>
 <ol>
 <li><strong>Metadata</strong> (<code>https://ai-catalog.org/extensions/metadata</code>)
-   - Used to store generic, schemaless key-value pairs (replacing the legacy metadata field).</li>
+   - Used to store generic, schemaless key-value pairs.</li>
 </ol>
 <p>As custom extensions become highly popular, the AI-Catalog TSC may promote
 them to Official Known Types or core standard fields in future specification versions.</p>
