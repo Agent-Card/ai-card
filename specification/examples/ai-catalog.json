@@ -32,7 +32,7 @@
     {
       "identifier": "urn:air:acme-corp.com:agent:finance-assistant-plugin",
       "displayName": "Finance Assistant Plugin",
-      "type": "application/agent-plugin+json",
+      "type": "application/agent-plugins+json",
       "description": "Agent Plugin bundle with skills and MCP server for finance workflows.",
       "tags": [
         "finance",
