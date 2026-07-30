@@ -259,7 +259,19 @@ The following members are OPTIONAL:
   for the full consumer resolution order.
 
 `description`
-: A string containing a short description of the artifact.
+: A string containing a short description of the artifact. Like
+  `displayName`, `description` is OPTIONAL and follows the same
+  authoritative-source rule: when the referenced artifact carries its
+  own canonical description — for example the `description` field of an
+  A2A Agent Card or an MCP Server Card — that artifact is the
+  authoritative source and entry `description` SHOULD be omitted to
+  avoid duplicating a value that can drift out of sync. When entry
+  `description` *is* present, however, it takes precedence: a consumer
+  SHOULD render it as given even when it differs from a description
+  carried by the referenced artifact, which is how a publisher provides
+  a listing-specific blurb. See
+  [Resolving an Artifact's Description](#resolving-an-artifact-s-description)
+  for the full consumer resolution order.
 
 `tags`
 : An array of strings serving as keywords for filtering and discovery.
@@ -269,6 +281,23 @@ The following members are OPTIONAL:
   [Semantic Versioning](https://semver.org/) is RECOMMENDED but not
   required. See [Multi-Version Entries](#multi-version-entries) for
   how versions interact with `identifier`.
+
+    Like `displayName` and `description`, `version` can restate a value
+    the referenced artifact already carries (an A2A Agent Card
+    `version`, an MCP Server Card `version`), and when a single entry
+    references such an artifact the entry `version` SHOULD be omitted to
+    avoid drift — the consumer can read it from the artifact. Unlike
+    `displayName` and `description`, however, `version` is not merely
+    cosmetic: it is part of the entry's uniqueness key, so it is
+    REQUIRED when a catalog lists multiple versions of the same
+    `identifier` (see [Multi-Version Entries](#multi-version-entries)).
+    A present `version` is used for catalog-level sorting and selection
+    rather than as a free-form display override, so it SHOULD equal the
+    version the referenced artifact reports; an entry `version` that
+    contradicts the artifact's own version is a publishing error, not a
+    deliberate override. See
+    [Resolving an Artifact's Version](#resolving-an-artifact-s-version)
+    for the full consumer resolution order.
 
 `updatedAt`
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
@@ -317,6 +346,64 @@ itself absent: step 2 yields no name, so the consumer falls through to
 the `identifier` segment in step 3. A publisher MAY still set
 `displayName` on such an entry to provide a better name than the bare
 identifier segment.
+
+### Resolving an Artifact's Description
+
+Because `description` is OPTIONAL, a consumer that wants to show a
+description cannot assume the entry carries one. It SHOULD resolve one in
+the following order:
+
+1. **`description` on the entry**, if present. A publisher-supplied
+   `description` always wins, even when it differs from a description
+   carried by the referenced artifact.
+2. **The referenced artifact's own canonical description**, if the
+   consumer has already fetched or cached the artifact — for example the
+   `description` field of an A2A Agent Card or an MCP Server Card.
+3. **No description**, if neither is available. Unlike a name, a
+   description has no identifier-derived fallback; a consumer SHOULD
+   simply render the entry without one.
+
+As with name resolution, a consumer SHOULD NOT dereference an artifact at
+render time solely to obtain a description. A registry, directory, or
+other service built on top of a catalog SHOULD resolve the description
+once at ingestion and cache the result, rather than fetching artifacts on
+the rendering path.
+
+### Resolving an Artifact's Version
+
+Because `version` is OPTIONAL on a single entry — and present only when
+the entry disambiguates others that share its `identifier` (see
+[Multi-Version Entries](#multi-version-entries)) or deliberately restates
+the artifact's version — a consumer cannot assume every entry carries
+one. To obtain a version, a consumer SHOULD resolve one in the following
+order:
+
+1. **`version` on the entry**, if present. Unlike `displayName` and
+   `description`, a present `version` is not a free-form display
+   override: it is authoritative for catalog-level sorting and version
+   selection. Within a multi-version listing it is REQUIRED and, combined
+   with `identifier`, uniquely addresses the entry.
+2. **The referenced artifact's own version**, if the consumer has already
+   fetched or cached the artifact — for example the `version` field of an
+   A2A Agent Card, an MCP Server Card, or an MCP Registry `server.json`.
+   A single entry that omits `version` because the artifact already
+   carries it is resolved here.
+3. **No version**, if neither is available — the entry represents an
+   unversioned artifact. A consumer that needs to order such entries
+   SHOULD fall back to `updatedAt`, consistent with
+   [Multi-Version Entries](#multi-version-entries).
+
+When both the entry and the referenced artifact carry a `version` and
+they disagree, the entry `version` is authoritative for catalog-level
+sorting and selection; the mismatch is a publishing error (it breaks
+latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
+silently preferring the artifact's value.
+
+As with name and description resolution, a consumer SHOULD NOT dereference
+an artifact at render time solely to obtain a version. A registry,
+directory, or other service built on top of a catalog SHOULD resolve the
+version once at ingestion and cache the result, rather than fetching
+artifacts on the rendering path.
 
 ## Multi-Version Entries
 
@@ -1972,7 +2059,7 @@ plugins/
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
 | Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
-| Plugin `description` | Entry `description` |
+| Plugin `description` | Stays in the plugin manifest (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
 | Plugin `author` | Entry `publisher` |
@@ -2021,7 +2108,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
-      "description": "Development kit for working with the Claude Agent SDK",
       "tags": ["development"],
       "publisher": {
         "identifier": "did:web:anthropic.com",
@@ -2035,7 +2121,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:adspirer:ads-agent",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
-      "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
       "tags": ["productivity", "ads"],
       "metadata": {
         "homepage": "https://www.adspirer.com"
@@ -2055,7 +2140,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:aikido:security",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
-      "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
       "tags": ["security"],
       "publisher": {
         "identifier": "did:web:aikido.dev",
