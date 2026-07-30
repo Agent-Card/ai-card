@@ -494,9 +494,9 @@ properties may evolve across versions.</p>
 <p>The following members are OPTIONAL:</p>
 <dl>
 <dt><code>identityType</code></dt>
-<dd>A string providing a type hint for the identity URI (e.g., "did",
+<dd>A string providing a type hint for the <code>identity</code> URI (e.g., "did",
   "spiffe", "dns"). This field is OPTIONAL when the type is evident
-  from the URI scheme.</dd>
+  from the URI scheme. It does not describe entries of <code>alsoKnownAs</code>.</dd>
 <dt><code>alsoKnownAs</code></dt>
 <dd>
 <p>An array of strings, each containing a globally unique URI
@@ -511,6 +511,9 @@ properties may evolve across versions.</p>
 <li>The domain-alignment rule defined in <a href="#identity">Identity</a>
   applies only to <code>identity</code>. Aliases MAY belong to different
   trust domains or identity schemes.</li>
+<li>The <code>identityType</code> hint applies only to <code>identity</code>; the type of
+  an alias is inferred from its URI scheme (e.g., <code>did:</code>,
+  <code>spiffe:</code>).</li>
 <li>Aliases are publisher claims covered by the Trust Manifest
   <code>signature</code>; no per-alias proof is required. Consumers MUST NOT
   rely on an alias from a manifest whose signature is absent or

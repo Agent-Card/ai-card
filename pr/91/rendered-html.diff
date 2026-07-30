@@ -28,10 +28,15 @@
  <p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
  values), each entry MAY carry its own Trust Manifest. There is no
  requirement that all versions carry identical trust metadata — trust
-@@ -483,6 +497,27 @@
- <dd>A string providing a type hint for the identity URI (e.g., "did",
+@@ -480,9 +494,33 @@
+ <p>The following members are OPTIONAL:</p>
+ <dl>
+ <dt><code>identityType</code></dt>
+-<dd>A string providing a type hint for the identity URI (e.g., "did",
++<dd>A string providing a type hint for the <code>identity</code> URI (e.g., "did",
    "spiffe", "dns"). This field is OPTIONAL when the type is evident
-   from the URI scheme.</dd>
+-  from the URI scheme.</dd>
++  from the URI scheme. It does not describe entries of <code>alsoKnownAs</code>.</dd>
 +<dt><code>alsoKnownAs</code></dt>
 +<dd>
 +<p>An array of strings, each containing a globally unique URI
@@ -46,6 +51,9 @@
 +<li>The domain-alignment rule defined in <a href="#identity">Identity</a>
 +  applies only to <code>identity</code>. Aliases MAY belong to different
 +  trust domains or identity schemes.</li>
++<li>The <code>identityType</code> hint applies only to <code>identity</code>; the type of
++  an alias is inferred from its URI scheme (e.g., <code>did:</code>,
++  <code>spiffe:</code>).</li>
 +<li>Aliases are publisher claims covered by the Trust Manifest
 +  <code>signature</code>; no per-alias proof is required. Consumers MUST NOT
 +  rely on an alias from a manifest whose signature is absent or
@@ -56,7 +64,7 @@
  <dt><code>trustSchema</code></dt>
  <dd>A Trust Schema object as defined in <a href="#trust-schema-object">Trust Schema</a>.</dd>
  <dt><code>attestations</code></dt>
-@@ -511,6 +546,9 @@
+@@ -511,6 +549,9 @@
  <pre><code class="language-json">{
    &quot;identity&quot;: &quot;did:web:acme.com:agent:finance&quot;,
    &quot;identityType&quot;: &quot;did&quot;,
@@ -66,7 +74,7 @@
    &quot;trustSchema&quot;: {
      &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
      &quot;version&quot;: &quot;1.0&quot;,
-@@ -710,6 +748,25 @@
+@@ -710,6 +751,25 @@
  <li>Confirm the JWT claims bind the <code>publisher.identifier</code> to the Trust
     Manifest's <code>identity</code>.</li>
  </ol>
@@ -92,7 +100,7 @@
  </section>
  <section id="verifying-artifact-integrity">
  <h3>Verifying Artifact Integrity</h3>
-@@ -1155,6 +1212,7 @@
+@@ -1155,6 +1215,7 @@
      }
      class TrustManifest {
          identity string
@@ -100,7 +108,7 @@
          trustSchema TrustSchema
          attestations Attestation[]
          provenance ProvenanceLink[]
-@@ -1304,6 +1362,7 @@
+@@ -1304,6 +1365,7 @@
  <pre><code>TrustManifest = {
    identity: text,
    ? identityType: text,

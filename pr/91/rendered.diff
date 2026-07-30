@@ -16,10 +16,13 @@
  When multiple entries share the same identifier (with different version
  values), each entry MAY carry its own Trust Manifest. There is no
  requirement that all versions carry identical trust metadata — trust
-@@ -479,6 +488,29 @@
- "spiffe", "dns"). This field is OPTIONAL when the type is evident
- from the URI scheme.
+@@ -477,7 +486,34 @@
  
+ A string providing a type hint for the identity URI (e.g., "did",
+ "spiffe", "dns"). This field is OPTIONAL when the type is evident
+-from the URI scheme.
++from the URI scheme. It does not describe entries of alsoKnownAs.
++
 +alsoKnownAs
 +
 +An array of strings, each containing a globally unique URI
@@ -37,16 +40,19 @@
 +applies only to identity. Aliases MAY belong to different
 +trust domains or identity schemes.
 +
++The identityType hint applies only to identity; the type of
++an alias is inferred from its URI scheme (e.g., did:,
++spiffe:).
++
 +Aliases are publisher claims covered by the Trust Manifest
 +signature; no per-alias proof is required. Consumers MUST NOT
 +rely on an alias from a manifest whose signature is absent or
 +fails verification (see
 +Verifying Alternative Identities).
-+
+ 
  trustSchema
  
- A Trust Schema object as defined in Trust Schema.
-@@ -521,6 +553,9 @@
+@@ -521,6 +557,9 @@
  {
  "identity": "did:web:acme.com:agent:finance",
  "identityType": "did",
@@ -56,7 +62,7 @@
  "trustSchema": {
  "identifier": "urn:trust:acme-enterprise-v1",
  "version": "1.0",
-@@ -756,6 +791,27 @@
+@@ -756,6 +795,27 @@
  
  Confirm the JWT claims bind the publisher.identifier to the Trust
  Manifest's identity.
@@ -84,7 +90,7 @@
  
  Verifying Artifact Integrity
  
-@@ -1235,6 +1291,7 @@
+@@ -1235,6 +1295,7 @@
  }
  class TrustManifest {
  identity string
@@ -92,7 +98,7 @@
  trustSchema TrustSchema
  attestations Attestation[]
  provenance ProvenanceLink[]
-@@ -1416,6 +1473,7 @@
+@@ -1416,6 +1477,7 @@
  TrustManifest = {
  identity: text,
  ? identityType: text,
