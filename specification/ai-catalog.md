@@ -108,7 +108,7 @@ members:
 : An array of Catalog Entry objects as defined in [Catalog Entry](#catalog-entry).
   This array MAY be empty.
 
-For example, a minimal catalog listing three AI artifacts:
+For example, a minimal catalog listing four AI artifacts:
 
 ```json
 {
@@ -129,6 +129,12 @@ For example, a minimal catalog listing three AI artifacts:
       "identifier": "urn:air:example.com:a2a:research",
       "type": "application/a2a-agent-card+json",
       "url": "https://agents.example.com/researchAssistant"
+    },
+    {
+      "identifier": "urn:air:example.com:plugin:productivity",
+      "displayName": "Productivity Plugin",
+      "type": "application/agent-plugin+json",
+      "url": "https://plugins.example.com/productivity/plugin.json"
     }
   ]
 }
@@ -222,6 +228,7 @@ It MUST contain the following members:
     - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file (the suffix `+md` is to be registered)
     - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
     - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
+    - `application/agent-plugin+json` — an Agent Plugin manifest ([Agent Plugins specification](https://agent-plugins.org/specification))
 
     These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
