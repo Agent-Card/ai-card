@@ -131,7 +131,7 @@ For example, a minimal catalog listing four AI artifacts:
       "url": "https://agents.example.com/researchAssistant"
     },
     {
-      "identifier": "urn:air:example.com:plugin:productivity",
+      "identifier": "urn:air:example.com:agent:productivity-plugin",
       "displayName": "Productivity Plugin",
       "type": "application/agent-plugin+json",
       "url": "https://plugins.example.com/productivity/plugin.json"
