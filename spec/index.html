@@ -215,10 +215,10 @@ members:</p>
 <dt><code>host</code></dt>
 <dd>A Host Info object as defined in <a href="#host-info">Host Info</a> identifying the
   operator of this catalog.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map of string keys to arbitrary values for custom or
-  non-standard metadata. See <a href="#metadata-extensibility">Metadata Extensibility</a>
-  for key naming conventions.</dd>
+<dt><code>extensions</code></dt>
+<dd>A JSON object (map) containing custom, vendor-specific, or
+  non-standard fields. See <a href="#extensions">Extensions</a> for definitions and
+  official extension types.</dd>
 </dl>
 </section>
 <section id="host-info">
@@ -369,8 +369,8 @@ for the full consumer resolution order.</p>
 <dt><code>updatedAt</code></dt>
 <dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
   when this entry was last modified.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map of string keys to arbitrary values for custom data.</dd>
+<dt><code>extensions</code></dt>
+<dd>A JSON object (map) containing custom data.</dd>
 <dt><code>publisher</code></dt>
 <dd>A Publisher object as defined in <a href="#publisher-object">Publisher Object</a>
   identifying the entity that publishes this artifact. This is the
@@ -589,9 +589,8 @@ properties may evolve across versions.</p>
 <dd>A string containing a detached JWS [[RFC7515]] signature computed
   over the Trust Manifest content. This enables integrity verification
   of the trust metadata independent of the artifact.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map of string keys to arbitrary values for extending trust
-  metadata.</dd>
+<dt><code>extensions</code></dt>
+<dd>A JSON object (map) for extending trust metadata.</dd>
 </dl>
 <p>For example, a Trust Manifest with identity, attestations, and
 provenance:</p>
@@ -893,40 +892,65 @@ RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.</p>
 </section>
 </section>
-<section id="metadata-extensibility">
-<h1>Metadata Extensibility</h1>
-<p>The <code>metadata</code> property appears on the AI Catalog top-level object,
+<section id="extensions">
+<h1>Extensions</h1>
+<p>The <code>extensions</code> property appears on the AI Catalog top-level object,
 on Catalog Entry objects, and on Trust Manifest objects. It provides
 a single, well-defined extension point for custom or vendor-specific
 properties.</p>
-<section id="key-naming">
-<h2>Key Naming</h2>
-<p>Metadata keys MUST be non-empty strings. To avoid collisions between
-independent publishers, the following conventions are RECOMMENDED:</p>
+<section id="format-and-key-naming">
+<h2>Format and Key Naming</h2>
+<p>The <code>extensions</code> field is a JSON object (map). Each key in the object MUST
+represent the extension type (namespace), and the corresponding value contains the extension data.</p>
+<p>To avoid collisions between independent publishers, the keys MUST
+be a valid URL or a reverse-DNS string:</p>
 <ul>
-<li><strong>Reverse-DNS prefix</strong> for vendor-specific keys:
+<li><strong>Reverse-DNS prefix</strong> for vendor-specific extensions:
   <code>com.example.confidenceScore</code>, <code>io.acme.deploymentRegion</code>.</li>
-<li><strong>Short, unqualified names</strong> for keys the publisher considers
-  broadly useful and unlikely to conflict: <code>repository</code>, <code>homepage</code>,
-  <code>license</code>.</li>
-<li><strong>Avoid keys that duplicate</strong> defined catalog fields (<code>displayName</code>,
-  <code>description</code>, <code>tags</code>, <code>version</code>). Consumers MAY ignore metadata
-  entries that shadow standard fields.</li>
+<li><strong>URL prefix</strong> for publicly accessible extension schemas:
+  <code>https://cisco.com/extensions/security-scan</code>.</li>
 </ul>
+<p>Consumers that do not recognize an extension key MUST ignore it without
+throwing an error.</p>
+<p>For example, a catalog entry with <code>extensions</code> representing metadata and a custom schema:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:air:treasury.gov:okf:fiscaldata&quot;,
+      &quot;type&quot;: &quot;text/vnd.okf+markdown&quot;,
+      &quot;tags&quot;: [&quot;finance&quot;, &quot;treasury&quot;],
+      &quot;extensions&quot;: {
+        &quot;https://ai-catalog.org/extensions/metadata&quot;: {
+          &quot;location&quot;: &quot;US-West&quot;,
+          &quot;environment&quot;: &quot;staging&quot;,
+          &quot;version-compatible&quot;: [&quot;&gt;=1.0.0&quot;]
+        },
+        &quot;https://openknowledgeformat.org/ns#&quot;: {
+          &quot;@context&quot;: {
+            &quot;us-gaap&quot;: &quot;https://xbrl.fasb.org/us-gaap/&quot;,
+            &quot;ifrs&quot;: &quot;https://xbrl.ifrs.org/taxonomy/&quot;
+          },
+          &quot;type&quot;: &quot;Financial Dataset&quot;,
+          &quot;taxonomy&quot;: &quot;us-gaap&quot;,
+          &quot;conformsTo&quot;: [&quot;us-gaap:Revenue&quot;, &quot;ifrs:Revenue&quot;]
+        }
+      }
+    }
+  ]
+}
+</code></pre>
 </section>
-<section id="reserved-keys">
-<h2>Reserved Keys</h2>
-<p>No metadata keys are reserved by this specification. Future
-specification versions MAY promote commonly used metadata keys into
-standard fields. When this occurs, the metadata key SHOULD be
-retained for backward compatibility and the standard field takes
-precedence.</p>
-</section>
-<section id="value-types">
-<h2>Value Types</h2>
-<p>Metadata values MAY be any valid JSON type (string, number, boolean,
-array, object, null). Consumers that do not recognize a metadata key
-SHOULD ignore it.</p>
+<section id="official-extensions">
+<h2>Official Extensions</h2>
+<p>While publishers are free to create custom extensions, this specification
+defines a set of "Official" known types for commonly requested schemas:</p>
+<ol>
+<li><strong>Metadata</strong> (<code>https://ai-catalog.org/extensions/metadata</code>)
+   - Used to store generic, schemaless key-value pairs.</li>
+</ol>
+<p>As custom extensions become highly popular, the AI-Catalog TSC may promote
+them to Official Known Types or core standard fields in future specification versions.</p>
 </section>
 </section>
 <section id="version-handling">
@@ -1354,7 +1378,7 @@ Catalog and Trust Manifest documents.</p>
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? metadata: { * text =&gt; any }
+  ? extensions: { * text =&gt; any }
 }
 
 HostInfo = {
@@ -1376,7 +1400,7 @@ CatalogEntry = {
   ? publisher: Publisher,
   ? trustManifest: TrustManifest,
   ? updatedAt: tdate,
-  ? metadata: { * text =&gt; any }
+  ? extensions: { * text =&gt; any }
 }
 
 Publisher = {
@@ -1397,7 +1421,7 @@ Publisher = {
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text,
   ? signature: text,
-  ? metadata: { * text =&gt; any }
+  ? extensions: { * text =&gt; any }
 }
 
 TrustSchema = {
