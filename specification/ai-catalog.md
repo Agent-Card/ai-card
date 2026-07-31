@@ -140,10 +140,10 @@ The following members are OPTIONAL:
 : A Host Info object as defined in [Host Info](#host-info) identifying the
   operator of this catalog.
 
-`metadata`
-: An open map of string keys to arbitrary values for custom or
-  non-standard metadata. See [Metadata Extensibility](#metadata-extensibility)
-  for key naming conventions.
+`extensions`
+: A JSON object (map) containing custom, vendor-specific, or
+  non-standard fields. See [Extensions](#extensions) for definitions and
+  official extension types.
 
 `signature`
 : A string containing a detached JWS [[RFC7515]] signature computed over
@@ -267,7 +267,19 @@ The following members are OPTIONAL:
   for the full consumer resolution order.
 
 `description`
-: A string containing a short description of the artifact.
+: A string containing a short description of the artifact. Like
+  `displayName`, `description` is OPTIONAL and follows the same
+  authoritative-source rule: when the referenced artifact carries its
+  own canonical description — for example the `description` field of an
+  A2A Agent Card or an MCP Server Card — that artifact is the
+  authoritative source and entry `description` SHOULD be omitted to
+  avoid duplicating a value that can drift out of sync. When entry
+  `description` *is* present, however, it takes precedence: a consumer
+  SHOULD render it as given even when it differs from a description
+  carried by the referenced artifact, which is how a publisher provides
+  a listing-specific blurb. See
+  [Resolving an Artifact's Description](#resolving-an-artifact-s-description)
+  for the full consumer resolution order.
 
 `tags`
 : An array of strings serving as keywords for filtering and discovery.
@@ -278,12 +290,29 @@ The following members are OPTIONAL:
   required. See [Multi-Version Entries](#multi-version-entries) for
   how versions interact with `identifier`.
 
+    Like `displayName` and `description`, `version` can restate a value
+    the referenced artifact already carries (an A2A Agent Card
+    `version`, an MCP Server Card `version`), and when a single entry
+    references such an artifact the entry `version` SHOULD be omitted to
+    avoid drift — the consumer can read it from the artifact. Unlike
+    `displayName` and `description`, however, `version` is not merely
+    cosmetic: it is part of the entry's uniqueness key, so it is
+    REQUIRED when a catalog lists multiple versions of the same
+    `identifier` (see [Multi-Version Entries](#multi-version-entries)).
+    A present `version` is used for catalog-level sorting and selection
+    rather than as a free-form display override, so it SHOULD equal the
+    version the referenced artifact reports; an entry `version` that
+    contradicts the artifact's own version is a publishing error, not a
+    deliberate override. See
+    [Resolving an Artifact's Version](#resolving-an-artifact-s-version)
+    for the full consumer resolution order.
+
 `updatedAt`
 : A string containing an ISO 8601 [[RFC3339]] timestamp indicating
   when this entry was last modified.
 
-`metadata`
-: An open map of string keys to arbitrary values for custom data.
+`extensions`
+: A JSON object (map) containing custom data.
 
 `publisher`
 : A Publisher object as defined in [Publisher Object](#publisher-object)
@@ -325,6 +354,64 @@ itself absent: step 2 yields no name, so the consumer falls through to
 the `identifier` segment in step 3. A publisher MAY still set
 `displayName` on such an entry to provide a better name than the bare
 identifier segment.
+
+### Resolving an Artifact's Description
+
+Because `description` is OPTIONAL, a consumer that wants to show a
+description cannot assume the entry carries one. It SHOULD resolve one in
+the following order:
+
+1. **`description` on the entry**, if present. A publisher-supplied
+   `description` always wins, even when it differs from a description
+   carried by the referenced artifact.
+2. **The referenced artifact's own canonical description**, if the
+   consumer has already fetched or cached the artifact — for example the
+   `description` field of an A2A Agent Card or an MCP Server Card.
+3. **No description**, if neither is available. Unlike a name, a
+   description has no identifier-derived fallback; a consumer SHOULD
+   simply render the entry without one.
+
+As with name resolution, a consumer SHOULD NOT dereference an artifact at
+render time solely to obtain a description. A registry, directory, or
+other service built on top of a catalog SHOULD resolve the description
+once at ingestion and cache the result, rather than fetching artifacts on
+the rendering path.
+
+### Resolving an Artifact's Version
+
+Because `version` is OPTIONAL on a single entry — and present only when
+the entry disambiguates others that share its `identifier` (see
+[Multi-Version Entries](#multi-version-entries)) or deliberately restates
+the artifact's version — a consumer cannot assume every entry carries
+one. To obtain a version, a consumer SHOULD resolve one in the following
+order:
+
+1. **`version` on the entry**, if present. Unlike `displayName` and
+   `description`, a present `version` is not a free-form display
+   override: it is authoritative for catalog-level sorting and version
+   selection. Within a multi-version listing it is REQUIRED and, combined
+   with `identifier`, uniquely addresses the entry.
+2. **The referenced artifact's own version**, if the consumer has already
+   fetched or cached the artifact — for example the `version` field of an
+   A2A Agent Card, an MCP Server Card, or an MCP Registry `server.json`.
+   A single entry that omits `version` because the artifact already
+   carries it is resolved here.
+3. **No version**, if neither is available — the entry represents an
+   unversioned artifact. A consumer that needs to order such entries
+   SHOULD fall back to `updatedAt`, consistent with
+   [Multi-Version Entries](#multi-version-entries).
+
+When both the entry and the referenced artifact carry a `version` and
+they disagree, the entry `version` is authoritative for catalog-level
+sorting and selection; the mismatch is a publishing error (it breaks
+latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
+silently preferring the artifact's value.
+
+As with name and description resolution, a consumer SHOULD NOT dereference
+an artifact at render time solely to obtain a version. A registry,
+directory, or other service built on top of a catalog SHOULD resolve the
+version once at ingestion and cache the result, rather than fetching
+artifacts on the rendering path.
 
 ## Multi-Version Entries
 
@@ -446,7 +533,7 @@ contain at least one *substantive* trust member:
 
 The members `identity` and `identityType` (which identify the workload
 principal) and the informational members `privacyPolicyUrl`,
-`termsOfServiceUrl`, and `metadata` do NOT satisfy this requirement.
+`termsOfServiceUrl`, and `extensions` do NOT satisfy this requirement.
 `subject`, `issuedAt`, and `expiresAt` are not substantive on their own:
 an unsigned `subject` digest is attacker-settable and unverifiable, so
 they count only as part of a `signature`.
@@ -510,13 +597,10 @@ The following members are OPTIONAL:
   reference can be substituted without detection. See
   [Trust Manifest Signatures](#trust-manifest-signatures).
 
-`metadata`
-: An open map of string keys to arbitrary values for extending trust
-  metadata. Unlike the Catalog Entry's `metadata` (which is
-  informational and unsigned), this map is part of the signed payload
-  when the Trust Manifest carries a `signature`; use it for extensions
-  that must be cryptographically bound to the manifest, and use the
-  entry's `metadata` for unsigned, informational extensions.
+`extensions`
+: A JSON object (map) for extending trust metadata. When the Trust Manifest
+  carries a `signature`, this object is part of the signed payload; use it
+  for extensions that must be cryptographically bound to the manifest.
 
 For example, a Trust Manifest with identity, attestations, and
 provenance:
@@ -554,7 +638,7 @@ provenance:
   "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
   "subject": {
     "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
-    "mediaType": "application/a2a-agent-card+json",
+    "type": "application/a2a-agent-card+json",
     "digest": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
   },
   "issuedAt": "2026-03-15T10:00:00Z",
@@ -573,9 +657,9 @@ content digest cannot be changed without invalidating the signature.
 
 A Subject object MUST contain:
 
-`mediaType`
+`type`
 : A string containing the media type of the bound artifact. This MUST
-  equal the containing Catalog Entry's `mediaType`.
+  equal the containing Catalog Entry's `type`.
 
 `digest`
 : A string containing the cryptographic digest of the artifact content,
@@ -597,8 +681,8 @@ artifact's media type and digest match the `subject` before relying on
 any claim in the Trust Manifest. See
 [Verifying Artifact Integrity](#verifying-artifact-integrity).
 
-The `subject.mediaType` and `subject.url` intentionally restate the
-entry's `mediaType` and `url` so that those values fall within the signed
+The `subject.type` and `subject.url` intentionally restate the
+entry's `type` and `url` so that those values fall within the signed
 payload. This is a deliberate duplication, not redundant metadata:
 without it, an attacker who controls the catalog document could change
 the entry's media type or location without invalidating the signature.
@@ -885,7 +969,7 @@ To verify artifact integrity:
 1. Verify the Trust Manifest signature
    ([Trust Manifest Signatures](#trust-manifest-signatures)) and anchor
    the identity ([Trust Anchoring](#trust-anchoring)).
-2. Confirm `subject.mediaType` equals the entry's `mediaType`, and, when
+2. Confirm `subject.type` equals the entry's `type`, and, when
    `subject.url` is present, that it equals the entry's `url`.
 3. Fetch the artifact content from the entry's `url`, or take it from
    the entry's `data`, observing the limits in
@@ -1010,40 +1094,70 @@ depth to prevent circular references. A depth limit of 4 is
 RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.
 
-# Metadata Extensibility
+# Extensions
 
-The `metadata` property appears on the AI Catalog top-level object,
+The `extensions` property appears on the AI Catalog top-level object,
 on Catalog Entry objects, and on Trust Manifest objects. It provides
 a single, well-defined extension point for custom or vendor-specific
 properties.
 
-## Key Naming
+## Format and Key Naming
 
-Metadata keys MUST be non-empty strings. To avoid collisions between
-independent publishers, the following conventions are RECOMMENDED:
+The `extensions` field is a JSON object (map). Each key in the object MUST
+represent the extension type (namespace), and the corresponding value contains the extension data.
 
-- **Reverse-DNS prefix** for vendor-specific keys:
+To avoid collisions between independent publishers, the keys MUST
+be a valid URL or a reverse-DNS string:
+
+- **Reverse-DNS prefix** for vendor-specific extensions:
   `com.example.confidenceScore`, `io.acme.deploymentRegion`.
-- **Short, unqualified names** for keys the publisher considers
-  broadly useful and unlikely to conflict: `repository`, `homepage`,
-  `license`.
-- **Avoid keys that duplicate** defined catalog fields (`displayName`,
-  `description`, `tags`, `version`). Consumers MAY ignore metadata
-  entries that shadow standard fields.
+- **URL prefix** for publicly accessible extension schemas:
+  `https://cisco.com/extensions/security-scan`.
 
-## Reserved Keys
+Consumers that do not recognize an extension key MUST ignore it without
+throwing an error.
 
-No metadata keys are reserved by this specification. Future
-specification versions MAY promote commonly used metadata keys into
-standard fields. When this occurs, the metadata key SHOULD be
-retained for backward compatibility and the standard field takes
-precedence.
+For example, a catalog entry with `extensions` representing metadata and a custom schema:
 
-## Value Types
+```json
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:air:treasury.gov:okf:fiscaldata",
+      "type": "text/vnd.okf+markdown",
+      "tags": ["finance", "treasury"],
+      "extensions": {
+        "https://ai-catalog.org/extensions/metadata": {
+          "location": "US-West",
+          "environment": "staging",
+          "version-compatible": [">=1.0.0"]
+        },
+        "https://openknowledgeformat.org/ns#": {
+          "@context": {
+            "us-gaap": "https://xbrl.fasb.org/us-gaap/",
+            "ifrs": "https://xbrl.ifrs.org/taxonomy/"
+          },
+          "type": "Financial Dataset",
+          "taxonomy": "us-gaap",
+          "conformsTo": ["us-gaap:Revenue", "ifrs:Revenue"]
+        }
+      }
+    }
+  ]
+}
+```
 
-Metadata values MAY be any valid JSON type (string, number, boolean,
-array, object, null). Consumers that do not recognize a metadata key
-SHOULD ignore it.
+## Official Extensions
+
+While publishers are free to create custom extensions, this specification
+defines a set of "Official" known types for commonly requested schemas:
+
+1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
+   - Used to store generic, schemaless key-value pairs.
+
+As custom extensions become highly popular, the AI-Catalog TSC may promote
+them to Official Known Types or core standard fields in future specification versions.
 
 # Version Handling
 
@@ -1184,7 +1298,7 @@ A conformant Minimal Catalog is a JSON document with media type
   `data`
 
 All other fields (`host`, `publisher`, `trustManifest`,
-`metadata`) are OPTIONAL. This level is sufficient for use cases that
+`extensions`) are OPTIONAL. This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents. A `trustManifest`, when present at any level,
 MUST be substantive (see [Manifest Validity](#manifest-validity)).
@@ -1375,7 +1489,7 @@ MUST treat it as untrusted input. In particular:
 
 Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
 information through image fetch requests. Publishers SHOULD carefully
-consider what information is included in `metadata` extension fields.
+consider what information is included in `extensions` fields.
 
 # Data Model Overview
 
@@ -1419,7 +1533,7 @@ classDiagram
     }
     class Subject {
         url string
-        mediaType string
+        type string
         digest string
     }
     class TrustSchema {
@@ -1545,7 +1659,7 @@ AICatalog = {
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? metadata: { * text => any }
+  ? extensions: { * text => any }
 }
 
 HostInfo = {
@@ -1567,7 +1681,7 @@ CatalogEntry = {
   ? publisher: Publisher,
   ? trustManifest: TrustManifest,
   ? updatedAt: tdate,
-  ? metadata: { * text => any }
+  ? extensions: { * text => any }
 }
 
 Publisher = {
@@ -1589,7 +1703,7 @@ TrustManifest = {
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text,
   ? signature: text,
-  ? metadata: { * text => any }
+  ? extensions: { * text => any }
 }
 
 TrustSchema = {
@@ -1851,7 +1965,7 @@ ai-catalog.json   ──pack──►   OCI / xRegistry / HTTP  ──unpack─�
 
 This separation keeps authoring and consumption simple: publishers and
 clients work with domain vocabulary (`entries`, `displayName`,
-`mediaType`, `trustManifest`), while infrastructure that wants
+`type`, `trustManifest`), while infrastructure that wants
 content-addressing, signing, replication, or registry APIs uses whichever
 binding below matches its substrate.
 
@@ -1864,7 +1978,7 @@ a pack/unpack round-trip.
 | Logical concept | Invariant a binding MUST preserve |
 |:---|:---|
 | Entry identity (`identifier`) | A stable, addressable identity for each entry |
-| Artifact content + `mediaType` | The artifact bytes are retrievable together with their media type |
+| Artifact content + `type` | The artifact bytes are retrievable together with their media type |
 | Catalog structure / nesting | Nested catalogs remain navigable as a hierarchy |
 | Trust Manifest association | An entry's Trust Manifest is discoverable from that entry |
 | Content integrity | The served bytes are verifiably bound to `trustManifest.subject.digest` |
@@ -1886,7 +2000,7 @@ a guarantee the substrate cannot express.
 | Invariant | OCI primitive (delegate) | xRegistry primitive (delegate) | Carried fallback |
 |:---|:---|:---|:---|
 | Identity | Repository path + digest | `resourceid` / `xid` | `entry.identifier` |
-| Content + media type | `layers[0]` + `artifactType` | Resource document + `contenttype` | Entry artifact + `mediaType` |
+| Content + media type | `layers[0]` + `artifactType` | Resource document + `contenttype` | Entry artifact + `type` |
 | Nesting | Nested Image Index | Nested Group / `xref` | Nested entry |
 | Manifest association | Referrers API (`subject`) | `xref` / extension attribute | Inline `trustManifest` |
 | Content integrity | Content-addressed digest | *(none — carried)* | `subject.digest` |
@@ -2095,7 +2209,7 @@ are the catalog entries; each entry's artifact is the Resource document.
 | AI Catalog document | A Group instance (e.g. in a `aicatalogs` Group type), or the Registry root when serving a single catalog |
 | Catalog Entry | A Resource within that Group |
 | Entry `identifier` | Resource `<SINGULAR>id` and `xid` |
-| Entry `mediaType` | Version `contenttype` (with `format` when a named format applies) |
+| Entry `type` | Version `contenttype` (with `format` when a named format applies) |
 | Entry artifact content | Resource document — inline (`<RESOURCE>` / `<RESOURCE>base64`) or external (`<RESOURCE>url`) |
 | Entry metadata (displayName, description, tags) | `name`, `description`, `labels` |
 | Entry version | Version `versionid` |
@@ -2115,7 +2229,7 @@ Tooling converts an AI Catalog JSON document into xRegistry resources:
 2. **Each catalog entry** becomes a Resource in that Group. The entry's
    artifact content is stored as the Resource document — inline via
    `<RESOURCE>` / `<RESOURCE>base64`, or by reference via `<RESOURCE>url`.
-   `mediaType` maps to `contenttype`; entry metadata maps to `name`,
+   `type` maps to `contenttype`; entry metadata maps to `name`,
    `description`, and `labels`. Multiple entry versions map to Versions.
 
 3. **Trust Manifests** are carried as an extension attribute on the
@@ -2136,7 +2250,7 @@ Tooling converts xRegistry resources back to an AI Catalog JSON document:
    `ai-catalog.json`.
 2. For each Resource, read its document (inline or via `<RESOURCE>url`)
    and `contenttype` to recover the entry's artifact content and
-   `mediaType`; map `name`, `description`, and `labels` back to entry
+   `type`; map `name`, `description`, and `labels` back to entry
    metadata.
 3. Read the Trust Manifest from the extension attribute or `xref`'d
    Resource, and verify its detached JWS and `subject.digest` against the
@@ -2171,7 +2285,7 @@ holding two entries. This is generated by tooling, not authored by hand:
       "aicatalog_trustmanifest": {
         "issuedAt": "2025-01-01T00:00:00Z",
         "subject": {
-          "mediaType": "application/a2a-agent-card+json",
+          "type": "application/a2a-agent-card+json",
           "digest": "sha256:aaa111..."
         },
         "signature": "eyJhbGciOiJFUzI1NiJ9..detached-JWS.."
@@ -2429,7 +2543,7 @@ plugins/
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
 | Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
-| Plugin `description` | Entry `description` |
+| Plugin `description` | Stays in the plugin manifest (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
 | Plugin `category` | Entry `tags[]` (first tag) |
 | Plugin `tags` | Entry `tags[]` (merged with category) |
 | Plugin `author` | Entry `publisher` |
@@ -2478,7 +2592,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
-      "description": "Development kit for working with the Claude Agent SDK",
       "tags": ["development"],
       "publisher": {
         "identifier": "did:web:anthropic.com",
@@ -2492,7 +2605,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:adspirer:ads-agent",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
-      "description": "Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.",
       "tags": ["productivity", "ads"],
       "metadata": {
         "homepage": "https://www.adspirer.com"
@@ -2512,7 +2624,6 @@ maps to an AI Catalog where each plugin is an entry:
       "identifier": "urn:claude-plugin:aikido:security",
       "type": "application/vnd.anthropic.claude-plugin+json",
       "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
-      "description": "Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.",
       "tags": ["security"],
       "publisher": {
         "identifier": "did:web:aikido.dev",

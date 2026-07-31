@@ -1,10 +1,10 @@
 # ADR-0016: displayName Is Optional on a Catalog Entry
 
 ## Status
-Proposed
+Accepted
 
 ## Date
-2026-06-18 (Proposed)
+2026-06-18
 
 ## Context
 A Catalog Entry is a thin pointer: it carries an `identifier`, a `mediaType`, and exactly one of `url` or `data` locating the full artifact. `displayName` (a human-readable name for the artifact) is a REQUIRED member of every Catalog Entry, and is listed among the required-at-minimum members of a Minimal Catalog (Level 1).
@@ -42,4 +42,4 @@ This decision concerns only the Catalog Entry. `displayName` on `HostInfo` and `
 An MCP Server Card's `title` is itself OPTIONAL. The guidance above is keyed on whether the artifact *carries a canonical name*, not on its media type: if a referenced Server Card omits `title`, the entry SHOULD keep `displayName` so the artifact is not left with only a reverse-DNS identifier and a prose description.
 
 ## Meeting Reference
-Slated for discussion at the 2026-06-18 AI Catalog bi-weekly working-group call; this ADR records the proposal ahead of that discussion. Update the Status and Date (and note who raised concerns and the agreed outcome, as in ADR-0011) once the working group ratifies it.
+Ratified at the 2026-06-18 AI Catalog bi-weekly working-group call: `displayName` was made OPTIONAL on the Catalog Entry as proposed. Removing the field entirely was considered and rejected so that opaque, self-nameless artifacts retain a place for a human-readable name.
