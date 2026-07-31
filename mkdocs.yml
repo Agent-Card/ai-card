@@ -33,10 +33,11 @@ theme:
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.tracking
-    - navigation.sections
     - navigation.expand
     - navigation.top
     - navigation.footer
+    - navigation.indexes
+    - navigation.sections
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -75,21 +76,26 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/Agent-Card/ai-catalog
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/wh4XQQG4tt
 
 nav:
   - Home: index.md
   - Specification: specification.md
   - Getting Started: getting-started.md
   - Guides:
+      - guides/index.md
       - Creating a Catalog: guides/creating-a-catalog.md
       - Organizing Catalogs: guides/organizing-catalogs.md
       - Consuming Catalogs: guides/consuming-catalogs.md
       - Serving Your Catalog: guides/serving-your-catalog.md
       - Adding Trust: guides/adding-trust.md
   - Examples:
+      - examples/index.md
       - Minimal Catalog: examples/minimal-catalog.md
       - Multi-Protocol Agent: examples/multi-protocol-agent.md
       - Nested Catalogs: examples/nested-catalogs.md
   - Implementations: implementations.md
+  - Community: community/index.md
 
 
