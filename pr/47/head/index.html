@@ -233,10 +233,10 @@ members:</p>
 <dt><code>host</code></dt>
 <dd>A Host Info object as defined in <a href="#host-info">Host Info</a> identifying the
   operator of this catalog.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map of string keys to arbitrary values for custom or
-  non-standard metadata. See <a href="#metadata-extensibility">Metadata Extensibility</a>
-  for key naming conventions.</dd>
+<dt><code>extensions</code></dt>
+<dd>A JSON object (map) containing custom, vendor-specific, or
+  non-standard fields. See <a href="#extensions">Extensions</a> for definitions and
+  official extension types.</dd>
 <dt><code>signature</code></dt>
 <dd>A string containing a detached JWS [[RFC7515]] signature computed over
   the JCS-canonicalized [[RFC8785]] catalog document (excluding the
@@ -353,19 +353,49 @@ provide the artifact content:</p>
   <a href="#resolving-an-artifact-s-display-name">Resolving an Artifact's Display Name</a>
   for the full consumer resolution order.</dd>
 <dt><code>description</code></dt>
-<dd>A string containing a short description of the artifact.</dd>
+<dd>A string containing a short description of the artifact. Like
+  <code>displayName</code>, <code>description</code> is OPTIONAL and follows the same
+  authoritative-source rule: when the referenced artifact carries its
+  own canonical description — for example the <code>description</code> field of an
+  A2A Agent Card or an MCP Server Card — that artifact is the
+  authoritative source and entry <code>description</code> SHOULD be omitted to
+  avoid duplicating a value that can drift out of sync. When entry
+  <code>description</code> <em>is</em> present, however, it takes precedence: a consumer
+  SHOULD render it as given even when it differs from a description
+  carried by the referenced artifact, which is how a publisher provides
+  a listing-specific blurb. See
+  <a href="#resolving-an-artifact-s-description">Resolving an Artifact's Description</a>
+  for the full consumer resolution order.</dd>
 <dt><code>tags</code></dt>
 <dd>An array of strings serving as keywords for filtering and discovery.</dd>
 <dt><code>version</code></dt>
-<dd>A string containing the version of this artifact.
+<dd>
+<p>A string containing the version of this artifact.
   <a href="https://semver.org/">Semantic Versioning</a> is RECOMMENDED but not
   required. See <a href="#multi-version-entries">Multi-Version Entries</a> for
-  how versions interact with <code>identifier</code>.</dd>
+  how versions interact with <code>identifier</code>.</p>
+<p>Like <code>displayName</code> and <code>description</code>, <code>version</code> can restate a value
+the referenced artifact already carries (an A2A Agent Card
+<code>version</code>, an MCP Server Card <code>version</code>), and when a single entry
+references such an artifact the entry <code>version</code> SHOULD be omitted to
+avoid drift — the consumer can read it from the artifact. Unlike
+<code>displayName</code> and <code>description</code>, however, <code>version</code> is not merely
+cosmetic: it is part of the entry's uniqueness key, so it is
+REQUIRED when a catalog lists multiple versions of the same
+<code>identifier</code> (see <a href="#multi-version-entries">Multi-Version Entries</a>).
+A present <code>version</code> is used for catalog-level sorting and selection
+rather than as a free-form display override, so it SHOULD equal the
+version the referenced artifact reports; an entry <code>version</code> that
+contradicts the artifact's own version is a publishing error, not a
+deliberate override. See
+<a href="#resolving-an-artifact-s-version">Resolving an Artifact's Version</a>
+for the full consumer resolution order.</p>
+</dd>
 <dt><code>updatedAt</code></dt>
 <dd>A string containing an ISO 8601 [[RFC3339]] timestamp indicating
   when this entry was last modified.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map of string keys to arbitrary values for custom data.</dd>
+<dt><code>extensions</code></dt>
+<dd>A JSON object (map) containing custom data.</dd>
 <dt><code>publisher</code></dt>
 <dd>A Publisher object as defined in <a href="#publisher-object">Publisher Object</a>
   identifying the entity that publishes this artifact. This is the
@@ -404,6 +434,63 @@ itself absent: step 2 yields no name, so the consumer falls through to
 the <code>identifier</code> segment in step 3. A publisher MAY still set
 <code>displayName</code> on such an entry to provide a better name than the bare
 identifier segment.</p>
+</section>
+<section id="resolving-an-artifact-s-description">
+<h3>Resolving an Artifact&#x27;s Description</h3>
+<p>Because <code>description</code> is OPTIONAL, a consumer that wants to show a
+description cannot assume the entry carries one. It SHOULD resolve one in
+the following order:</p>
+<ol>
+<li><strong><code>description</code> on the entry</strong>, if present. A publisher-supplied
+   <code>description</code> always wins, even when it differs from a description
+   carried by the referenced artifact.</li>
+<li><strong>The referenced artifact's own canonical description</strong>, if the
+   consumer has already fetched or cached the artifact — for example the
+   <code>description</code> field of an A2A Agent Card or an MCP Server Card.</li>
+<li><strong>No description</strong>, if neither is available. Unlike a name, a
+   description has no identifier-derived fallback; a consumer SHOULD
+   simply render the entry without one.</li>
+</ol>
+<p>As with name resolution, a consumer SHOULD NOT dereference an artifact at
+render time solely to obtain a description. A registry, directory, or
+other service built on top of a catalog SHOULD resolve the description
+once at ingestion and cache the result, rather than fetching artifacts on
+the rendering path.</p>
+</section>
+<section id="resolving-an-artifact-s-version">
+<h3>Resolving an Artifact&#x27;s Version</h3>
+<p>Because <code>version</code> is OPTIONAL on a single entry — and present only when
+the entry disambiguates others that share its <code>identifier</code> (see
+<a href="#multi-version-entries">Multi-Version Entries</a>) or deliberately restates
+the artifact's version — a consumer cannot assume every entry carries
+one. To obtain a version, a consumer SHOULD resolve one in the following
+order:</p>
+<ol>
+<li><strong><code>version</code> on the entry</strong>, if present. Unlike <code>displayName</code> and
+   <code>description</code>, a present <code>version</code> is not a free-form display
+   override: it is authoritative for catalog-level sorting and version
+   selection. Within a multi-version listing it is REQUIRED and, combined
+   with <code>identifier</code>, uniquely addresses the entry.</li>
+<li><strong>The referenced artifact's own version</strong>, if the consumer has already
+   fetched or cached the artifact — for example the <code>version</code> field of an
+   A2A Agent Card, an MCP Server Card, or an MCP Registry <code>server.json</code>.
+   A single entry that omits <code>version</code> because the artifact already
+   carries it is resolved here.</li>
+<li><strong>No version</strong>, if neither is available — the entry represents an
+   unversioned artifact. A consumer that needs to order such entries
+   SHOULD fall back to <code>updatedAt</code>, consistent with
+   <a href="#multi-version-entries">Multi-Version Entries</a>.</li>
+</ol>
+<p>When both the entry and the referenced artifact carry a <code>version</code> and
+they disagree, the entry <code>version</code> is authoritative for catalog-level
+sorting and selection; the mismatch is a publishing error (it breaks
+latest-selection) that a consumer MAY surface but SHOULD NOT resolve by
+silently preferring the artifact's value.</p>
+<p>As with name and description resolution, a consumer SHOULD NOT dereference
+an artifact at render time solely to obtain a version. A registry,
+directory, or other service built on top of a catalog SHOULD resolve the
+version once at ingestion and cache the result, rather than fetching
+artifacts on the rendering path.</p>
 </section>
 </section>
 <section id="multi-version-entries">
@@ -517,7 +604,7 @@ contain at least one <em>substantive</em> trust member:</p>
 </ul>
 <p>The members <code>identity</code> and <code>identityType</code> (which identify the workload
 principal) and the informational members <code>privacyPolicyUrl</code>,
-<code>termsOfServiceUrl</code>, and <code>metadata</code> do NOT satisfy this requirement.
+<code>termsOfServiceUrl</code>, and <code>extensions</code> do NOT satisfy this requirement.
 <code>subject</code>, <code>issuedAt</code>, and <code>expiresAt</code> are not substantive on their own:
 an unsigned <code>subject</code> digest is attacker-settable and unverifiable, so
 they count only as part of a <code>signature</code>.</p>
@@ -570,13 +657,10 @@ present.</p>
   digest carried in <code>subject</code>, neither the trust claims nor the artifact
   reference can be substituted without detection. See
   <a href="#trust-manifest-signatures">Trust Manifest Signatures</a>.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map of string keys to arbitrary values for extending trust
-  metadata. Unlike the Catalog Entry's <code>metadata</code> (which is
-  informational and unsigned), this map is part of the signed payload
-  when the Trust Manifest carries a <code>signature</code>; use it for extensions
-  that must be cryptographically bound to the manifest, and use the
-  entry's <code>metadata</code> for unsigned, informational extensions.</dd>
+<dt><code>extensions</code></dt>
+<dd>A JSON object (map) for extending trust metadata. When the Trust Manifest
+  carries a <code>signature</code>, this object is part of the signed payload; use it
+  for extensions that must be cryptographically bound to the manifest.</dd>
 </dl>
 <p>For example, a Trust Manifest with identity, attestations, and
 provenance:</p>
@@ -612,7 +696,7 @@ provenance:</p>
   &quot;termsOfServiceUrl&quot;: &quot;https://acme-corp.com/legal/terms&quot;,
   &quot;subject&quot;: {
     &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
-    &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+    &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
     &quot;digest&quot;: &quot;sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08&quot;
   },
   &quot;issuedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;,
@@ -630,9 +714,9 @@ Subject is part of the signed payload, the artifact reference and its
 content digest cannot be changed without invalidating the signature.</p>
 <p>A Subject object MUST contain:</p>
 <dl>
-<dt><code>mediaType</code></dt>
+<dt><code>type</code></dt>
 <dd>A string containing the media type of the bound artifact. This MUST
-  equal the containing Catalog Entry's <code>mediaType</code>.</dd>
+  equal the containing Catalog Entry's <code>type</code>.</dd>
 <dt><code>digest</code></dt>
 <dd>A string containing the cryptographic digest of the artifact content,
   in the format defined in <a href="#digest-format">Digest Format</a>. For an
@@ -652,8 +736,8 @@ When verifying such a manifest, consumers MUST confirm that the fetched
 artifact's media type and digest match the <code>subject</code> before relying on
 any claim in the Trust Manifest. See
 <a href="#verifying-artifact-integrity">Verifying Artifact Integrity</a>.</p>
-<p>The <code>subject.mediaType</code> and <code>subject.url</code> intentionally restate the
-entry's <code>mediaType</code> and <code>url</code> so that those values fall within the signed
+<p>The <code>subject.type</code> and <code>subject.url</code> intentionally restate the
+entry's <code>type</code> and <code>url</code> so that those values fall within the signed
 payload. This is a deliberate duplication, not redundant metadata:
 without it, an attacker who controls the catalog document could change
 the entry's media type or location without invalidating the signature.</p>
@@ -920,7 +1004,7 @@ To verify artifact integrity:</p>
 <li>Verify the Trust Manifest signature
    (<a href="#trust-manifest-signatures">Trust Manifest Signatures</a>) and anchor
    the identity (<a href="#trust-anchoring">Trust Anchoring</a>).</li>
-<li>Confirm <code>subject.mediaType</code> equals the entry's <code>mediaType</code>, and, when
+<li>Confirm <code>subject.type</code> equals the entry's <code>type</code>, and, when
    <code>subject.url</code> is present, that it equals the entry's <code>url</code>.</li>
 <li>Fetch the artifact content from the entry's <code>url</code>, or take it from
    the entry's <code>data</code>, observing the limits in
@@ -1040,40 +1124,65 @@ RECOMMENDED. Implementations MAY support deeper nesting but SHOULD
 document their limit.</p>
 </section>
 </section>
-<section id="metadata-extensibility">
-<h1>Metadata Extensibility</h1>
-<p>The <code>metadata</code> property appears on the AI Catalog top-level object,
+<section id="extensions">
+<h1>Extensions</h1>
+<p>The <code>extensions</code> property appears on the AI Catalog top-level object,
 on Catalog Entry objects, and on Trust Manifest objects. It provides
 a single, well-defined extension point for custom or vendor-specific
 properties.</p>
-<section id="key-naming">
-<h2>Key Naming</h2>
-<p>Metadata keys MUST be non-empty strings. To avoid collisions between
-independent publishers, the following conventions are RECOMMENDED:</p>
+<section id="format-and-key-naming">
+<h2>Format and Key Naming</h2>
+<p>The <code>extensions</code> field is a JSON object (map). Each key in the object MUST
+represent the extension type (namespace), and the corresponding value contains the extension data.</p>
+<p>To avoid collisions between independent publishers, the keys MUST
+be a valid URL or a reverse-DNS string:</p>
 <ul>
-<li><strong>Reverse-DNS prefix</strong> for vendor-specific keys:
+<li><strong>Reverse-DNS prefix</strong> for vendor-specific extensions:
   <code>com.example.confidenceScore</code>, <code>io.acme.deploymentRegion</code>.</li>
-<li><strong>Short, unqualified names</strong> for keys the publisher considers
-  broadly useful and unlikely to conflict: <code>repository</code>, <code>homepage</code>,
-  <code>license</code>.</li>
-<li><strong>Avoid keys that duplicate</strong> defined catalog fields (<code>displayName</code>,
-  <code>description</code>, <code>tags</code>, <code>version</code>). Consumers MAY ignore metadata
-  entries that shadow standard fields.</li>
+<li><strong>URL prefix</strong> for publicly accessible extension schemas:
+  <code>https://cisco.com/extensions/security-scan</code>.</li>
 </ul>
+<p>Consumers that do not recognize an extension key MUST ignore it without
+throwing an error.</p>
+<p>For example, a catalog entry with <code>extensions</code> representing metadata and a custom schema:</p>
+<pre><code class="language-json">{
+  &quot;specVersion&quot;: &quot;1.0&quot;,
+  &quot;entries&quot;: [
+    {
+      &quot;identifier&quot;: &quot;urn:air:treasury.gov:okf:fiscaldata&quot;,
+      &quot;type&quot;: &quot;text/vnd.okf+markdown&quot;,
+      &quot;tags&quot;: [&quot;finance&quot;, &quot;treasury&quot;],
+      &quot;extensions&quot;: {
+        &quot;https://ai-catalog.org/extensions/metadata&quot;: {
+          &quot;location&quot;: &quot;US-West&quot;,
+          &quot;environment&quot;: &quot;staging&quot;,
+          &quot;version-compatible&quot;: [&quot;&gt;=1.0.0&quot;]
+        },
+        &quot;https://openknowledgeformat.org/ns#&quot;: {
+          &quot;@context&quot;: {
+            &quot;us-gaap&quot;: &quot;https://xbrl.fasb.org/us-gaap/&quot;,
+            &quot;ifrs&quot;: &quot;https://xbrl.ifrs.org/taxonomy/&quot;
+          },
+          &quot;type&quot;: &quot;Financial Dataset&quot;,
+          &quot;taxonomy&quot;: &quot;us-gaap&quot;,
+          &quot;conformsTo&quot;: [&quot;us-gaap:Revenue&quot;, &quot;ifrs:Revenue&quot;]
+        }
+      }
+    }
+  ]
+}
+</code></pre>
 </section>
-<section id="reserved-keys">
-<h2>Reserved Keys</h2>
-<p>No metadata keys are reserved by this specification. Future
-specification versions MAY promote commonly used metadata keys into
-standard fields. When this occurs, the metadata key SHOULD be
-retained for backward compatibility and the standard field takes
-precedence.</p>
-</section>
-<section id="value-types">
-<h2>Value Types</h2>
-<p>Metadata values MAY be any valid JSON type (string, number, boolean,
-array, object, null). Consumers that do not recognize a metadata key
-SHOULD ignore it.</p>
+<section id="official-extensions">
+<h2>Official Extensions</h2>
+<p>While publishers are free to create custom extensions, this specification
+defines a set of "Official" known types for commonly requested schemas:</p>
+<ol>
+<li><strong>Metadata</strong> (<code>https://ai-catalog.org/extensions/metadata</code>)
+   - Used to store generic, schemaless key-value pairs.</li>
+</ol>
+<p>As custom extensions become highly popular, the AI-Catalog TSC may promote
+them to Official Known Types or core standard fields in future specification versions.</p>
 </section>
 </section>
 <section id="version-handling">
@@ -1209,7 +1318,7 @@ their declared level.</p>
   <code>data</code></li>
 </ul>
 <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
-<code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
+<code>extensions</code>) are OPTIONAL. This level is sufficient for use cases that
 only need a simple list of AI artifacts — for example, a catalog of
 MCP servers or A2A agents. A <code>trustManifest</code>, when present at any level,
 MUST be substantive (see <a href="#manifest-validity">Manifest Validity</a>).</p>
@@ -1398,7 +1507,7 @@ MUST treat it as untrusted input. In particular:</p>
 <h2>Privacy Considerations</h2>
 <p>Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
 information through image fetch requests. Publishers SHOULD carefully
-consider what information is included in <code>metadata</code> extension fields.</p>
+consider what information is included in <code>extensions</code> fields.</p>
 </section>
 </section>
 <section class="appendix" id="data-model-overview">
@@ -1442,7 +1551,7 @@ classDiagram
     }
     class Subject {
         url string
-        mediaType string
+        type string
         digest string
     }
     class TrustSchema {
@@ -1553,7 +1662,7 @@ Catalog and Trust Manifest documents.</p>
   specVersion: text,
   ? host: HostInfo,
   entries: [* CatalogEntry],
-  ? metadata: { * text =&gt; any }
+  ? extensions: { * text =&gt; any }
 }
 
 HostInfo = {
@@ -1575,7 +1684,7 @@ CatalogEntry = {
   ? publisher: Publisher,
   ? trustManifest: TrustManifest,
   ? updatedAt: tdate,
-  ? metadata: { * text =&gt; any }
+  ? extensions: { * text =&gt; any }
 }
 
 Publisher = {
@@ -1596,7 +1705,7 @@ Publisher = {
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text,
   ? signature: text,
-  ? metadata: { * text =&gt; any }
+  ? extensions: { * text =&gt; any }
 }
 
 TrustSchema = {
@@ -1847,7 +1956,7 @@ ai-catalog.json   ──pack──►   OCI / xRegistry / HTTP  ──unpack─�
 </code></pre>
 <p>This separation keeps authoring and consumption simple: publishers and
 clients work with domain vocabulary (<code>entries</code>, <code>displayName</code>,
-<code>mediaType</code>, <code>trustManifest</code>), while infrastructure that wants
+<code>type</code>, <code>trustManifest</code>), while infrastructure that wants
 content-addressing, signing, replication, or registry APIs uses whichever
 binding below matches its substrate.</p>
 <section id="binding-invariants">
@@ -1868,7 +1977,7 @@ a pack/unpack round-trip.</p>
 <td style="text-align: left;">A stable, addressable identity for each entry</td>
 </tr>
 <tr>
-<td style="text-align: left;">Artifact content + <code>mediaType</code></td>
+<td style="text-align: left;">Artifact content + <code>type</code></td>
 <td style="text-align: left;">The artifact bytes are retrievable together with their media type</td>
 </tr>
 <tr>
@@ -1921,7 +2030,7 @@ a guarantee the substrate cannot express.</p>
 <td style="text-align: left;">Content + media type</td>
 <td style="text-align: left;"><code>layers[0]</code> + <code>artifactType</code></td>
 <td style="text-align: left;">Resource document + <code>contenttype</code></td>
-<td style="text-align: left;">Entry artifact + <code>mediaType</code></td>
+<td style="text-align: left;">Entry artifact + <code>type</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">Nesting</td>
@@ -2232,7 +2341,7 @@ are the catalog entries; each entry's artifact is the Resource document.</p>
 <td style="text-align: left;">Resource <code>&lt;SINGULAR&gt;id</code> and <code>xid</code></td>
 </tr>
 <tr>
-<td style="text-align: left;">Entry <code>mediaType</code></td>
+<td style="text-align: left;">Entry <code>type</code></td>
 <td style="text-align: left;">Version <code>contenttype</code> (with <code>format</code> when a named format applies)</td>
 </tr>
 <tr>
@@ -2279,7 +2388,7 @@ are the catalog entries; each entry's artifact is the Resource document.</p>
 <p><strong>Each catalog entry</strong> becomes a Resource in that Group. The entry's
    artifact content is stored as the Resource document — inline via
    <code>&lt;RESOURCE&gt;</code> / <code>&lt;RESOURCE&gt;base64</code>, or by reference via <code>&lt;RESOURCE&gt;url</code>.
-   <code>mediaType</code> maps to <code>contenttype</code>; entry metadata maps to <code>name</code>,
+   <code>type</code> maps to <code>contenttype</code>; entry metadata maps to <code>name</code>,
    <code>description</code>, and <code>labels</code>. Multiple entry versions map to Versions.</p>
 </li>
 <li>
@@ -2304,7 +2413,7 @@ are the catalog entries; each entry's artifact is the Resource document.</p>
    <code>ai-catalog.json</code>.</li>
 <li>For each Resource, read its document (inline or via <code>&lt;RESOURCE&gt;url</code>)
    and <code>contenttype</code> to recover the entry's artifact content and
-   <code>mediaType</code>; map <code>name</code>, <code>description</code>, and <code>labels</code> back to entry
+   <code>type</code>; map <code>name</code>, <code>description</code>, and <code>labels</code> back to entry
    metadata.</li>
 <li>Read the Trust Manifest from the extension attribute or <code>xref</code>'d
    Resource, and verify its detached JWS and <code>subject.digest</code> against the
@@ -2338,7 +2447,7 @@ holding two entries. This is generated by tooling, not authored by hand:</p>
       &quot;aicatalog_trustmanifest&quot;: {
         &quot;issuedAt&quot;: &quot;2025-01-01T00:00:00Z&quot;,
         &quot;subject&quot;: {
-          &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
+          &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
           &quot;digest&quot;: &quot;sha256:aaa111...&quot;
         },
         &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached-JWS..&quot;
@@ -2648,7 +2757,7 @@ plugins/
 </tr>
 <tr>
 <td style="text-align: left;">Plugin <code>description</code></td>
-<td style="text-align: left;">Entry <code>description</code></td>
+<td style="text-align: left;">Stays in the plugin manifest (which carries its own <code>description</code>); entry <code>description</code> is omitted to avoid duplicating a value that can drift</td>
 </tr>
 <tr>
 <td style="text-align: left;">Plugin <code>category</code></td>
@@ -2727,7 +2836,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
       &quot;identifier&quot;: &quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;,
-      &quot;description&quot;: &quot;Development kit for working with the Claude Agent SDK&quot;,
       &quot;tags&quot;: [&quot;development&quot;],
       &quot;publisher&quot;: {
         &quot;identifier&quot;: &quot;did:web:anthropic.com&quot;,
@@ -2741,7 +2849,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
       &quot;identifier&quot;: &quot;urn:claude-plugin:adspirer:ads-agent&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;,
-      &quot;description&quot;: &quot;Cross-platform ad management for Google Ads, Meta Ads, TikTok Ads, and LinkedIn Ads.&quot;,
       &quot;tags&quot;: [&quot;productivity&quot;, &quot;ads&quot;],
       &quot;metadata&quot;: {
         &quot;homepage&quot;: &quot;https://www.adspirer.com&quot;
@@ -2761,7 +2868,6 @@ maps to an AI Catalog where each plugin is an entry:</p>
       &quot;identifier&quot;: &quot;urn:claude-plugin:aikido:security&quot;,
       &quot;type&quot;: &quot;application/vnd.anthropic.claude-plugin+json&quot;,
       &quot;url&quot;: &quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;,
-      &quot;description&quot;: &quot;Aikido Security scanning — SAST, secrets, and IaC vulnerability detection.&quot;,
       &quot;tags&quot;: [&quot;security&quot;],
       &quot;publisher&quot;: {
         &quot;identifier&quot;: &quot;did:web:aikido.dev&quot;,

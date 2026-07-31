@@ -42,9 +42,9 @@
  
  <section id="sotd">
 @@ -219,6 +237,13 @@
- <dd>An open map of string keys to arbitrary values for custom or
-   non-standard metadata. See <a href="#metadata-extensibility">Metadata Extensibility</a>
-   for key naming conventions.</dd>
+ <dd>A JSON object (map) containing custom, vendor-specific, or
+   non-standard fields. See <a href="#extensions">Extensions</a> for definitions and
+   official extension types.</dd>
 +<dt><code>signature</code></dt>
 +<dd>A string containing a detached JWS [[RFC7515]] signature computed over
 +  the JCS-canonicalized [[RFC8785]] catalog document (excluding the
@@ -55,7 +55,7 @@
  </dl>
  </section>
  <section id="host-info">
-@@ -463,17 +488,44 @@
+@@ -550,17 +575,44 @@
    identity schemes is open.</dd>
  </dl>
  <p>When a Trust Manifest appears within a Catalog Entry, the <code>identity</code>
@@ -93,7 +93,7 @@
 +</ul>
 +<p>The members <code>identity</code> and <code>identityType</code> (which identify the workload
 +principal) and the informational members <code>privacyPolicyUrl</code>,
-+<code>termsOfServiceUrl</code>, and <code>metadata</code> do NOT satisfy this requirement.
++<code>termsOfServiceUrl</code>, and <code>extensions</code> do NOT satisfy this requirement.
 +<code>subject</code>, <code>issuedAt</code>, and <code>expiresAt</code> are not substantive on their own:
 +an unsigned <code>subject</code> digest is attacker-settable and unverifiable, so
 +they count only as part of a <code>signature</code>.</p>
@@ -105,7 +105,7 @@
  </section>
  <section id="optional-members">
  <h2>Optional Members</h2>
-@@ -498,13 +550,33 @@
+@@ -585,12 +637,30 @@
    artifact.</dd>
  <dt><code>termsOfServiceUrl</code></dt>
  <dd>A string containing a URL to the terms of service.</dd>
@@ -132,24 +132,21 @@
 +  digest carried in <code>subject</code>, neither the trust claims nor the artifact
 +  reference can be substituted without detection. See
 +  <a href="#trust-manifest-signatures">Trust Manifest Signatures</a>.</dd>
- <dt><code>metadata</code></dt>
- <dd>An open map of string keys to arbitrary values for extending trust
--  metadata.</dd>
-+  metadata. Unlike the Catalog Entry's <code>metadata</code> (which is
-+  informational and unsigned), this map is part of the signed payload
-+  when the Trust Manifest carries a <code>signature</code>; use it for extensions
-+  that must be cryptographically bound to the manifest, and use the
-+  entry's <code>metadata</code> for unsigned, informational extensions.</dd>
+ <dt><code>extensions</code></dt>
+-<dd>A JSON object (map) for extending trust metadata.</dd>
++<dd>A JSON object (map) for extending trust metadata. When the Trust Manifest
++  carries a <code>signature</code>, this object is part of the signed payload; use it
++  for extensions that must be cryptographically bound to the manifest.</dd>
  </dl>
  <p>For example, a Trust Manifest with identity, attestations, and
  provenance:</p>
-@@ -538,9 +610,53 @@
+@@ -624,9 +694,53 @@
    ],
    &quot;privacyPolicyUrl&quot;: &quot;https://acme-corp.com/legal/privacy&quot;,
    &quot;termsOfServiceUrl&quot;: &quot;https://acme-corp.com/legal/terms&quot;,
 +  &quot;subject&quot;: {
 +    &quot;url&quot;: &quot;https://api.acme-corp.com/agents/finance/v2.1.json&quot;,
-+    &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
++    &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
 +    &quot;digest&quot;: &quot;sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08&quot;
 +  },
 +  &quot;issuedAt&quot;: &quot;2026-03-15T10:00:00Z&quot;,
@@ -167,9 +164,9 @@
 +content digest cannot be changed without invalidating the signature.</p>
 +<p>A Subject object MUST contain:</p>
 +<dl>
-+<dt><code>mediaType</code></dt>
++<dt><code>type</code></dt>
 +<dd>A string containing the media type of the bound artifact. This MUST
-+  equal the containing Catalog Entry's <code>mediaType</code>.</dd>
++  equal the containing Catalog Entry's <code>type</code>.</dd>
 +<dt><code>digest</code></dt>
 +<dd>A string containing the cryptographic digest of the artifact content,
 +  in the format defined in <a href="#digest-format">Digest Format</a>. For an
@@ -189,15 +186,15 @@
 +artifact's media type and digest match the <code>subject</code> before relying on
 +any claim in the Trust Manifest. See
 +<a href="#verifying-artifact-integrity">Verifying Artifact Integrity</a>.</p>
-+<p>The <code>subject.mediaType</code> and <code>subject.url</code> intentionally restate the
-+entry's <code>mediaType</code> and <code>url</code> so that those values fall within the signed
++<p>The <code>subject.type</code> and <code>subject.url</code> intentionally restate the
++entry's <code>type</code> and <code>url</code> so that those values fall within the signed
 +payload. This is a deliberate duplication, not redundant metadata:
 +without it, an attacker who controls the catalog document could change
 +the entry's media type or location without invalidating the signature.</p>
  </section>
  <section id="trust-schema-object">
  <h2>Trust Schema Object</h2>
-@@ -639,6 +755,30 @@
+@@ -725,6 +839,30 @@
  <p>This section describes how consumers verify the trust metadata
  carried by a Trust Manifest. Verification is OPTIONAL — consumers
  that do not need trust assurance can skip this entirely.</p>
@@ -228,7 +225,7 @@
  <section id="digest-format">
  <h3>Digest Format</h3>
  <p>Digests in this specification use the format <code>algorithm:hex-value</code>,
-@@ -651,20 +791,53 @@
+@@ -737,20 +875,53 @@
  </section>
  <section id="trust-manifest-signatures">
  <h3>Trust Manifest Signatures</h3>
@@ -293,7 +290,7 @@
  </section>
  <section id="key-resolution">
  <h3>Key Resolution</h3>
-@@ -686,6 +859,29 @@
+@@ -772,6 +943,29 @@
    or look up a DNSKEY/TXT record containing the JWK thumbprint.</dd>
  </dl>
  </section>
@@ -323,7 +320,7 @@
  <section id="verifying-host-identity">
  <h3>Verifying Host Identity</h3>
  <p>To verify the host of a catalog:</p>
-@@ -710,17 +906,37 @@
+@@ -796,17 +990,37 @@
  <li>Confirm the JWT claims bind the <code>publisher.identifier</code> to the Trust
     Manifest's <code>identity</code>.</li>
  </ol>
@@ -347,7 +344,7 @@
 +<li>Verify the Trust Manifest signature
 +   (<a href="#trust-manifest-signatures">Trust Manifest Signatures</a>) and anchor
 +   the identity (<a href="#trust-anchoring">Trust Anchoring</a>).</li>
-+<li>Confirm <code>subject.mediaType</code> equals the entry's <code>mediaType</code>, and, when
++<li>Confirm <code>subject.type</code> equals the entry's <code>type</code>, and, when
 +   <code>subject.url</code> is present, that it equals the entry's <code>url</code>.</li>
 +<li>Fetch the artifact content from the entry's <code>url</code>, or take it from
 +   the entry's <code>data</code>, observing the limits in
@@ -367,7 +364,7 @@
  </section>
  <section id="verifying-attestations">
  <h3>Verifying Attestations</h3>
-@@ -731,6 +947,24 @@
+@@ -817,6 +1031,24 @@
     declared digest.</li>
  <li>Validate the attestation per its <code>type</code> (e.g., verify a JWT
     signature, confirm a PDF certificate is current).</li>
@@ -392,9 +389,12 @@
  </ol>
  </section>
  </section>
-@@ -977,7 +1211,8 @@
+@@ -1086,9 +1318,10 @@
+   <code>data</code></li>
+ </ul>
  <p>All other fields (<code>host</code>, <code>publisher</code>, <code>trustManifest</code>,
- <code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
+-<code>metadata</code>) are OPTIONAL. This level is sufficient for use cases that
++<code>extensions</code>) are OPTIONAL. This level is sufficient for use cases that
  only need a simple list of AI artifacts — for example, a catalog of
 -MCP servers or A2A agents.</p>
 +MCP servers or A2A agents. A <code>trustManifest</code>, when present at any level,
@@ -402,7 +402,7 @@
  </section>
  <section id="level-2-discoverable-catalog">
  <h2>Level 2: Discoverable Catalog</h2>
-@@ -992,8 +1227,19 @@
+@@ -1103,8 +1336,19 @@
  <h2>Level 3: Trusted Catalog</h2>
  <p>In addition to Level 2 requirements, a Trusted Catalog:</p>
  <ul>
@@ -424,7 +424,7 @@
  <li>MAY include <code>publisher</code> objects on entries with verifiable identifiers</li>
  <li>Enables verifiable identity, compliance attestations, and provenance
    tracking</li>
-@@ -1029,14 +1275,18 @@
+@@ -1140,14 +1384,18 @@
    verification guards against transport-level tampering but not
    catalog-level substitution.</strong></dd>
  <dt><strong>Layer 2 — Signed Trust Manifest</strong></dt>
@@ -451,7 +451,7 @@
  <dt><strong>Layer 3 — Content-Addressed Distribution (OCI)</strong></dt>
  <dd>The catalog is distributed through an OCI registry where all content
    — entries, artifacts, and Trust Manifests — is addressed by
-@@ -1073,10 +1323,37 @@
+@@ -1184,10 +1432,37 @@
    unauthorized modification.</li>
  <li><strong>Layer 1</strong> enables post-fetch integrity checks but does not prevent
    whole-entry substitution.</li>
@@ -491,7 +491,16 @@
  </ul>
  </section>
  <section id="identifier-typosquatting">
-@@ -1134,6 +1411,7 @@
+@@ -1232,7 +1507,7 @@
+ <h2>Privacy Considerations</h2>
+ <p>Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
+ information through image fetch requests. Publishers SHOULD carefully
+-consider what information is included in <code>metadata</code> extension fields.</p>
++consider what information is included in <code>extensions</code> fields.</p>
+ </section>
+ </section>
+ <section class="appendix" id="data-model-overview">
+@@ -1245,6 +1520,7 @@
          specVersion string
          entries CatalogEntry[]
          host HostInfo
@@ -499,7 +508,7 @@
      }
      class HostInfo {
          displayName string
-@@ -1155,10 +1433,17 @@
+@@ -1266,10 +1542,17 @@
      }
      class TrustManifest {
          identity string
@@ -512,12 +521,12 @@
 +    }
 +    class Subject {
 +        url string
-+        mediaType string
++        type string
 +        digest string
      }
      class TrustSchema {
          identifier string
-@@ -1180,6 +1465,7 @@
+@@ -1291,6 +1574,7 @@
      CatalogEntry --> "0..1" Publisher : publisher
      CatalogEntry --> "0..1" TrustManifest : trustManifest
      HostInfo --> "0..1" TrustManifest : trustManifest
@@ -525,7 +534,7 @@
      TrustManifest --> "0..1" TrustSchema : trustSchema
      TrustManifest --> "*" Attestation : attestations
      TrustManifest --> "*" ProvenanceLink : provenance
-@@ -1538,46 +1824,154 @@
+@@ -1649,46 +1933,154 @@
  catalog with protocol-specific entries, allowing clients to choose
  MCP or A2A based on their capabilities.</p>
  </section>
@@ -587,7 +596,7 @@
 +</code></pre>
 +<p>This separation keeps authoring and consumption simple: publishers and
 +clients work with domain vocabulary (<code>entries</code>, <code>displayName</code>,
-+<code>mediaType</code>, <code>trustManifest</code>), while infrastructure that wants
++<code>type</code>, <code>trustManifest</code>), while infrastructure that wants
 +content-addressing, signing, replication, or registry APIs uses whichever
 +binding below matches its substrate.</p>
 +<section id="binding-invariants">
@@ -608,7 +617,7 @@
 +<td style="text-align: left;">A stable, addressable identity for each entry</td>
 +</tr>
 +<tr>
-+<td style="text-align: left;">Artifact content + <code>mediaType</code></td>
++<td style="text-align: left;">Artifact content + <code>type</code></td>
 +<td style="text-align: left;">The artifact bytes are retrievable together with their media type</td>
 +</tr>
 +<tr>
@@ -661,7 +670,7 @@
 +<td style="text-align: left;">Content + media type</td>
 +<td style="text-align: left;"><code>layers[0]</code> + <code>artifactType</code></td>
 +<td style="text-align: left;">Resource document + <code>contenttype</code></td>
-+<td style="text-align: left;">Entry artifact + <code>mediaType</code></td>
++<td style="text-align: left;">Entry artifact + <code>type</code></td>
 +</tr>
 +<tr>
 +<td style="text-align: left;">Nesting</td>
@@ -715,7 +724,7 @@
  <section id="conceptual-mapping">
  <h2>Conceptual Mapping</h2>
  <p>The OCI image specification (v1.1+) supports arbitrary artifact types
-@@ -1799,6 +2193,182 @@
+@@ -1910,6 +2302,182 @@
  while infrastructure-oriented deployments leverage OCI distribution.</p>
  </section>
  </section>
@@ -758,7 +767,7 @@
 +<td style="text-align: left;">Resource <code>&lt;SINGULAR&gt;id</code> and <code>xid</code></td>
 +</tr>
 +<tr>
-+<td style="text-align: left;">Entry <code>mediaType</code></td>
++<td style="text-align: left;">Entry <code>type</code></td>
 +<td style="text-align: left;">Version <code>contenttype</code> (with <code>format</code> when a named format applies)</td>
 +</tr>
 +<tr>
@@ -805,7 +814,7 @@
 +<p><strong>Each catalog entry</strong> becomes a Resource in that Group. The entry's
 +   artifact content is stored as the Resource document — inline via
 +   <code>&lt;RESOURCE&gt;</code> / <code>&lt;RESOURCE&gt;base64</code>, or by reference via <code>&lt;RESOURCE&gt;url</code>.
-+   <code>mediaType</code> maps to <code>contenttype</code>; entry metadata maps to <code>name</code>,
++   <code>type</code> maps to <code>contenttype</code>; entry metadata maps to <code>name</code>,
 +   <code>description</code>, and <code>labels</code>. Multiple entry versions map to Versions.</p>
 +</li>
 +<li>
@@ -830,7 +839,7 @@
 +   <code>ai-catalog.json</code>.</li>
 +<li>For each Resource, read its document (inline or via <code>&lt;RESOURCE&gt;url</code>)
 +   and <code>contenttype</code> to recover the entry's artifact content and
-+   <code>mediaType</code>; map <code>name</code>, <code>description</code>, and <code>labels</code> back to entry
++   <code>type</code>; map <code>name</code>, <code>description</code>, and <code>labels</code> back to entry
 +   metadata.</li>
 +<li>Read the Trust Manifest from the extension attribute or <code>xref</code>'d
 +   Resource, and verify its detached JWS and <code>subject.digest</code> against the
@@ -864,7 +873,7 @@
 +      &quot;aicatalog_trustmanifest&quot;: {
 +        &quot;issuedAt&quot;: &quot;2025-01-01T00:00:00Z&quot;,
 +        &quot;subject&quot;: {
-+          &quot;mediaType&quot;: &quot;application/a2a-agent-card+json&quot;,
++          &quot;type&quot;: &quot;application/a2a-agent-card+json&quot;,
 +          &quot;digest&quot;: &quot;sha256:aaa111...&quot;
 +        },
 +        &quot;signature&quot;: &quot;eyJhbGciOiJFUzI1NiJ9..detached-JWS..&quot;
@@ -898,7 +907,7 @@
  <section class="appendix" id="mapping-to-mcp-servers">
  <h1>Mapping to MCP Servers</h1>
  <p>This appendix describes how <strong>remote (HTTP-connectable) MCP servers</strong>
-@@ -1832,7 +2402,7 @@
+@@ -1943,7 +2511,7 @@
    servers?</dd>
  </dl>
  </section>
@@ -907,7 +916,7 @@
  <h2>Conceptual Mapping</h2>
  <table>
  <thead>
-@@ -2042,7 +2612,7 @@
+@@ -2153,7 +2721,7 @@
      README.md
  </code></pre>
  </section>

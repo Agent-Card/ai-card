@@ -9,9 +9,9 @@
  Status of This Document
  
 @@ -164,6 +164,15 @@
- An open map of string keys to arbitrary values for custom or
- non-standard metadata. See Metadata Extensibility
- for key naming conventions.
+ A JSON object (map) containing custom, vendor-specific, or
+ non-standard fields. See Extensions for definitions and
+ official extension types.
 +
 +signature
 +
@@ -24,7 +24,7 @@
  
  Host Info
  
-@@ -455,11 +464,14 @@
+@@ -546,11 +555,14 @@
  identity schemes is open.
  
  When a Trust Manifest appears within a Catalog Entry, the identity
@@ -43,7 +43,7 @@
  
  When a Trust Manifest appears on a Host Info object, identity
  SHOULD match the host's identifier field when present.
-@@ -469,6 +481,34 @@
+@@ -560,6 +572,34 @@
  requirement that all versions carry identical trust metadata — trust
  properties may evolve across versions.
  
@@ -64,7 +64,7 @@
 +
 +The members identity and identityType (which identify the workload
 +principal) and the informational members privacyPolicyUrl,
-+termsOfServiceUrl, and metadata do NOT satisfy this requirement.
++termsOfServiceUrl, and extensions do NOT satisfy this requirement.
 +subject, issuedAt, and expiresAt are not substantive on their own:
 +an unsigned subject digest is attacker-settable and unverifiable, so
 +they count only as part of a signature.
@@ -78,7 +78,7 @@
  Optional Members
  
  The following members are OPTIONAL:
-@@ -504,16 +544,42 @@
+@@ -595,15 +635,39 @@
  
  A string containing a URL to the terms of service.
  
@@ -113,25 +113,22 @@
 +reference can be substituted without detection. See
 +Trust Manifest Signatures.
  
- metadata
+ extensions
  
- An open map of string keys to arbitrary values for extending trust
--metadata.
-+metadata. Unlike the Catalog Entry's metadata (which is
-+informational and unsigned), this map is part of the signed payload
-+when the Trust Manifest carries a signature; use it for extensions
-+that must be cryptographically bound to the manifest, and use the
-+entry's metadata for unsigned, informational extensions.
+-A JSON object (map) for extending trust metadata.
++A JSON object (map) for extending trust metadata. When the Trust Manifest
++carries a signature, this object is part of the signed payload; use it
++for extensions that must be cryptographically bound to the manifest.
  
  For example, a Trust Manifest with identity, attestations, and
  provenance:
-@@ -548,8 +614,58 @@
+@@ -638,8 +702,58 @@
  ],
  "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
  "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
 +"subject": {
 +"url": "https://api.acme-corp.com/agents/finance/v2.1.json",
-+"mediaType": "application/a2a-agent-card+json",
++"type": "application/a2a-agent-card+json",
 +"digest": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
 +},
 +"issuedAt": "2026-03-15T10:00:00Z",
@@ -149,10 +146,10 @@
 +
 +A Subject object MUST contain:
 +
-+mediaType
++type
 +
 +A string containing the media type of the bound artifact. This MUST
-+equal the containing Catalog Entry's mediaType.
++equal the containing Catalog Entry's type.
 +
 +digest
 +
@@ -176,15 +173,15 @@
 +any claim in the Trust Manifest. See
 +Verifying Artifact Integrity.
 +
-+The subject.mediaType and subject.url intentionally restate the
-+entry's mediaType and url so that those values fall within the signed
++The subject.type and subject.url intentionally restate the
++entry's type and url so that those values fall within the signed
 +payload. This is a deliberate duplication, not redundant metadata:
 +without it, an attacker who controls the catalog document could change
 +the entry's media type or location without invalidating the signature.
  
  Trust Schema Object
  
-@@ -673,6 +789,33 @@
+@@ -763,6 +877,33 @@
  carried by a Trust Manifest. Verification is OPTIONAL — consumers
  that do not need trust assurance can skip this entirely.
  
@@ -218,7 +215,7 @@
  Digest Format
  
  Digests in this specification use the format algorithm:hex-value,
-@@ -686,22 +829,60 @@
+@@ -776,22 +917,60 @@
  
  Trust Manifest Signatures
  
@@ -293,7 +290,7 @@
  
  Key Resolution
  
-@@ -729,6 +910,32 @@
+@@ -819,6 +998,32 @@
  Resolve the domain's TLS certificate and extract the public key,
  or look up a DNSKEY/TXT record containing the JWK thumbprint.
  
@@ -326,7 +323,7 @@
  Verifying Host Identity
  
  To verify the host of a catalog:
-@@ -757,17 +964,41 @@
+@@ -847,17 +1052,41 @@
  Confirm the JWT claims bind the publisher.identifier to the Trust
  Manifest's identity.
  
@@ -354,7 +351,7 @@
 +(Trust Manifest Signatures) and anchor
 +the identity (Trust Anchoring).
 +
-+Confirm subject.mediaType equals the entry's mediaType, and, when
++Confirm subject.type equals the entry's type, and, when
 +subject.url is present, that it equals the entry's url.
 +
 +Fetch the artifact content from the entry's url, or take it from
@@ -377,7 +374,7 @@
  
  Verifying Attestations
  
-@@ -780,6 +1011,26 @@
+@@ -870,6 +1099,26 @@
  
  Validate the attestation per its type (e.g., verify a JWT
  signature, confirm a PDF certificate is current).
@@ -404,9 +401,12 @@
  
  Organizing Catalogs
  
-@@ -1042,7 +1293,8 @@
+@@ -1157,9 +1406,10 @@
+ data
+ 
  All other fields (host, publisher, trustManifest,
- metadata) are OPTIONAL. This level is sufficient for use cases that
+-metadata) are OPTIONAL. This level is sufficient for use cases that
++extensions) are OPTIONAL. This level is sufficient for use cases that
  only need a simple list of AI artifacts — for example, a catalog of
 -MCP servers or A2A agents.
 +MCP servers or A2A agents. A trustManifest, when present at any level,
@@ -414,7 +414,7 @@
  
  Level 2: Discoverable Catalog
  
-@@ -1057,8 +1309,22 @@
+@@ -1174,8 +1424,22 @@
  
  In addition to Level 2 requirements, a Trusted Catalog:
  
@@ -439,7 +439,7 @@
  
  MAY include publisher objects on entries with verifiable identifiers
  
-@@ -1100,14 +1366,18 @@
+@@ -1217,14 +1481,18 @@
  
  Layer 2 — Signed Trust Manifest
  
@@ -466,7 +466,7 @@
  
  Layer 3 — Content-Addressed Distribution (OCI)
  
-@@ -1150,11 +1420,39 @@
+@@ -1267,11 +1535,39 @@
  Layer 1 enables post-fetch integrity checks but does not prevent
  whole-entry substitution.
  
@@ -508,7 +508,16 @@
  
  Identifier Typosquatting
  
-@@ -1214,6 +1512,7 @@
+@@ -1319,7 +1615,7 @@
+ 
+ Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
+ information through image fetch requests. Publishers SHOULD carefully
+-consider what information is included in metadata extension fields.
++consider what information is included in extensions fields.
+ 
+ Data Model Overview
+ 
+@@ -1331,6 +1627,7 @@
  specVersion string
  entries CatalogEntry[]
  host HostInfo
@@ -516,7 +525,7 @@
  }
  class HostInfo {
  displayName string
-@@ -1235,10 +1534,17 @@
+@@ -1352,10 +1649,17 @@
  }
  class TrustManifest {
  identity string
@@ -529,12 +538,12 @@
 +}
 +class Subject {
 +url string
-+mediaType string
++type string
 +digest string
  }
  class TrustSchema {
  identifier string
-@@ -1260,6 +1566,7 @@
+@@ -1377,6 +1681,7 @@
  CatalogEntry --> "0..1" Publisher : publisher
  CatalogEntry --> "0..1" TrustManifest : trustManifest
  HostInfo --> "0..1" TrustManifest : trustManifest
@@ -542,7 +551,7 @@
  TrustManifest --> "0..1" TrustSchema : trustSchema
  TrustManifest --> "*" Attestation : attestations
  TrustManifest --> "*" ProvenanceLink : provenance
-@@ -1650,13 +1957,7 @@
+@@ -1767,13 +2072,7 @@
  catalog with protocol-specific entries, allowing clients to choose
  MCP or A2A based on their capabilities.
  
@@ -557,7 +566,7 @@
  
  The AI Catalog specification defines a logical format: a JSON
  document with entries, displayName, type, and trustManifest
-@@ -1664,36 +1965,153 @@
+@@ -1781,36 +2080,153 @@
  artifacts. Authors write simple JSON. APIs serve simple JSON. Clients
  consume simple JSON.
  
@@ -605,7 +614,7 @@
 +
 +This separation keeps authoring and consumption simple: publishers and
 +clients work with domain vocabulary (entries, displayName,
-+mediaType, trustManifest), while infrastructure that wants
++type, trustManifest), while infrastructure that wants
 +content-addressing, signing, replication, or registry APIs uses whichever
 +binding below matches its substrate.
 +
@@ -623,7 +632,7 @@
 +
 +A stable, addressable identity for each entry
 +
-+Artifact content + mediaType
++Artifact content + type
 +
 +The artifact bytes are retrievable together with their media type
 +
@@ -678,7 +687,7 @@
 +
 +Resource document + contenttype
 +
-+Entry artifact + mediaType
++Entry artifact + type
 +
 +Nesting
 +
@@ -738,7 +747,7 @@
  
  Conceptual Mapping
  
-@@ -1910,6 +2328,174 @@
+@@ -2027,6 +2443,174 @@
  Both approaches can coexist. A tooling bridge converts between them
  losslessly, allowing simple consumers to work with the logical format
  while infrastructure-oriented deployments leverage OCI distribution.
@@ -780,7 +789,7 @@
 +
 +Resource <SINGULAR>id and xid
 +
-+Entry mediaType
++Entry type
 +
 +Version contenttype (with format when a named format applies)
 +
@@ -823,7 +832,7 @@
 +Each catalog entry becomes a Resource in that Group. The entry's
 +artifact content is stored as the Resource document — inline via
 +<RESOURCE> / <RESOURCE>base64, or by reference via <RESOURCE>url.
-+mediaType maps to contenttype; entry metadata maps to name,
++type maps to contenttype; entry metadata maps to name,
 +description, and labels. Multiple entry versions map to Versions.
 +
 +Trust Manifests are carried as an extension attribute on the
@@ -845,7 +854,7 @@
 +
 +For each Resource, read its document (inline or via <RESOURCE>url)
 +and contenttype to recover the entry's artifact content and
-+mediaType; map name, description, and labels back to entry
++type; map name, description, and labels back to entry
 +metadata.
 +
 +Read the Trust Manifest from the extension attribute or xref'd
@@ -882,7 +891,7 @@
 +"aicatalog_trustmanifest": {
 +"issuedAt": "2025-01-01T00:00:00Z",
 +"subject": {
-+"mediaType": "application/a2a-agent-card+json",
++"type": "application/a2a-agent-card+json",
 +"digest": "sha256:aaa111..."
 +},
 +"signature": "eyJhbGciOiJFUzI1NiJ9..detached-JWS.."
