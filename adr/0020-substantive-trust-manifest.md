@@ -1,4 +1,4 @@
-# ADR-0018: Require a Substantive Trust Manifest
+# ADR-0020: Require a Substantive Trust Manifest
 
 **Status:** Accepted
 
@@ -56,7 +56,7 @@ rule as if no Trust Manifest were present.
 - The rule is independent of conformance level: even a Level 1 catalog
   that includes a manifest must make it substantive. Level 3 remains
   stricter, requiring a `signature` specifically (see
-  [ADR-0017](0017-trust-manifest-artifact-binding.md)).
+  [ADR-0019](0019-trust-manifest-artifact-binding.md)).
 - Unsigned manifests remain valid when they carry attestations,
   provenance, or a trust schema, preserving low-assurance use cases that
   do not sign.

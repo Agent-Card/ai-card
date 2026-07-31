@@ -1,4 +1,4 @@
-# ADR-0017: Bind Trust Manifest Signatures to Artifact Content
+# ADR-0019: Bind Trust Manifest Signatures to Artifact Content
 
 **Status:** Accepted
 
