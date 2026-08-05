@@ -1151,13 +1151,278 @@ For example, a catalog entry with `extensions` representing metadata and a custo
 ## Official Extensions
 
 While publishers are free to create custom extensions, this specification
-defines a set of "Official" known types for commonly requested schemas:
+defines a set of "Official" known types for commonly requested schemas.
+Official extension keys use the `https://ai-catalog.org/extensions/`
+prefix, which signals that the extension is standardized by the AI Catalog
+Working Group rather than defined by an individual vendor. A consumer that
+does not implement an official extension MUST still ignore it without error,
+exactly as it would any other unrecognized extension key.
 
 1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
    - Used to store generic, schemaless key-value pairs.
 
+2. **Dependencies** (`https://ai-catalog.org/extensions/dependencies`)
+   - Declares the downstream artifacts a catalog entry depends on at
+     runtime. See [Dependencies Extension](#dependencies-extension).
+
 As custom extensions become highly popular, the AI-Catalog TSC may promote
 them to Official Known Types or core standard fields in future specification versions.
+
+## Dependencies Extension
+
+An artifact often relies on other artifacts to function: an agent may call
+a downstream MCP server, an agent skill may require a specific tool, or a
+plugin may depend on a companion agent. The **Dependencies extension**
+(`https://ai-catalog.org/extensions/dependencies`) is an official extension
+that lets a publisher declare those relationships on a Catalog Entry so
+that a consumer — typically an agent planner or a governance tool — can
+answer questions such as *"can I use this artifact?"* (do I hold the
+credentials its dependencies require?) and *"what breaks if I decommission
+artifact X?"* **before** invoking or deploying anything.
+
+This capability is provided as an extension rather than a core field
+deliberately. The core catalog schema is kept minimal and dependency-free
+(see [ADR-0002](https://github.com/Agent-Card/ai-catalog/blob/main/adr/0002-defer-entry-dependencies.md)),
+and the extension mechanism ([Extensions](#extensions)) is exactly the
+sanctioned place for capabilities that not every catalog needs. Because the
+extension is additive and unrecognized extensions are ignored, it requires
+no `specVersion` change: a catalog carrying it remains a conformant 1.0
+document.
+
+Dependencies are **discovery metadata, not a resolver**. The extension
+declares the edges of a dependency graph; it does not fetch, install, or
+version-resolve them. Consistent with the catalog's role as a thin pointer
+around artifacts it does not define, a dependency is a *reference* to
+another artifact's `identifier`, never an embedded copy of it. The
+depended-on artifact remains the authoritative source for its own metadata.
+
+### Extension Value Structure
+
+The value of the `https://ai-catalog.org/extensions/dependencies` key is an
+object with the following OPTIONAL members:
+
+`required`
+: An array of Dependency Requirement objects that MUST all be satisfiable
+  for the artifact to function. This array expresses an **AND**
+  relationship: every element is a co-requisite. A consumer SHOULD treat an
+  unmet `required` element as a hard blocker — the artifact cannot be
+  expected to operate without it.
+
+`optional`
+: An array of Dependency Requirement objects that enhance the artifact but
+  are not essential. Each element is independently droppable: its absence
+  SHOULD degrade functionality gracefully rather than block use.
+
+Both arrays MAY be omitted or empty. An extension value with neither member
+present is equivalent to omitting the extension entirely.
+
+### Dependency Requirement
+
+Each element of `required` and `optional` is a **Dependency Requirement**,
+which is one of two shapes:
+
+- **A single Dependency object** — the common, flat case: the requirement
+  is satisfied by exactly one specific artifact.
+- **A Dependency Group** — a requirement satisfied by *any one* of several
+  interchangeable alternatives, expressed as an `anyOf` array. This is an
+  **OR** relationship (for example, "a vector store — either Pinecone or
+  pgvector"). Any single listed alternative satisfies the slot.
+
+The presence of the `anyOf` key discriminates the two shapes. A Dependency
+Group object contains an `anyOf` array of two or more Dependency objects,
+any one of which satisfies the requirement, and an OPTIONAL `purpose` string
+stated once for the whole group. A requirement satisfied by exactly one
+artifact is written as a flat Dependency object, not as a single-element
+group.
+
+Expressing AND via the `required` array and OR via `anyOf` groups on
+separate structural axes keeps the two relationships unambiguous — the
+concern that led the working group to defer a core `dependencies` field.
+This is also deliberately distinct from the
+[nested-catalog dual-protocol pattern](#nested-catalog-entries): a nested
+catalog represents **one** logical artifact exposed through multiple
+protocol faces (MCP *and* A2A) that a client chooses between at call time,
+whereas `anyOf` expresses genuinely **different** downstream artifacts that
+interchangeably fill one capability slot.
+
+### Dependency Object
+
+A Dependency object references a single depended-on artifact. It MUST
+contain:
+
+`identifier`
+: A string referencing the depended-on artifact's `identifier`, using the
+  same naming rules as a Catalog Entry `identifier` (the
+  `urn:air:{publisher}:{namespace}:{name}` structure is RECOMMENDED; see
+  [Catalog Entry](#catalog-entry)). The reference MAY point to an artifact
+  published by a different organization or hosted in a different catalog;
+  resolution is not guaranteed (see [Resolution](#resolution) below).
+
+The following members are OPTIONAL:
+
+`type`
+: A media type indicating what kind of artifact the dependency is, drawn
+  from the same vocabulary as the Catalog Entry `type` field (e.g.,
+  `application/mcp-server-card+json`, `application/a2a-agent-card+json`).
+  RECOMMENDED, so that a consumer can reason about a dependency without
+  dereferencing it. The resolved artifact remains authoritative for its own
+  type.
+
+`versionConstraint`
+: A string expressing the range of acceptable versions of the dependency.
+  A [Semantic Versioning](https://semver.org/) range (e.g., `>=3.0.0`,
+  `^3.1`, `3.x`) is RECOMMENDED, mirroring the entry `version` convention;
+  when the depended-on artifact does not use SemVer, the value degrades to
+  an exact-string match against the target's version. This field is named
+  distinctly from `version` because it is a *matcher*, not a concrete
+  version literal, and unlike a bare lower bound it can express an upper
+  bound (e.g., "requires v3 but v4 is a breaking change"). When absent, any
+  version is acceptable.
+
+`credentialPropagation`
+: A string hint describing how the artifact authenticates to this
+  dependency at runtime, so a planner can determine upfront which
+  credentials it (or its caller) must hold. Like `type`, this is an open
+  text field with a RECOMMENDED value set:
+
+    - `obo` — *on behalf of*: the caller's user identity is propagated to
+      the dependency (delegated access; the audit trail is
+      user-attributed).
+    - `agent` — the artifact uses its own workload/agent identity
+      (agent-attributed).
+    - `user` — a distinct interactive user credential for the dependency is
+      required (the caller must authenticate separately).
+    - `none` — the dependency is public and requires no credential.
+
+    Values are lowercase to match `identityType` casing elsewhere in this
+    specification. This field is **advisory**: it MUST NOT be treated as an
+    authoritative security control. The depended-on artifact enforces its
+    real credential requirements at connection time; a planner uses this
+    hint for pre-flight filtering, not for granting access. Note this is a
+    different concept from the Trust Manifest / Publisher `identityType`
+    field, which hints at the *scheme* of an identifier (`did`, `dns`,
+    `spiffe`); `credentialPropagation` describes credential/audit
+    attribution and is an orthogonal axis.
+
+`purpose`
+: An OPTIONAL free-text description of why the artifact depends on this
+  dependency (e.g., "Read and write Salesforce CRM records"). It aids
+  impact analysis and consent UX. When a Dependency appears inside an
+  `anyOf` group, `purpose` MAY instead be stated once on the group.
+
+### Resolution
+
+A dependency is identified by `identifier` alone; the extension does not
+carry the dependency's `url` or `data`. A consumer that needs the
+depended-on artifact resolves the `identifier` through whatever mechanism
+it uses to locate artifacts (the same catalog, a nested or federated
+catalog, a registry, or a well-known lookup). Because a dependency MAY
+reference an artifact outside the current catalog or publisher,
+**resolution is not guaranteed**. Consumers:
+
+- MUST handle an unresolvable or unavailable `required` dependency
+  gracefully — surfacing it as a blocker rather than failing abruptly.
+- MUST NOT automatically fetch, install, or invoke a resolved dependency
+  without applying the same trust verification they would apply to any
+  artifact (see [Trust Manifest](#trust-manifest) and
+  [Security Considerations](#security-considerations)).
+- SHOULD detect cycles and bound traversal when following dependency edges
+  transitively, analogous to the nested-catalog depth limit (see
+  [Nested Catalog Depth and Circular References](#nested-catalog-depth-and-circular-references)).
+
+Because it lives under `extensions`, the Dependencies extension is
+publisher-supplied metadata that sits outside the Trust Manifest's signed
+`subject` binding, exactly like the entry `publisher` field. Its contents
+are therefore only as trustworthy as the catalog document itself unless
+brought under a catalog-level `signature` (see
+[Dependency Confusion and Malicious Dependencies](#dependency-confusion-and-malicious-dependencies)).
+
+### Example
+
+The following entry uses the Dependencies extension to describe an agent
+that has a hard dependency on a Salesforce MCP server (accessed on behalf
+of the user), a hard dependency on *either* of two interchangeable vector
+stores, and an optional dependency on an email-sending agent:
+
+```json
+{
+  "identifier": "urn:air:acme-corp.com:agent:crm-assistant",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://api.acme-corp.com/agents/crm-assistant.json",
+  "extensions": {
+    "https://ai-catalog.org/extensions/dependencies": {
+      "required": [
+        {
+          "identifier": "urn:air:salesforce.com:mcp:sales-cloud",
+          "type": "application/mcp-server-card+json",
+          "versionConstraint": ">=3.0.0",
+          "credentialPropagation": "obo",
+          "purpose": "Read and write Salesforce CRM records"
+        },
+        {
+          "purpose": "Vector store for retrieval-augmented answers",
+          "anyOf": [
+            {
+              "identifier": "urn:air:acme-corp.com:mcp:pinecone",
+              "type": "application/mcp-server-card+json",
+              "credentialPropagation": "agent"
+            },
+            {
+              "identifier": "urn:air:acme-corp.com:mcp:pgvector",
+              "type": "application/mcp-server-card+json",
+              "credentialPropagation": "agent"
+            }
+          ]
+        }
+      ],
+      "optional": [
+        {
+          "identifier": "urn:air:acme-corp.com:agent:email-sender",
+          "type": "application/a2a-agent-card+json",
+          "credentialPropagation": "agent",
+          "purpose": "Send email notifications when a deal closes"
+        }
+      ]
+    }
+  }
+}
+```
+
+A planner reading this entry can determine, without dereferencing any
+artifact, that using the CRM assistant requires the caller to be able to
+propagate user credentials to Salesforce (`obo`), that one of two vector
+stores must be reachable under the agent's own identity, and that email
+notifications are best-effort.
+
+### Schema
+
+The following CDDL [[RFC8610]] defines the value of the
+`https://ai-catalog.org/extensions/dependencies` extension key.
+
+```
+DependenciesExtension = {
+  ? required: [* DependencyRequirement],
+  ? optional: [* DependencyRequirement]
+}
+
+; A requirement is EITHER a single dependency reference (the flat, common
+; case) OR a group of interchangeable alternatives. The presence of the
+; `anyOf` key discriminates the two shapes.
+DependencyRequirement = Dependency / DependencyGroup
+
+Dependency = {
+  identifier: text,
+  ? type: text,
+  ? versionConstraint: text,
+  ? credentialPropagation: text,
+  ? purpose: text
+}
+
+DependencyGroup = {
+  anyOf: [2* Dependency],
+  ? purpose: text
+}
+```
 
 # Version Handling
 
@@ -1421,6 +1686,14 @@ this threat:
 - **Layer 3** makes modification structurally impossible through
   content-addressing.
 
+An attacker who can modify a catalog can also tamper with an entry's
+[Dependencies extension](#dependencies-extension) — adding or removing
+dependency references, or downgrading a `credentialPropagation` value to
+coax a false "safe" verdict from a pre-flight check. The same trust layers
+apply: only a catalog-level `signature` (Layer 2) or content-addressed
+distribution (Layer 3) protects the dependency list from undetected
+modification.
+
 ## Trust Manifest Substitution
 
 Because a Trust Manifest is a peer element of the catalog entry rather
@@ -1445,6 +1718,42 @@ compounding mechanisms:
   JCS-canonicalized [[RFC8785]] catalog document (excluding the
   `signature` member itself) and verified exactly as a Trust Manifest
   signature.
+
+## Dependency Confusion and Malicious Dependencies
+
+The [Dependencies extension](#dependencies-extension) lets an entry point
+at other artifacts by `identifier`. This introduces threats beyond those of
+a standalone entry, and consumers MUST treat the extension as advisory
+input rather than an instruction to act:
+
+- **Dependency reference substitution / confusion.** An attacker who can
+  write the catalog document can add, remove, or repoint dependency
+  references, or register a typosquatted dependency `identifier` (see
+  [Identifier Typosquatting](#identifier-typosquatting)) so that a planner
+  resolves a malicious artifact. Consumers MUST NOT automatically fetch,
+  install, or invoke a resolved dependency without applying the same trust
+  verification ([Trust Manifest](#trust-manifest)) they would apply to any
+  other artifact.
+- **Advisory hints are not controls.** `credentialPropagation`,
+  `versionConstraint`, and `purpose` are publisher assertions. A tampered or
+  mistaken `credentialPropagation: "none"` MUST NOT be read as evidence that
+  a dependency is safe to reach without credentials; the depended-on
+  artifact enforces its real requirements at connection time.
+- **Unbounded or circular dependency graphs.** Following dependency edges
+  transitively can loop or fan out without limit. Consumers SHOULD detect
+  cycles and bound traversal depth, analogous to the nested-catalog limit
+  (see [Nested Catalog Depth and Circular References](#nested-catalog-depth-and-circular-references)).
+- **Topology leakage.** An enumerated dependency list exposes internal and
+  third-party service identifiers and reveals which of them require
+  privileged credentials. Publishers SHOULD treat a published dependency
+  list as public information and omit or gate references to sensitive
+  internal systems.
+
+Because the extension lives under `extensions`, its contents are outside the
+Trust Manifest's signed `subject` and are only as trustworthy as the catalog
+document itself. Publishers who rely on dependencies for pre-flight
+decisions SHOULD bring the catalog under a catalog-level `signature` so the
+dependency list cannot be tampered with undetected.
 
 ## Identifier Typosquatting
 
@@ -1773,6 +2082,19 @@ artifact types including a nested catalog packaging related artifacts:
         ],
         "privacyPolicyUrl": "https://acme.com/legal/privacy",
         "termsOfServiceUrl": "https://acme.com/legal/terms"
+      },
+      "extensions": {
+        "https://ai-catalog.org/extensions/dependencies": {
+          "required": [
+            {
+              "identifier": "urn:air:acme.com:server:finance-mcp",
+              "type": "application/mcp-server-card+json",
+              "versionConstraint": ">=1.4.0",
+              "credentialPropagation": "obo",
+              "purpose": "Execute finance tools on behalf of the user"
+            }
+          ]
+        }
       },
       "updatedAt": "2026-03-15T10:00:00Z"
     },
@@ -2365,6 +2687,7 @@ AI Catalog (cross-artifact)
 | *(not in the Server Card)* | Entry `publisher` |
 | *(not in the Server Card)* | Entry `trustManifest` (identity, attestations, provenance) |
 | *(not in the Server Card)* | Entry `tags` for cross-artifact discovery |
+| *(not in the Server Card)* | Downstream dependencies via the [Dependencies extension](#dependencies-extension) |
 
 ## MCP Server as Catalog Entry
 
@@ -2553,6 +2876,7 @@ plugins/
 | Plugin `.claude-plugin/plugin.json` | The artifact content (referenced via `url`) |
 | *(not in marketplace)* | Entry `trustManifest` (identity, attestations) |
 | *(not in marketplace)* | Entry `type` |
+| *(not in marketplace)* | Downstream dependencies (e.g. a plugin's required MCP servers) via the [Dependencies extension](#dependencies-extension) |
 | Centralized marketplace repo | AI Catalog (decentralized, any URL) |
 
 ## Source Types

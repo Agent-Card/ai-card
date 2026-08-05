@@ -58,6 +58,8 @@ The mapping works as follows:
 | Nested catalog entry | Nested OCI Image Index |
 | Trust Manifest | OCI Referrer artifact attached to the entry manifest |
 
+An entry's `dependencies` extension travels along as ordinary entry metadata within its manifest (`config`/`annotations`) — unlike the Trust Manifest, it is **not** modeled as an OCI Referrer.
+
 The logical AI Catalog format remains the authoring and consumption interface — tooling handles the OCI pack/unpack:
 
 ```

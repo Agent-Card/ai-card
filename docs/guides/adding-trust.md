@@ -83,6 +83,15 @@ All other fields are optional:
 | `signature` | Detached JWS signature over the Trust Manifest content |
 | `metadata` | Open map for custom trust metadata |
 
+!!! note "Three distinct identity concepts — don't conflate them"
+    AI Catalog uses "identity" in three different senses. Keep them separate:
+
+    - **Publisher / Trust Manifest `identityType`** — a hint at the *scheme* of an identifier (`did`, `spiffe`, `dns`). It tells a client how to resolve and verify the `identity` URI. That is all it does.
+    - **`credentialPropagation`** (on the [dependencies extension](../specification.md)) — describes how an artifact authenticates *downstream* to the artifacts it depends on: `obo` (on-behalf-of, user identity propagated — a **user-attributed** audit trail), `agent` (the agent's own workload identity — an **agent-attributed** trail), `user` (a separate interactive user credential), or `none` (public). It is an advisory attribution hint, never a security control.
+    - **`provenance`** — artifact *lineage*: where the artifact was built or derived from (see [Adding provenance](#adding-provenance)).
+
+    So `identityType` is about *who published this*, `credentialPropagation` is about *how it calls its dependencies*, and `provenance` is about *where it came from*.
+
 !!! tip "Attestation document format"
     Attestation documents are not restricted to any particular format — they can be human-readable (e.g., a PDF audit report) or machine-readable for automated verification (e.g., JWTs, Verifiable Credentials).
 

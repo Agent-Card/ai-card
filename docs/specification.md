@@ -10,6 +10,7 @@ The specification covers:
 
 - **Core schema** — formal definitions for AI Catalog, Catalog Entry, Host Info, Publisher, and all fields
 - **Trust Manifest** — identity binding, attestations, provenance links, signing, and verification procedures
+- **Official Extensions** — additive extensions defined under the `https://ai-catalog.org/extensions/` prefix, including the Dependencies extension ([`https://ai-catalog.org/extensions/dependencies`](https://ai-catalog.org/extensions/dependencies)) for declaring an entry's downstream dependencies
 - **Discovery** — well-known URI, link relation headers, and agent-driven discovery
 - **Conformance levels** — normative requirements for Minimal, Discoverable, and Trusted catalogs
 - **Version handling** — compatibility rules for producers and consumers

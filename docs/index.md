@@ -70,6 +70,10 @@ Serve it at `/.well-known/ai-catalog.json` and any AI client can discover everyt
 
     Sub-catalogs can be authored, hosted, and updated independently by different teams or organizations.
 
+- **Dependency-aware discovery**
+
+    The optional Dependencies extension lets an entry declare its downstream artifacts — powering pre-flight credential checks ("do I hold what this agent needs?") and impact analysis, all via an official extension that leaves the core schema untouched.
+
 </div>
 
 ---

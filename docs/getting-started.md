@@ -86,3 +86,4 @@ Serving the catalog at `/.well-known/ai-catalog.json` enables automated discover
 - [**Serving Your Catalog**](guides/serving-your-catalog.md) — hosting options and `Content-Type` configuration
 - [**Adding Trust**](guides/adding-trust.md) — reach Level 3 with verifiable identity and attestations
 - [**Organizing Catalogs**](guides/organizing-catalogs.md) — nest catalogs for large inventories
+- [**Declaring Dependencies**](examples/agent-with-dependencies.md) — use the Dependencies extension to declare downstream artifacts and enable consumer [pre-flight credential checks](guides/consuming-catalogs.md#pre-flight-dependency-check)
