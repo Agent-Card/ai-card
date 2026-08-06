@@ -90,6 +90,7 @@ nav:
       - Minimal Catalog: examples/minimal-catalog.md
       - Multi-Protocol Agent: examples/multi-protocol-agent.md
       - Nested Catalogs: examples/nested-catalogs.md
+      - Lifecycle Metadata: examples/lifecycle-metadata.md
   - Implementations: implementations.md
 
 

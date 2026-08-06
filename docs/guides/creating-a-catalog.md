@@ -231,6 +231,59 @@ Both the top-level catalog object and individual entries support a `metadata` fi
 
 Metadata keys should use reverse-DNS prefixes for vendor-specific keys (`com.acme.*`), or short unqualified names for broadly useful keys (`license`, `homepage`). Avoid shadowing standard fields like `displayName` or `tags`. Clients that don't recognize a key should ignore it.
 
+## The Lifecycle extension {#the-lifecycle-extension}
+
+When an artifact version is deprecated, scheduled for retirement, or superseded
+by a successor, advertise that at discovery time with the **Lifecycle** official
+extension. It carries the version's lifecycle `status`, its release date, and —
+when deprecated — the successor, timeline, breaking changes, and migration
+guide, so consumers can filter deprecated artifacts and plan migrations.
+
+Official extensions live in the entry's `extensions` map, keyed by their
+namespace URL. The Lifecycle extension uses:
+
+```
+https://ai-catalog.org/extensions/lifecycle
+```
+
+The extension describes the **version** the entry identifies, so within a
+[multi-version listing](#multi-version-entries) each versioned entry can carry
+its own status — a deprecated v1 alongside an active v2:
+
+```json
+{
+  "identifier": "urn:air:acme-corp.com:finance:invoice-processor",
+  "version": "1.0.0",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://api.acme-corp.com/agents/invoice/v1",
+  "extensions": {
+    "https://ai-catalog.org/extensions/lifecycle": {
+      "status": "deprecated",
+      "releaseDate": "2025-03-15",
+      "deprecated": {
+        "replacedBy": "urn:air:acme-corp.com:finance:invoice-processor-v2",
+        "deprecationDate": "2026-09-01",
+        "endOfLifeDate": "2027-01-01",
+        "breakingChanges": [
+          "Authentication changed from API key to OAuth2"
+        ],
+        "migrationGuide": "https://docs.acme-corp.com/invoice-v2-migration"
+      }
+    }
+  }
+}
+```
+
+Recommended `status` values are `preview`, `active`, `deprecated`, and
+`retired` — each names a version a consumer can actually reach (there is no
+"planned" state, since an unreleased version has no endpoint to list). Include
+the `deprecated` object when the status is `deprecated` or `retired`, and
+populate `replacedBy` or `migrationGuide` (or both) so a consumer can act on
+the deprecation.
+
+See [Lifecycle Metadata](../examples/lifecycle-metadata.md) for the full example
+and field reference.
+
 ## Complete example
 
 ```json

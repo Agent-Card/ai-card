@@ -171,6 +171,75 @@ def latest_entries(entries):
     return list(by_id.values())
 ```
 
+## Filtering by lifecycle status
+
+An entry may carry the [Lifecycle extension](../examples/lifecycle-metadata.md)
+in its `extensions` map, declaring whether the artifact version is a
+pre-release (`preview`), generally available (`active`), `deprecated`, or
+`retired`. A consumer that understands the extension can filter deprecated or
+retired artifacts at discovery and follow the recommended successor:
+
+```python
+LIFECYCLE_KEY = "https://ai-catalog.org/extensions/lifecycle"
+
+RECOMMENDED_STATUSES = {"preview", "active", "deprecated", "retired"}
+
+def normalize_status(raw):
+    """Map a status value to a recommended state.
+
+    `status` is open text, so a producer may emit a value outside the
+    recommended set. Interpret it rather than discard it — an agent can do
+    this semantically (e.g. an LLM mapping "sunset" -> "deprecated"). Return
+    None only when the value can't be interpreted with confidence.
+    """
+    if raw is None or raw in RECOMMENDED_STATUSES:
+        return raw
+    synonyms = {
+        "sunset": "deprecated", "end-of-support": "deprecated",
+        "obsolete": "deprecated", "eol": "retired", "end-of-life": "retired",
+        "ga": "active", "generally-available": "active", "stable": "active",
+        "beta": "preview", "alpha": "preview", "rc": "preview",
+    }
+    return synonyms.get(str(raw).strip().lower())  # None if uninterpretable
+
+def is_selectable(entry, allow_deprecated=False):
+    lc = entry.get("extensions", {}).get(LIFECYCLE_KEY)
+    if not lc:
+        return True  # no lifecycle info — treat as any other entry
+
+    status = normalize_status(lc.get("status"))
+    if status == "retired":
+        return False
+    if status == "deprecated" and not allow_deprecated:
+        return False
+    if lc.get("status") and status is None:
+        # Declared but uninterpretable: fail safe, don't assume "active".
+        # Surface the raw value and keep it out of long-lived commitments.
+        return allow_deprecated
+    return True
+
+def successor_id(entry):
+    """The identifier a deprecated entry recommends migrating to, if any."""
+    lc = entry.get("extensions", {}).get(LIFECYCLE_KEY) or {}
+    return (lc.get("deprecated") or {}).get("replacedBy")
+```
+
+- If you **don't** understand the extension key, ignore it and treat the entry
+  as any other.
+- `status` is open text, so its recommended values are not exhaustive. Never
+  reject an entry *just* because its status is unrecognized — but don't
+  silently discard the value either, or you fail open: a value like `sunset`
+  may signal a retirement you'd then miss.
+- Instead, **interpret** an unrecognized status against the recommended states.
+  An agent consumer can do this semantically rather than with a fixed synonym
+  table. When you can't interpret it confidently, surface the raw value and
+  treat the artifact conservatively rather than assuming it is `active`.
+- You **may** still select a deprecated artifact deliberately — for a
+  short-lived task that completes before its `endOfLifeDate`, for example.
+- The dates and `replacedBy` reference are producer assertions, not signed
+  claims. Corroborate them out of band when you need a supported-until
+  guarantee.
+
 ## TypeScript example
 
 ```typescript
