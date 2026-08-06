@@ -104,6 +104,42 @@ def resolve_artifact(entry):
 
 When fetching from `url`, the server should respond with the content type declared in the entry's `type` field.
 
+## Selecting a deployment instance
+
+An entry may carry the [Deployment extension](../examples/deployment-metadata.md)
+in its `extensions` map, listing the concrete instances of one logical artifact
+across environments, release channels, and regions. A consumer that understands
+the extension may pick the instance matching its
+environment/releaseChannel/region/compliance policy instead of the default entry
+`url`:
+
+```python
+DEPLOYMENT_KEY = "https://ai-catalog.org/extensions/deployment"
+
+def resolve_url(entry, region=None, compliance=None, release_channel=None):
+    ext = entry.get("extensions", {}).get(DEPLOYMENT_KEY)
+    if not ext:
+        return entry["url"]  # extension unknown/absent — use default url
+
+    for inst in ext["instances"]:
+        if region and inst.get("region") != region:
+            continue
+        if compliance and compliance not in inst.get("compliance", []):
+            continue
+        if release_channel and inst.get("releaseChannel") != release_channel:
+            continue
+        return inst["url"]
+
+    return None  # policy unmet — do not fall back to a non-conforming instance
+```
+
+- If you **don't** understand the extension key, ignore it and fall back to the
+  entry's `url`.
+- If you **do** understand it but no instance satisfies your policy, do not
+  fall back to a non-conforming instance.
+- `dataResidency` and `compliance` are producer assertions, not signed claims.
+  Verify them via the entry's `trustManifest` when you need assurance.
+
 ## Handling nested catalogs
 
 An entry with `type: "application/ai-catalog+json"` is itself a catalog. To get all artifacts, recurse into it:

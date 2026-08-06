@@ -231,6 +231,60 @@ Both the top-level catalog object and individual entries support a `metadata` fi
 
 Metadata keys should use reverse-DNS prefixes for vendor-specific keys (`com.acme.*`), or short unqualified names for broadly useful keys (`license`, `homepage`). Avoid shadowing standard fields like `displayName` or `tags`. Clients that don't recognize a key should ignore it.
 
+## The Deployment extension {#the-deployment-extension}
+
+When one logical artifact runs in several places — production and staging,
+`us-east-1` and `eu-west-1`, with differing data-residency and compliance
+constraints — describe those deployments with the **Deployment** official
+extension. The entry keeps a single stable `identifier`; the extension
+enumerates the concrete instances behind it.
+
+Official extensions live in the entry's `extensions` map, keyed by their
+namespace URL. The Deployment extension uses:
+
+```
+https://ai-catalog.org/extensions/deployment
+```
+
+Its value has a required, non-empty `instances` array. Each instance requires an
+`instanceId` (unique within the entry) and a `url`, plus optional `environment`,
+`releaseChannel`, `region`, `dataResidency`, `compliance`, and `description`:
+
+```json
+{
+  "identifier": "urn:air:acme-corp.com:agent:invoice-processor",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://api.acme-corp.com/agents/invoice",
+  "extensions": {
+    "https://ai-catalog.org/extensions/deployment": {
+      "instances": [
+        {
+          "instanceId": "invoice-prod-us",
+          "environment": "production",
+          "url": "https://api.acme-corp.com/agents/invoice",
+          "region": "us-east-1"
+        },
+        {
+          "instanceId": "invoice-prod-eu",
+          "environment": "production",
+          "url": "https://eu-api.acme-corp.com/agents/invoice",
+          "region": "eu-west-1",
+          "dataResidency": ["EU"],
+          "compliance": ["GDPR"]
+        }
+      ]
+    }
+  }
+}
+```
+
+The entry's top-level `url` stays the default entry point; each instance `url` is
+an alternative endpoint for the same artifact. Represent that default among the
+instances so one instance `url` equals the entry `url`.
+
+See [Deployment Metadata](../examples/deployment-metadata.md) for the full
+example and instance field reference.
+
 ## Complete example
 
 ```json

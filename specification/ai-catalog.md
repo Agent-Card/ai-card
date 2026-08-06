@@ -1155,9 +1155,147 @@ defines a set of "Official" known types for commonly requested schemas:
 
 1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
    - Used to store generic, schemaless key-value pairs.
+2. **Deployment** (`https://ai-catalog.org/extensions/deployment`)
+   - Declares the concrete deployment instances (environments, regions,
+     data-residency, and compliance) of the artifact identified by the
+     entry, enabling instance selection under a consumer's policy.
 
 As custom extensions become highly popular, the AI-Catalog TSC may promote
 them to Official Known Types or core standard fields in future specification versions.
+
+## Deployment Metadata Extension
+
+Official extension key: `https://ai-catalog.org/extensions/deployment`
+
+A single logical artifact identified by an entry's `identifier` is often
+deployed as more than one concrete instance. The SAME agent or server may
+run in development, staging, and production, and across multiple regions
+(e.g. `us-east-1`, `eu-west-1`) whose data-residency and compliance
+constraints differ. An entry's `identifier` and top-level `url` capture
+*what* the artifact is and its default entry point, but they do not
+express *where* it lives or under which constraints. The Deployment
+extension separates identity from instance: it enriches an entry with the
+set of deployment instances of that one logical artifact, so consumers can
+deterministically select an instance that matches their policy (e.g. EU
+clients targeting EU instances), exercise discovery against staging, or
+shadow-test a pre-release release channel (such as a beta or edge
+build) — all while the entry retains a single logical identity.
+
+The extension value is a JSON object appearing under the key
+`https://ai-catalog.org/extensions/deployment` in an entry's `extensions`
+map. It contains:
+
+`instances`
+: REQUIRED. An array of Instance objects. This array MUST be non-empty.
+
+Each Instance object contains:
+
+`instanceId`
+: REQUIRED. A string containing a stable identifier for this deployment
+  instance. It MUST be unique within the extension object.
+
+`url`
+: REQUIRED. A string containing the entry-point URL for this instance.
+
+`environment`
+: OPTIONAL. A string naming the deployment environment, e.g.
+  `"production"`, `"staging"`, `"development"`.
+
+`releaseChannel`
+: OPTIONAL. A string naming the release channel of this instance — the
+  maturity or stability track of the deployed version, orthogonal to the
+  `environment` it runs in. e.g. `"stable"`, `"beta"`, `"LTS"`, `"EDGE"`.
+
+`region`
+: OPTIONAL. A string naming the deployment region, e.g. `"us-east-1"`,
+  `"eu-west-1"`.
+
+`dataResidency`
+: OPTIONAL. An array of strings naming the jurisdictions where data is
+  stored or processed, e.g. `["EU"]`, `["US", "CA"]`.
+
+`compliance`
+: OPTIONAL. An array of strings naming the compliance regimes the instance
+  conforms to, e.g. `["GDPR"]`, `["SOC2", "HIPAA"]`.
+
+`description`
+: OPTIONAL. A string containing a human-readable label for the instance.
+
+The following rules apply:
+
+- The entry's top-level `url` remains the DEFAULT entry point for the
+  artifact. Each instance's `url` is an alternative endpoint for the SAME
+  logical artifact (the same `identifier`). Instances are deployments, NOT
+  distinct artifacts.
+- One of the listed instance `url` values SHOULD equal the entry's `url`
+  (the default instance). Producers SHOULD ensure the default entry-point
+  URL is represented among the instances.
+- A consumer that does not understand the extension key MUST ignore it and
+  fall back to the entry's `url`. This is guaranteed by the existing
+  extensions rule (see [Format and Key Naming](#format-and-key-naming)).
+- A consumer that DOES understand the extension MAY select an instance
+  whose `environment`, `releaseChannel`, `region`, `dataResidency`, or
+  `compliance` satisfies the consumer's policy. If no instance matches its policy, the
+  consumer SHOULD NOT fall back to a non-conforming instance — for
+  example, an EU-only client MUST NOT use a non-EU instance.
+- `instanceId` MUST be unique within the extension object.
+- Because this is deployment metadata, not a trust claim, it is unsigned
+  unless it appears in a Trust Manifest's `extensions`; it MUST NOT be
+  treated as a security control on its own. The `compliance` and
+  `dataResidency` values are producer assertions — a consumer needing
+  assurance verifies them via the Trust Manifest (attestations), not via
+  this extension.
+
+For example, an A2A agent deployed across regions and environments:
+
+```json
+{
+  "identifier": "urn:air:acme-corp.com:agent:invoice-processor",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://api.acme-corp.com/agents/invoice",
+  "tags": ["finance", "a2a"],
+  "extensions": {
+    "https://ai-catalog.org/extensions/deployment": {
+      "instances": [
+        {
+          "instanceId": "invoice-prod-us",
+          "environment": "production",
+          "url": "https://api.acme-corp.com/agents/invoice",
+          "region": "us-east-1"
+        },
+        {
+          "instanceId": "invoice-prod-eu",
+          "environment": "production",
+          "url": "https://eu-api.acme-corp.com/agents/invoice",
+          "region": "eu-west-1",
+          "dataResidency": ["EU"],
+          "compliance": ["GDPR"]
+        },
+        {
+          "instanceId": "invoice-staging",
+          "environment": "staging",
+          "url": "https://staging-api.acme-corp.com/agents/invoice",
+          "region": "us-east-1",
+          "releaseChannel": "beta"
+        }
+      ]
+    }
+  }
+}
+```
+
+**Consumer selection.** A consumer that understands the extension filters
+`instances` by the attributes its policy constrains — selecting on
+`environment` to reach a staging deployment, on `releaseChannel` to prefer
+a `stable` build (or opt into a `beta` or `EDGE` one), on `region` for
+locality, and on `dataResidency` or `compliance` to honor regulatory
+obligations (e.g. an EU client keeps only instances whose `dataResidency`
+includes `"EU"`). It then uses a matching instance's `url` in place of the
+entry's default `url`. When the filter leaves no matching instance, the
+consumer SHOULD treat the artifact as unavailable for that request rather
+than fall back to a non-conforming instance or to the entry's default
+`url`; the no-unsafe-fallback rule ensures a compliance-constrained client
+never silently uses a deployment that violates its policy.
 
 # Version Handling
 
@@ -1489,7 +1627,14 @@ MUST treat it as untrusted input. In particular:
 
 Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
 information through image fetch requests. Publishers SHOULD carefully
-consider what information is included in `extensions` fields.
+consider what information is included in `extensions` fields. In
+particular, the Deployment extension's `region` and `dataResidency`
+values may reveal internal infrastructure topology, so publishers SHOULD
+expose only those instances intended for the catalog's audience.
+Furthermore, an instance's `compliance` and `dataResidency` values are
+unsigned producer assertions unless carried in a signed Trust Manifest, so
+a consumer needing assurance MUST corroborate them via attestations rather
+than trusting the extension alone.
 
 # Data Model Overview
 
@@ -1688,6 +1833,27 @@ Publisher = {
   identifier: text,
   displayName: text,
   ? identityType: text
+}
+```
+
+## Deployment Extension
+
+The following CDDL is INFORMATIVE. It describes the value of the
+`https://ai-catalog.org/extensions/deployment` entry in an `extensions`
+map (see [Deployment Metadata Extension](#deployment-metadata-extension)):
+
+```
+DeploymentExtension = { instances: [+ DeploymentInstance] }
+
+DeploymentInstance = {
+  instanceId: text,
+  url: text,
+  ? environment: text,
+  ? releaseChannel: text,
+  ? region: text,
+  ? dataResidency: [+ text],
+  ? compliance: [+ text],
+  ? description: text
 }
 ```
 
