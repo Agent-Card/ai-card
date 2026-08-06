@@ -30,7 +30,7 @@
       "updatedAt": "2026-02-22T16:00:00Z"
     },
     {
-      "identifier": "urn:air:acme-corp.com:agent:finance-assistant-plugin",
+      "identifier": "urn:air:acme-corp.com:plugin:finance-assistant-plugin",
       "displayName": "Finance Assistant Plugin",
       "type": "application/agent-plugins+json",
       "description": "Agent Plugin bundle with skills and MCP server for finance workflows.",
