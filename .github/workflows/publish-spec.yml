@@ -150,16 +150,17 @@ jobs:
 
       - name: Publish PR preview to gh-pages
         run: |
-          python3 tools/update_gh_pages.py preview \
+          python3 tools/update_gh_pages.py preview-subdir \
             --source-dir ".site/pr/${{ github.event.pull_request.number }}" \
             --pr-number "${{ github.event.pull_request.number }}" \
+            --subdir-name spec \
             --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
             --commit-message "Publish specification preview for PR #${{ github.event.pull_request.number }}"
 
       - name: Comment preview URL on pull request
         env:
           GH_TOKEN: ${{ github.token }}
-          PREVIEW_URL: https://ai-catalog.io/pr/${{ github.event.pull_request.number }}/
+          PREVIEW_URL: https://ai-catalog.io/pr/${{ github.event.pull_request.number }}/spec/
         run: |
           marker='<!-- ai-catalog-preview-url -->'
           body=$(cat <<EOF

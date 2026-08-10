@@ -7,6 +7,7 @@ on:
       - synchronize
       - reopened
       - ready_for_review
+      - closed
     paths:
       - .github/workflows/publish-docs.yml
       - docs/**
@@ -33,6 +34,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
     runs-on: ubuntu-latest
 
     steps:
@@ -82,3 +84,102 @@ jobs:
             --cname ai-catalog.io \
             --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
             --commit-message "Publish documentation site from main"
+
+  publish-pr-preview:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Build documentation site
+        run: |
+          uv run --python 3.12 --locked --group docs mkdocs build \
+            --site-dir ".site/pr/${{ github.event.pull_request.number }}" \
+            --strict
+
+      - name: Publish PR preview to gh-pages
+        run: |
+          python3 tools/update_gh_pages.py preview \
+            --source-dir ".site/pr/${{ github.event.pull_request.number }}" \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            --commit-message "Publish documentation preview for PR #${{ github.event.pull_request.number }}"
+
+      - name: Comment preview URL on pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_URL: https://ai-catalog.io/pr/${{ github.event.pull_request.number }}/
+        run: |
+          marker='<!-- ai-catalog-docs-preview -->'
+          body=$(cat <<EOF
+          ${marker}
+          Preview: ${PREVIEW_URL}
+
+          This comment is updated automatically while the pull request preview is available.
+          EOF
+          )
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last \
+            --create-if-none \
+            --body "$body"
+
+  cleanup-pr-preview:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-write
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Remove PR preview from gh-pages
+        run: |
+          python3 tools/update_gh_pages.py cleanup \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --remote-url "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
+            --commit-message "Remove documentation preview for PR #${{ github.event.pull_request.number }}"
+
+      - name: Update preview comment on pull request close
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          marker='<!-- ai-catalog-docs-preview -->'
+          body=$(cat <<EOF
+          ${marker}
+          Preview unavailable.
+
+          The pull request preview was removed because this pull request is closed.
+          EOF
+          )
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --edit-last \
+            --create-if-none \
+            --body "$body"
