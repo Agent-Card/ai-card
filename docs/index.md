@@ -1,3 +1,7 @@
+---
+icon: material/home
+---
+
 # AI Catalog
 
 **A JSON format for making all your AI artifacts discoverable.**

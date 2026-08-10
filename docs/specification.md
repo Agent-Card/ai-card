@@ -1,3 +1,7 @@
+---
+icon: material/file-document
+---
+
 # Full Specification
 
 The AI Catalog specification is published as a W3C-style normative document.

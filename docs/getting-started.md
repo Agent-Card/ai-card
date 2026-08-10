@@ -1,3 +1,7 @@
+---
+icon: material/rocket-launch
+---
+
 # Getting Started
 
 This guide gets a working AI Catalog live in about 5 minutes.
