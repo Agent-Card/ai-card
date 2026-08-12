@@ -51,6 +51,20 @@
       ],
       "url": "https://data.acme-corp.com/datasets/market-dataset-2026q1.parquet",
       "updatedAt": "2026-02-22T16:00:00Z"
+    },
+    {
+      "identifier": "urn:air:acme-corp.com:plugin:finance-assistant-plugin",
+      "displayName": "Finance Assistant Plugin",
+      "type": "application/agent-plugins+json",
+      "description": "Agent Plugin bundle with skills and MCP server for finance workflows.",
+      "tags": [
+        "finance",
+        "plugin",
+        "skills",
+        "mcp"
+      ],
+      "url": "https://plugins.acme-corp.com/finance-assistant/plugin.json",
+      "updatedAt": "2026-02-22T16:00:00Z"
     }
   ]
 }
