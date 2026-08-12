@@ -1332,11 +1332,16 @@
 <td><code>application/agent-skills+gzip</code></td>
 </tr>
 <tr>
+<td>Agent Plugin manifest</td>
+<td><code>application/agent-plugins+json</code></td>
+</tr>
+<tr>
 <td>Dataset</td>
 <td><code>application/parquet</code>, <code>text/csv</code>, or appropriate type</td>
 </tr>
 </tbody>
 </table>
+<p>An <strong>Agent Plugin</strong> (<a href="https://agent-plugins.org">agent-plugins.org</a>) is a portable package bundling Agent Skills and MCP servers into a single distributable unit. The catalog entry's <code>url</code> points to the plugin's <code>plugin.json</code> manifest — the machine-readable descriptor clients use for discovery. Loading and executing the full plugin requires the complete plugin directory, distributed out-of-band (e.g., via git or a package registry).</p>
 <p>This list is not exhaustive — AI Catalog accepts any string as a <code>type</code> value. The spec is intentionally artifact-agnostic.</p>
 <h3 id="optional-fields">Optional fields<a class="headerlink" href="#optional-fields" title="Permanent link">&para;</a></h3>
 <p>Enrich your entries with additional metadata:</p>
