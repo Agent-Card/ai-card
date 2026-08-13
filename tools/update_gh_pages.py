@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Update the gh-pages branch with canonical or PR preview content."
     )
-    parser.add_argument("mode", choices=("root", "preview", "cleanup", "subdir"))
+    parser.add_argument("mode", choices=("root", "preview", "preview-subdir", "cleanup", "subdir"))
     parser.add_argument(
         "--repo-root",
         type=Path,
@@ -129,9 +129,20 @@ def stage_subdir_publish(checkout_dir: Path, source_dir: Path, subdir_name: str)
 
 def stage_preview_publish(checkout_dir: Path, source_dir: Path, pr_number: int) -> None:
     preview_dir = checkout_dir / "pr" / str(pr_number)
-    remove_path(preview_dir)
+    if preview_dir.exists():
+        clear_root(preview_dir, {"spec"})
     preview_dir.mkdir(parents=True, exist_ok=True)
     copy_tree_contents(source_dir, preview_dir)
+    (checkout_dir / ".nojekyll").touch()
+
+
+def stage_preview_subdir_publish(
+    checkout_dir: Path, source_dir: Path, pr_number: int, subdir_name: str
+) -> None:
+    subdir = checkout_dir / "pr" / str(pr_number) / subdir_name
+    remove_path(subdir)
+    subdir.mkdir(parents=True, exist_ok=True)
+    copy_tree_contents(source_dir, subdir)
     (checkout_dir / ".nojekyll").touch()
 
 
@@ -203,6 +214,11 @@ def apply_mode(args: argparse.Namespace, checkout_dir: Path) -> None:
     if args.mode == "preview":
         stage_preview_publish(checkout_dir, args.source_dir.resolve(), args.pr_number)
         return
+    if args.mode == "preview-subdir":
+        stage_preview_subdir_publish(
+            checkout_dir, args.source_dir.resolve(), args.pr_number, args.subdir_name
+        )
+        return
     if args.mode == "subdir":
         stage_subdir_publish(checkout_dir, args.source_dir.resolve(), args.subdir_name)
         return
@@ -239,12 +255,12 @@ def publish_once(args: argparse.Namespace, branch_exists: bool) -> bool:
 
 
 def validate_args(args: argparse.Namespace) -> None:
-    if args.mode in {"root", "preview", "subdir"} and not args.source_dir:
-        raise SystemExit("--source-dir is required for root, preview, and subdir modes")
-    if args.mode in {"preview", "cleanup"} and args.pr_number is None:
-        raise SystemExit("--pr-number is required for preview and cleanup modes")
-    if args.mode == "subdir" and not args.subdir_name:
-        raise SystemExit("--subdir-name is required for subdir mode")
+    if args.mode in {"root", "preview", "preview-subdir", "subdir"} and not args.source_dir:
+        raise SystemExit("--source-dir is required for root, preview, preview-subdir, and subdir modes")
+    if args.mode in {"preview", "preview-subdir", "cleanup"} and args.pr_number is None:
+        raise SystemExit("--pr-number is required for preview, preview-subdir, and cleanup modes")
+    if args.mode in {"subdir", "preview-subdir"} and not args.subdir_name:
+        raise SystemExit("--subdir-name is required for subdir and preview-subdir modes")
 
 
 def main() -> None:
