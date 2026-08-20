@@ -89,10 +89,11 @@ Every entry must have these three things:
 | Agent Skill (Markdown) | `application/agent-skills+md` |
 | Agent Skill (ZIP bundle) | `application/agent-skills+zip` |
 | Agent Skill (gzipped tarball) | `application/agent-skills+gzip` |
-| Agent Plugin manifest | `application/agent-plugins+json` |
+| Agent Plugin (ZIP bundle) | `application/agent-plugins+zip` |
+| Agent Plugin (gzipped tarball) | `application/agent-plugins+gzip` |
 | Dataset | `application/parquet`, `text/csv`, or appropriate type |
 
-An **Agent Plugin** ([agent-plugins.org](https://agent-plugins.org)) is a portable package bundling Agent Skills and MCP servers into a single distributable unit. The catalog entry's `url` points to the plugin's `plugin.json` manifest — the machine-readable descriptor clients use for discovery. Loading and executing the full plugin requires the complete plugin directory, distributed out-of-band (e.g., via git or a package registry).
+An **Agent Plugin** ([agent-plugins.org](https://agent-plugins.org)) is directory-based. For AI Catalog delivery, archive the complete plugin directory as ZIP or gzipped tar, point the entry's `url` to that archive, and copy `plugin.json`'s `name`, `description`, and `keywords` to `displayName`, `description`, and `tags`, respectively; clients extract the archive before loading the plugin.
 
 This list is not exhaustive — AI Catalog accepts any string as a `type` value. The spec is intentionally artifact-agnostic.
 

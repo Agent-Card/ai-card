@@ -133,8 +133,10 @@ For example, a minimal catalog listing four AI artifacts:
     {
       "identifier": "urn:air:example.com:agent:productivity-plugin",
       "displayName": "Productivity Plugin",
-      "type": "application/agent-plugins+json",
-      "url": "https://plugins.example.com/productivity/plugin.json"
+      "type": "application/agent-plugins+zip",
+      "description": "Tools for common productivity workflows.",
+      "tags": ["productivity", "workflows"],
+      "url": "https://plugins.example.com/productivity.zip"
     }
   ]
 }
@@ -236,7 +238,8 @@ It MUST contain the following members:
     - `application/agent-skills+md` — an Agent Skill defined in a standard Markdown file (the suffix `+md` is to be registered)
     - `application/agent-skills+zip` — an Agent Skill bundle (ZIP archive)
     - `application/agent-skills+gzip` — an Agent Skill bundle (gzipped tarball)
-    - `application/agent-plugins+json` — an Agent Plugin manifest ([Agent Plugins specification](https://agent-plugins.org/specification))
+    - `application/agent-plugins+zip` — an Agent Plugin bundle (ZIP archive)
+    - `application/agent-plugins+gzip` — an Agent Plugin bundle (gzipped tarball)
 
     These values are designed to align with official IANA media type registration standards. Standard ecosystem types use registered structured syntax suffixes (`+json`, `+zip`, `+gzip`). For any new or custom types not listed here, it is up to the specific client implementation to handle them correctly.
 
@@ -259,9 +262,11 @@ The following members are OPTIONAL:
 : A string containing a human-readable name for the artifact.
   This field SHOULD be set only when the referenced artifact does not
   already carry its own canonical human-readable name — for example a
-  raw dataset (`application/parquet`), a model blob, or a skill bundle
-  (`application/agent-skills+zip`), none of which embed a self-describing
-  name. When the referenced artifact does carry such a name — for
+  raw dataset (`application/parquet`), a model blob, a skill bundle
+  (`application/agent-skills+zip`), or an Agent Plugin bundle
+  (`application/agent-plugins+zip`), none of which directly expose a
+  self-describing name without processing the artifact. When the referenced
+  artifact does carry such a name — for
   example the `name` field of an A2A Agent Card or the `title` field of
   an MCP Server Card — that artifact is the authoritative source and
   `displayName` SHOULD be omitted to avoid duplicating a value that can
