@@ -30,7 +30,7 @@ The `type` field is an open text format, so any string value is accepted. To ens
 - `application/a2a-agent-card+json` — A2A Agent Card
 - `application/mcp-server-card+json` — MCP Server Card
 - `application/agent-skills+json` — Agent Skill Metadata json file
-- `text/markdown;profile="urn:air:agent-skill"` — Agent Skill defined in a standard Markdown file (see the rationale on generic formats below)
+- `application/agent-skills+md` — Agent Skill defined in a standard Markdown file (the suffix +md is to be registered)
 - `application/agent-skills+zip` — Agent Skill bundle in a ZIP archive
 - `application/agent-skills+gzip` — Agent Skill bundle in a gzipped tarball
 
