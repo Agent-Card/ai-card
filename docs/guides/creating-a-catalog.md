@@ -111,6 +111,7 @@ Enrich your entries with additional metadata:
 | `publisher` | object | Who publishes this artifact (see [Publisher object](#publisher-object)) |
 | `trustManifest` | object | Trust and identity metadata (see [Adding Trust](adding-trust.md)) |
 | `metadata` | object | Custom key/value pairs (see [Metadata extensibility](#metadata-extensibility)) |
+| `extensions` | object | Named extension map. Includes the official `dependencies` extension (see [Declaring dependencies](#declaring-dependencies)) |
 
 ### When to set `displayName`
 
@@ -206,6 +207,125 @@ A catalog may contain multiple entries with the same `identifier` but different 
 ```
 
 When `version` is present, the combination of `identifier` + `version` must be unique. Clients looking for the latest version should sort by `version` (semver) or `updatedAt` and take the most recent.
+
+## Declaring dependencies
+
+Artifacts rarely stand alone. An agent may need an MCP server for tool access, a
+vector store for retrieval, or another agent to delegate work to. The official
+**dependencies extension** lets an entry declare what it depends on so consumers
+can run pre-flight checks ("can I use this agent — do I hold the required
+credentials?"), filter discovery by available credentials, perform impact analysis
+("what breaks if I decommission this server?"), and reason about compliance
+(user- vs agent-attributed audit).
+
+Dependencies live under the entry's `extensions` map, keyed by the extension URI
+`https://ai-catalog.org/extensions/dependencies`:
+
+!!! note "Official extension — no `specVersion` bump"
+    The `https://ai-catalog.org/extensions/` prefix marks this as an **official**
+    AI Catalog extension, the same tier as the [metadata](#metadata-extensibility)
+    extension. It is additive: the core schema is unchanged, `specVersion` stays
+    `"1.0"`, and consumers that don't recognize the extension simply ignore it.
+    See the [Dependencies Extension](../specification.md)
+    section of the specification for the normative contract.
+
+### Extension shape
+
+The extension value has two optional arrays:
+
+`required`
+:   **AND semantics.** Every element must be satisfiable for the artifact to
+    function. Unresolvable required dependencies are hard blockers.
+
+`optional`
+:   Each element is independently droppable — the artifact still works without it,
+    with graceful degradation.
+
+Each element of either array is a **Requirement**, which is *either*:
+
+- a single **Dependency** object (the flat, common case), *or*
+- a **Dependency Group** — `{ "anyOf": [ <Dependency>, ... ], "purpose": "..." }` —
+  expressing **OR semantics**: any one alternative satisfies the slot. State
+  `purpose` once for the whole group.
+
+A **Dependency** object has these fields:
+
+| Field | Required? | Description |
+|---|---|---|
+| `identifier` | **required** | A `urn:air:{publisher}:{namespace}:{name}` reference to another artifact's entry identifier. May be cross-publisher or cross-catalog — dependencies may reference external domains. |
+| `type` | optional, recommended | The media type from the entry `type` vocabulary, e.g. `application/mcp-server-card+json` or `application/a2a-agent-card+json` (note the `-card` suffix). |
+| `versionConstraint` | optional | A **SemVer range** string, e.g. `">=3.0.0"`, `"^3.1"`, `"3.x"`. It is a matcher, not a literal — not `minVersion`, not `version`. Absent means any version. |
+| `credentialPropagation` | optional | Advisory hint about how credentials flow to this dependency (see below). |
+| `purpose` | optional | Free text explaining why the dependency exists, e.g. "Read and write Salesforce CRM records". |
+
+!!! warning "`credentialPropagation` is distinct from `identityType`"
+    `credentialPropagation` describes **how credentials flow at connect time** and
+    is open text with recommended lowercase values: `"obo"` (on-behalf-of — the
+    user's identity is propagated, producing user-attributed audit), `"agent"`
+    (the agent's own workload identity), `"user"` (a separate interactive user
+    credential is required), and `"none"` (public). It is **advisory only** — the
+    downstream artifact enforces real credentials at connect time, so never treat
+    it as a security control.
+
+    Do **not** conflate it with [`identityType`](#publisher-object), which is a
+    completely different field: `identityType` is an identifier *scheme* hint
+    (`did`, `dns`, `spiffe`) on a Publisher or Trust Manifest, describing how to
+    resolve an identifier — not how credentials propagate.
+
+### Full example
+
+```json
+{
+  "identifier": "urn:air:acme-corp.com:agent:crm-assistant",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://api.acme-corp.com/agents/crm-assistant.json",
+  "extensions": {
+    "https://ai-catalog.org/extensions/dependencies": {
+      "required": [
+        {
+          "identifier": "urn:air:salesforce.com:mcp:sales-cloud",
+          "type": "application/mcp-server-card+json",
+          "versionConstraint": ">=3.0.0",
+          "credentialPropagation": "obo",
+          "purpose": "Read and write Salesforce CRM records"
+        },
+        {
+          "purpose": "Vector store for retrieval",
+          "anyOf": [
+            {
+              "identifier": "urn:air:acme-corp.com:mcp:pinecone",
+              "type": "application/mcp-server-card+json",
+              "credentialPropagation": "agent"
+            },
+            {
+              "identifier": "urn:air:acme-corp.com:mcp:pgvector",
+              "type": "application/mcp-server-card+json",
+              "credentialPropagation": "agent"
+            }
+          ]
+        }
+      ],
+      "optional": [
+        {
+          "identifier": "urn:air:acme-corp.com:agent:email-sender",
+          "type": "application/a2a-agent-card+json",
+          "credentialPropagation": "agent",
+          "purpose": "Send email notifications"
+        }
+      ]
+    }
+  }
+}
+```
+
+Here the `crm-assistant` agent hard-requires the Salesforce MCP server (v3 or
+later, called on behalf of the user) *and* one of two vector stores, while the
+email sender is optional. Note the cross-publisher reference to
+`urn:air:salesforce.com:...` — an external domain.
+
+!!! warning "Consumers must verify trust"
+    Consumers **must** handle unresolvable required dependencies gracefully and
+    **must not** auto-fetch or install a dependency without trust verification.
 
 ## Publisher object
 

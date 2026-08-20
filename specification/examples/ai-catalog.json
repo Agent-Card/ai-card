@@ -38,6 +38,27 @@
         },
         "issuedAt": "2026-02-22T16:30:00Z",
         "signature": "eyJhbGciOiJFUzI1NiJ9..detached-jws-signature"
+      },
+      "extensions": {
+        "https://ai-catalog.org/extensions/dependencies": {
+          "required": [
+            {
+              "identifier": "urn:air:acme-corp.com:mcp:finance-data",
+              "type": "application/mcp-server-card+json",
+              "versionConstraint": ">=2.0.0",
+              "credentialPropagation": "obo",
+              "purpose": "Query finance market data on behalf of the user"
+            }
+          ],
+          "optional": [
+            {
+              "identifier": "urn:air:acme-corp.com:agent:notifier",
+              "type": "application/a2a-agent-card+json",
+              "credentialPropagation": "agent",
+              "purpose": "Send trade notifications"
+            }
+          ]
+        }
       }
     },
     {

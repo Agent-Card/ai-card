@@ -1,6 +1,9 @@
 # ADR-0002: Defer Dependency Expression Between Entries
 
-**Status:** Accepted
+**Status:** Accepted (this decision — no dependency field in the *core*
+schema — still stands; the deferred capability was later delivered as an
+official extension by [ADR-0021](0021-dependencies-extension.md), which
+resolves the AND/OR concern raised below)
 
 **Date:** 2026-04-02
 
@@ -66,3 +69,9 @@ semantics.
   - A mechanism for OR relationships (possibly via nested catalogs
     or a `relationship` annotation)
   - Alignment with how OCI expresses dependencies (referrers/layers)
+
+**Update:** [ADR-0021](0021-dependencies-extension.md) delivers this
+capability as the official `https://ai-catalog.org/extensions/dependencies`
+extension rather than a core field, so the core schema stays as decided here.
+It resolves the AND/OR question by placing AND on a `required` array and OR on
+an `anyOf` group (kept distinct from nested-catalog protocol alternatives).

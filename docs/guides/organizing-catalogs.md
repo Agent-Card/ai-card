@@ -13,6 +13,15 @@ Use nested catalogs when:
 
 A flat catalog is simpler. Nest only when you have a clear organizational reason.
 
+## Composition vs. dependency
+
+Nesting is **composition** — artifacts packaged *together* inside one catalog, either by reference (a nested catalog entry) or inline (the `data` field). Everything on this page is composition.
+
+A **dependency** is different: it's a reference — carrying requirements like a version range or credential-propagation hint — to a *separate*, possibly external artifact that must exist and be usable at runtime, but is not contained by this catalog. Dependencies are declared with the [`dependencies` extension](../specification.md) on an entry, not by nesting.
+
+!!! note
+    The depth limit and visited-URL tracking below govern the **composition tree** only. Dependencies form a separate **dependency graph** that can span publishers and catalogs, and it needs its own cycle detection independent of nesting depth — a chain of dependencies is not bounded by how deeply catalogs are nested. See [Creating a Catalog](creating-a-catalog.md#declaring-dependencies) for declaring dependencies and [Agent with dependencies](../examples/agent-with-dependencies.md) for a worked example. This page does not repeat the field spec.
+
 ## Nested catalog entries
 
 An entry whose `type` is `application/ai-catalog+json` is a nested catalog reference. Clients discover it, fetch the URL, and process the result as another catalog:
