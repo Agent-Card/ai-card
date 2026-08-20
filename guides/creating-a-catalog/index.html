@@ -1332,8 +1332,12 @@
 <td><code>application/agent-skills+gzip</code></td>
 </tr>
 <tr>
-<td>Agent Plugin manifest</td>
-<td><code>application/agent-plugins+json</code></td>
+<td>Agent Plugin (ZIP bundle)</td>
+<td><code>application/agent-plugins+zip</code></td>
+</tr>
+<tr>
+<td>Agent Plugin (gzipped tarball)</td>
+<td><code>application/agent-plugins+gzip</code></td>
 </tr>
 <tr>
 <td>Dataset</td>
@@ -1341,7 +1345,7 @@
 </tr>
 </tbody>
 </table>
-<p>An <strong>Agent Plugin</strong> (<a href="https://agent-plugins.org">agent-plugins.org</a>) is a portable package bundling Agent Skills and MCP servers into a single distributable unit. The catalog entry's <code>url</code> points to the plugin's <code>plugin.json</code> manifest — the machine-readable descriptor clients use for discovery. Loading and executing the full plugin requires the complete plugin directory, distributed out-of-band (e.g., via git or a package registry).</p>
+<p>An <strong>Agent Plugin</strong> (<a href="https://agent-plugins.org">agent-plugins.org</a>) is directory-based. For AI Catalog delivery, archive the complete plugin directory as ZIP or gzipped tar, point the entry's <code>url</code> to that archive, and copy <code>plugin.json</code>'s <code>name</code>, <code>description</code>, and <code>keywords</code> to <code>displayName</code>, <code>description</code>, and <code>tags</code>, respectively; clients extract the archive before loading the plugin.</p>
 <p>This list is not exhaustive — AI Catalog accepts any string as a <code>type</code> value. The spec is intentionally artifact-agnostic.</p>
 <h3 id="optional-fields">Optional fields<a class="headerlink" href="#optional-fields" title="Permanent link">&para;</a></h3>
 <p>Enrich your entries with additional metadata:</p>
