@@ -1167,9 +1167,179 @@ defines a set of "Official" known types for commonly requested schemas:
 
 1. **Metadata** (`https://ai-catalog.org/extensions/metadata`)
    - Used to store generic, schemaless key-value pairs.
+2. **Lifecycle** (`https://ai-catalog.org/extensions/lifecycle`)
+   - Declares the software-lifecycle state of the artifact version
+     identified by the entry — release, deprecation timeline, breaking
+     changes, and recommended successor — so consumers can filter
+     deprecated or retired artifacts and plan migrations at discovery time.
 
 As custom extensions become highly popular, the AI-Catalog TSC may promote
 them to Official Known Types or core standard fields in future specification versions.
+
+## Lifecycle Metadata Extension
+
+Official extension key: `https://ai-catalog.org/extensions/lifecycle`
+
+An entry's `version` and `updatedAt` record *which* revision of an
+artifact this is and *when* the entry last changed, but they say nothing
+about *where that revision sits in its lifecycle* — whether it is a
+preview, generally available, deprecated with a scheduled end-of-life, or
+already retired — nor how a consumer should move off it. Agents evolve: a
+v1 agent is superseded by a breaking v2, an endpoint is scheduled for
+shutdown, a successor is published. Without lifecycle metadata at
+discovery time a consumer cannot distinguish a current artifact from a
+deprecated one, cannot learn an end-of-life date before committing to an
+integration, and cannot discover the recommended replacement or its
+migration guide. The Lifecycle extension enriches an entry with the
+software-lifecycle state of the artifact version it identifies, so
+consumers can filter deprecated or retired artifacts at discovery, plan
+around a known end-of-life date, and follow a producer-supplied migration
+path to a successor.
+
+The extension value is a JSON object appearing under the key
+`https://ai-catalog.org/extensions/lifecycle` in an entry's `extensions`
+map. It contains:
+
+`status`
+: OPTIONAL. A string naming the lifecycle state of this artifact version.
+  Because a catalog entry describes an artifact that is already
+  discoverable, every recommended value denotes a version a consumer can
+  actually reach; a not-yet-released state has no place here. This field
+  is open text; to ensure interoperability the following values are
+  RECOMMENDED: `"preview"` (released ahead of general availability for
+  evaluation, not yet fully supported), `"active"` (generally available
+  and supported — the default state of a healthy artifact), `"deprecated"`
+  (still available but scheduled for retirement, with a successor or
+  migration path), and `"retired"` (end-of-life: no longer supported and
+  SHOULD NOT be adopted, though the entry may remain listed as a tombstone
+  pointing to its successor).
+
+`releaseDate`
+: OPTIONAL. A string containing an ISO 8601 [[RFC3339]] `full-date` (e.g.
+  `"2026-03-15"`) or date-time on which this artifact version was
+  released. This is distinct from the entry's `updatedAt`, which records
+  when the catalog entry itself was last modified.
+
+`deprecated`
+: OPTIONAL. A Deprecation object (defined below) describing the
+  deprecation timeline, breaking changes, and recommended successor. It
+  SHOULD be present when `status` is `"deprecated"` or `"retired"`, and
+  SHOULD be absent otherwise.
+
+The Deprecation object contains:
+
+`replacedBy`
+: OPTIONAL. A string containing the `identifier` of the artifact that
+  supersedes this one. Because it is an artifact identifier, it is subject
+  to the same naming rule as a Catalog Entry's `identifier` (see
+  [Catalog Entry](#catalog-entry)): the `urn:air` structure is HIGHLY
+  RECOMMENDED and MUST be used for open or federated systems, so that the
+  successor resolves to the same identity wherever it is listed. The
+  successor MAY be a newer `version` of the same `identifier` (a version
+  bump) or a different `identifier` (a distinct successor artifact); it
+  SHOULD NOT equal the deprecated entry's own `identifier` and `version`
+  together.
+
+`deprecationDate`
+: OPTIONAL. A string containing an ISO 8601 [[RFC3339]] date or date-time
+  on which this artifact version became (or becomes) deprecated. A date in
+  the future announces an upcoming deprecation consumers can plan around.
+
+`endOfLifeDate`
+: OPTIONAL. A string containing an ISO 8601 [[RFC3339]] date or date-time
+  after which this artifact version is retired and SHOULD NOT be relied
+  upon. A date in the future is a commitment consumers can plan around.
+
+`breakingChanges`
+: OPTIONAL. An array of strings, each a human-readable description of a
+  breaking change a consumer must account for when migrating to the
+  successor.
+
+`migrationGuide`
+: OPTIONAL. A string containing a URL to documentation describing how to
+  migrate to the successor.
+
+The following rules apply:
+
+- Lifecycle metadata describes the artifact **version** identified by the
+  entry, not the logical artifact as a whole. When a catalog lists
+  multiple versions of the same `identifier` (see
+  [Multi-Version Entries](#multi-version-entries)), each versioned entry
+  MAY carry its own Lifecycle extension, so a v1 entry can be
+  `"deprecated"` while the v2 entry is `"active"`.
+- When `status` is `"deprecated"` or `"retired"`, producers SHOULD include
+  a `deprecated` object and SHOULD populate `replacedBy` or
+  `migrationGuide` (or both) so a consumer can act on the deprecation.
+- A consumer that does not understand the extension key MUST ignore it and
+  treat the entry as it would any other. This is guaranteed by the
+  existing extensions rule (see [Format and Key Naming](#format-and-key-naming)).
+- A consumer that DOES understand the extension MAY use it to filter or
+  rank entries at discovery — for example excluding `"retired"` artifacts,
+  warning on `"deprecated"` ones, or preferring the `replacedBy`
+  successor. A consumer MAY still choose a deprecated artifact
+  deliberately (e.g. for a short-lived task that completes before the
+  `endOfLifeDate`).
+- Because this is lifecycle metadata, not a trust claim, it is unsigned
+  unless it appears in a Trust Manifest's `extensions`; it MUST NOT be
+  treated as a security or support guarantee on its own. The dates and the
+  successor reference are producer assertions.
+
+For example, a deprecated v1 agent superseded by a v2 with a scheduled
+end-of-life:
+
+```json
+{
+  "identifier": "urn:air:acme.com:finance:invoice-processor",
+  "version": "1.0.0",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://api.acme.com/agents/invoice/v1",
+  "tags": ["finance", "a2a"],
+  "extensions": {
+    "https://ai-catalog.org/extensions/lifecycle": {
+      "status": "deprecated",
+      "releaseDate": "2025-03-15",
+      "deprecated": {
+        "replacedBy": "urn:air:acme.com:finance:invoice-processor-v2",
+        "deprecationDate": "2026-09-01",
+        "endOfLifeDate": "2027-01-01",
+        "breakingChanges": [
+          "Authentication changed from API key to OAuth2",
+          "Response schema now uses ISO 8601 dates"
+        ],
+        "migrationGuide": "https://docs.acme.com/invoice-v2-migration"
+      }
+    }
+  }
+}
+```
+
+**Consumer behavior.** A consumer that understands the extension reads
+`status` to decide how to treat the entry at discovery: it MAY hide or
+de-rank `"retired"` and `"deprecated"` artifacts, surface the
+`endOfLifeDate` so an operator can plan a migration, and follow
+`replacedBy` to the successor entry (resolving it like any other
+`identifier`) and `migrationGuide` for the steps involved.
+
+Because `status` is open text, the recommended values are not exhaustive
+and a consumer MUST NOT reject an entry solely because its `status` is
+unrecognized. A consumer SHOULD NOT, however, silently discard an
+unrecognized value and treat the artifact as though no status were
+declared: that fails open, because a value such as `"sunset"` or
+`"end-of-support"` may signal retirement that a consumer would then
+overlook. Instead, a consumer SHOULD attempt to interpret an unrecognized
+value against the recommended states — an agent consumer, in particular,
+can map it semantically to the nearest recommended value (e.g. `"sunset"`
+→ `"deprecated"`). When it cannot interpret the value with confidence, a
+consumer SHOULD preserve and surface the raw value and treat the artifact
+conservatively (for example, excluding it from long-lived commitments)
+rather than assume it is `"active"`. This mirrors how unrecognized `type`
+values are handled — never a hard failure — while failing safe, since
+`status` qualifies an artifact the consumer can otherwise use rather than
+routing it.
+
+Lifecycle dates and the successor reference are producer assertions; a
+consumer that needs a supported-until guarantee corroborates them out of
+band rather than trusting the extension alone.
 
 # Version Handling
 
@@ -1501,7 +1671,15 @@ MUST treat it as untrusted input. In particular:
 
 Logo URLs SHOULD use Data URIs [[RFC2397]] to avoid leaking client
 information through image fetch requests. Publishers SHOULD carefully
-consider what information is included in `extensions` fields.
+consider what information is included in `extensions` fields. In
+particular, the Lifecycle extension's dates and `replacedBy` reference may
+disclose an unreleased successor or an internal retirement schedule ahead
+of a public announcement, so publishers SHOULD expose only those lifecycle
+details intended for the catalog's audience. Furthermore, lifecycle dates
+and the successor reference are unsigned producer assertions unless carried
+in a signed Trust Manifest, so a consumer needing a supported-until
+guarantee MUST corroborate them out of band rather than trusting the
+extension alone.
 
 # Data Model Overview
 
@@ -1700,6 +1878,28 @@ Publisher = {
   identifier: text,
   displayName: text,
   ? identityType: text
+}
+```
+
+## Lifecycle Extension
+
+The following CDDL is INFORMATIVE. It describes the value of the
+`https://ai-catalog.org/extensions/lifecycle` entry in an `extensions`
+map (see [Lifecycle Metadata Extension](#lifecycle-metadata-extension)):
+
+```
+LifecycleExtension = {
+  ? status: text,
+  ? releaseDate: text,
+  ? deprecated: Deprecation
+}
+
+Deprecation = {
+  ? replacedBy: text,
+  ? deprecationDate: text,
+  ? endOfLifeDate: text,
+  ? breakingChanges: [+ text],
+  ? migrationGuide: text
 }
 ```
 
