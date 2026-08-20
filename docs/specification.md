@@ -19,10 +19,12 @@ The specification covers:
 - **Version handling** — compatibility rules for producers and consumers
 - **Security considerations** — trust layers, catalog poisoning, typosquatting, embedded content safety
 - **CDDL schema** — formal machine-readable schema
-- **Mappings** — how AI Catalog maps to OCI Distribution, MCP servers (via MCP Server Cards), and Claude Code Plugins
 
 ## Relationship to these docs
 
 The developer documentation you're reading now is a practical guide aimed at getting you productive quickly. It draws from the specification but is not normative.
+
+Informative ecosystem and distribution mappings are maintained separately
+in the [Mappings](mappings/index.md) section.
 
 When building a production implementation, refer to the specification for precise requirements — especially for Trust Manifest verification, signature algorithms, and conformance obligations.
