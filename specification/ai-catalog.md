@@ -203,7 +203,7 @@ A Catalog Entry object describes a single AI artifact in the catalog.
 It MUST contain the following members:
 
 `identifier`
-: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). However, to ensure interoperability, identity uniqueness, and discoverability, the standard `urn:air` naming structure is **HIGHLY RECOMMENDED** and **MUST** be used for open or federated systems.
+: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). Consumers that do not recognize an identifier scheme MUST treat the value as opaque. Identifier syntax alone does not verify publisher identity or establish trust. For open or federated systems, a globally unique absolute URI is RECOMMENDED. The `urn:air` naming structure is RECOMMENDED when the publisher assigns an identifier in a namespace it controls.
 
     **Standard Naming Format:**
     `urn:air:{publisher}:{namespace}:{name}`
@@ -219,7 +219,7 @@ It MUST contain the following members:
 
     For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.
 
-    See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present.
+    See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present, and [Registry Projection](#registry-projection) for identifiers assigned while projecting an existing registry.
 
 `type`
 : A string containing the identifier that specifies the type of the
@@ -468,6 +468,54 @@ For example, a catalog listing two versions of the same agent:
 
 Both entries share the same `identifier` but have distinct `version`
 values, so the combination is unique.
+
+## Registry Projection
+
+A registry projecting existing records MUST reuse any primary identifier
+it previously published for the artifact. On first publication,
+it SHOULD preserve a publisher-assigned identifier when the source is
+authorized to use that identifier or namespace. Otherwise, it SHOULD
+assign and persist a stable identifier in a namespace the registry
+controls. A registry MUST NOT infer namespace authorization from the
+artifact's URL or an unsigned `publisher` field.
+
+A registry MUST NOT silently replace a previously published primary
+identifier, including when an authorized publisher-assigned identifier
+becomes available later. Adopting a different primary identifier requires
+an explicit migration mechanism, which this specification does not define.
+
+A registry-assigned identifier identifies the artifact, not a particular
+version or registry record. It MUST remain stable across
+versions, registry-coordinate changes, and retrieval-URL changes, and
+MUST NOT be reassigned to another artifact. The registry assigning the
+identifier, the catalog `host`, and the artifact `publisher` are
+independent roles.
+
+Registry-native coordinates SHOULD be preserved in a namespaced entry
+extension when needed for lookup or round trips. They do not participate
+in catalog uniqueness or establish publisher identity, trust, or
+equivalence with another identifier.
+
+```json
+{
+  "identifier": "https://registry.example/ids/artifacts/7bf4a8c2",
+  "type": "application/a2a-agent-card+json",
+  "url": "https://registry.example/apis/registry/v3/groups/payments/artifacts/fraud-agent",
+  "publisher": {
+    "identifier": "did:web:acme.example",
+    "displayName": "Acme"
+  },
+  "extensions": {
+    "com.example.registry.coordinates": {
+      "registryUri": "https://registry.example",
+      "namespace": "payments",
+      "name": "fraud-agent"
+    }
+  }
+}
+```
+
+The extension key is illustrative.
 
 ## Publisher Object
 
