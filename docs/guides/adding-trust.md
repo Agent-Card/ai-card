@@ -81,7 +81,7 @@ All other fields are optional:
 | `privacyPolicyUrl` | URL to the privacy policy |
 | `termsOfServiceUrl` | URL to the terms of service |
 | `signature` | Detached JWS signature over the Trust Manifest content |
-| `metadata` | Open map for custom trust metadata |
+| `extensions` | Named extension map for custom trust data; included in the signed payload when the manifest is signed (see [Extensions](creating-a-catalog.md#extensions)) |
 
 !!! tip "Attestation document format"
     Attestation documents are not restricted to any particular format — they can be human-readable (e.g., a PDF audit report) or machine-readable for automated verification (e.g., JWTs, Verifiable Credentials).

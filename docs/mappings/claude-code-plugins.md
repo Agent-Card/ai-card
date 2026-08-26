@@ -34,7 +34,6 @@ plugins/
 |:---|:---|
 | `marketplace.json` (whole file) | AI Catalog document (top-level) |
 | Marketplace `name` | Catalog `host.displayName` |
-| Marketplace `description` | Catalog `metadata.description` |
 | Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
 | `plugins[]` array | Catalog `entries[]` array |
 | Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
@@ -44,7 +43,6 @@ plugins/
 | Plugin `author` | Entry `publisher` |
 | Plugin `source` (url, git-subdir, or path) | Entry `url` (pointing to the plugin repository) |
 | Plugin `source.sha` | Entry `trustManifest.provenance[].sourceDigest` |
-| Plugin `homepage` | Entry `metadata.homepage` |
 | Plugin `.claude-plugin/plugin.json` | The artifact content (referenced via `url`) |
 | *(not in marketplace)* | Entry `trustManifest` (identity, attestations) |
 | *(not in marketplace)* | Entry `type` |
@@ -91,28 +89,6 @@ maps to an AI Catalog where each plugin is an entry:
       "publisher": {
         "identifier": "did:web:anthropic.com",
         "displayName": "Anthropic"
-      },
-      "metadata": {
-        "homepage": "https://github.com/anthropics/claude-plugins-public/tree/main/plugins/agent-sdk-dev"
-      }
-    },
-    {
-      "identifier": "urn:claude-plugin:adspirer:ads-agent",
-      "type": "application/vnd.anthropic.claude-plugin+json",
-      "url": "https://github.com/amekala/adspirer-mcp-plugin.git",
-      "tags": ["productivity", "ads"],
-      "metadata": {
-        "homepage": "https://www.adspirer.com"
-      },
-      "trustManifest": {
-        "identity": "urn:claude-plugin:adspirer:ads-agent",
-        "provenance": [
-          {
-            "relation": "publishedFrom",
-            "sourceId": "https://github.com/amekala/adspirer-mcp-plugin",
-            "sourceDigest": "sha1:aa70dbdbbbb843e94a794c10c2b13f5dd66b5e40"
-          }
-        ]
       }
     },
     {

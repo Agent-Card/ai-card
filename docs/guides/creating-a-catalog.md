@@ -24,8 +24,8 @@ Two optional top-level fields round out a complete catalog:
 `host`
 :   Identifies the organization operating this catalog. Required for [Level 2 (Discoverable)](../getting-started.md#what-youve-built) conformance.
 
-`metadata`
-:   An open map for custom or vendor-specific properties. See [Metadata extensibility](#metadata-extensibility).
+`extensions`
+:   A map of custom or vendor-specific extensions, keyed by a URL or reverse-DNS name. See [Extensions](#extensions).
 
 ## Adding a `host` object
 
@@ -110,7 +110,7 @@ Enrich your entries with additional metadata:
 | `updatedAt` | string | ISO 8601 timestamp of last modification |
 | `publisher` | object | Who publishes this artifact (see [Publisher object](#publisher-object)) |
 | `trustManifest` | object | Trust and identity metadata (see [Adding Trust](adding-trust.md)) |
-| `metadata` | object | Custom key/value pairs (see [Metadata extensibility](#metadata-extensibility)) |
+| `extensions` | object | Named extensions (see [Extensions](#extensions)) |
 
 ### When to set `displayName`
 
@@ -221,19 +221,23 @@ The `publisher` field on an entry identifies who publishes that artifact:
 
 `identifier` and `displayName` are required. `identityType` is optional and provides a hint for resolving the identifier (`"did"`, `"dns"`, etc.).
 
-## Metadata extensibility
+## Extensions
 
-Both the top-level catalog object and individual entries support a `metadata` field for custom properties:
+Both the top-level catalog object and individual entries support an `extensions` map for custom properties. Each key identifies an extension and must be a URL or a reverse-DNS name. Consumers that do not recognize an extension key must ignore it without error.
+
+For generic key/value properties, use the official `https://ai-catalog.org/extensions/metadata` extension:
 
 ```json
-"metadata": {
-  "com.acme.region": "us-east-1",
-  "com.acme.sla": "99.9%",
-  "license": "Apache-2.0"
+"extensions": {
+  "https://ai-catalog.org/extensions/metadata": {
+    "region": "us-east-1",
+    "sla": "99.9%",
+    "license": "Apache-2.0"
+  }
 }
 ```
 
-Metadata keys should use reverse-DNS prefixes for vendor-specific keys (`com.acme.*`), or short unqualified names for broadly useful keys (`license`, `homepage`). Avoid shadowing standard fields like `displayName` or `tags`. Clients that don't recognize a key should ignore it.
+The value of this official extension is a schemaless object for generic key/value properties.
 
 ## Complete example
 
