@@ -17,10 +17,14 @@
  When multiple entries share the same identifier (with different version
  values), each entry MAY carry its own Trust Manifest. There is no
  requirement that all versions carry identical trust metadata — trust
-@@ -624,6 +634,48 @@
- "spiffe", "dns"). This field is OPTIONAL when the type is evident
- from the URI scheme.
+@@ -622,7 +632,50 @@
  
+ A string providing a type hint for the identity URI (e.g., "did",
+ "spiffe", "dns"). This field is OPTIONAL when the type is evident
+-from the URI scheme.
++from the URI scheme. It describes only identity; each entry of
++alsoKnownAs carries its own identityType member.
++
 +alsoKnownAs
 +
 +An array of Identity Alias objects, each asserting an identity of
@@ -62,11 +66,10 @@
 +rely on an alias from a manifest whose signature is absent or
 +fails verification (see
 +Verifying Alternative Identities).
-+
+ 
  trustSchema
  
- A Trust Schema object as defined in Trust Schema.
-@@ -689,6 +741,12 @@
+@@ -689,6 +742,12 @@
  {
  "identity": "did:web:acme.com:agent:finance",
  "identityType": "did",
@@ -79,7 +82,7 @@
  "trustSchema": {
  "identifier": "urn:trust:acme-enterprise-v1",
  "version": "1.0",
-@@ -1070,6 +1128,34 @@
+@@ -1070,6 +1129,34 @@
  Manifest signature. Consumers MUST treat publisher fields as advisory
  unless a verified publisher-identity attestation cryptographically
  binds publisher.identifier to the signed manifest's identity.
@@ -114,7 +117,7 @@
  
  Verifying Artifact Integrity
  
-@@ -1664,6 +1750,7 @@
+@@ -1664,6 +1751,7 @@
  class TrustManifest {
  identity string
  subject Subject
@@ -122,7 +125,7 @@
  trustSchema TrustSchema
  attestations Attestation[]
  provenance ProvenanceLink[]
-@@ -1674,6 +1761,10 @@
+@@ -1674,6 +1762,10 @@
  url string
  type string
  digest string
@@ -133,7 +136,7 @@
  }
  class TrustSchema {
  identifier string
-@@ -1696,6 +1787,7 @@
+@@ -1696,6 +1788,7 @@
  CatalogEntry --> "0..1" TrustManifest : trustManifest
  HostInfo --> "0..1" TrustManifest : trustManifest
  TrustManifest --> "0..1" Subject : subject
@@ -141,7 +144,7 @@
  TrustManifest --> "0..1" TrustSchema : trustSchema
  TrustManifest --> "*" Attestation : attestations
  TrustManifest --> "*" ProvenanceLink : provenance
-@@ -1852,6 +1944,7 @@
+@@ -1852,6 +1945,7 @@
  TrustManifest = {
  identity: text,
  ? identityType: text,
@@ -149,7 +152,7 @@
  ? trustSchema: TrustSchema,
  ? attestations: [* Attestation],
  ? provenance: [* ProvenanceLink],
-@@ -1859,6 +1952,11 @@
+@@ -1859,6 +1953,11 @@
  ? termsOfServiceUrl: text,
  ? signature: text,
  ? extensions: { * text => any }
@@ -161,7 +164,7 @@
  }
  
  TrustSchema = {
-@@ -1912,6 +2010,12 @@
+@@ -1912,6 +2011,12 @@
  "trustManifest": {
  "identity": "spiffe://acme.com/ns/finance/sa/finance-a2a-pod",
  "identityType": "spiffe",

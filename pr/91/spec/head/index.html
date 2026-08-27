@@ -648,7 +648,8 @@ present.</p>
 <dt><code>identityType</code></dt>
 <dd>A string providing a type hint for the <code>identity</code> URI (e.g., "did",
   "spiffe", "dns"). This field is OPTIONAL when the type is evident
-  from the URI scheme.</dd>
+  from the URI scheme. It describes only <code>identity</code>; each entry of
+  <code>alsoKnownAs</code> carries its own <code>identityType</code> member.</dd>
 <dt><code>alsoKnownAs</code></dt>
 <dd>
 <p>An array of Identity Alias objects, each asserting an identity of
