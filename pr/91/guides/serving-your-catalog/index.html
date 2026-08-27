@@ -12,29 +12,31 @@
         <meta name="author" content="Agent Card Working Group">
       
       
-        <link rel="canonical" href="https://agent-card.github.io/ai-catalog/">
+        <link rel="canonical" href="https://agent-card.github.io/ai-catalog/guides/serving-your-catalog/">
       
       
+        <link rel="prev" href="../consuming-catalogs/">
       
-        <link rel="next" href="specification/">
+      
+        <link rel="next" href="../adding-trust/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>AI Catalog</title>
+        <title>Serving Your Catalog - AI Catalog</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,7 +55,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ai-catalog" class="md-skip">
+        <a href="#serving-your-catalog" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +96,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="AI Catalog" class="md-header__button md-logo" aria-label="AI Catalog" data-md-component="logo">
+    <a href="../.." title="AI Catalog" class="md-header__button md-logo" aria-label="AI Catalog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Serving Your Catalog
             
           </span>
         </div>
@@ -232,7 +234,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="AI Catalog" class="md-nav__button md-logo" aria-label="AI Catalog" data-md-component="logo">
+    <a href="../.." title="AI Catalog" class="md-nav__button md-logo" aria-label="AI Catalog" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -259,39 +261,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -309,70 +282,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-it-looks-like" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What it looks like
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key features
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#who-is-this-for" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Who is this for?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Get started
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -384,7 +293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="specification/" class="md-nav__link">
+      <a href="../../specification/" class="md-nav__link">
         
   
   
@@ -413,7 +322,7 @@
   
   
     <li class="md-nav__item">
-      <a href="getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -439,6 +348,8 @@
       
   
   
+    
+  
   
   
     
@@ -467,17 +378,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="guides/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -503,7 +412,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -523,7 +432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/creating-a-catalog/" class="md-nav__link">
+      <a href="../creating-a-catalog/" class="md-nav__link">
         
   
   
@@ -551,7 +460,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/organizing-catalogs/" class="md-nav__link">
+      <a href="../organizing-catalogs/" class="md-nav__link">
         
   
   
@@ -579,7 +488,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/consuming-catalogs/" class="md-nav__link">
+      <a href="../consuming-catalogs/" class="md-nav__link">
         
   
   
@@ -604,10 +513,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="guides/serving-your-catalog/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving Your Catalog
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -623,6 +559,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#static-file-at-the-well-known-uri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static file at the well-known URI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#link-relation-discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Link relation discovery
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oci-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OCI Distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcp-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP servers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-catalogs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamic catalogs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verifying-your-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifying your catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -635,7 +657,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/adding-trust/" class="md-nav__link">
+      <a href="../adding-trust/" class="md-nav__link">
         
   
   
@@ -701,7 +723,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="examples/" class="md-nav__link ">
+            <a href="../../examples/" class="md-nav__link ">
               
   
   
@@ -747,7 +769,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/minimal-catalog/" class="md-nav__link">
+      <a href="../../examples/minimal-catalog/" class="md-nav__link">
         
   
   
@@ -775,7 +797,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/multi-protocol-agent/" class="md-nav__link">
+      <a href="../../examples/multi-protocol-agent/" class="md-nav__link">
         
   
   
@@ -803,7 +825,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/nested-catalogs/" class="md-nav__link">
+      <a href="../../examples/nested-catalogs/" class="md-nav__link">
         
   
   
@@ -838,7 +860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="implementations/" class="md-nav__link">
+      <a href="../../implementations/" class="md-nav__link">
         
   
   
@@ -867,7 +889,7 @@
   
   
     <li class="md-nav__item">
-      <a href="community/" class="md-nav__link">
+      <a href="../../community/" class="md-nav__link">
         
   
   
@@ -916,10 +938,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-looks-like" class="md-nav__link">
+  <a href="#static-file-at-the-well-known-uri" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it looks like
+        Static file at the well-known URI
       
     </span>
   </a>
@@ -927,10 +949,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-features" class="md-nav__link">
+  <a href="#link-relation-discovery" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key features
+        Link relation discovery
       
     </span>
   </a>
@@ -938,10 +960,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#who-is-this-for" class="md-nav__link">
+  <a href="#oci-distribution" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Who is this for?
+        OCI Distribution
       
     </span>
   </a>
@@ -949,10 +971,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
+  <a href="#mcp-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get started
+        MCP servers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-catalogs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamic catalogs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verifying-your-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verifying your catalog
       
     </span>
   </a>
@@ -979,94 +1023,99 @@
   
 
 
-<h1 id="ai-catalog">AI Catalog<a class="headerlink" href="#ai-catalog" title="Permanent link">&para;</a></h1>
-<p><strong>A JSON format for making all your AI artifacts discoverable.</strong></p>
-<p>The AI ecosystem is growing fast — MCP servers, A2A agents, Claude Code plugins, datasets, model cards. Each protocol defines its own discovery mechanism, forcing clients to implement bespoke logic for every artifact type.</p>
-<p>AI Catalog solves this with a simple, typed JSON format that indexes any kind of AI artifact in one place. Clients read one file. Publishers maintain one list.</p>
-<hr />
-<h2 id="what-it-looks-like">What it looks like<a class="headerlink" href="#what-it-looks-like" title="Permanent link">&para;</a></h2>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;specVersion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Acme Corp&quot;</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:web:acme-corp.com&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">&quot;entries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:air:acme-corp.com:mcp:weather&quot;</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/mcp-server-card+json&quot;</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://api.acme-corp.com/mcp/server-card&quot;</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:air:acme-corp.com:a2a:research&quot;</span><span class="p">,</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/a2a-agent-card+json&quot;</span><span class="p">,</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://agents.acme-corp.com/research&quot;</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:air:acme-corp.com:catalog:finance&quot;</span><span class="p">,</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">      </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Finance Suite&quot;</span><span class="p">,</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/ai-catalog+json&quot;</span><span class="p">,</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://acme-corp.com/catalogs/finance.json&quot;</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span><span class="p">]</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">}</span>
+<h1 id="serving-your-catalog">Serving Your Catalog<a class="headerlink" href="#serving-your-catalog" title="Permanent link">&para;</a></h1>
+<p>AI Catalog is intentionally location-independent — a catalog is valid wherever it lives, identified by its media type and <code>specVersion</code>, not its URL. This guide covers the main distribution models.</p>
+<h2 id="static-file-at-the-well-known-uri">Static file at the well-known URI<a class="headerlink" href="#static-file-at-the-well-known-uri" title="Permanent link">&para;</a></h2>
+<p>The simplest and most common approach: serve a static JSON file at the well-known URI.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://yourdomain.com/.well-known/ai-catalog.json
 </span></code></pre></div>
-<p>Serve it at <code>/.well-known/ai-catalog.json</code> and any AI client can discover everything you offer.</p>
-<hr />
-<h2 id="key-features">Key features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
-<div class="grid cards">
-<ul>
-<li>
-<p><strong>Artifact-agnostic</strong></p>
-<p>Uses a <code>type</code> field to identify artifact kinds — <code>application/mcp-server-card+json</code>, <code>application/a2a-agent-card+json</code>, and any future type — without defining their schema.</p>
-</li>
-<li>
-<p><strong>Progressive complexity</strong></p>
-<p>Start with just types and URLs. Add host identity, tags, and versions when you're ready. Layer in trust metadata only when you need it.</p>
-</li>
-<li>
-<p><strong>Composable and nestable</strong></p>
-<p>Catalog entries can point to other catalogs, enabling hierarchical organization and multi-artifact packaging.</p>
-</li>
-<li>
-<p><strong>Location independent</strong></p>
-<p>Catalogs work at <code>/.well-known/</code>, as API responses, embedded in registries, or as local files. No special infrastructure required.</p>
-</li>
-<li>
-<p><strong>Optional trust layer</strong></p>
-<p>The Trust Manifest extension adds verifiable identity, compliance attestations, and provenance tracking — without modifying the catalog structure.</p>
-</li>
-<li>
-<p><strong>Federation-ready</strong></p>
-<p>Sub-catalogs can be authored, hosted, and updated independently by different teams or organizations.</p>
-</li>
-</ul>
+<p>This path is a <a href="https://www.rfc-editor.org/rfc/rfc8615">well-known URI (RFC 8615)</a> registered with IANA. AI clients performing domain-level discovery check this path automatically — no prior configuration needed.</p>
+<p>Serve the file over HTTPS with the <code>Content-Type</code> header:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Content-Type: application/ai-catalog+json
+</span></code></pre></div>
+<p>This is the recommended starting point. It works with any static file host, CDN, or web server.</p>
+<div class="admonition important">
+<p class="admonition-title">HTTPS is required</p>
+<p>Always serve your catalog over HTTPS (TLS 1.2+).</p>
 </div>
-<hr />
-<h2 id="who-is-this-for">Who is this for?<a class="headerlink" href="#who-is-this-for" title="Permanent link">&para;</a></h2>
-<p><strong>AI tool publishers</strong> — Expose your MCP servers, A2A agents, or plugins through a single discoverable endpoint.</p>
-<p><strong>Platform and enterprise teams</strong> — Organize a large AI artifact inventory into browsable, hierarchical catalogs.</p>
-<p><strong>Registry builders</strong> — Provide a standard discovery interface across multiple artifact types.</p>
-<p><strong>Client developers</strong> — Write one discovery flow that works for all AI artifact types.</p>
-<hr />
-<h2 id="get-started">Get started<a class="headerlink" href="#get-started" title="Permanent link">&para;</a></h2>
-<div class="grid cards">
-<ul>
-<li><a href="getting-started/"><strong>Quickstart</strong> — get a catalog live in 5 minutes</a></li>
-<li><a href="guides/creating-a-catalog/"><strong>Creating a Catalog</strong> — detailed authoring guide</a></li>
-<li><a href="guides/consuming-catalogs/"><strong>Consuming Catalogs</strong> — guide for client developers</a></li>
-<li><a href="specification/"><strong>Full Specification</strong> — normative reference</a></li>
-</ul>
-</div>
+<h2 id="link-relation-discovery">Link relation discovery<a class="headerlink" href="#link-relation-discovery" title="Permanent link">&para;</a></h2>
+<p>Your catalog doesn't have to live at <code>/.well-known/</code> only. Any URL works — you just need to advertise it. Add an <code>ai-catalog</code> link relation to your HTTP responses or HTML pages so clients can find it:</p>
+<p><strong>HTTP <code>Link</code> header:</strong></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Link: &lt;https://yourdomain.com/catalog/ai.json&gt;; rel=&quot;ai-catalog&quot;
+</span></code></pre></div>
+<p><strong>HTML <code>&lt;link&gt;</code> element:</strong></p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;ai-catalog&quot;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>      <span class="na">href</span><span class="o">=</span><span class="s">&quot;/catalog/ai.json&quot;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>      <span class="na">type</span><span class="o">=</span><span class="s">&quot;application/ai-catalog+json&quot;</span><span class="p">&gt;</span>
+</span></code></pre></div>
+<p>When clients visit your site, they check for this relation first, then fall back to the well-known URI. This is useful if you want the catalog at a non-standard path, or if you need to serve different catalogs from different pages of a multi-tenant platform.</p>
+<h2 id="oci-distribution">OCI Distribution<a class="headerlink" href="#oci-distribution" title="Permanent link">&para;</a></h2>
+<p>For environments that need content-addressed storage, signing, and global replication, AI Catalog documents can be distributed through OCI registries using existing container infrastructure.</p>
+<p>The mapping works as follows:</p>
+<table>
+<thead>
+<tr>
+<th>AI Catalog (logical)</th>
+<th>OCI (physical)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AI Catalog document</td>
+<td>OCI Image Index with <code>artifactType: "application/ai-catalog+json"</code></td>
+</tr>
+<tr>
+<td>Catalog Entry</td>
+<td>OCI Image Manifest with <code>artifactType</code> set to the entry's <code>type</code></td>
+</tr>
+<tr>
+<td>Entry artifact content</td>
+<td>Manifest <code>layers[0]</code> blob</td>
+</tr>
+<tr>
+<td>Entry metadata</td>
+<td>Manifest <code>config</code> blob and/or <code>annotations</code></td>
+</tr>
+<tr>
+<td>Nested catalog entry</td>
+<td>Nested OCI Image Index</td>
+</tr>
+<tr>
+<td>Trust Manifest</td>
+<td>OCI Referrer artifact attached to the entry manifest</td>
+</tr>
+</tbody>
+</table>
+<p>The logical AI Catalog format remains the authoring and consumption interface — tooling handles the OCI pack/unpack:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Authoring                    Distribution              Consumption
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>─────────                    ────────────              ───────────
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>ai-catalog.json  ─ pack ─►  OCI Registry  ─ unpack ─► ai-catalog.json
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>  entries[]                  Index/Manifests             entries[]
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>  trustManifest              Referrers                   trustManifest
+</span></code></pre></div>
+<p>Clients that fetch from <code>/.well-known/ai-catalog.json</code> or a registry API always receive the logical JSON format — they never parse OCI structures directly.</p>
+<p>OCI distribution provides Layer 3 trust: all content is addressed by cryptographic digest, making substitution structurally impossible. See <a href="../adding-trust/#trust-layers">Adding Trust</a> for how this fits into the progressive trust model.</p>
+<p>For the full OCI mapping specification including the Image Index structure and Referrers API usage, refer to the <a href="../../specification/">Full Specification</a>.</p>
+<h2 id="mcp-servers">MCP servers<a class="headerlink" href="#mcp-servers" title="Permanent link">&para;</a></h2>
+<p>Remote (HTTP-connectable) MCP servers map to AI Catalog entries by referencing each server's <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127">MCP Server Card</a>. Each MCP server becomes a catalog entry with <code>type: "application/mcp-server-card+json"</code> whose <code>url</code> points to the server's Server Card. A domain — or a registry — that hosts several MCP servers can publish them all as a single AI Catalog.</p>
+<p>This enables cross-protocol discovery: a client that understands AI Catalog can discover MCP servers alongside A2A agents, datasets, and other artifact types from a single endpoint.</p>
+<h2 id="dynamic-catalogs">Dynamic catalogs<a class="headerlink" href="#dynamic-catalogs" title="Permanent link">&para;</a></h2>
+<p>Nothing requires a static file. A catalog can be generated dynamically by an API endpoint — for example, serving different entries based on the caller's identity or filtering by query parameters. The response just needs to be valid <code>application/ai-catalog+json</code> JSON with <code>specVersion</code> and <code>entries</code>.</p>
+<h2 id="verifying-your-catalog">Verifying your catalog<a class="headerlink" href="#verifying-your-catalog" title="Permanent link">&para;</a></h2>
+<p>After deploying, verify:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Check headers and status</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>-I<span class="w"> </span>https://yourdomain.com/.well-known/ai-catalog.json
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Fetch and validate the JSON</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>curl<span class="w"> </span>-s<span class="w"> </span>https://yourdomain.com/.well-known/ai-catalog.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>json.tool
+</span></code></pre></div>
+<p>A well-served catalog returns HTTP 200, a <code>Content-Type</code> containing <code>json</code>, and a body with <code>specVersion</code> and <code>entries</code> fields.</p>
 
 
 
 
 
 
-
-  
-  
 
 
 
@@ -1095,15 +1144,31 @@
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../consuming-catalogs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Consuming Catalogs">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Consuming Catalogs
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="specification/" class="md-footer__link md-footer__link--next" aria-label="Next: Specification">
+          <a href="../adding-trust/" class="md-footer__link md-footer__link--next" aria-label="Next: Adding Trust">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Specification
+                Adding Trust
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1171,10 +1236,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.instant.prefetch", "navigation.tracking", "navigation.expand", "navigation.top", "navigation.footer", "navigation.indexes", "navigation.sections", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.prefetch", "navigation.tracking", "navigation.expand", "navigation.top", "navigation.footer", "navigation.indexes", "navigation.sections", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
