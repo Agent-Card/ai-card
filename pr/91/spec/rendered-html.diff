@@ -1,0 +1,185 @@
+--- a/base/index.html
++++ b/head/index.html
+@@ -18,6 +18,12 @@
+                   "href": "https://github.com/xregistry/spec",
+                   "status": "Draft",
+                   "publisher": "CNCF"
++            },
++            "RFC3986": {
++                  "title": "Uniform Resource Identifier (URI): Generic Syntax",
++                  "href": "https://www.rfc-editor.org/rfc/rfc3986",
++                  "status": "RFC",
++                  "publisher": "IETF"
+             },
+             "RFC8785": {
+                   "title": "JSON Canonicalization Scheme (JCS)",
+@@ -597,6 +603,15 @@
+ payload, rather than inferred only from unsigned entry context.</p>
+ <p>When a Trust Manifest appears on a Host Info object, <code>identity</code>
+ SHOULD match the host's <code>identifier</code> field when present.</p>
++<p>An artifact may legitimately hold more than one verifiable identity at
++the same time, for example a SPIFFE ID for runtime workload identity
++and a DID for publisher-anchored organizational identity, or it may
++retain a former identifier after a rename or migration between
++identities or schemes. Additional identities are declared through the
++OPTIONAL <code>alsoKnownAs</code> member (see <a href="#optional-members">Optional Members</a>). 
++The <code>identity</code> field remains the single canonical subject identifier:
++consumers MUST use <code>identity</code> when referencing the artifact's trust
++subject or checking identity equivalence between entries.</p>
+ <p>When multiple entries share the same <code>identifier</code> (with different <code>version</code>
+ values), each entry MAY carry its own Trust Manifest. There is no
+ requirement that all versions carry identical trust metadata — trust
+@@ -631,9 +646,47 @@
+ <p>The following members are OPTIONAL:</p>
+ <dl>
+ <dt><code>identityType</code></dt>
+-<dd>A string providing a type hint for the identity URI (e.g., "did",
++<dd>A string providing a type hint for the <code>identity</code> URI (e.g., "did",
+   "spiffe", "dns"). This field is OPTIONAL when the type is evident
+   from the URI scheme.</dd>
++<dt><code>alsoKnownAs</code></dt>
++<dd>
++<p>An array of Identity Alias objects, each asserting an identity of
++  the same subject as <code>identity</code> under an alternative identity
++  scheme. An Identity Alias object MUST contain:</p>
++<dl>
++<dt><code>identity</code></dt>
++<dd>A string containing a globally unique URI [[RFC3986]] that
++  identifies the same subject as the manifest's canonical
++  <code>identity</code>.</dd>
++</dl>
++<p>An Identity Alias object MAY contain:</p>
++<dl>
++<dt><code>identityType</code></dt>
++<dd>A string providing a type hint for the alias <code>identity</code> URI
++  (e.g., "did", "spiffe", "dns"). This member is OPTIONAL when
++  the type is evident from the URI scheme.</dd>
++</dl>
++<p>The following rules apply:</p>
++<ul>
++<li>An alias is an equivalent identity of the subject; the
++  manifest's <code>identity</code> alone remains canonical and is used for
++  referencing and equivalence checking. Aliases MAY also record
++  former identifiers of the subject, preserving continuity after
++  a rename or a migration between identities or schemes.</li>
++<li>The array is an unordered set: it MUST NOT contain two aliases
++  with the same <code>identity</code> value, and no alias <code>identity</code> may
++  equal the manifest's canonical <code>identity</code>.</li>
++<li>The domain-alignment rule defined in <a href="#identity">Identity</a>
++  applies only to the canonical <code>identity</code>. Aliases MAY belong to
++  different trust domains or identity schemes.</li>
++<li>Aliases are publisher claims covered by the Trust Manifest
++  <code>signature</code>; no per-alias proof is required. Consumers MUST NOT
++  rely on an alias from a manifest whose signature is absent or
++  fails verification (see
++  <a href="#verifying-alternative-identities">Verifying Alternative Identities</a>).</li>
++</ul>
++</dd>
+ <dt><code>trustSchema</code></dt>
+ <dd>A Trust Schema object as defined in <a href="#trust-schema-object">Trust Schema</a>.</dd>
+ <dt><code>attestations</code></dt>
+@@ -679,6 +732,12 @@
+ <pre><code class="language-json">{
+   &quot;identity&quot;: &quot;did:web:acme.com:agent:finance&quot;,
+   &quot;identityType&quot;: &quot;did&quot;,
++  &quot;alsoKnownAs&quot;: [
++    {
++      &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-agent-pod&quot;,
++      &quot;identityType&quot;: &quot;spiffe&quot;
++    }
++  ],
+   &quot;trustSchema&quot;: {
+     &quot;identifier&quot;: &quot;urn:trust:acme-enterprise-v1&quot;,
+     &quot;version&quot;: &quot;1.0&quot;,
+@@ -1006,6 +1065,31 @@
+ Manifest signature. Consumers MUST treat <code>publisher</code> fields as advisory
+ unless a verified <code>publisher-identity</code> attestation cryptographically
+ binds <code>publisher.identifier</code> to the signed manifest's <code>identity</code>.</p>
++</section>
++<section id="verifying-alternative-identities">
++<h3>Verifying Alternative Identities</h3>
++<p>Aliases need no verification procedure of their own. Because the
++signed payload covers <code>alsoKnownAs</code>, verifying the Trust Manifest
++<code>signature</code> as described in
++<a href="#trust-manifest-signatures">Trust Manifest Signatures</a> also verifies
++every listed alias: a valid signature proves that the publisher
++controlling the canonical <code>identity</code> claims each alias as an
++equivalent identity of the subject. Consumers MUST NOT rely on aliases
++from a manifest whose signature is absent or fails verification.</p>
++<p>Signature verification itself always keys off the canonical identity:
++the verification key is resolved from <code>identity</code> as described in
++<a href="#trust-manifest-signatures">Trust Manifest Signatures</a>. A consumer
++that cannot resolve the canonical identity scheme cannot verify the
++signature and therefore cannot rely on any alias.</p>
++<p>Once the signature is verified, a consumer MAY use whichever identity,
++canonical or alias, fits the identity schemes its tooling operates
++on. For example, after verifying the signature through a resolvable
++canonical DID <code>identity</code>, the consumer can use a SPIFFE ID alias to
++match the artifact's runtime workload identity.</p>
++<p>Note that the signature proves the publisher claims the alias, not
++that the alias's own trust domain acknowledges the link. Consumers
++making authorization decisions inside the alias's trust domain MAY
++additionally obtain proof of control native to the alias scheme.</p>
+ </section>
+ <section id="verifying-artifact-integrity">
+ <h3>Verifying Artifact Integrity</h3>
+@@ -1555,6 +1639,7 @@
+     class TrustManifest {
+         identity string
+         subject Subject
++        alsoKnownAs IdentityAlias[]
+         trustSchema TrustSchema
+         attestations Attestation[]
+         provenance ProvenanceLink[]
+@@ -1565,6 +1650,10 @@
+         url string
+         type string
+         digest string
++    }
++    class IdentityAlias {
++        identity string
++        identityType string
+     }
+     class TrustSchema {
+         identifier string
+@@ -1587,6 +1676,7 @@
+     CatalogEntry --> "0..1" TrustManifest : trustManifest
+     HostInfo --> "0..1" TrustManifest : trustManifest
+     TrustManifest --> "0..1" Subject : subject
++    TrustManifest --> "*" IdentityAlias : alsoKnownAs
+     TrustManifest --> "0..1" TrustSchema : trustSchema
+     TrustManifest --> "*" Attestation : attestations
+     TrustManifest --> "*" ProvenanceLink : provenance
+@@ -1711,6 +1801,7 @@
+ <pre><code>TrustManifest = {
+   identity: text,
+   ? identityType: text,
++  ? alsoKnownAs: [* IdentityAlias],
+   ? trustSchema: TrustSchema,
+   ? attestations: [* Attestation],
+   ? provenance: [* ProvenanceLink],
+@@ -1718,6 +1809,11 @@
+   ? termsOfServiceUrl: text,
+   ? signature: text,
+   ? extensions: { * text =&gt; any }
++}
++
++IdentityAlias = {
++  identity: text,
++  ? identityType: text
+ }
+ 
+ TrustSchema = {
+@@ -1772,6 +1868,12 @@
+       &quot;trustManifest&quot;: {
+         &quot;identity&quot;: &quot;spiffe://acme.com/ns/finance/sa/finance-a2a-pod&quot;,
+         &quot;identityType&quot;: &quot;spiffe&quot;,
++        &quot;alsoKnownAs&quot;: [
++          {
++            &quot;identity&quot;: &quot;did:web:acme-corp.com:agent:finance-a2a&quot;,
++            &quot;identityType&quot;: &quot;did&quot;
++          }
++        ],
+         &quot;attestations&quot;: [
+           {
+             &quot;type&quot;: &quot;publisher-identity&quot;,
