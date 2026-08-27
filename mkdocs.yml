@@ -95,6 +95,13 @@ nav:
       - Minimal Catalog: examples/minimal-catalog.md
       - Multi-Protocol Agent: examples/multi-protocol-agent.md
       - Nested Catalogs: examples/nested-catalogs.md
+  - Mappings:
+      - mappings/index.md
+      - Distribution Substrates: mappings/distribution-substrates.md
+      - OCI Distribution: mappings/oci-distribution.md
+      - xRegistry: mappings/xregistry.md
+      - MCP Servers: mappings/mcp-servers.md
+      - Claude Code Plugins: mappings/claude-code-plugins.md
   - Implementations: implementations.md
   - Community: community/index.md
 
