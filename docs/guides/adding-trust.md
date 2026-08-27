@@ -75,6 +75,7 @@ All other fields are optional:
 | Field | Description |
 |---|---|
 | `identityType` | Type hint for the identity URI: `"did"`, `"spiffe"`, `"dns"` |
+| `alsoKnownAs` | Array of Identity Alias objects declaring alternative identities of the same subject |
 | `trustSchema` | Describes the trust framework applied |
 | `attestations` | Array of compliance and identity attestation objects |
 | `provenance` | Array of provenance links (source code, OCI digests) |

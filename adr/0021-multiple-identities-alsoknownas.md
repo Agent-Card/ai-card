@@ -1,4 +1,4 @@
-# ADR 0019: Support Multiple Identities via `alsoKnownAs` in the Trust Manifest
+# ADR 0021: Support Multiple Identities via `alsoKnownAs` in the Trust Manifest
 
 ## Status
 Proposed

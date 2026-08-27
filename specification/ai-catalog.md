@@ -573,7 +573,8 @@ The following members are OPTIONAL:
 `identityType`
 : A string providing a type hint for the `identity` URI (e.g., "did",
   "spiffe", "dns"). This field is OPTIONAL when the type is evident
-  from the URI scheme.
+  from the URI scheme. It describes only `identity`; each entry of
+  `alsoKnownAs` carries its own `identityType` member.
 
 `alsoKnownAs`
 : An array of Identity Alias objects, each asserting an identity of
