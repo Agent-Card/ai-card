@@ -42,7 +42,6 @@ plugins/
 | Plugin `tags` | Entry `tags[]` (merged with category) |
 | Plugin `author` | Entry `publisher` |
 | Plugin `source` (url, git-subdir, or path) | Entry `url` (pointing to the plugin repository) |
-| Plugin `source.sha` | Entry `trustManifest.provenance[].sourceDigest` |
 | Plugin `.claude-plugin/plugin.json` | The artifact content (referenced via `url`) |
 | *(not in marketplace)* | Entry `trustManifest` (identity, attestations) |
 | *(not in marketplace)* | Entry `type` |
@@ -50,13 +49,12 @@ plugins/
 
 ## Source Types
 
-The marketplace supports three source types for plugins. Each maps
-differently to AI Catalog entry fields:
+The following examples show how marketplace source forms map to AI
+Catalog entry fields:
 
 Direct URL source
-: `{"source": "url", "url": "https://github.com/org/repo.git", "sha": "..."}`
-  maps to entry `url` pointing at the repository, with `sha` captured
-  as provenance digest.
+: `{"source": "url", "url": "https://github.com/org/repo.git"}` maps to
+  entry `url` pointing at the repository.
 
 Git subdirectory source
 : `{"source": "git-subdir", "url": "org/repo", "path": "plugins/name", "ref": "main"}`
@@ -68,9 +66,9 @@ Local path source
 
 ## Marketplace as AI Catalog
 
-The `marketplace.json` from
+The `agent-sdk-dev` plugin from
 [claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
-maps to an AI Catalog where each plugin is an entry:
+maps to an AI Catalog as follows:
 
 ```json
 {
@@ -89,26 +87,6 @@ maps to an AI Catalog where each plugin is an entry:
       "publisher": {
         "identifier": "did:web:anthropic.com",
         "displayName": "Anthropic"
-      }
-    },
-    {
-      "identifier": "urn:claude-plugin:aikido:security",
-      "type": "application/vnd.anthropic.claude-plugin+json",
-      "url": "https://github.com/AikidoSec/aikido-claude-plugin.git",
-      "tags": ["security"],
-      "publisher": {
-        "identifier": "did:web:aikido.dev",
-        "displayName": "Aikido Security"
-      },
-      "trustManifest": {
-        "identity": "urn:claude-plugin:aikido:security",
-        "provenance": [
-          {
-            "relation": "publishedFrom",
-            "sourceId": "https://github.com/AikidoSec/aikido-claude-plugin",
-            "sourceDigest": "sha1:d7fa8b8e192680d9a26c1a5dcaead7cf5cdb7139"
-          }
-        ]
       }
     }
   ]
@@ -161,25 +139,21 @@ listing available plugins. AI Catalog extends this with:
    or publisher verification. Trust Manifests provide verifiable
    publisher identity and compliance metadata.
 
-2. **Source integrity**: The marketplace includes optional `sha` fields
-   on source references. AI Catalog formalizes this as provenance links
-   with typed relations and cryptographic digests.
-
-3. **Cross-ecosystem discovery**: Plugins become discoverable alongside
+2. **Cross-ecosystem discovery**: Plugins become discoverable alongside
    MCP servers, A2A agents, and other artifacts through the standard
    `/.well-known/ai-catalog.json` convention — not only within Claude
    Code's `/plugin` system.
 
-4. **Media type identification**: The marketplace does not type its
+3. **Media type identification**: The marketplace does not type its
    plugins. AI Catalog assigns `application/vnd.anthropic.claude-plugin+json`
    enabling clients to filter and route by artifact type.
 
-5. **Composability**: Plugin packages that combine skills, MCP servers,
+4. **Composability**: Plugin packages that combine skills, MCP servers,
    and commands can be represented as nested catalogs, making the
    internal structure of a plugin package explicit and independently
    addressable.
 
-6. **Decentralized publishing**: Any domain can publish Claude Code
+5. **Decentralized publishing**: Any domain can publish Claude Code
    plugins via AI Catalog without submitting to the centralized
    marketplace repository.
 
