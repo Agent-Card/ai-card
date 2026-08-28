@@ -1,159 +1,183 @@
-# Mapping to Claude Code Plugins Marketplace
+# Mapping to Claude Code Plugin Marketplaces
 
-This guide describes how the Anthropic Claude Code Plugins
-marketplace format (see
-[claude-plugins-official](https://github.com/anthropics/claude-plugins-official))
-maps to AI Catalog, enabling Claude Code plugins to be discovered,
-indexed, and distributed through a unified catalog alongside other AI
-artifacts.
+This guide describes how a
+[Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces)
+can be represented as an AI Catalog, enabling Claude Code plugins to be
+discovered and indexed alongside other AI artifacts.
 
 ## Overview
 
-The Claude Code Plugins marketplace is defined by a `marketplace.json`
-file that lists available plugins. Each plugin is a directory containing
-a `.claude-plugin/plugin.json` metadata file and optional components:
-MCP server configurations (`.mcp.json`), slash commands (`commands/`),
-agent definitions (`agents/`), and skill definitions (`skills/`).
+A Claude Code plugin marketplace is defined by a `marketplace.json` file
+that lists plugin definitions and tells Claude Code how to install them.
+A plugin source is an installation locator; it is not necessarily a URL
+that retrieves a single artifact document.
 
-```
-marketplace.json                    # Top-level plugin directory
-plugins/
-  example-plugin/
-    .claude-plugin/
-      plugin.json                   # Plugin metadata (name, description, author)
-    .mcp.json                       # MCP server config (optional)
-    commands/                       # Slash commands (optional)
-    agents/                         # Agent definitions (optional)
-    skills/                         # Skill definitions (optional)
-    README.md
-```
+This guide illustrates a projection that catalogs a manifest-backed
+plugin's `.claude-plugin/plugin.json` as its artifact document.
+
+Claude Code's `strict` field controls where component definitions come
+from. With `strict: true` (the default), `plugin.json` is authoritative
+for component definitions, but the marketplace entry may supplement it.
+With `strict: false`, the marketplace entry is the complete definition
+and `plugin.json` is not required. This manifest-backed projection
+applies only when `plugin.json` contains the complete component
+definition. Otherwise, the operator must materialize the effective
+definition or choose another artifact representation.
+
+The guide assumes that the AI Catalog operator is also the marketplace
+operator. When they are different, the catalog operator supplies its own
+`host` information rather than deriving it from marketplace `owner`
+metadata.
+
+The projection is not entirely mechanical. The catalog operator assigns
+globally unique entry identifiers, chooses the artifact representation
+and media type, resolves installation sources to retrievable artifact
+documents, and supplies any verifiable host or publisher identifiers.
 
 ## Conceptual Mapping
 
-| Claude Plugins Marketplace | AI Catalog Equivalent |
-|:---|:---|
-| `marketplace.json` (whole file) | AI Catalog document (top-level) |
-| Marketplace `name` | Catalog `host.displayName` |
-| Marketplace `owner` | Catalog `host` (with `identifier` derived from owner) |
-| `plugins[]` array | Catalog `entries[]` array |
-| Plugin `name` | Entry `identifier` (derived as URN); the plugin manifest carries its own name, so entry `displayName` is omitted |
-| Plugin `description` | Stays in the plugin manifest (which carries its own `description`); entry `description` is omitted to avoid duplicating a value that can drift |
-| Plugin `category` | Entry `tags[]` (first tag) |
-| Plugin `tags` | Entry `tags[]` (merged with category) |
-| Plugin `author` | Entry `publisher` |
-| Plugin `source` (url, git-subdir, or path) | Entry `url` (pointing to the plugin repository) |
-| Plugin `.claude-plugin/plugin.json` | The artifact content (referenced via `url`) |
-| *(not in marketplace)* | Entry `trustManifest` (identity, attestations) |
-| *(not in marketplace)* | Entry `type` |
-| Centralized marketplace repo | AI Catalog (decentralized, any URL) |
+| Claude plugin marketplace | AI Catalog field | Mapping rule |
+|:---|:---|:---|
+| `marketplace.json` (whole file) | AI Catalog document | Project each plugin supported by this profile to an entry. |
+| Marketplace `owner.name` | Candidate for catalog `host.displayName` | The catalog operator may use it when the same operator publishes both documents. Otherwise, the catalog operator supplies `host`. |
+| Marketplace `owner.email` | No core equivalent | Contact information does not establish a verifiable `host.identifier`. |
+| Marketplace `name`, `description`, `version`, and dependency policy | No direct core equivalent | These describe the Claude marketplace rather than the catalog host or an individual artifact. |
+| `plugins[]` | Catalog `entries[]` | Each manifest-backed plugin becomes one entry. |
+| Plugin `name` | Input to entry `identifier` | The name is scoped to its marketplace. The catalog operator assigns a globally unique identifier; it cannot derive the publisher authority from the name alone. |
+| Plugin `displayName` and `description` | Entry `displayName` and `description`, conditionally | Omit them when the referenced artifact directly exposes the canonical values. Include them when clients would otherwise need to process an archive, when the artifact lacks them, or when they are intentional catalog-level values. |
+| Plugin `version` | Entry `version`, conditionally | Omit it when a single referenced artifact directly exposes the canonical version. Include it when clients would otherwise need to process an archive or when catalog-level version selection requires it; when present, it must match the artifact. |
+| Plugin `category`, `tags`, and `keywords` | Entry `tags[]` | Merge and deduplicate the discovery terms selected for the catalog. |
+| Plugin `author.name` | Entry `publisher.displayName`, conditionally | The author may be used only when independently established as the publishing organization and paired with a verifiable identifier for that same entity. |
+| Plugin `source` | Input to entry `url` or `data` | The operator resolves the installation locator, then publishes or references a complete artifact representation. A repository or directory URL is not itself an artifact document. |
+| Plugin `homepage`, `repository`, and `license` | No direct core equivalent | They remain Claude metadata unless the artifact carries them or a separately defined extension preserves them. |
+| Plugin component fields and `strict` | Plugin artifact content and projection policy | They determine the effective Claude component definition. Publishing a component in another artifact format requires a separately defined conversion. |
+| *(not in marketplace metadata)* | Entry `type` | The catalog operator selects a type that describes the representation carried by `url` or `data`. |
+| *(not established by marketplace metadata)* | Entry, host, or publisher `identifier` | The responsible catalog operator or artifact publisher supplies the identifier. |
+| *(not in marketplace metadata)* | `trustManifest` | Add only independently established identity, attestation, or provenance information. Trust cannot be inferred from marketplace metadata. |
 
-## Source Types
+## Resolving Plugin Sources
 
-The following examples show how marketplace source forms map to AI
-Catalog entry fields:
+Claude Code supports several plugin source forms. Refer to the
+[Claude Code marketplace documentation](https://code.claude.com/docs/en/plugin-marketplaces#plugin-sources)
+for their current syntax.
 
-Direct URL source
-: `{"source": "url", "url": "https://github.com/org/repo.git"}` maps to
-  entry `url` pointing at the repository.
-
-Git subdirectory source
-: `{"source": "git-subdir", "url": "org/repo", "path": "plugins/name", "ref": "main"}`
-  maps to entry `url` constructed from the repository, path, and ref.
-
-Local path source
-: `"./plugins/name"` or `"./external_plugins/name"` maps to entry `url`
-  pointing at the known repository location for the plugin directory.
+Regardless of source form, an AI Catalog entry must contain a complete
+artifact representation through `url` or `data`. A `url` retrieves the
+artifact document represented by the entry, and that document should be
+served with the media type declared by `type`. For this manifest-backed
+profile, an operator resolves the installation source and publishes or
+references `.claude-plugin/plugin.json` at a stable URL.
 
 ## Marketplace as AI Catalog
 
-The `agent-sdk-dev` plugin from
-[claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
-maps to an AI Catalog as follows:
+The following synthetic `marketplace.json` contains one plugin while
+covering representative marketplace and plugin metadata:
+
+```json
+{
+  "name": "example-tools",
+  "description": "Claude Code plugins maintained by the Example Marketplace Team",
+  "version": "2026.1",
+  "owner": {
+    "name": "Example Marketplace Team",
+    "email": "marketplace@example.com"
+  },
+  "plugins": [
+    {
+      "name": "review-tools",
+      "category": "development",
+      "tags": ["code-review"],
+      "source": {
+        "source": "git-subdir",
+        "url": "https://git.example/example/claude-plugins.git",
+        "path": "plugins/review-tools",
+        "ref": "v1.2.0"
+      },
+      "strict": true
+    }
+  ]
+}
+```
+
+The referenced `.claude-plugin/plugin.json` provides the plugin's
+canonical metadata:
+
+```json
+{
+  "name": "review-tools",
+  "displayName": "Review Tools",
+  "description": "Adds code-review workflows to Claude Code",
+  "version": "1.2.0",
+  "author": {
+    "name": "Example Plugin Team",
+    "email": "plugins@example.com"
+  },
+  "homepage": "https://plugins.example/review-tools",
+  "repository": "https://git.example/example/claude-plugins",
+  "license": "Apache-2.0",
+  "keywords": ["review", "quality"]
+}
+```
+
+This projection makes the following assumptions:
+
+- The catalog operator uses the marketplace owner's name for
+  `host.displayName`.
+- The operator publishes the manifest at the stable URL below and uses
+  the illustrative operator-defined media type shown.
+- The operator has independently verified that Example Plugin Team
+  controls `plugins.example`.
+- The publisher has authorized the corresponding `urn:air` identifier.
+
+Under these assumptions, the operator can represent the marketplace as
+follows:
 
 ```json
 {
   "specVersion": "1.0",
   "host": {
-    "displayName": "Claude Code Plugins Directory",
-    "identifier": "did:web:anthropic.com",
-    "documentationUrl": "https://code.claude.com/docs/en/plugins"
+    "displayName": "Example Marketplace Team"
   },
   "entries": [
     {
-      "identifier": "urn:claude-plugin:anthropic:agent-sdk-dev",
-      "type": "application/vnd.anthropic.claude-plugin+json",
-      "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev",
-      "tags": ["development"],
+      "identifier": "urn:air:plugins.example:claude-code:review-tools",
+      "type": "application/vnd.example.claude-code-plugin+json",
+      "url": "https://plugins.example/artifacts/review-tools/1.2.0/plugin.json",
+      "tags": ["development", "code-review", "review", "quality"],
       "publisher": {
-        "identifier": "did:web:anthropic.com",
-        "displayName": "Anthropic"
+        "identifier": "plugins.example",
+        "displayName": "Example Plugin Team"
       }
     }
   ]
 }
 ```
 
-## Plugin Packages as Nested Catalogs
-
-A plugin that contains multiple components (MCP servers, skills,
-commands, agents) naturally maps to a nested AI Catalog. This
-mirrors the plugin directory structure where a single plugin
-contains multiple artifact types:
-
-```json
-{
-  "identifier": "urn:claude-plugin:anthropic:example-plugin",
-  "displayName": "example-plugin",
-  "type": "application/ai-catalog+json",
-  "description": "Comprehensive plugin with commands, agents, skills, and MCP servers",
-  "tags": ["development"],
-  "publisher": {
-    "identifier": "did:web:anthropic.com",
-    "displayName": "Anthropic"
-  },
-  "data": {
-    "specVersion": "1.0",
-    "entries": [
-      {
-        "identifier": "urn:claude-plugin:anthropic:example-plugin:mcp",
-        "type": "application/mcp-server-card+json",
-        "url": "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json"
-      },
-      {
-        "identifier": "urn:claude-plugin:anthropic:example-plugin:skills",
-        "displayName": "Example Plugin Skills",
-        "type": "application/agent-skills+zip",
-        "url": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip"
-      }
-    ]
-  }
-}
-```
+The output omits the marketplace identifier and description because
+they have no direct core equivalent. It leaves the plugin's canonical
+display metadata, version, and descriptive links in the manifest while
+merging the available discovery terms into entry `tags`. The entry
+identifier, type, artifact URL, host display name, and publisher
+identity are explicit operator inputs or policy decisions rather than
+values mechanically derived from `marketplace.json`.
 
 ## What AI Catalog Adds to the Marketplace
 
 The `marketplace.json` format is a lightweight directory focused on
-listing available plugins. AI Catalog extends this with:
+listing and installing Claude Code plugins. Representing those plugins
+in AI Catalog adds:
 
-1. **Trust and identity**: The marketplace has no signing, attestation,
-   or publisher verification. Trust Manifests provide verifiable
-   publisher identity and compliance metadata.
-
-2. **Cross-ecosystem discovery**: Plugins become discoverable alongside
+1. **Cross-ecosystem discovery**: Plugins become discoverable alongside
    MCP servers, A2A agents, and other artifacts through the standard
-   `/.well-known/ai-catalog.json` convention — not only within Claude
+   `/.well-known/ai-catalog.json` convention, not only within Claude
    Code's `/plugin` system.
 
-3. **Media type identification**: The marketplace does not type its
-   plugins. AI Catalog assigns `application/vnd.anthropic.claude-plugin+json`
-   enabling clients to filter and route by artifact type.
+2. **Explicit artifact representation**: Each entry declares the type
+   of document its `url` retrieves or its `data` contains, so consumers
+   can filter and route artifacts without interpreting Claude
+   installation locators.
 
-4. **Composability**: Plugin packages that combine skills, MCP servers,
-   and commands can be represented as nested catalogs, making the
-   internal structure of a plugin package explicit and independently
-   addressable.
-
-5. **Decentralized publishing**: Any domain can publish Claude Code
-   plugins via AI Catalog without submitting to the centralized
-   marketplace repository.
-
+3. **Independent identity and trust**: Publishers can add verifiable
+   identifiers, attestations, and provenance when they possess that
+   information. The projection does not infer those claims from owner,
+   author, or source metadata.
