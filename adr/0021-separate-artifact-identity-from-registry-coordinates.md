@@ -13,8 +13,8 @@
 
 Existing registries commonly identify artifacts with native coordinates,
 such as a registry namespace and artifact name. When projecting those
-records as AI Catalog entries, a registry may have no publisher-assigned
-`urn:air` identifier.
+records as AI Catalog entries, the catalog operator may have no
+publisher-assigned `urn:air` identifier.
 
 Using the registry's domain in `urn:air` is easy, but the current format
 defines that domain as the artifact publisher. Requiring the publisher's
@@ -46,33 +46,34 @@ A publisher-authorized `urn:air` identifier is one assigned by the
 artifact publisher or its authorized delegate, with the artifact
 publisher's domain in the `{publisher}` segment.
 
-A registry uses a stateful preserve-or-mint policy:
+Catalog projection creates a Catalog Entry from either a source Catalog
+Entry in another AI Catalog or a source record in another system. When
+incorporating a projected entry for the first time, a catalog operator
+selects its identifier by applying these rules in order:
 
-1. If the registry previously published an identifier for the artifact,
-   reuse it, even if another identifier becomes available later.
-2. Otherwise, if the source entry contains a publisher-authorized
-   `urn:air` identifier, preserve it exactly.
-3. Otherwise, the registry may preserve or replace a non-`urn:air` source
-   identifier. Non-`urn:air` identifiers have no guaranteed portability
+1. If the source contains a publisher-authorized `urn:air` identifier,
+   preserve it exactly.
+2. Otherwise, the operator may preserve a non-`urn:air` source identifier
+   or replace it. Non-`urn:air` identifiers have no guaranteed portability
    across catalogs.
-4. When assigning a new identifier, a registry that becomes the artifact
+3. When assigning a new identifier, an operator that becomes the artifact
    publisher should use `urn:air` with its own domain in the `{publisher}`
-   segment. A registry acting as an authorized delegate should use
+   segment. An operator acting as an authorized delegate should use
    `urn:air` with the delegating publisher's domain in that segment. An
-   independent registry must use a non-`urn:air` identifier under its own
-   control.
+   operator that is neither the artifact publisher nor its authorized
+   delegate must use a non-`urn:air` identifier under its own control.
 
-Merely hosting or aggregating an entry does not make a registry the
+Operating a catalog or aggregating an entry does not make its operator the
 artifact publisher.
 
 Changing a previously published primary identifier requires an explicit
 migration mechanism, which this decision does not define.
 
-The registry assigning an identifier, the catalog `host`, and the
-artifact `publisher` are independent roles. A registry-issued identifier
-does not imply that the registry published the artifact.
+The catalog operator and artifact publisher are distinct roles. An
+operator-assigned identifier does not imply that the operator published
+the artifact.
 
-A registry may retain replaced source identifiers or registry-native
+A catalog operator may retain replaced source identifiers or source-system
 coordinates. When retained, they should be stored in a namespaced entry
 extension. They do not affect catalog uniqueness or establish publisher
 identity, trust, or equivalence with another identifier.
@@ -80,15 +81,15 @@ identity, trust, or equivalence with another identifier.
 ## Consequences
 
 - Publisher-authorized `urn:air` identifiers are preserved across
-  registries and mirrors.
-- Non-`urn:air` identifiers remain valid, but registries may replace them
-  when they are unsuitable for the destination catalog.
+  catalogs and mirrors.
+- Non-`urn:air` identifiers remain valid, but catalog operators may preserve
+  or replace them.
 - Legacy records can be projected without publisher enrollment by using
-  a registry-issued identifier.
-- Two registries may assign different identifiers to the same artifact
-  when no publisher-authorized `urn:air` identity is available. The model
-  does not claim equivalence it cannot establish.
-- No new core field is added; native coordinates use `extensions`.
+  an operator-assigned identifier.
+- Two catalog operators may assign different identifiers to the same
+  artifact when no publisher-authorized `urn:air` identity is available.
+  The model does not claim equivalence it cannot establish.
+- No new core field is added; source-system coordinates use `extensions`.
 - Generic aliases and primary-identifier migration remain future work.
 
 ## Alternatives Considered
@@ -100,5 +101,6 @@ Requiring a publisher-domain `urn:air` was rejected as a universal rule
 because it makes automatic projection depend on publisher enrollment.
 
 Adding `aliases`, `nativeIdentifier`, or `identifiers[]` was deferred
-because registry coordinates do not necessarily assert logical identity
-equivalence, and `extensions` is sufficient for the immediate use case.
+because source-system coordinates do not necessarily assert logical
+identity equivalence, and `extensions` is sufficient for the immediate
+use case.

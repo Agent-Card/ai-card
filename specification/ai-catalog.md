@@ -203,9 +203,9 @@ A Catalog Entry object describes a single AI artifact in the catalog.
 It MUST contain the following members:
 
 `identifier`
-: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). Consumers that do not recognize an identifier scheme MUST treat the value as opaque. Identifier syntax alone does not verify publisher identity or establish trust. For open or federated systems, a globally unique absolute URI is RECOMMENDED. An artifact publisher that wants an entry identifier to be preserved when the artifact appears in other catalogs SHOULD use the AI Catalog-specific `urn:air` naming structure with its own domain in the `{publisher}` segment. A catalog incorporating an entry for the first time with a publisher-authorized `urn:air` identifier MUST preserve that identifier exactly.
+: A string uniquely identifying this artifact. This field is an open text format (e.g., any valid URI or URN is accepted). Consumers that do not recognize an identifier scheme MUST treat the value as opaque. Identifier syntax alone does not verify publisher identity or establish trust. For open or federated systems, a globally unique absolute URI is RECOMMENDED. An artifact publisher that wants an entry identifier to be preserved when the artifact appears in other catalogs SHOULD use the AI Catalog-specific `urn:air` naming structure with its own domain in the `{publisher}` segment. A catalog operator incorporating an entry for the first time with a publisher-authorized `urn:air` identifier MUST preserve that identifier exactly.
 
-    **AI Catalog Publisher Naming Format:**
+    **`urn:air` Identifier Format:**
     `urn:air:{publisher}:{namespace}:{name}`
 
     - `{publisher}`: The domain name of the organization publishing the artifact (e.g., `example.com`).
@@ -219,7 +219,7 @@ It MUST contain the following members:
 
     For closed or local systems where a different identifier format is used, client implementations are responsible for parsing and processing the custom format as appropriate.
 
-    See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present, and [Registry Projection](#registry-projection) for identifiers assigned while projecting an existing registry.
+    See [Multi-Version Entries](#multi-version-entries) for uniqueness rules when multiple versions are present, and [Catalog Projection](#catalog-projection) for identifiers assigned while projecting an existing Catalog Entry or source-system record.
 
 `type`
 : A string containing the identifier that specifies the type of the
@@ -435,7 +435,7 @@ When `version` is present, the combination of `identifier` and `version`
 MUST be unique within the catalog. When `version` is absent, `identifier`
 alone MUST be unique. The `identifier` SHOULD be stable across versions.
 Only publisher-authorized `urn:air` identifiers receive a cross-catalog
-preservation requirement, as defined in [Registry Projection](#registry-projection).
+preservation requirement, as defined in [Catalog Projection](#catalog-projection).
 
 Clients that need only the latest version SHOULD sort entries
 sharing the same `identifier` by `version` (when parseable as a semantic
@@ -469,46 +469,44 @@ For example, a catalog listing two versions of the same agent:
 Both entries share the same `identifier` but have distinct `version`
 values, so the combination is unique.
 
-## Registry Projection
+## Catalog Projection
 
 A publisher-authorized `urn:air` identifier is one assigned by the
 artifact publisher or its authorized delegate, with the artifact
 publisher's domain in the `{publisher}` segment.
 
-A registry creating an entry from an existing record or catalog entry
-MUST select its primary identifier by applying these rules in order:
+Catalog projection creates a Catalog Entry from either a source Catalog
+Entry in another AI Catalog or a source record in another system. When
+incorporating a projected entry for the first time, a catalog operator
+MUST select its identifier by applying these rules in order:
 
-1. If the registry previously published an identifier for the artifact,
-   it MUST reuse that identifier, even if another identifier becomes
-   available later.
-2. Otherwise, if the source entry contains a publisher-authorized
-   `urn:air` identifier, it MUST preserve the identifier exactly.
-3. Otherwise, the registry MAY preserve a non-`urn:air` source identifier
+1. If the source contains a publisher-authorized `urn:air` identifier,
+   the operator MUST preserve it exactly.
+2. Otherwise, the operator MAY preserve a non-`urn:air` source identifier
    or replace it. Non-`urn:air` identifiers have no guaranteed portability
    across catalogs.
-4. When assigning a new identifier, a registry that becomes the artifact
+3. When assigning a new identifier, an operator that becomes the artifact
    publisher SHOULD use `urn:air` with its own domain in the `{publisher}`
-   segment. A registry acting as an authorized delegate SHOULD use
+   segment. An operator acting as an authorized delegate SHOULD use
    `urn:air` with the delegating publisher's domain in that segment. An
-   independent registry MUST use a non-`urn:air` identifier under its own
-   control.
+   operator that is neither the artifact publisher nor its authorized
+   delegate MUST use a non-`urn:air` identifier under its own control.
 
-Merely hosting or aggregating an entry does not make a registry the
-artifact publisher.
-A registry MUST NOT infer publisher authorization from the artifact's URL
-or an unsigned `publisher` field.
+Operating a catalog or aggregating an entry does not make its operator the
+artifact publisher. A catalog operator MUST NOT infer publisher
+authorization from the artifact's URL or an unsigned `publisher` field.
 
 Adopting a different primary identifier after publication requires an
 explicit migration mechanism, which this specification does not define.
 
-A registry-assigned identifier identifies the artifact, not a particular
-version or registry record. It MUST remain stable across
-versions, registry-coordinate changes, and retrieval-URL changes, and
-MUST NOT be reassigned to another artifact. The registry assigning the
-identifier, the catalog `host`, and the artifact `publisher` are
-independent roles.
+An identifier assigned by a catalog operator identifies the artifact, not
+a particular version or source record. It MUST remain stable across
+versions, source-coordinate changes, and retrieval-URL changes, and MUST
+NOT be reassigned to another artifact. The catalog operator and artifact
+publisher are distinct roles. The operator is the entity identified by the
+top-level `host` field when that field is present.
 
-A registry MAY retain replaced source identifiers or registry-native
+A catalog operator MAY retain replaced source identifiers or source-system
 coordinates. If retained, they SHOULD be stored in a namespaced entry
 extension. They do not participate in catalog uniqueness or establish
 publisher identity, trust, or equivalence with another identifier.
