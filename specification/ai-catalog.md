@@ -335,7 +335,9 @@ The following members are OPTIONAL:
 `trustManifest`
 : A Trust Manifest object as defined in [Trust Manifest](#trust-manifest)
   providing verifiable identity and trust metadata for this artifact.
-  See [Trust Manifest](#trust-manifest) for details.
+  A Trust Manifest carried here is an *Entry Trust Manifest*. See
+  [Entry Trust Manifest Publisher-Domain Alignment](#entry-trust-manifest-publisher-domain-alignment)
+  for its requirements.
 
 ### Resolving an Artifact's Display Name
 
@@ -513,18 +515,74 @@ A Trust Manifest MUST contain:
   DID, SPIFFE ID, or URL; these are illustrative and the set of
   identity schemes is open.
 
-When a Trust Manifest appears within a Catalog Entry, the `identity`
-field's trust domain MUST align with the publisher domain in the
-containing entry's `identifier` field. This binding ensures
-trust claims are associated with the authorized publisher namespace even
-when `identity` and `identifier` use different URI schemes.
-Consumers MUST reject a Trust Manifest whose `identity` domain does not
-align with the publisher domain in the containing entry's `identifier`.
-The `identity` is carried here so domain binding is part of the signed
-payload, rather than inferred only from unsigned entry context.
-
 When a Trust Manifest appears on a Host Info object, `identity`
 SHOULD match the host's `identifier` field when present.
+
+### Entry Trust Manifest Publisher-Domain Alignment
+
+This subsection applies only to a Trust Manifest on a Catalog Entry. A Catalog
+Entry that includes a Trust Manifest MUST use a publisher-authorized `urn:air`
+identifier with the standard syntax defined in [Catalog Entry](#catalog-entry).
+The identifier MUST have been assigned by the artifact publisher or its
+authorized delegate using the publisher's domain in its `{publisher}`
+component. Non-`urn:air` identifiers remain valid for Catalog Entries that do
+not include an Entry Trust Manifest.
+
+An independent catalog operator MAY reproduce an Entry Trust Manifest together
+with its publisher-assigned identifier.
+
+The publisher domain is the `{publisher}` component of the Catalog Entry's
+`urn:air` identifier. Consumers obtain the identity domain from a valid Trust
+Manifest `identity` URI [[RFC3986]] as follows:
+
+- **`did:web`:** the domain used by the method's resolution rules
+  [[DIDWEB]], excluding any port;
+- **HTTPS:** the URI host, excluding any port [[RFC9110]]; or
+- **SPIFFE:** the trust domain of a valid SPIFFE ID [[SPIFFEID]], when that
+  trust domain is an IDNA2008 domain name [[RFC5890]] [[RFC5891]].
+
+URI, DID, SPIFFE, and domain syntax validity are defined by their respective
+standards, including [[RFC8141]]. A valid port remains part of the identity but
+is not part of the domain used for publisher-domain comparison. Paths, queries,
+and fragments likewise do not participate in the comparison. The `identity`
+URI itself determines which rule above applies. The optional `identityType`
+member is only a descriptive hint and MUST NOT be used to select a
+domain-extraction rule.
+
+The publisher domain and identity domain MUST be valid IDNA2008 domain names in
+ASCII form, with internationalized labels encoded as A-labels (the ASCII form
+beginning with `xn--`) and without a trailing root dot. Consumers MUST compare
+them for exact equality after converting ASCII letters to lowercase; suffix
+matching and organizational-ownership heuristics MUST NOT be used.
+
+| Entry identifier | Trust Manifest `identity` | Alignment |
+|---|---|---|
+| `urn:air:example.com:agent:billing` | `did:web:example.com:agent:billing` | aligned |
+| `urn:air:example.com:agent:billing` | `https://EXAMPLE.com:8443/keys/billing` | aligned |
+| `urn:air:example.com:agent:billing` | `spiffe://example.com/billing` | aligned |
+| `urn:air:example.com:agent:billing` | `did:web:service.example.com:billing` | not aligned |
+
+A consumer MUST disregard all claims in an Entry Trust Manifest if any of the
+following conditions applies:
+
+- The Catalog Entry's `identifier` does not use the standard `urn:air` syntax.
+- The Catalog Entry's `identifier`, the Trust Manifest's `identity`, or either
+  domain is invalid under the applicable standards or the requirements above.
+- This subsection does not define how to obtain a domain from the Trust
+  Manifest's `identity` URI.
+- The publisher domain and identity domain are not aligned.
+
+The consumer MUST then apply the same policy it would apply to a Catalog Entry
+without a usable Trust Manifest.
+
+Alignment establishes consistency between the publisher domain in the Catalog
+Entry's `identifier` and the domain in the Trust Manifest's `identity`. It does
+not establish control of that domain, publisher or signer authorization,
+signature validity, artifact integrity, publisher authenticity, or
+trustworthiness. Those properties require the corresponding verification and
+trust-anchoring procedures. A Trust Manifest signature covers its `identity`,
+but does not by itself authenticate the containing Catalog Entry's
+`identifier`.
 
 When multiple entries share the same `identifier` (with different `version`
 values), each entry MAY carry its own Trust Manifest. There is no
@@ -1822,7 +1880,7 @@ artifact types including a nested catalog packaging related artifacts:
             "type": "application/parquet",
             "url": "https://data.acme-corp.com/market-2026q1.parquet",
             "trustManifest": {
-              "identity": "urn:air:acme.com:data:market-2026q1",
+              "identity": "did:web:acme.com:data:market-2026q1",
               "provenance": [
                 {
                   "relation": "publishedFrom",
@@ -1835,7 +1893,7 @@ artifact types including a nested catalog packaging related artifacts:
         ]
       },
       "trustManifest": {
-        "identity": "urn:air:acme.com:plugin:finance-suite",
+        "identity": "did:web:acme.com:plugin:finance-suite",
         "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
       },
       "updatedAt": "2026-03-20T14:00:00Z"
