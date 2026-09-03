@@ -10,7 +10,7 @@ and reducing interoperability.
 
 This document defines the **AI Catalog**: a typed, nestable JSON
 container for discovering heterogeneous AI artifacts. Each entry
-declares its artifact type via a type identifier and may reference or
+declares its artifact type via a type identifier (which is an IANA media type) and may reference or
 embed the native artifact metadata. A minimal catalog is simply a
 list of entries — names, types, and URLs — requiring no additional
 infrastructure.
