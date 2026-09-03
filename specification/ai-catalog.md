@@ -56,13 +56,6 @@ Artifact
   manifest, an A2A agent card, a Claude Code plugin, a
   dataset descriptor, or a nested AI Catalog.
 
-AI Card
-: The umbrella concept for any AI artifact metadata document, such as
-  an A2A Agent Card, an MCP Server Card, or an Agent Skill. "AI Card"
-  is the name of the working group and the overall effort; the
-  normative term for such a document in this specification is
-  Catalog Entry.
-
 # Design Goals
 
 1. **Artifact Agnosticism**: The catalog MUST be capable of indexing
