@@ -55,7 +55,7 @@ Trust builds on the three conformance levels:
           "type": "application/a2a-agent-card+json",
           "url": "...",
           "trustManifest": {
-            "identity": "urn:air:acme-corp.com:a2a:finance",
+            "identity": "did:web:acme-corp.com:a2a:finance",
             "attestations": [...]
           }
         }
@@ -68,13 +68,20 @@ Trust builds on the three conformance levels:
 A Trust Manifest is an object on a Catalog Entry (or Host Info object) with one required field:
 
 `identity`
-:   A globally unique URI that identifies this artifact. **Its trust domain must align with the publisher domain in the containing entry's `identifier`.** This binding ties trust claims to the authorized publisher.
+:   A globally unique URI that identifies this artifact.
+
+For a Trust Manifest on a Catalog Entry:
+
+- The containing Catalog Entry's `identifier` must be a publisher-authorized `urn:air` identifier.
+- The publisher domain in the Catalog Entry's `identifier` must exactly match the domain obtained from the Trust Manifest's `identity`, ignoring ASCII case. AI Catalog defines how to obtain that domain from `did:web`, HTTPS, and SPIFFE identities.
+
+This alignment is a consistency check; it does not prove publisher authorization or control of the domain. See the [full specification](../specification.md) for the normative rules.
 
 All other fields are optional:
 
 | Field | Description |
 |---|---|
-| `identityType` | Type hint for the identity URI: `"did"`, `"spiffe"`, `"dns"` |
+| `identityType` | Optional hint describing the identity URI, such as `did` or `spiffe`; consumers use `identity` itself—not this hint—to determine the domain for publisher-domain alignment |
 | `trustSchema` | Describes the trust framework applied |
 | `attestations` | Array of compliance and identity attestation objects |
 | `provenance` | Array of provenance links (source code, OCI digests) |
@@ -92,7 +99,7 @@ The simplest trust step is asserting publisher identity. Use an attestation of t
 
 ```json
 "trustManifest": {
-  "identity": "urn:air:acme-corp.com:a2a:finance",
+  "identity": "did:web:acme-corp.com:a2a:finance",
   "attestations": [
     {
       "type": "publisher-identity",
@@ -165,7 +172,7 @@ The `signature` field holds a detached JWS (RFC 7515):
 
 ```json
 "trustManifest": {
-  "identity": "urn:air:acme-corp.com:a2a:finance",
+  "identity": "did:web:acme-corp.com:a2a:finance",
   "attestations": [...],
   "signature": "eyJhbGciOiJFUzI1NiJ9..detached-jws-signature"
 }
@@ -207,7 +214,7 @@ A Trust Manifest with identity, compliance attestation, provenance, and signatur
     "displayName": "Acme Financial Corp"
   },
   "trustManifest": {
-    "identity": "urn:air:acme-corp.com:a2a:finance",
+    "identity": "did:web:acme-corp.com:a2a:finance",
     "trustSchema": {
       "identifier": "urn:trust:acme-enterprise-v1",
       "version": "1.0",
