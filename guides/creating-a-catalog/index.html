@@ -619,10 +619,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#metadata-extensibility" class="md-nav__link">
+  <a href="#extensions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Metadata extensibility
+        Extensions
       
     </span>
   </a>
@@ -1387,10 +1387,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#metadata-extensibility" class="md-nav__link">
+  <a href="#extensions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Metadata extensibility
+        Extensions
       
     </span>
   </a>
@@ -1458,8 +1458,8 @@
 <dl>
 <dt><code>host</code></dt>
 <dd>Identifies the organization operating this catalog. Required for <a href="../../getting-started/#what-youve-built">Level 2 (Discoverable)</a> conformance.</dd>
-<dt><code>metadata</code></dt>
-<dd>An open map for custom or vendor-specific properties. See <a href="#metadata-extensibility">Metadata extensibility</a>.</dd>
+<dt><code>extensions</code></dt>
+<dd>A map of custom or vendor-specific extensions, keyed by a URL or reverse-DNS name. See <a href="#extensions">Extensions</a>.</dd>
 </dl>
 <h2 id="adding-a-host-object">Adding a <code>host</code> object<a class="headerlink" href="#adding-a-host-object" title="Permanent link">&para;</a></h2>
 <p>The <code>host</code> object identifies who operates the catalog. Adding it upgrades you to Level 2 (Discoverable):</p>
@@ -1622,9 +1622,9 @@
 <td>Trust and identity metadata (see <a href="../adding-trust/">Adding Trust</a>)</td>
 </tr>
 <tr>
-<td><code>metadata</code></td>
+<td><code>extensions</code></td>
 <td>object</td>
-<td>Custom key/value pairs (see <a href="#metadata-extensibility">Metadata extensibility</a>)</td>
+<td>Named extensions (see <a href="#extensions">Extensions</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1714,15 +1714,18 @@
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>identifier</code> and <code>displayName</code> are required. <code>identityType</code> is optional and provides a hint for resolving the identifier (<code>"did"</code>, <code>"dns"</code>, etc.).</p>
-<h2 id="metadata-extensibility">Metadata extensibility<a class="headerlink" href="#metadata-extensibility" title="Permanent link">&para;</a></h2>
-<p>Both the top-level catalog object and individual entries support a <code>metadata</code> field for custom properties:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;com.acme.region&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;com.acme.sla&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;99.9%&quot;</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Apache-2.0&quot;</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
+<h2 id="extensions">Extensions<a class="headerlink" href="#extensions" title="Permanent link">&para;</a></h2>
+<p>Both the top-level catalog object and individual entries support an <code>extensions</code> map for custom properties. Each key identifies an extension and must be a URL or a reverse-DNS name. Consumers that do not recognize an extension key must ignore it without error.</p>
+<p>For generic key/value properties, use the official <code>https://ai-catalog.org/extensions/metadata</code> extension:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&quot;extensions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;https://ai-catalog.org/extensions/metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="nt">&quot;region&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">&quot;sla&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;99.9%&quot;</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Apache-2.0&quot;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Metadata keys should use reverse-DNS prefixes for vendor-specific keys (<code>com.acme.*</code>), or short unqualified names for broadly useful keys (<code>license</code>, <code>homepage</code>). Avoid shadowing standard fields like <code>displayName</code> or <code>tags</code>. Clients that don't recognize a key should ignore it.</p>
+<p>The value of this official extension is a schemaless object for generic key/value properties.</p>
 <h2 id="complete-example">Complete example<a class="headerlink" href="#complete-example" title="Permanent link">&para;</a></h2>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;specVersion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>

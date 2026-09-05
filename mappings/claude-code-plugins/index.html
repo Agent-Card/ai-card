@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mapping-to-claude-code-plugins-marketplace" class="md-skip">
+        <a href="#mapping-to-claude-code-plugin-marketplaces" class="md-skip">
           Skip to content
         </a>
       
@@ -1022,10 +1022,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#source-types" class="md-nav__link">
+  <a href="#resolving-plugin-sources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source Types
+        Resolving Plugin Sources
       
     </span>
   </a>
@@ -1037,17 +1037,6 @@
     <span class="md-ellipsis">
       
         Marketplace as AI Catalog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#plugin-packages-as-nested-catalogs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plugin Packages as Nested Catalogs
       
     </span>
   </a>
@@ -1188,10 +1177,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#source-types" class="md-nav__link">
+  <a href="#resolving-plugin-sources" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source Types
+        Resolving Plugin Sources
       
     </span>
   </a>
@@ -1203,17 +1192,6 @@
     <span class="md-ellipsis">
       
         Marketplace as AI Catalog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#plugin-packages-as-nested-catalogs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plugin Packages as Nested Catalogs
       
     </span>
   </a>
@@ -1251,259 +1229,240 @@
   
 
 
-<h1 id="mapping-to-claude-code-plugins-marketplace">Mapping to Claude Code Plugins Marketplace<a class="headerlink" href="#mapping-to-claude-code-plugins-marketplace" title="Permanent link">&para;</a></h1>
-<p>This guide describes how the Anthropic Claude Code Plugins
-marketplace format (see
-<a href="https://github.com/anthropics/claude-plugins-official">claude-plugins-official</a>)
-maps to AI Catalog, enabling Claude Code plugins to be discovered,
-indexed, and distributed through a unified catalog alongside other AI
-artifacts.</p>
+<h1 id="mapping-to-claude-code-plugin-marketplaces">Mapping to Claude Code Plugin Marketplaces<a class="headerlink" href="#mapping-to-claude-code-plugin-marketplaces" title="Permanent link">&para;</a></h1>
+<p>This guide describes how a
+<a href="https://code.claude.com/docs/en/plugin-marketplaces">Claude Code plugin marketplace</a>
+can be represented as an AI Catalog, enabling Claude Code plugins to be
+discovered and indexed alongside other AI artifacts.</p>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The Claude Code Plugins marketplace is defined by a <code>marketplace.json</code>
-file that lists available plugins. Each plugin is a directory containing
-a <code>.claude-plugin/plugin.json</code> metadata file and optional components:
-MCP server configurations (<code>.mcp.json</code>), slash commands (<code>commands/</code>),
-agent definitions (<code>agents/</code>), and skill definitions (<code>skills/</code>).</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>marketplace.json                    # Top-level plugin directory
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>plugins/
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  example-plugin/
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    .claude-plugin/
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>      plugin.json                   # Plugin metadata (name, description, author)
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    .mcp.json                       # MCP server config (optional)
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    commands/                       # Slash commands (optional)
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    agents/                         # Agent definitions (optional)
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    skills/                         # Skill definitions (optional)
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    README.md
-</span></code></pre></div>
+<p>A Claude Code plugin marketplace is defined by a <code>marketplace.json</code> file
+that lists plugin definitions and tells Claude Code how to install them.
+A plugin source is an installation locator; it is not necessarily a URL
+that retrieves a single artifact document.</p>
+<p>This guide illustrates a projection that catalogs a manifest-backed
+plugin's <code>.claude-plugin/plugin.json</code> as its artifact document.</p>
+<p>Claude Code's <code>strict</code> field controls where component definitions come
+from. With <code>strict: true</code> (the default), <code>plugin.json</code> is authoritative
+for component definitions, but the marketplace entry may supplement it.
+With <code>strict: false</code>, the marketplace entry is the complete definition
+and <code>plugin.json</code> is not required. This manifest-backed projection
+applies only when <code>plugin.json</code> contains the complete component
+definition. Otherwise, the operator must materialize the effective
+definition or choose another artifact representation.</p>
+<p>The guide assumes that the AI Catalog operator is also the marketplace
+operator. When they are different, the catalog operator supplies its own
+<code>host</code> information rather than deriving it from marketplace <code>owner</code>
+metadata.</p>
+<p>The projection is not entirely mechanical. The catalog operator assigns
+globally unique entry identifiers, chooses the artifact representation
+and media type, resolves installation sources to retrievable artifact
+documents, and supplies any verifiable host or publisher identifiers.</p>
 <h2 id="conceptual-mapping">Conceptual Mapping<a class="headerlink" href="#conceptual-mapping" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Claude Plugins Marketplace</th>
-<th style="text-align: left;">AI Catalog Equivalent</th>
+<th style="text-align: left;">Claude plugin marketplace</th>
+<th style="text-align: left;">AI Catalog field</th>
+<th style="text-align: left;">Mapping rule</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;"><code>marketplace.json</code> (whole file)</td>
-<td style="text-align: left;">AI Catalog document (top-level)</td>
+<td style="text-align: left;">AI Catalog document</td>
+<td style="text-align: left;">Project each plugin supported by this profile to an entry.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Marketplace <code>name</code></td>
-<td style="text-align: left;">Catalog <code>host.displayName</code></td>
+<td style="text-align: left;">Marketplace <code>owner.name</code></td>
+<td style="text-align: left;">Candidate for catalog <code>host.displayName</code></td>
+<td style="text-align: left;">The catalog operator may use it when the same operator publishes both documents. Otherwise, the catalog operator supplies <code>host</code>.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Marketplace <code>description</code></td>
-<td style="text-align: left;">Catalog <code>metadata.description</code></td>
+<td style="text-align: left;">Marketplace <code>owner.email</code></td>
+<td style="text-align: left;">No core equivalent</td>
+<td style="text-align: left;">Contact information does not establish a verifiable <code>host.identifier</code>.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Marketplace <code>owner</code></td>
-<td style="text-align: left;">Catalog <code>host</code> (with <code>identifier</code> derived from owner)</td>
+<td style="text-align: left;">Marketplace <code>name</code>, <code>description</code>, <code>version</code>, and dependency policy</td>
+<td style="text-align: left;">No direct core equivalent</td>
+<td style="text-align: left;">These describe the Claude marketplace rather than the catalog host or an individual artifact.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><code>plugins[]</code> array</td>
-<td style="text-align: left;">Catalog <code>entries[]</code> array</td>
+<td style="text-align: left;"><code>plugins[]</code></td>
+<td style="text-align: left;">Catalog <code>entries[]</code></td>
+<td style="text-align: left;">Each manifest-backed plugin becomes one entry.</td>
 </tr>
 <tr>
 <td style="text-align: left;">Plugin <code>name</code></td>
-<td style="text-align: left;">Entry <code>identifier</code> (derived as URN); the plugin manifest carries its own name, so entry <code>displayName</code> is omitted</td>
+<td style="text-align: left;">Input to entry <code>identifier</code></td>
+<td style="text-align: left;">The name is scoped to its marketplace. The catalog operator assigns a globally unique identifier; it cannot derive the publisher authority from the name alone.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>description</code></td>
-<td style="text-align: left;">Stays in the plugin manifest (which carries its own <code>description</code>); entry <code>description</code> is omitted to avoid duplicating a value that can drift</td>
+<td style="text-align: left;">Plugin <code>displayName</code> and <code>description</code></td>
+<td style="text-align: left;">Entry <code>displayName</code> and <code>description</code>, conditionally</td>
+<td style="text-align: left;">Omit them when the referenced artifact directly exposes the canonical values. Include them when clients would otherwise need to process an archive, when the artifact lacks them, or when they are intentional catalog-level values.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>category</code></td>
-<td style="text-align: left;">Entry <code>tags[]</code> (first tag)</td>
+<td style="text-align: left;">Plugin <code>version</code></td>
+<td style="text-align: left;">Entry <code>version</code>, conditionally</td>
+<td style="text-align: left;">Omit it when a single referenced artifact directly exposes the canonical version. Include it when clients would otherwise need to process an archive or when catalog-level version selection requires it; when present, it must match the artifact.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>tags</code></td>
-<td style="text-align: left;">Entry <code>tags[]</code> (merged with category)</td>
+<td style="text-align: left;">Plugin <code>category</code>, <code>tags</code>, and <code>keywords</code></td>
+<td style="text-align: left;">Entry <code>tags[]</code></td>
+<td style="text-align: left;">Merge and deduplicate the discovery terms selected for the catalog.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>author</code></td>
-<td style="text-align: left;">Entry <code>publisher</code></td>
+<td style="text-align: left;">Plugin <code>author.name</code></td>
+<td style="text-align: left;">Entry <code>publisher.displayName</code>, conditionally</td>
+<td style="text-align: left;">The author may be used only when independently established as the publishing organization and paired with a verifiable identifier for that same entity.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>source</code> (url, git-subdir, or path)</td>
-<td style="text-align: left;">Entry <code>url</code> (pointing to the plugin repository)</td>
+<td style="text-align: left;">Plugin <code>source</code></td>
+<td style="text-align: left;">Input to entry <code>url</code> or <code>data</code></td>
+<td style="text-align: left;">The operator resolves the installation locator, then publishes or references a complete artifact representation. A repository or directory URL is not itself an artifact document.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>source.sha</code></td>
-<td style="text-align: left;">Entry <code>trustManifest.provenance[].sourceDigest</code></td>
+<td style="text-align: left;">Plugin <code>homepage</code>, <code>repository</code>, and <code>license</code></td>
+<td style="text-align: left;">No direct core equivalent</td>
+<td style="text-align: left;">They remain Claude metadata unless the artifact carries them or a separately defined extension preserves them.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>homepage</code></td>
-<td style="text-align: left;">Entry <code>metadata.homepage</code></td>
+<td style="text-align: left;">Plugin component fields and <code>strict</code></td>
+<td style="text-align: left;">Plugin artifact content and projection policy</td>
+<td style="text-align: left;">They determine the effective Claude component definition. Publishing a component in another artifact format requires a separately defined conversion.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Plugin <code>.claude-plugin/plugin.json</code></td>
-<td style="text-align: left;">The artifact content (referenced via <code>url</code>)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><em>(not in marketplace)</em></td>
-<td style="text-align: left;">Entry <code>trustManifest</code> (identity, attestations)</td>
-</tr>
-<tr>
-<td style="text-align: left;"><em>(not in marketplace)</em></td>
+<td style="text-align: left;"><em>(not in marketplace metadata)</em></td>
 <td style="text-align: left;">Entry <code>type</code></td>
+<td style="text-align: left;">The catalog operator selects a type that describes the representation carried by <code>url</code> or <code>data</code>.</td>
 </tr>
 <tr>
-<td style="text-align: left;">Centralized marketplace repo</td>
-<td style="text-align: left;">AI Catalog (decentralized, any URL)</td>
+<td style="text-align: left;"><em>(not established by marketplace metadata)</em></td>
+<td style="text-align: left;">Entry, host, or publisher <code>identifier</code></td>
+<td style="text-align: left;">The responsible catalog operator or artifact publisher supplies the identifier.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>(not in marketplace metadata)</em></td>
+<td style="text-align: left;"><code>trustManifest</code></td>
+<td style="text-align: left;">Add only independently established identity, attestation, or provenance information. Trust cannot be inferred from marketplace metadata.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="source-types">Source Types<a class="headerlink" href="#source-types" title="Permanent link">&para;</a></h2>
-<p>The marketplace supports three source types for plugins. Each maps
-differently to AI Catalog entry fields:</p>
-<dl>
-<dt>Direct URL source</dt>
-<dd><code>{"source": "url", "url": "https://github.com/org/repo.git", "sha": "..."}</code>
-  maps to entry <code>url</code> pointing at the repository, with <code>sha</code> captured
-  as provenance digest.</dd>
-<dt>Git subdirectory source</dt>
-<dd><code>{"source": "git-subdir", "url": "org/repo", "path": "plugins/name", "ref": "main"}</code>
-  maps to entry <code>url</code> constructed from the repository, path, and ref.</dd>
-<dt>Local path source</dt>
-<dd><code>"./plugins/name"</code> or <code>"./external_plugins/name"</code> maps to entry <code>url</code>
-  pointing at the known repository location for the plugin directory.</dd>
-</dl>
+<h2 id="resolving-plugin-sources">Resolving Plugin Sources<a class="headerlink" href="#resolving-plugin-sources" title="Permanent link">&para;</a></h2>
+<p>Claude Code supports several plugin source forms. Refer to the
+<a href="https://code.claude.com/docs/en/plugin-marketplaces#plugin-sources">Claude Code marketplace documentation</a>
+for their current syntax.</p>
+<p>Regardless of source form, an AI Catalog entry must contain a complete
+artifact representation through <code>url</code> or <code>data</code>. A <code>url</code> retrieves the
+artifact document represented by the entry, and that document should be
+served with the media type declared by <code>type</code>. For this manifest-backed
+profile, an operator resolves the installation source and publishes or
+references <code>.claude-plugin/plugin.json</code> at a stable URL.</p>
 <h2 id="marketplace-as-ai-catalog">Marketplace as AI Catalog<a class="headerlink" href="#marketplace-as-ai-catalog" title="Permanent link">&para;</a></h2>
-<p>The <code>marketplace.json</code> from
-<a href="https://github.com/anthropics/claude-plugins-official">claude-plugins-official</a>
-maps to an AI Catalog where each plugin is an entry:</p>
+<p>The following synthetic <code>marketplace.json</code> contains one plugin while
+covering representative marketplace and plugin metadata:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example-tools&quot;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Claude Code plugins maintained by the Example Marketplace Team&quot;</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026.1&quot;</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nt">&quot;owner&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Marketplace Team&quot;</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;marketplace@example.com&quot;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">  </span><span class="nt">&quot;plugins&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;review-tools&quot;</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">      </span><span class="nt">&quot;category&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;development&quot;</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">      </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;code-review&quot;</span><span class="p">],</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">        </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git-subdir&quot;</span><span class="p">,</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://git.example/example/claude-plugins.git&quot;</span><span class="p">,</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">        </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;plugins/review-tools&quot;</span><span class="p">,</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">        </span><span class="nt">&quot;ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1.2.0&quot;</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">      </span><span class="p">},</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">      </span><span class="nt">&quot;strict&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The referenced <code>.claude-plugin/plugin.json</code> provides the plugin's
+canonical metadata:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;specVersion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Claude Code Plugins Directory&quot;</span><span class="p">,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:web:anthropic.com&quot;</span><span class="p">,</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="nt">&quot;documentationUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://code.claude.com/docs/en/plugins&quot;</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">&quot;entries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:anthropic:agent-sdk-dev&quot;</span><span class="p">,</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/vnd.anthropic.claude-plugin+json&quot;</span><span class="p">,</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/agent-sdk-dev&quot;</span><span class="p">,</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">      </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;development&quot;</span><span class="p">],</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">        </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:web:anthropic.com&quot;</span><span class="p">,</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Anthropic&quot;</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">      </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">        </span><span class="nt">&quot;homepage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/anthropics/claude-plugins-public/tree/main/plugins/agent-sdk-dev&quot;</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">      </span><span class="p">}</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:adspirer:ads-agent&quot;</span><span class="p">,</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/vnd.anthropic.claude-plugin+json&quot;</span><span class="p">,</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/amekala/adspirer-mcp-plugin.git&quot;</span><span class="p">,</span>
-</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">      </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;productivity&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ads&quot;</span><span class="p">],</span>
-</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">      </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">        </span><span class="nt">&quot;homepage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://www.adspirer.com&quot;</span>
-</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="w">      </span><span class="nt">&quot;trustManifest&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="w">        </span><span class="nt">&quot;identity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:adspirer:ads-agent&quot;</span><span class="p">,</span>
-</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="w">        </span><span class="nt">&quot;provenance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="w">          </span><span class="p">{</span>
-</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="w">            </span><span class="nt">&quot;relation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;publishedFrom&quot;</span><span class="p">,</span>
-</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="w">            </span><span class="nt">&quot;sourceId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/amekala/adspirer-mcp-plugin&quot;</span><span class="p">,</span>
-</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="w">            </span><span class="nt">&quot;sourceDigest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sha1:aa70dbdbbbb843e94a794c10c2b13f5dd66b5e40&quot;</span>
-</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a><span class="w">          </span><span class="p">}</span>
-</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="w">        </span><span class="p">]</span>
-</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="w">      </span><span class="p">}</span>
-</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:aikido:security&quot;</span><span class="p">,</span>
-</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/vnd.anthropic.claude-plugin+json&quot;</span><span class="p">,</span>
-</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/AikidoSec/aikido-claude-plugin.git&quot;</span><span class="p">,</span>
-</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a><span class="w">      </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;security&quot;</span><span class="p">],</span>
-</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a><span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a><span class="w">        </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:web:aikido.dev&quot;</span><span class="p">,</span>
-</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Aikido Security&quot;</span>
-</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a><span class="w">      </span><span class="nt">&quot;trustManifest&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a><span class="w">        </span><span class="nt">&quot;identity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:aikido:security&quot;</span><span class="p">,</span>
-</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="w">        </span><span class="nt">&quot;provenance&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-1-53"><a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a><span class="w">          </span><span class="p">{</span>
-</span><span id="__span-1-54"><a id="__codelineno-1-54" name="__codelineno-1-54" href="#__codelineno-1-54"></a><span class="w">            </span><span class="nt">&quot;relation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;publishedFrom&quot;</span><span class="p">,</span>
-</span><span id="__span-1-55"><a id="__codelineno-1-55" name="__codelineno-1-55" href="#__codelineno-1-55"></a><span class="w">            </span><span class="nt">&quot;sourceId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/AikidoSec/aikido-claude-plugin&quot;</span><span class="p">,</span>
-</span><span id="__span-1-56"><a id="__codelineno-1-56" name="__codelineno-1-56" href="#__codelineno-1-56"></a><span class="w">            </span><span class="nt">&quot;sourceDigest&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sha1:d7fa8b8e192680d9a26c1a5dcaead7cf5cdb7139&quot;</span>
-</span><span id="__span-1-57"><a id="__codelineno-1-57" name="__codelineno-1-57" href="#__codelineno-1-57"></a><span class="w">          </span><span class="p">}</span>
-</span><span id="__span-1-58"><a id="__codelineno-1-58" name="__codelineno-1-58" href="#__codelineno-1-58"></a><span class="w">        </span><span class="p">]</span>
-</span><span id="__span-1-59"><a id="__codelineno-1-59" name="__codelineno-1-59" href="#__codelineno-1-59"></a><span class="w">      </span><span class="p">}</span>
-</span><span id="__span-1-60"><a id="__codelineno-1-60" name="__codelineno-1-60" href="#__codelineno-1-60"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-1-61"><a id="__codelineno-1-61" name="__codelineno-1-61" href="#__codelineno-1-61"></a><span class="w">  </span><span class="p">]</span>
-</span><span id="__span-1-62"><a id="__codelineno-1-62" name="__codelineno-1-62" href="#__codelineno-1-62"></a><span class="p">}</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;review-tools&quot;</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Review Tools&quot;</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Adds code-review workflows to Claude Code&quot;</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.2.0&quot;</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Plugin Team&quot;</span><span class="p">,</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;plugins@example.com&quot;</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="nt">&quot;homepage&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://plugins.example/review-tools&quot;</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="nt">&quot;repository&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://git.example/example/claude-plugins&quot;</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nt">&quot;license&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Apache-2.0&quot;</span><span class="p">,</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="nt">&quot;keywords&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;review&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;quality&quot;</span><span class="p">]</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="plugin-packages-as-nested-catalogs">Plugin Packages as Nested Catalogs<a class="headerlink" href="#plugin-packages-as-nested-catalogs" title="Permanent link">&para;</a></h2>
-<p>A plugin that contains multiple components (MCP servers, skills,
-commands, agents) naturally maps to a nested AI Catalog. This
-mirrors the plugin directory structure where a single plugin
-contains multiple artifact types:</p>
+<p>This projection makes the following assumptions:</p>
+<ul>
+<li>The catalog operator uses the marketplace owner's name for
+  <code>host.displayName</code>.</li>
+<li>The operator publishes the manifest at the stable URL below and uses
+  the illustrative operator-defined media type shown.</li>
+<li>The operator has independently verified that Example Plugin Team
+  controls <code>plugins.example</code>.</li>
+<li>The publisher has authorized the corresponding <code>urn:air</code> identifier.</li>
+</ul>
+<p>Under these assumptions, the operator can represent the marketplace as
+follows:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:anthropic:example-plugin&quot;</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example-plugin&quot;</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/ai-catalog+json&quot;</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Comprehensive plugin with commands, agents, skills, and MCP servers&quot;</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;development&quot;</span><span class="p">],</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;did:web:anthropic.com&quot;</span><span class="p">,</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Anthropic&quot;</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">&quot;specVersion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">&quot;entries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span><span class="p">{</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">        </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:anthropic:example-plugin:mcp&quot;</span><span class="p">,</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/mcp-server-card+json&quot;</span><span class="p">,</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/anthropics/claude-plugins-official/blob/main/plugins/example-plugin/server-card.json&quot;</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="p">{</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">        </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:claude-plugin:anthropic:example-plugin:skills&quot;</span><span class="p">,</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Plugin Skills&quot;</span><span class="p">,</span>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/agent-skills+zip&quot;</span><span class="p">,</span>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">        </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://github.com/anthropics/claude-plugins-official/tree/main/plugins/example-plugin/skills.zip&quot;</span>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">      </span><span class="p">}</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">    </span><span class="p">]</span>
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="p">}</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;specVersion&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Marketplace Team&quot;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nt">&quot;entries&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;urn:air:plugins.example:claude-code:review-tools&quot;</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;application/vnd.example.claude-code-plugin+json&quot;</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://plugins.example/artifacts/review-tools/1.2.0/plugin.json&quot;</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;development&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;code-review&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;review&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;quality&quot;</span><span class="p">],</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="nt">&quot;publisher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">        </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;plugins.example&quot;</span><span class="p">,</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">        </span><span class="nt">&quot;displayName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Example Plugin Team&quot;</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">      </span><span class="p">}</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>The output omits the marketplace identifier and description because
+they have no direct core equivalent. It leaves the plugin's canonical
+display metadata, version, and descriptive links in the manifest while
+merging the available discovery terms into entry <code>tags</code>. The entry
+identifier, type, artifact URL, host display name, and publisher
+identity are explicit operator inputs or policy decisions rather than
+values mechanically derived from <code>marketplace.json</code>.</p>
 <h2 id="what-ai-catalog-adds-to-the-marketplace">What AI Catalog Adds to the Marketplace<a class="headerlink" href="#what-ai-catalog-adds-to-the-marketplace" title="Permanent link">&para;</a></h2>
 <p>The <code>marketplace.json</code> format is a lightweight directory focused on
-listing available plugins. AI Catalog extends this with:</p>
+listing and installing Claude Code plugins. Representing those plugins
+in AI Catalog adds:</p>
 <ol>
-<li>
-<p><strong>Trust and identity</strong>: The marketplace has no signing, attestation,
-   or publisher verification. Trust Manifests provide verifiable
-   publisher identity and compliance metadata.</p>
-</li>
-<li>
-<p><strong>Source integrity</strong>: The marketplace includes optional <code>sha</code> fields
-   on source references. AI Catalog formalizes this as provenance links
-   with typed relations and cryptographic digests.</p>
-</li>
 <li>
 <p><strong>Cross-ecosystem discovery</strong>: Plugins become discoverable alongside
    MCP servers, A2A agents, and other artifacts through the standard
-   <code>/.well-known/ai-catalog.json</code> convention — not only within Claude
+   <code>/.well-known/ai-catalog.json</code> convention, not only within Claude
    Code's <code>/plugin</code> system.</p>
 </li>
 <li>
-<p><strong>Media type identification</strong>: The marketplace does not type its
-   plugins. AI Catalog assigns <code>application/vnd.anthropic.claude-plugin+json</code>
-   enabling clients to filter and route by artifact type.</p>
+<p><strong>Explicit artifact representation</strong>: Each entry declares the type
+   of document its <code>url</code> retrieves or its <code>data</code> contains, so consumers
+   can filter and route artifacts without interpreting Claude
+   installation locators.</p>
 </li>
 <li>
-<p><strong>Composability</strong>: Plugin packages that combine skills, MCP servers,
-   and commands can be represented as nested catalogs, making the
-   internal structure of a plugin package explicit and independently
-   addressable.</p>
-</li>
-<li>
-<p><strong>Decentralized publishing</strong>: Any domain can publish Claude Code
-   plugins via AI Catalog without submitting to the centralized
-   marketplace repository.</p>
+<p><strong>Independent identity and trust</strong>: Publishers can add verifiable
+   identifiers, attestations, and provenance when they possess that
+   information. The projection does not infer those claims from owner,
+   author, or source metadata.</p>
 </li>
 </ol>
 
