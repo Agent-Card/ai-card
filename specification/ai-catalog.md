@@ -526,6 +526,16 @@ payload, rather than inferred only from unsigned entry context.
 When a Trust Manifest appears on a Host Info object, `identity`
 SHOULD match the host's `identifier` field when present.
 
+An artifact may legitimately hold more than one verifiable identity at
+the same time, for example a SPIFFE ID for runtime workload identity
+and a DID for publisher-anchored organizational identity, or it may
+retain a former identifier after a rename or migration between
+identities or schemes. Additional identities are declared through the
+OPTIONAL `alsoKnownAs` member (see [Optional Members](#optional-members)). 
+The `identity` field remains the single canonical subject identifier:
+consumers MUST use `identity` when referencing the artifact's trust
+subject or checking identity equivalence between entries.
+
 When multiple entries share the same `identifier` (with different `version`
 values), each entry MAY carry its own Trust Manifest. There is no
 requirement that all versions carry identical trust metadata — trust
@@ -561,9 +571,46 @@ present.
 The following members are OPTIONAL:
 
 `identityType`
-: A string providing a type hint for the identity URI (e.g., "did",
+: A string providing a type hint for the `identity` URI (e.g., "did",
   "spiffe", "dns"). This field is OPTIONAL when the type is evident
-  from the URI scheme.
+  from the URI scheme. It describes only `identity`; each entry of
+  `alsoKnownAs` carries its own `identityType` member.
+
+`alsoKnownAs`
+: An array of Identity Alias objects, each asserting an identity of
+  the same subject as `identity` under an alternative identity
+  scheme. An Identity Alias object MUST contain:
+
+    `identity`
+    : A string containing a globally unique URI [[RFC3986]] that
+      identifies the same subject as the manifest's canonical
+      `identity`.
+
+    An Identity Alias object MAY contain:
+
+    `identityType`
+    : A string providing a type hint for the alias `identity` URI
+      (e.g., "did", "spiffe", "dns"). This member is OPTIONAL when
+      the type is evident from the URI scheme.
+
+    The following rules apply:
+
+    - An alias is an equivalent identity of the subject; the
+      manifest's `identity` alone remains canonical and is used for
+      referencing and equivalence checking. Aliases MAY also record
+      former identifiers of the subject, preserving continuity after
+      a rename or a migration between identities or schemes.
+    - The array is an unordered set: it MUST NOT contain two aliases
+      with the same `identity` value, and no alias `identity` may
+      equal the manifest's canonical `identity`.
+    - The domain-alignment rule defined in [Identity](#identity)
+      applies only to the canonical `identity`. Aliases MAY belong to
+      different trust domains or identity schemes.
+    - Aliases are publisher claims covered by the Trust Manifest
+      `signature`; no per-alias proof is required. Consumers MUST NOT
+      rely on an alias from a manifest whose signature is absent or
+      fails verification (see
+      [Verifying Alternative Identities](#verifying-alternative-identities)).
 
 `trustSchema`
 : A Trust Schema object as defined in [Trust Schema](#trust-schema-object).
@@ -621,6 +668,12 @@ provenance:
 {
   "identity": "did:web:acme.com:agent:finance",
   "identityType": "did",
+  "alsoKnownAs": [
+    {
+      "identity": "spiffe://acme.com/ns/finance/sa/finance-agent-pod",
+      "identityType": "spiffe"
+    }
+  ],
   "trustSchema": {
     "identifier": "urn:trust:acme-enterprise-v1",
     "version": "1.0",
@@ -971,6 +1024,34 @@ The `publisher` object resides on the Catalog Entry, outside the Trust
 Manifest signature. Consumers MUST treat `publisher` fields as advisory
 unless a verified `publisher-identity` attestation cryptographically
 binds `publisher.identifier` to the signed manifest's `identity`.
+
+### Verifying Alternative Identities
+
+Aliases need no verification procedure of their own. Because the
+signed payload covers `alsoKnownAs`, verifying the Trust Manifest
+`signature` as described in
+[Trust Manifest Signatures](#trust-manifest-signatures) also verifies
+every listed alias: a valid signature proves that the publisher
+controlling the canonical `identity` claims each alias as an
+equivalent identity of the subject. Consumers MUST NOT rely on aliases
+from a manifest whose signature is absent or fails verification.
+
+Signature verification itself always keys off the canonical identity:
+the verification key is resolved from `identity` as described in
+[Trust Manifest Signatures](#trust-manifest-signatures). A consumer
+that cannot resolve the canonical identity scheme cannot verify the
+signature and therefore cannot rely on any alias.
+
+Once the signature is verified, a consumer MAY use whichever identity,
+canonical or alias, fits the identity schemes its tooling operates
+on. For example, after verifying the signature through a resolvable
+canonical DID `identity`, the consumer can use a SPIFFE ID alias to
+match the artifact's runtime workload identity.
+
+Note that the signature proves the publisher claims the alias, not
+that the alias's own trust domain acknowledges the link. Consumers
+making authorization decisions inside the alias's trust domain MAY
+additionally obtain proof of control native to the alias scheme.
 
 ### Verifying Artifact Integrity
 
@@ -1537,6 +1618,7 @@ classDiagram
     class TrustManifest {
         identity string
         subject Subject
+        alsoKnownAs IdentityAlias[]
         trustSchema TrustSchema
         attestations Attestation[]
         provenance ProvenanceLink[]
@@ -1547,6 +1629,10 @@ classDiagram
         url string
         type string
         digest string
+    }
+    class IdentityAlias {
+        identity string
+        identityType string
     }
     class TrustSchema {
         identifier string
@@ -1569,6 +1655,7 @@ classDiagram
     CatalogEntry --> "0..1" TrustManifest : trustManifest
     HostInfo --> "0..1" TrustManifest : trustManifest
     TrustManifest --> "0..1" Subject : subject
+    TrustManifest --> "*" IdentityAlias : alsoKnownAs
     TrustManifest --> "0..1" TrustSchema : trustSchema
     TrustManifest --> "*" Attestation : attestations
     TrustManifest --> "*" ProvenanceLink : provenance
@@ -1709,6 +1796,7 @@ Publisher = {
 TrustManifest = {
   identity: text,
   ? identityType: text,
+  ? alsoKnownAs: [* IdentityAlias],
   ? trustSchema: TrustSchema,
   ? attestations: [* Attestation],
   ? provenance: [* ProvenanceLink],
@@ -1716,6 +1804,11 @@ TrustManifest = {
   ? termsOfServiceUrl: text,
   ? signature: text,
   ? extensions: { * text => any }
+}
+
+IdentityAlias = {
+  identity: text,
+  ? identityType: text
 }
 
 TrustSchema = {
@@ -1771,6 +1864,12 @@ artifact types including a nested catalog packaging related artifacts:
       "trustManifest": {
         "identity": "spiffe://acme.com/ns/finance/sa/finance-a2a-pod",
         "identityType": "spiffe",
+        "alsoKnownAs": [
+          {
+            "identity": "did:web:acme-corp.com:agent:finance-a2a",
+            "identityType": "did"
+          }
+        ],
         "attestations": [
           {
             "type": "publisher-identity",
