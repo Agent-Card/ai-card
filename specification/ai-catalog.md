@@ -619,7 +619,7 @@ provenance:
 
 ```json
 {
-  "identity": "did:web:acme.com:agent:finance",
+  "identity": "did:web:acme-corp.com:agent:finance",
   "identityType": "did",
   "trustSchema": {
     "identifier": "urn:trust:acme-enterprise-v1",
@@ -649,6 +649,8 @@ provenance:
   "privacyPolicyUrl": "https://acme-corp.com/legal/privacy",
   "termsOfServiceUrl": "https://acme-corp.com/legal/terms",
   "subject": {
+    "identifier": "urn:air:acme-corp.com:agent:finance",
+    "version": "2.1.0",
     "url": "https://api.acme-corp.com/agents/finance/v2.1.json",
     "type": "application/a2a-agent-card+json",
     "digest": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
@@ -660,14 +662,21 @@ provenance:
 
 ## Subject Binding
 
-The Subject object binds a Trust Manifest to the specific artifact it
-describes, closing the substitution gap in which an attacker who
-controls the catalog document leaves a validly-signed Trust Manifest in
-place but repoints the entry to a different artifact. Because the
-Subject is part of the signed payload, the artifact reference and its
-content digest cannot be changed without invalidating the signature.
+The Subject object binds a Trust Manifest to the specific artifact release it
+describes, closing substitution gaps in which an attacker who controls the
+catalog document leaves a validly-signed Trust Manifest in place but repoints
+the entry, assigns the manifest to another logical artifact, or relabels the
+artifact as another version. Because the Subject is part of the signed
+payload, the release coordinates, artifact reference when present, and content
+digest cannot be changed without invalidating the signature.
 
 A Subject object MUST contain:
+
+`identifier`
+: A string containing the logical identifier of the bound artifact. When the
+  Subject appears in a Trust Manifest on a Catalog Entry, this MUST exactly
+  equal the containing entry's `identifier`. Consumers MUST reject a signed
+  entry Trust Manifest when these values differ.
 
 `type`
 : A string containing the media type of the bound artifact. This MUST
@@ -680,7 +689,16 @@ A Subject object MUST contain:
   bytes served. For an artifact embedded in `data`, the digest is
   computed over the JCS-canonicalized [[RFC8785]] JSON value.
 
-The following member is OPTIONAL:
+The following members are OPTIONAL in the Subject data model:
+
+`version`
+: A string containing the version of the bound artifact release. A signed
+  Trust Manifest on a Catalog Entry MUST include `subject.version` when the
+  containing entry has a `version`, and the two values MUST be exactly equal.
+  When the containing entry omits `version`, `subject.version` MAY still
+  describe the artifact release and no entry-version comparison is required.
+  Consumers MUST reject a signed entry Trust Manifest that violates these
+  requirements.
 
 `url`
 : A string containing the URL of the bound artifact. When present, it
@@ -688,16 +706,19 @@ The following member is OPTIONAL:
   a Trust Manifest whose `subject.url` does not match the entry's `url`.
 
 A Trust Manifest that carries a `signature` MUST include a `subject`.
-When verifying such a manifest, consumers MUST confirm that the fetched
-artifact's media type and digest match the `subject` before relying on
-any claim in the Trust Manifest. See
+When verifying a signed entry Trust Manifest, consumers MUST confirm that the
+entry's identifier, version when present, and media type match the `subject`,
+and that the artifact content matches `subject.digest`, before relying on any
+claim in the Trust Manifest. See
 [Verifying Artifact Integrity](#verifying-artifact-integrity).
 
-The `subject.type` and `subject.url` intentionally restate the
-entry's `type` and `url` so that those values fall within the signed
-payload. This is a deliberate duplication, not redundant metadata:
-without it, an attacker who controls the catalog document could change
-the entry's media type or location without invalidating the signature.
+The `subject.identifier`, `subject.type`, and optional `subject.url`
+intentionally restate values from the Catalog Entry so that they fall within
+the signed payload. When the entry declares a version, `subject.version`
+restates it for the same reason. This is deliberate duplication, not redundant
+metadata: without it, an attacker who controls the catalog document could
+change the artifact's logical identifier, release version, media type, or
+location without invalidating the signature.
 
 ## Trust Schema Object
 
@@ -867,8 +888,9 @@ members. To create or verify a signature:
 
 This approach ensures the signature is stable regardless of JSON key
 ordering or whitespace. Because the signed payload includes the
-`subject` binding, a verified signature commits the publisher to a
-specific artifact digest, not merely to the trust claims.
+`subject` binding, a verified entry Trust Manifest commits the signer's claims
+to a specific logical artifact release and representation, not merely to an
+unidentified artifact representation.
 
 Producers SHOULD avoid placing numeric values that do not round-trip
 under JCS serialization (e.g., integers outside the range exactly
@@ -981,20 +1003,24 @@ To verify artifact integrity:
 1. Verify the Trust Manifest signature
    ([Trust Manifest Signatures](#trust-manifest-signatures)) and anchor
    the identity ([Trust Anchoring](#trust-anchoring)).
-2. Confirm `subject.type` equals the entry's `type`, and, when
+2. Confirm `subject.identifier` exactly equals the entry's `identifier`.
+3. When the entry has a `version`, confirm `subject.version` is present and
+   exactly equal.
+4. Confirm `subject.type` equals the entry's `type`, and, when
    `subject.url` is present, that it equals the entry's `url`.
-3. Fetch the artifact content from the entry's `url`, or take it from
+5. Fetch the artifact content from the entry's `url`, or take it from
    the entry's `data`, observing the limits in
    [Safe Fetching](#safe-fetching).
-4. Compute the digest of the fetched bytes (for `url`) or of the
+6. Compute the digest of the fetched bytes (for `url`) or of the
    JCS-canonicalized value (for `data`) using the algorithm named in
    `subject.digest`.
-5. Compare the computed digest to `subject.digest`. Reject the artifact
+7. Compare the computed digest to `subject.digest`. Reject the artifact
    if they differ.
 
 Because the `subject` is part of the signed payload, this check binds
-the publisher's signature to the exact artifact, defeating catalog-level
-substitution of the artifact URL or content. The OPTIONAL
+the verified signature to the logical artifact release and its exact
+representation, defeating catalog-level substitution or relabeling of the
+artifact identifier, version, URL, media type, or content. The OPTIONAL
 `provenance[].sourceDigest` records the digest of an upstream *source*
 (e.g., a Git commit) and is complementary to — not a substitute for —
 the `subject` digest.
@@ -1335,7 +1361,9 @@ In addition to Level 2 requirements, a Trusted Catalog:
   an `issuedAt` timestamp
 - Consumers MUST verify the signature, anchor the identity
   ([Trust Anchoring](#trust-anchoring)), and confirm the `subject`
-  digest before relying on any claim
+  digest before relying on any claim. For an entry Trust Manifest, consumers
+  MUST also confirm the subject's identifier, version when the entry declares
+  one, media type, and optional URL against the containing entry
 - SHOULD provide catalog-level integrity, either by serving the catalog
   through a content-addressed channel (see
   [Security Considerations](#security-considerations)) or by including a
@@ -1377,17 +1405,18 @@ appropriate to their threat model.
 
 **Layer 2 — Signed Trust Manifest**
 : The Trust Manifest includes a `signature` field (detached JWS) and a
-  `subject` that binds the signature to the artifact's content digest
-  (see [Subject Binding](#subject-binding)). The consumer verifies the
-  signature, anchors the signer's identity to a trust root
-  ([Trust Anchoring](#trust-anchoring)), and confirms the `subject`
-  digest before trusting any claim. This closes the substitution gap
-  from Layer 1: because the signed payload commits to the artifact
-  digest, an attacker cannot repoint the entry to a different artifact
-  or forge claims without the publisher's private key. Consumers that
-  rely on trust metadata MUST verify signatures and MUST reject Trust
-  Manifests whose signature does not validate, whose `subject` does not
-  match the fetched artifact, or whose identity cannot be anchored.
+  `subject` that binds the signature to the artifact's logical identifier,
+  version when present, media type, and content digest (see
+  [Subject Binding](#subject-binding)). The consumer verifies the signature,
+  anchors the signer's identity to a trust root
+  ([Trust Anchoring](#trust-anchoring)), and confirms the `subject` bindings
+  before trusting any claim. This closes the substitution gap from Layer 1:
+  because the signed payload commits to the logical release and its
+  representation, an attacker cannot relabel or repoint the entry to a
+  different artifact or forge claims without the signer's private key.
+  Consumers that rely on trust metadata MUST verify signatures and MUST
+  reject Trust Manifests whose signature does not validate, whose `subject`
+  does not match the fetched artifact, or whose identity cannot be anchored.
 
 **Layer 3 — Content-Addressed Distribution (OCI)**
 : The catalog is distributed through an OCI registry where all content
@@ -1427,9 +1456,9 @@ this threat:
   unauthorized modification.
 - **Layer 1** enables post-fetch integrity checks but does not prevent
   whole-entry substitution.
-- **Layer 2** binds the signed Trust Manifest to the artifact digest
-  via `subject`, preventing both Trust Manifest forgery and artifact
-  substitution under a valid signature.
+- **Layer 2** binds the signed Trust Manifest to the logical artifact release
+  and its representation via `subject`, preventing Trust Manifest forgery and
+  artifact substitution or relabeling under a valid signature.
 - **Layer 3** makes modification structurally impossible through
   content-addressing.
 
@@ -1442,9 +1471,10 @@ both. This specification defends against substitution with three
 compounding mechanisms:
 
 - **Subject binding.** A signed Trust Manifest MUST include a `subject`
-  that commits to the artifact's media type and content digest (see
-  [Subject Binding](#subject-binding)). The artifact reference therefore
-  cannot be changed without invalidating the signature.
+  that commits to the artifact's logical identifier, version when present,
+  media type, and content digest (see [Subject Binding](#subject-binding)).
+  The artifact release or representation therefore cannot be changed without
+  invalidating the signature.
 - **Trust anchoring.** A signature is only meaningful once the signer's
   identity is anchored to a trust root established out of band (see
   [Trust Anchoring](#trust-anchoring)); otherwise an attacker can sign a
@@ -1544,6 +1574,8 @@ classDiagram
         signature string
     }
     class Subject {
+        identifier string
+        version string
         url string
         type string
         digest string
@@ -1714,8 +1746,19 @@ TrustManifest = {
   ? provenance: [* ProvenanceLink],
   ? privacyPolicyUrl: text,
   ? termsOfServiceUrl: text,
+  ? subject: Subject,
+  ? issuedAt: tdate,
+  ? expiresAt: tdate,
   ? signature: text,
   ? extensions: { * text => any }
+}
+
+Subject = {
+  identifier: text,
+  ? version: text,
+  type: text,
+  digest: text,
+  ? url: text
 }
 
 TrustSchema = {
@@ -1835,7 +1878,13 @@ artifact types including a nested catalog packaging related artifacts:
         ]
       },
       "trustManifest": {
-        "identity": "urn:air:acme.com:plugin:finance-suite",
+        "identity": "did:web:acme.com:plugin:finance-suite",
+        "subject": {
+          "identifier": "urn:air:acme.com:plugin:finance-suite",
+          "type": "application/ai-catalog+json",
+          "digest": "sha256:22223333444455556666777788889999aaaabbbbccccddddeeeeffff00001111"
+        },
+        "issuedAt": "2026-03-20T14:00:00Z",
         "signature": "eyJhbGciOiJFUzI1NiJ9..detached"
       },
       "updatedAt": "2026-03-20T14:00:00Z"
